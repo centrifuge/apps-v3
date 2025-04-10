@@ -1,10 +1,15 @@
 import { Meta, StoryFn } from '@storybook/react'
 import * as React from 'react'
-import { AnchorButton as AnchorButtonComp, Button as ButtonComp } from '.'
-import { IconChevronDown, IconClock } from '../../icon'
+import {
+  AnchorButton as AnchorButtonComp,
+  Button as ButtonComp,
+  WalletButton as WalletButtonComp,
+  BackButton as BackButtonComp,
+  VisualButton as VisualButtonComp
+} from '.'
+import { IconChevronDown, IconClock, IconAward, IconCoffee } from '../../icon'
 import { Grid } from '../Grid'
 import { Shelf } from '../Shelf'
-import { WalletButton as WalletButtonComp } from './WalletButton'
 
 export default {
   title: 'Components/Button',
@@ -14,6 +19,8 @@ export default {
 type ButtonStory = StoryFn<typeof ButtonComp>
 type AnchorButtonStory = StoryFn<typeof AnchorButtonComp>
 type WalletButtonStory = StoryFn<typeof WalletButtonComp>
+type BackButtonStory = StoryFn<typeof BackButtonComp>
+type VisualButtonStory = StoryFn<typeof VisualButtonComp>
 
 const Template: ButtonStory = (args): React.ReactElement => (
   <Grid columns={5} gap={3} justifyItems="start" maxWidth={800} equalColumns>
@@ -81,4 +88,31 @@ WalletButton.args = {
   disabled: false,
   loading: false,
   active: false,
+}
+
+export const BackButton: BackButtonStory = (args) => <BackButtonComp {...args} />
+BackButton.args = {
+  label: 'Back',
+  to: '#',
+  width: '200px',
+}
+
+export const VisualButton: VisualButtonStory = (args) => (
+  <Grid columns={5} gap={3} justifyItems="space-between" equalColumns>
+    <VisualButtonComp {...args} variant='primary' />
+    <VisualButtonComp {...args} variant='secondary' />
+    <VisualButtonComp {...args} variant='tertiary' />
+    <VisualButtonComp {...args} variant='wallet' />
+    <VisualButtonComp {...args} variant='inverted' />
+  </Grid>
+)
+VisualButton.args = {
+  variant: 'primary',
+  small: false,
+  icon: IconAward,
+  iconRight: IconCoffee,
+  disabled: false,
+  loading: false,
+  loadingMessage: 'Loading',
+  active: true
 }
