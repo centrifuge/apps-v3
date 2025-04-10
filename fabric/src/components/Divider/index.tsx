@@ -1,7 +1,7 @@
 import styled from 'styled-components'
 import { Box } from '../Box'
 
-const Hr = Box.withComponent('hr')
+const Hr = Box
 
 export const Divider = styled(Hr)`
   margin: 0;

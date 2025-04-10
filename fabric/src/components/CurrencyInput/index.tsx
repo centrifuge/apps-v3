@@ -14,7 +14,7 @@ export type CurrencyInputProps = Omit<React.InputHTMLAttributes<HTMLInputElement
     small?: boolean
   }
 
-const StyledMaxButton = styled(Box)`
+const StyledMaxButton = styled(Box).attrs({ as: 'button' })`
   padding: 0 8px;
   border: 0;
   border-radius: 12px;
@@ -30,11 +30,11 @@ const StyledMaxButton = styled(Box)`
   &:focus-visible {
     box-shadow: ${({ theme }) => theme.shadows.buttonPrimary};
   }
-`.withComponent('button')
+`
 
-StyledMaxButton.defaultProps = {
-  type: 'button',
-}
+// StyledMaxButton.defaultProps = {
+//   type: 'button',
+// }
 
 export function CurrencyInput({
   id,
