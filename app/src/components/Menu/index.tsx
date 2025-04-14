@@ -22,6 +22,7 @@ const COLOR = '#7C8085'
 export const StyledRouterButton = styled(Text)<{ isLarge?: boolean }>`
   display: flex;
   flex-direction: row;
+  text-decoration: none;
   align-items: ${({ isLarge }) => (isLarge ? 'center' : 'flex-start')};
   padding: 6px;
   margin: 4px;

@@ -1,7 +1,6 @@
 import { Navigate } from 'react-router-dom'
 import { RouteObject } from "react-router-dom";
 import { LayoutBase } from './components/LayoutBase'
-import './Root.css'
 import { AboutPage } from './pages/About'
 import { NotFoundPage } from './pages/NotFound'
 import { HomePage } from './pages/Home';
