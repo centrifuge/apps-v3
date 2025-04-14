@@ -1,9 +1,6 @@
 import styled from 'styled-components'
-import { Box } from '../Box'
 
-const Hr = Box
-
-export const Divider = styled(Hr)`
+export const Divider = styled('hr')`
   margin: 0;
   border-top-width: 1px;
   border-right-width: 0;
@@ -13,6 +10,5 @@ export const Divider = styled(Hr)`
 `
 
 Divider.defaultProps = {
-  width: '100%',
-  borderColor: 'borderPrimary',
+  color: 'borderPrimary',
 }
