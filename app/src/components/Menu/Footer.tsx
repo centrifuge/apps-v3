@@ -1,7 +1,7 @@
 import { Stack, Text } from '@centrifuge/fabric'
 import * as React from 'react'
 import styled from 'styled-components'
-import { InvestmentDisclaimerDialog } from './Dialogs/InvestmentDisclaimerDialog'
+import { InvestmentDisclaimerDialog } from '../Dialogs/InvestmentDisclaimerDialog'
 
 export const Footer = () => {
   const [isDialogOpen, setIsDialogOpen] = React.useState(false)

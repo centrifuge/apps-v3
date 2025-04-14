@@ -1,7 +1,7 @@
 import React from 'react'
 import { centrifugeTheme } from '@centrifuge/fabric'
 import { DefaultTheme } from 'styled-components'
-import { LogoCentrifuge, LogoCentrifugeText } from './components/LogoCentrifuge'
+import { LogoCentrifuge, LogoCentrifugeText } from './components/LayoutBase/LogoCentrifuge'
 
 export const lightTheme: DefaultTheme = {
   ...centrifugeTheme,

@@ -1,24 +1,32 @@
-import React from "react";
+import { Navigate } from 'react-router-dom'
 import { RouteObject } from "react-router-dom";
-import App from "./App";
-import { HomePage } from "./pages/Home";
-import { AboutPage } from "./pages/About";
-import { ErrorPage } from "./pages/Error";
+import { LayoutBase } from './components/LayoutBase'
+import './Root.css'
+import { AboutPage } from './pages/About'
+import { NotFoundPage } from './pages/NotFound'
+import { HomePage } from './pages/Home';
 
 export const routes: RouteObject[] = [
   {
-    path: "/",
-    element: <App />,
-    errorElement: <ErrorPage />,
+    path: '/',
+    element: <LayoutBase />,
     children: [
       {
-        index: true,
-        element: <HomePage />,
+        path: '/',
+        element: <Navigate to="/pools" replace />,
       },
       {
-        path: "about",
-        element: <AboutPage />,
+        path: '/pools/*',
+        element: <HomePage />,
+        handle: { component: HomePage },
       },
+      {
+        path: '/dashboard/*',
+        element: <AboutPage />,
+        handle: { component: AboutPage },
+      },
+      { path: '*', element: <NotFoundPage />, handle: { component: NotFoundPage } },
     ],
+    errorElement: <NotFoundPage />,
   },
 ];
