@@ -4,11 +4,14 @@
   "private": true,
   "description": "Centrifuge Apps V3 Workspace",
   "scripts": {
+    "preinstall": "npx only-allow pnpm",
     "dev:app": "pnpm --filter app dev",
     "dev:functions": "pnpm --filter functions dev",
     "build:app": "pnpm --filter app build",
     "build:functions": "pnpm --filter functions build",
-    "dev": "concurrently \"pnpm dev:app\" \"pnpm dev:functions\""
+    "dev": "concurrently \"pnpm dev:app\" \"pnpm dev:functions\"",
+    "lint": "eslint -c .eslintrc.js '*/**/*.{js,ts,tsx}'",
+    "lint:fix": "npm run lint -- --fix"
   },
   "engines": {
     "node": ">=18",
