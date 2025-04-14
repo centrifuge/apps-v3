@@ -95,7 +95,7 @@ export function ToggleMenu({
         <Grid display="flex" flexDirection="column" mt={1}>
           {links.map((link) => (
             <RouterButton
-              as="a"
+              as={Link}
               color="white"
               href={onchainVoting.find((l) => l.label === link)?.href}
               target="_blank"

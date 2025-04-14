@@ -10,7 +10,6 @@
   ],
   "scripts": {
     "build": "pnpm build:icons && tsc",
-    "prepare": "pnpm build",
     "bump": "standard-version --sign",
     "storybook": " pnpm build:icons --ignore-existing && storybook dev -p 6006",
     "build-storybook": "storybook build",
@@ -38,8 +37,8 @@
     "@typescript-eslint/parser": "^4.32.0",
     "csstype": "^3.0.9",
     "prettier": "^2.4.1",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "standard-version": "^9.3.2",
     "storybook": "^7.6.10",
     "styled-components": "^5.3.6",
@@ -56,7 +55,6 @@
     "styled-components": "*"
   },
   "dependencies": {
-    "@polkadot/react-identicon": "^2.12.1",
     "@react-aria/button": "^3.3.4",
     "@react-aria/dialog": "^3.1.4",
     "@react-aria/focus": "^3.5.0",

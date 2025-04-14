@@ -1,17 +1,17 @@
 {
-  "date": "2025-04-04T22:49:58.034Z",
+  "date": "2025-04-14T16:06:25.836Z",
   "preset": "nitro-dev",
   "framework": {
     "name": "nitro",
     "version": ""
   },
   "versions": {
-    "nitro": "2.11.8"
+    "nitro": "2.11.9"
   },
   "dev": {
-    "pid": 82827,
+    "pid": 27606,
     "workerAddress": {
-      "socketPath": "/var/folders/43/pxgcgz6s5sn7lw42b3492n8h0000gn/T/nitro-worker-82827-1-1-3345.sock"
+      "socketPath": "/var/folders/z_/8rzc2zyd02gcfrm_2wx18p5h0000gn/T/nitro-worker-27606-1-1-1014.sock"
     }
   }
 }

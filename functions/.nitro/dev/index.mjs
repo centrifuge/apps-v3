@@ -1,31 +1,29 @@
 import process from 'node:process';globalThis._importMeta_={url:import.meta.url,env:process.env};import { tmpdir } from 'node:os';
-import destr from 'file:///Users/sophial/Code/Work/Centrifuge/apps-v3/node_modules/.pnpm/destr@2.0.5/node_modules/destr/dist/index.mjs';
-import { defineEventHandler, handleCacheHeaders, splitCookiesString, createEvent, fetchWithEvent, isEvent, eventHandler, setHeaders, sendRedirect, proxyRequest, getRequestURL, getRequestHeader, getResponseHeader, getRequestHeaders, setResponseHeaders, setResponseStatus, send, createApp, createRouter as createRouter$1, toNodeListener, lazyEventHandler, createError, getRouterParam, readBody, getQuery as getQuery$1 } from 'file:///Users/sophial/Code/Work/Centrifuge/apps-v3/node_modules/.pnpm/h3@1.15.1/node_modules/h3/dist/index.mjs';
-import { createHooks } from 'file:///Users/sophial/Code/Work/Centrifuge/apps-v3/node_modules/.pnpm/hookable@5.5.3/node_modules/hookable/dist/index.mjs';
-import { createFetch, Headers as Headers$1 } from 'file:///Users/sophial/Code/Work/Centrifuge/apps-v3/node_modules/.pnpm/ofetch@1.4.1/node_modules/ofetch/dist/node.mjs';
-import { fetchNodeRequestHandler, callNodeRequestHandler } from 'file:///Users/sophial/Code/Work/Centrifuge/apps-v3/node_modules/.pnpm/node-mock-http@1.0.0/node_modules/node-mock-http/dist/index.mjs';
-import { parseURL, withoutBase, joinURL, getQuery, withQuery } from 'file:///Users/sophial/Code/Work/Centrifuge/apps-v3/node_modules/.pnpm/ufo@1.5.4/node_modules/ufo/dist/index.mjs';
-import { prefixStorage } from 'file:///Users/sophial/Code/Work/Centrifuge/apps-v3/node_modules/.pnpm/unstorage@1.15.0_db0@0.3.1_ioredis@5.6.0/node_modules/unstorage/dist/index.mjs';
-import { createStorage } from 'file:///Users/sophial/Code/Work/Centrifuge/apps-v3/functions/node_modules/unstorage/dist/index.mjs';
-import unstorage_47drivers_47fs from 'file:///Users/sophial/Code/Work/Centrifuge/apps-v3/functions/node_modules/unstorage/drivers/fs.mjs';
-import { digest } from 'file:///Users/sophial/Code/Work/Centrifuge/apps-v3/node_modules/.pnpm/ohash@2.0.11/node_modules/ohash/dist/index.mjs';
-import { klona } from 'file:///Users/sophial/Code/Work/Centrifuge/apps-v3/node_modules/.pnpm/klona@2.0.6/node_modules/klona/dist/index.mjs';
-import { defuFn } from 'file:///Users/sophial/Code/Work/Centrifuge/apps-v3/functions/node_modules/defu/dist/defu.mjs';
-import { snakeCase } from 'file:///Users/sophial/Code/Work/Centrifuge/apps-v3/node_modules/.pnpm/scule@1.3.0/node_modules/scule/dist/index.mjs';
-import { getContext } from 'file:///Users/sophial/Code/Work/Centrifuge/apps-v3/node_modules/.pnpm/unctx@2.4.1/node_modules/unctx/dist/index.mjs';
-import defu from 'file:///Users/sophial/Code/Work/Centrifuge/apps-v3/node_modules/.pnpm/defu@6.1.4/node_modules/defu/dist/defu.mjs';
-import { toRouteMatcher, createRouter } from 'file:///Users/sophial/Code/Work/Centrifuge/apps-v3/node_modules/.pnpm/radix3@1.1.2/node_modules/radix3/dist/index.mjs';
+import destr from 'file:///Users/katie/centrifuge/apps-v3/node_modules/destr/dist/index.mjs';
+import { defineEventHandler, handleCacheHeaders, splitCookiesString, createEvent, fetchWithEvent, isEvent, eventHandler, setHeaders, sendRedirect, proxyRequest, getRequestURL, getRequestHeader, getResponseHeader, getRequestHeaders, setResponseHeaders, setResponseStatus, send, createApp, createRouter as createRouter$1, toNodeListener, lazyEventHandler, createError, getRouterParam, readBody, getQuery as getQuery$1 } from 'file:///Users/katie/centrifuge/apps-v3/node_modules/h3/dist/index.mjs';
+import { createHooks } from 'file:///Users/katie/centrifuge/apps-v3/node_modules/hookable/dist/index.mjs';
+import { createFetch, Headers as Headers$1 } from 'file:///Users/katie/centrifuge/apps-v3/node_modules/ofetch/dist/node.mjs';
+import { fetchNodeRequestHandler, callNodeRequestHandler } from 'file:///Users/katie/centrifuge/apps-v3/node_modules/node-mock-http/dist/index.mjs';
+import { parseURL, withoutBase, joinURL, getQuery, withQuery } from 'file:///Users/katie/centrifuge/apps-v3/node_modules/ufo/dist/index.mjs';
+import { createStorage, prefixStorage } from 'file:///Users/katie/centrifuge/apps-v3/node_modules/unstorage/dist/index.mjs';
+import unstorage_47drivers_47fs from 'file:///Users/katie/centrifuge/apps-v3/node_modules/unstorage/drivers/fs.mjs';
+import { digest } from 'file:///Users/katie/centrifuge/apps-v3/node_modules/ohash/dist/index.mjs';
+import { klona } from 'file:///Users/katie/centrifuge/apps-v3/node_modules/klona/dist/index.mjs';
+import defu, { defuFn } from 'file:///Users/katie/centrifuge/apps-v3/node_modules/defu/dist/defu.mjs';
+import { snakeCase } from 'file:///Users/katie/centrifuge/apps-v3/node_modules/scule/dist/index.mjs';
+import { getContext } from 'file:///Users/katie/centrifuge/apps-v3/node_modules/unctx/dist/index.mjs';
+import { toRouteMatcher, createRouter } from 'file:///Users/katie/centrifuge/apps-v3/node_modules/radix3/dist/index.mjs';
 import { readFile } from 'node:fs/promises';
 import { resolve, dirname, join } from 'node:path';
-import consola from 'file:///Users/sophial/Code/Work/Centrifuge/apps-v3/node_modules/.pnpm/consola@3.4.2/node_modules/consola/dist/index.mjs';
-import { ErrorParser } from 'file:///Users/sophial/Code/Work/Centrifuge/apps-v3/node_modules/.pnpm/youch-core@0.3.2/node_modules/youch-core/build/index.js';
-import { Youch } from 'file:///Users/sophial/Code/Work/Centrifuge/apps-v3/node_modules/.pnpm/youch@4.1.0-beta.6/node_modules/youch/build/index.js';
-import { SourceMapConsumer } from 'file:///Users/sophial/Code/Work/Centrifuge/apps-v3/node_modules/.pnpm/source-map@0.7.4/node_modules/source-map/source-map.js';
+import consola from 'file:///Users/katie/centrifuge/apps-v3/node_modules/consola/dist/index.mjs';
+import { ErrorParser } from 'file:///Users/katie/centrifuge/apps-v3/node_modules/youch-core/build/index.js';
+import { Youch } from 'file:///Users/katie/centrifuge/apps-v3/node_modules/youch/build/index.js';
+import { SourceMapConsumer } from 'file:///Users/katie/centrifuge/apps-v3/node_modules/nitropack/node_modules/source-map/source-map.js';
 import { Server } from 'node:http';
 import nodeCrypto from 'node:crypto';
 import { parentPort, threadId } from 'node:worker_threads';
 
-const serverAssets = [{"baseName":"server","dir":"/Users/sophial/Code/Work/Centrifuge/apps-v3/functions/assets"}];
+const serverAssets = [{"baseName":"server","dir":"/Users/katie/centrifuge/apps-v3/functions/assets"}];
 
 const assets = createStorage();
 
@@ -37,11 +35,11 @@ const storage = createStorage({});
 
 storage.mount('/assets', assets);
 
-storage.mount('root', unstorage_47drivers_47fs({"driver":"fs","readOnly":true,"base":"/Users/sophial/Code/Work/Centrifuge/apps-v3/functions"}));
-storage.mount('src', unstorage_47drivers_47fs({"driver":"fs","readOnly":true,"base":"/Users/sophial/Code/Work/Centrifuge/apps-v3/functions"}));
-storage.mount('build', unstorage_47drivers_47fs({"driver":"fs","readOnly":false,"base":"/Users/sophial/Code/Work/Centrifuge/apps-v3/functions/.nitro"}));
-storage.mount('cache', unstorage_47drivers_47fs({"driver":"fs","readOnly":false,"base":"/Users/sophial/Code/Work/Centrifuge/apps-v3/functions/.nitro/cache"}));
-storage.mount('data', unstorage_47drivers_47fs({"driver":"fs","base":"/Users/sophial/Code/Work/Centrifuge/apps-v3/functions/.data/kv"}));
+storage.mount('root', unstorage_47drivers_47fs({"driver":"fs","readOnly":true,"base":"/Users/katie/centrifuge/apps-v3/functions"}));
+storage.mount('src', unstorage_47drivers_47fs({"driver":"fs","readOnly":true,"base":"/Users/katie/centrifuge/apps-v3/functions"}));
+storage.mount('build', unstorage_47drivers_47fs({"driver":"fs","readOnly":false,"base":"/Users/katie/centrifuge/apps-v3/functions/.nitro"}));
+storage.mount('cache', unstorage_47drivers_47fs({"driver":"fs","readOnly":false,"base":"/Users/katie/centrifuge/apps-v3/functions/.nitro/cache"}));
+storage.mount('data', unstorage_47drivers_47fs({"driver":"fs","base":"/Users/katie/centrifuge/apps-v3/functions/.data/kv"}));
 
 function useStorage(base = "") {
   return base ? prefixStorage(storage, base) : storage;
@@ -918,10 +916,10 @@ const plugins = [
   
 ];
 
-const _lazy_DTVc6D = () => Promise.resolve().then(function () { return hello$1; });
+const _lazy_pXoAjY = () => Promise.resolve().then(function () { return hello$1; });
 
 const handlers = [
-  { route: '/api/hello', handler: _lazy_DTVc6D, lazy: true, middleware: false, method: undefined }
+  { route: '/api/hello', handler: _lazy_pXoAjY, lazy: true, middleware: false, method: undefined }
 ];
 
 function createNitroApp() {
