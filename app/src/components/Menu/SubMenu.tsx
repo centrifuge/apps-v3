@@ -38,6 +38,7 @@ const RouterButton = styled(Text)`
   color: white;
   font-size: 14px;
   border-radius: 4px;
+  font-family: ${({ theme }) => theme.fonts.standard};
   &:hover {
     color: ${({ theme }) => theme.colors.textGold};
     background-color: rgba(145, 150, 155, 0.13);
@@ -93,17 +94,19 @@ export function ToggleMenu({
       </Toggle>
       {open && (
         <Grid display="flex" flexDirection="column" mt={1}>
-          {links.map((link) => (
+          {links.map((link) => {
+            const toLink = onchainVoting.find((l) => l.label === link)?.href
+            return ( toLink ? (
             <RouterButton
               as={Link}
               color="white"
-              href={onchainVoting.find((l) => l.label === link)?.href}
+              to={toLink}
               target="_blank"
               style={{ textDecoration: 'none' }}
             >
               {link}
-            </RouterButton>
-          ))}
+            </RouterButton>) : null
+          )})}
         </Grid>
       )}
     </>
