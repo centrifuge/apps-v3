@@ -26,7 +26,7 @@ export const lightTheme: DefaultTheme = {
 
 type EnvironmentConfig = {
   name: string
-  logo: React.ComponentType<any>[]
+  logo: React.ComponentType[]
   themes: { light: DefaultTheme }
   defaultTheme: 'light' | 'dark'
 }

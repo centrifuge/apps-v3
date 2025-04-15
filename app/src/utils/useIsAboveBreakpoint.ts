@@ -6,7 +6,7 @@ type Breakpoint = string | keyof ThemeBreakpoints
 
 export function useIsAboveBreakpoint(bp: Breakpoint) {
   const theme = useTheme()
-  // @ts-ignore
+  // @ts-expect-error
   const query = `(min-width: ${theme.breakpoints[bp] || bp})`
   const [state, setState] = React.useState(() => window.matchMedia(query).matches)
 
