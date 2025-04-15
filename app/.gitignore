@@ -1,0 +1,35 @@
+node_modules
+.next
+.idea/
+.vscode
+.DS_Store
+node_modules
+out
+services/tinlake/addresses_tinlake.json
+nft_data_definition.json
+dist
+
+
+# Yarn
+yarn.lock
+yarn-error.log
+.yarn
+!.yarn/releases
+!.yarn/plugins
+!.yarn/sdks
+!.yarn/versions
+
+# Environment files
+.env*.local
+.env*
+!.env-config/
+!.env.example
+!.env.kovan-example
+!.env.goerli-example
+!.env.mainnet-example
+!.env.altair
+!.env.development
+!.env.demo
+!.env.catalyst
+!.env.production
+!.env.ff-prod
