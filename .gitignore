@@ -9,16 +9,6 @@ services/tinlake/addresses_tinlake.json
 nft_data_definition.json
 dist
 
-
-# Yarn
-yarn.lock
-yarn-error.log
-.yarn
-!.yarn/releases
-!.yarn/plugins
-!.yarn/sdks
-!.yarn/versions
-
 # Environment files
 .env*.local
 .env*
