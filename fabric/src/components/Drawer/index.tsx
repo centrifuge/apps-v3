@@ -50,11 +50,11 @@ function DrawerInner({ title, children, isOpen, onClose, width = 'drawer', hideI
   }, [isOpen])
 
   function animate(open: boolean) {
+    console.log('>> animate', open, !!ref.current)
     if (!ref.current) return
     if (animation.current) {
       animation.current.onfinish = () => {}
     }
-
     if (open) {
       ref.current.style.transform = 'translateX(100%)'
       ref.current.style.opacity = '0'

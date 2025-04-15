@@ -50,18 +50,20 @@ const Content = styled.main`
 const SidebarMenu = () => {
   const isMedium = useIsAboveBreakpoint('M')
   const isLarge = useIsAboveBreakpoint('L')
-  return (<>
-    <Box>
-      <Link to="/">
-        <Box color="textPrimary" width={[80, 80, 36, 120, 120]}>
-        {!isMedium || isLarge ? <LogoCentrifugeText /> : <LogoCentrifuge />}
-        </Box>
-      </Link>
-      <Menu />
-    </Box>
-    <Footer />
-  </>
-)}
+  return (
+    <>
+      <Box>
+        <Link to="/">
+          <Box color="textPrimary" width={[80, 80, 36, 120, 120]}>
+            {!isMedium || isLarge ? <LogoCentrifugeText /> : <LogoCentrifuge />}
+          </Box>
+        </Link>
+        <Menu />
+      </Box>
+      <Footer />
+    </>
+  )
+}
 
 const MobileMenuContent = () => (
   <>
@@ -78,7 +80,6 @@ export const LayoutBase = () => {
   const isMedium = useIsAboveBreakpoint('M')
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-
   // Close the mobile menu when the location changes
   useEffect(() => {
     setMobileMenuOpen(false)
@@ -101,11 +102,23 @@ export const LayoutBase = () => {
             <Box mr={2} width={220}>
               WalletMenu
             </Box>
-            <IconButton onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+            <IconButton>
               {mobileMenuOpen ? (
-                <IconX color="white" size="iconLarge" />
+                <IconX
+                  color="white"
+                  size="iconLarge"
+                  onClick={() => {
+                    setMobileMenuOpen(false)
+                  }}
+                />
               ) : (
-                <IconHamburger color="white" size="iconLarge" />
+                <IconHamburger
+                  color="white"
+                  size="iconLarge"
+                  onClick={() => {
+                    setMobileMenuOpen(true)
+                  }}
+                />
               )}
             </IconButton>
           </Box>
@@ -121,7 +134,7 @@ export const LayoutBase = () => {
       {!isDesktop && (
         <Drawer
           isOpen={mobileMenuOpen}
-          onClose={() => setMobileMenuOpen(false)}
+          onClose={() => null}
           title="Menu"
           backgroundColor="backgroundInverted"
           width={isMedium ? '400px' : '100%'}

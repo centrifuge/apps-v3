@@ -10,6 +10,7 @@
   ],
   "scripts": {
     "build": "pnpm build:icons && tsc",
+    "prepare": "pnpm build",
     "bump": "standard-version --sign",
     "storybook": " pnpm build:icons --ignore-existing && storybook dev -p 6006",
     "build-storybook": "storybook build",

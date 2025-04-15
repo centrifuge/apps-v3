@@ -248,7 +248,7 @@ export function ImageUpload({
                   {!disabled && <Button variant="tertiary" onClick={handleClear} icon={IconX} disabled={disabled} />}
                 </Flex>
               </Shelf>
-              <Divider borderColor="borderPrimary" />
+              <Divider color="borderPrimary" />
               <Stack mt={2} flex={1} minHeight={60} position="relative">
                 {fileUrl && (
                   <Box

@@ -9,6 +9,7 @@
     "dev:functions": "pnpm --filter functions dev",
     "build:app": "pnpm --filter app build",
     "build:functions": "pnpm --filter functions build",
+    "build:fabric": "pnpm --filter fabric build",
     "dev": "concurrently \"pnpm dev:app\" \"pnpm dev:functions\"",
     "lint": "concurrently \"pnpm --filter app lint\" \"pnpm --filter fabric lint\"",
     "lint:fix": "npm run lint -- --fix"
