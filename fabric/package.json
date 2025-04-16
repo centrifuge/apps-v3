@@ -37,14 +37,18 @@
     "@typescript-eslint/eslint-plugin": "^4.32.0",
     "@typescript-eslint/parser": "^4.32.0",
     "csstype": "^3.0.9",
-    "eslint": "^7.32.0",
     "prettier": "^2.4.1",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "standard-version": "^9.3.2",
     "storybook": "^7.6.10",
     "styled-components": "^5.3.6",
-    "typescript": "~5.3.3"
+    "@eslint/eslintrc": "^3.3.1",
+    "@eslint/js": "^9.24.0",
+    "eslint": "^9.24.0",
+    "globals": "^16.0.0",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.29.1"
   },
   "peerDependencies": {
     "react": "*",
@@ -52,7 +56,6 @@
     "styled-components": "*"
   },
   "dependencies": {
-    "@polkadot/react-identicon": "^2.12.1",
     "@react-aria/button": "^3.3.4",
     "@react-aria/dialog": "^3.1.4",
     "@react-aria/focus": "^3.5.0",

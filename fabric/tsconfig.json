@@ -10,7 +10,7 @@
       "es2017",
       "ES2021.String"
     ],
-    "jsx": "react",
+    "jsx": "react-jsx",
     "declaration": true,
     "moduleResolution": "node",
     "noUnusedLocals": false,

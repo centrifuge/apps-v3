@@ -1,15 +1,13 @@
-module.exports = {
-  env: {
-    browser: true,
-    es6: true,
-    node: true,
-    jest: true,
-  },
-  extends: ['eslint:recommended'],
-  parser: '@typescript-eslint/parser',
+// @ts-check
 
-  plugins: ['@typescript-eslint/eslint-plugin'],
-  rules: {
+import eslint from '@eslint/js';
+import tseslint from 'typescript-eslint';
+
+export default tseslint.config(
+  eslint.configs.recommended,
+  tseslint.configs.recommended,
+  {
+    rules: {
     'prefer-arrow-callback': 'error',
     'no-new-func': 'error',
     'no-else-return': 'error',
@@ -96,4 +94,8 @@ module.exports = {
     '@typescript-eslint/semi': ['off', null],
     '@typescript-eslint/type-annotation-spacing': 'off',
   },
+    ignores: [
+      './functions/**',
+    ],
 }
+);

@@ -30,7 +30,7 @@ const ScrollContainer = styled(Stack)`
 export function MenuItemGroup({ children, hideDivider = false }: { children: React.ReactNode; hideDivider?: boolean }) {
   return (
     <>
-      {hideDivider ? null : <MenuDivider borderColor="borderPrimary" />}
+      {hideDivider ? null : <MenuDivider color="borderPrimary" />}
       {children}
     </>
   )
