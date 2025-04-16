@@ -1,7 +1,9 @@
 import React from 'react'
-import { centrifugeTheme } from '@centrifuge/fabric'
+import { centrifugeTheme, FabricTheme } from '@centrifuge/fabric'
 import { DefaultTheme } from 'styled-components'
 import { LogoCentrifuge, LogoCentrifugeText } from './components/LayoutBase/LogoCentrifuge'
+
+export interface LightDarkTheme extends DefaultTheme, FabricTheme {}
 
 export const lightTheme: DefaultTheme = {
   ...centrifugeTheme,
