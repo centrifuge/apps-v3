@@ -1,8 +1,7 @@
-import { Box, Button, Stack, Text } from '@centrifuge/fabric'
+import { Button, Stack, Text } from '@centrifuge/fabric'
 import * as React from 'react'
 import { ErrorBoundary as ReactErrorBoundary } from 'react-error-boundary'
 import { useQueryErrorResetBoundary } from 'react-query'
-import { Spinner } from './Spinner'
 
 type ErrorCb = (args: { error: any; retry: () => void }) => React.ReactElement | null
 
@@ -12,19 +11,9 @@ type Props = {
   renderError?: ErrorCb
 }
 
-export function LoadBoundary({ children, fallback, renderError }: Props) {
+export function LoadBoundary({ children, renderError }: Props) {
   return (
-    <React.Suspense
-      fallback={
-        fallback || (
-          <Box mt={8}>
-            <Spinner />
-          </Box>
-        )
-      }
-    >
       <ErrorBoundary renderError={renderError}>{children}</ErrorBoundary>
-    </React.Suspense>
   )
 }
 
