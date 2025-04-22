@@ -1,6 +1,5 @@
 import { Box, Stack, Text } from '@centrifuge/fabric'
 import * as React from 'react'
-// import { Dec } from '../../src/utils/Decimal'
 import { formatBalance } from '../../src/utils/formatting'
 import { LayoutSection } from '../components/LayoutBase/LayoutSection'
 import { PoolList } from '../components/PoolList'
