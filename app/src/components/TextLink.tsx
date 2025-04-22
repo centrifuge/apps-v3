@@ -5,6 +5,7 @@ import styled from 'styled-components'
 // TODO move this to fabric probably
 
 export const TextLink = styled.span`
+  font-family: Inter, sans-serif;
   position: relative;
   color: inherit;
   text-decoration: underline;
