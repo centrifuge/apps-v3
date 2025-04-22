@@ -30,7 +30,8 @@ type EnvironmentConfig = {
   name: string
   logo: React.ComponentType[]
   themes: { light: DefaultTheme }
-  defaultTheme: 'light' | 'dark'
+  defaultTheme: 'light' | 'dark',
+  baseCurrency: 'USD'
 }
 
 
@@ -44,7 +45,8 @@ const CENTRIFUGE: EnvironmentConfig = {
   themes: {
     light: lightTheme,
   },
-  defaultTheme: 'light'
+  defaultTheme: 'light',
+  baseCurrency: 'USD',
 }
 
 export const config = CENTRIFUGE

@@ -3,7 +3,7 @@ import { RouteObject } from "react-router-dom";
 import { LayoutBase } from './components/LayoutBase'
 import { AboutPage } from './pages/About'
 import { NotFoundPage } from './pages/NotFound'
-import { HomePage } from './pages/Home';
+import  PoolsPage from './pages/Pools'
 
 export const routes: RouteObject[] = [
   {
@@ -15,9 +15,9 @@ export const routes: RouteObject[] = [
         element: <Navigate to="/pools" replace />,
       },
       {
-        path: '/pools/*',
-        element: <HomePage />,
-        handle: { component: HomePage },
+        path: '/pools',
+        element: <PoolsPage />,
+        handle: { component: PoolsPage },
       },
       {
         path: '/dashboard/*',
