@@ -2,6 +2,7 @@ import * as React from 'react'
 import styled from 'styled-components'
 
 export const TextLink = styled.span`
+  font-family: Inter, sans-serif;
   position: relative;
   color: inherit;
   text-decoration: underline;
