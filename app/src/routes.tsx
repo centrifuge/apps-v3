@@ -1,9 +1,9 @@
 import { Navigate } from 'react-router-dom'
-import { RouteObject } from "react-router-dom";
+import { RouteObject } from 'react-router-dom'
 import { LayoutBase } from './components/LayoutBase'
-import { AboutPage } from './pages/About'
 import { NotFoundPage } from './pages/NotFound'
-import  PoolsPage from './pages/Pools'
+import PoolsPage from './pages/Pools'
+import PortfolioPage from './pages/Portfolio'
 
 export const routes: RouteObject[] = [
   {
@@ -19,13 +19,9 @@ export const routes: RouteObject[] = [
         element: <PoolsPage />,
         handle: { component: PoolsPage },
       },
-      {
-        path: '/dashboard/*',
-        element: <AboutPage />,
-        handle: { component: AboutPage },
-      },
+      { path: '/portfolio', element: <PortfolioPage />, handle: { component: PortfolioPage } },
       { path: '*', element: <NotFoundPage />, handle: { component: NotFoundPage } },
     ],
     errorElement: <NotFoundPage />,
   },
-];
+]
