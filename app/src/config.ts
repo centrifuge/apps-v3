@@ -1,7 +1,9 @@
 import React from 'react'
-import { centrifugeTheme } from '@centrifuge/fabric'
+import { centrifugeTheme, FabricTheme } from '@centrifuge/fabric'
 import { DefaultTheme } from 'styled-components'
 import { LogoCentrifuge, LogoCentrifugeText } from './components/LayoutBase/LogoCentrifuge'
+
+export interface LightDarkTheme extends DefaultTheme, FabricTheme {}
 
 export const lightTheme: DefaultTheme = {
   ...centrifugeTheme,
@@ -28,7 +30,8 @@ type EnvironmentConfig = {
   name: string
   logo: React.ComponentType[]
   themes: { light: DefaultTheme }
-  defaultTheme: 'light' | 'dark'
+  defaultTheme: 'light' | 'dark',
+  baseCurrency: 'USD'
 }
 
 
@@ -42,7 +45,8 @@ const CENTRIFUGE: EnvironmentConfig = {
   themes: {
     light: lightTheme,
   },
-  defaultTheme: 'light'
+  defaultTheme: 'light',
+  baseCurrency: 'USD',
 }
 
 export const config = CENTRIFUGE
