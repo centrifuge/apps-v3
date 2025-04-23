@@ -1,8 +1,5 @@
 import * as React from 'react'
-import { Link } from 'react-router-dom'
 import styled from 'styled-components'
-
-// TODO move this to fabric probably
 
 export const TextLink = styled.span`
   font-family: Inter, sans-serif;
@@ -31,13 +28,6 @@ export const TextLink = styled.span`
     }
   }
 `
-
-export const RouterTextLink = TextLink.withComponent(Link)
-
-export const ButtonTextLink = TextLink.withComponent('button')
-ButtonTextLink.defaultProps = {
-  type: 'button',
-}
 
 export function AnchorTextLink(props: React.ComponentPropsWithoutRef<'a'>) {
   return <TextLink as="a" target="_blank" rel="noopener noreferrer" {...props} />
