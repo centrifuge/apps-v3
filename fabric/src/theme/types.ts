@@ -2,8 +2,6 @@ import { ResponsiveValue } from 'styled-system'
 
 type Status = 'Default' | 'Info' | 'Ok' | 'Warning' | 'Critical' | 'Promote'
 
-// Colors
-
 type StatusColorName = `status${Status}` | `status${Status}Bg`
 
 type AccentColorName =
@@ -27,6 +25,7 @@ type BackgroundColorName = `background${
   | 'Thumbnail'
   | 'AccentPrimary'
   | 'AccentSecondary'
+  | 'Placeholder'
   | 'Inverted'}`
 type ButtonColorName =
   | `${'background' | 'text' | 'border'}Button${'Primary' | 'Secondary' | 'Tertiary' | 'Inverted'}${
@@ -66,7 +65,7 @@ export type ThemeBreakpoints = BreakpointValue[] & {
   [k in BreakpointName]: BreakpointValue
 }
 
-type SizeName = 'dialog' | 'drawer' | 'container' | 'iconSmall' | 'iconMedium' | 'iconRegular' | 'iconLarge' | 'input'
+type SizeName = 'dialog' | 'drawer' | 'container' | 'iconSmall' | 'iconMedium' | 'iconRegular' | 'iconLarge' | 'input' | 'mainContent'
 type SizeValue = number
 
 type ThemeSizes = {

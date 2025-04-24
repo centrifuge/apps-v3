@@ -1,7 +1,7 @@
-import { Grid, IconChevronDown, IconChevronRight, Stack, Text } from '@centrifuge/fabric'
+import { Grid, IconChevronDown, IconChevronRight, Stack, Text, FabricTheme } from '@centrifuge/fabric'
 import * as React from 'react'
 import { Link } from 'react-router-dom'
-import styled from 'styled-components'
+import styled, {useTheme} from 'styled-components'
 import { StyledRouterButton } from '.'
 import { useIsAboveBreakpoint } from '../../utils/useIsAboveBreakpoint'
 import { baseButton, primaryButton } from './styles'
@@ -35,7 +35,7 @@ export const Toggle = styled(Text)<{ isActive?: boolean; stacked?: boolean }>`
 const RouterButton = styled(Text)`
   padding: 6px;
   margin-left: 28px;
-  color: white;
+  color: ${({ theme }) => theme.colors.textInverted};
   font-size: 14px;
   border-radius: 4px;
   font-family: ${({ theme }) => theme.fonts.standard};
@@ -74,6 +74,7 @@ export function ToggleMenu({
   setOpen: (open: boolean) => void
   links: string[]
 }) {
+  const theme = useTheme() as FabricTheme
   return (
     <>
       <Toggle
@@ -85,7 +86,7 @@ export function ToggleMenu({
         onClick={() => setOpen(!open)}
       >
         {icon}
-        <Text color="white">{label}</Text>
+        <Text color={theme.colors.textInverted}>{label}</Text>
         {open ? (
           <IconChevronDown size={['iconMedium', 'iconMedium', 'iconSmall']} />
         ) : (
@@ -99,7 +100,7 @@ export function ToggleMenu({
             return ( toLink ? (
             <RouterButton
               as={Link}
-              color="white"
+              color={theme.colors.textInverted}
               to={toLink}
               target="_blank"
               style={{ textDecoration: 'none' }}
@@ -126,6 +127,7 @@ export function SubMenu({
 }) {
   const [open, setOpen] = React.useState(false)
   const isLarge = useIsAboveBreakpoint('L')
+  const theme = useTheme() as FabricTheme
   return (
     <>
       <Stack>
@@ -135,28 +137,28 @@ export function SubMenu({
           <>
             {isLarge ? (
               <>
-                <StyledRouterButton as={Link} color="white" to={`/${label.toLowerCase()}`}>
+                <StyledRouterButton as={Link} color={theme.colors.textInverted} to={`/${label.toLowerCase()}`}>
                   {icon}
-                  <Text color="white" variant="body2" style={{ marginLeft: 8 }}>
+                  <Text color={theme.colors.textInverted} variant="body2" style={{ marginLeft: 8 }}>
                     {label}
                   </Text>
                 </StyledRouterButton>
                 {links.map((link) => (
-                  <RouterButton key={link} as={Link} color="white" to={`/${label.toLowerCase()}/${link.toLowerCase()}`}>
+                  <RouterButton key={link} as={Link} color={theme.colors.textInverted} to={`/${label.toLowerCase()}/${link.toLowerCase()}`}>
                     {link}
                   </RouterButton>
                 ))}
               </>
             ) : (
               <Stack>
-                <StyledRouterButton as={Link} color="white" to={`/${label.toLowerCase()}`}>
+                <StyledRouterButton as={Link} color={theme.colors.textInverted} to={`/${label.toLowerCase()}`}>
                   {icon}
-                  <Text color="white" variant="body2" style={{ marginLeft: 8 }}>
+                  <Text color={theme.colors.textInverted} variant="body2" style={{ marginLeft: 8 }}>
                     {label}
                   </Text>
                 </StyledRouterButton>
                 {links.map((link) => (
-                  <RouterButton key={link} as={Link} color="white" to={`/${label.toLowerCase()}/${link.toLowerCase()}`}>
+                  <RouterButton key={link} as={Link} color={theme.colors.textInverted} to={`/${label.toLowerCase()}/${link.toLowerCase()}`}>
                     {link}
                   </RouterButton>
                 ))}

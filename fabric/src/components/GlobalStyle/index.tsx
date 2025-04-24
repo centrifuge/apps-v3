@@ -1,5 +1,4 @@
-import * as React from 'react'
-import { createGlobalStyle, useTheme } from 'styled-components'
+import { createGlobalStyle } from 'styled-components'
 
 export const StyledGlobalStyle = createGlobalStyle`
   html {
@@ -28,13 +27,3 @@ export const StyledGlobalStyle = createGlobalStyle`
     outline: none;
   }
 `
-
-export function GlobalStyle() {
-  const theme = useTheme()
-  React.useLayoutEffect(() => {
-    Object.entries(theme.colors).forEach(([key, color]) => {
-      if (typeof color === 'string') document.documentElement.style.setProperty(`--fabric-${key}`, color)
-    })
-  }, [])
-  return <StyledGlobalStyle />
-}

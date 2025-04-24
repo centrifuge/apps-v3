@@ -16,6 +16,7 @@ export const baseTheme: Omit<FabricTheme, 'colors' | 'scheme'> = {
     iconRegular: 32,
     iconLarge: 40,
     input: 40,
+    mainContent: 1800,
   },
   radii: {
     tooltip: 4,

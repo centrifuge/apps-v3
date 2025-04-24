@@ -3,10 +3,11 @@ import { useTooltip, useTooltipTrigger } from '@react-aria/tooltip'
 import { useTooltipTriggerState } from '@react-stately/tooltip'
 import css, { CssFunctionReturnType } from '@styled-system/css'
 import * as React from 'react'
-import styled from 'styled-components'
+import styled, { useTheme } from 'styled-components'
 import { Positioner } from '../Positioner'
 import { Stack } from '../Stack'
 import { Text, TextProps } from '../Text'
+import { FabricTheme } from '../../theme'
 
 export type TooltipProps = TextProps & {
   title?: string
@@ -94,7 +95,7 @@ export function Tooltip({
 }: TooltipProps) {
   const triggerRef = React.useRef<HTMLButtonElement>(null)
   const overlayRef = React.useRef<HTMLDivElement>(null)
-
+  const theme = useTheme() as FabricTheme
   const config = { isDisabled: disabled, delay }
 
   const state = useTooltipTriggerState(config)
@@ -126,11 +127,11 @@ export function Tooltip({
               pointer={pointer}
             >
               {!!title && (
-                <Text variant="body3" fontWeight={600} color="white">
+                <Text variant="body3" fontWeight={600} color={theme.colors.textInverted}>
                   {title}
                 </Text>
               )}
-              <Text variant="body4" color="white">
+              <Text variant="body4" color={theme.colors.textInverted}>
                 {body}
               </Text>
             </Container>

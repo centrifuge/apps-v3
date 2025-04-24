@@ -9,9 +9,10 @@ import {
   IconSwitch,
   IconWallet,
   Text,
+  FabricTheme
 } from '@centrifuge/fabric'
 import { Link } from 'react-router-dom'
-import styled from 'styled-components'
+import styled, {useTheme} from 'styled-components'
 import { useIsAboveBreakpoint } from '../../utils/useIsAboveBreakpoint'
 
 import { RouterLinkButton } from './RouterLinkButton'
@@ -44,14 +45,14 @@ const StyledRouterLinkButton = styled(RouterLinkButton)`
   & > span {
     background-color: ${COLOR};
     border-color: transparent;
-    color: white;
+    color:${({ theme }) => theme.colors.textInverted}
     margin-bottom: 20px;
     font-size: ${({ theme }) => theme.colors.textGold};
 
     &:hover {
       box-shadow: 0px 0px 0px 3px #7c8085b3;
       background-color: ${COLOR};
-      color: white;
+      color:${({ theme }) => theme.colors.textInverted}
     }
 
     &:active {
@@ -65,33 +66,34 @@ export function Menu() {
   const showSwaps = false // useFeatureFlags()
   const iconSize = 'iconSmall'
   const isLarge = useIsAboveBreakpoint('L')
+  const theme = useTheme() as FabricTheme
 
   const menuItems = [
     {
       label: 'Dashboard',
-      icon: <IconDashboard size={iconSize} color="white" />,
+      icon: <IconDashboard size={iconSize} color={theme.colors.textInverted} />,
       subMenu: ['Account', 'Assets', 'Investors'],
       enabled: pools.length > 0,
       route: '/dashboard',
       withToggle: false,
     },
-    { label: 'Pools', icon: <IconInvestments size={iconSize} color="white" />, route: '/pools', enabled: true },
-    { label: 'Portfolio', icon: <IconWallet size={iconSize} color="white" />, route: '/portfolio', enabled: true },
-    { label: 'Prime', icon: <IconGlobe size={iconSize} color="white" />, route: '/prime', enabled: true },
+    { label: 'Pools', icon: <IconInvestments size={iconSize} color={theme.colors.textInverted} />, route: '/pools', enabled: true },
+    { label: 'Portfolio', icon: <IconWallet size={iconSize} color={theme.colors.textInverted} />, route: '/portfolio', enabled: true },
+    { label: 'Prime', icon: <IconGlobe size={iconSize} color={theme.colors.textInverted} />, route: '/prime', enabled: true },
     {
       label: 'Governance',
-      icon: <IconGovernance size={iconSize} color="white" />,
+      icon: <IconGovernance size={iconSize} color={theme.colors.textInverted} />,
       subMenu: ['Onchain voting', 'Offchain voting', 'Governance forum'],
       enabled: true,
       withToggle: true,
     },
     {
       label: 'NFTs',
-      icon: <IconNft size={iconSize} color="white" />,
+      icon: <IconNft size={iconSize} color={theme.colors.textInverted} />,
       route: '/nfts',
       enabled: false // config.network !== 'centrifuge',
     },
-    { label: 'Swaps', icon: <IconSwitch size={iconSize} color="white" />, route: '/swaps', enabled: showSwaps },
+    { label: 'Swaps', icon: <IconSwitch size={iconSize} color={theme.colors.textInverted} />, route: '/swaps', enabled: showSwaps },
   ]
 
   return (
@@ -105,7 +107,7 @@ export function Menu() {
             ) : (
               <StyledRouterButton as={Link} key={item.label + index} isLarge={isLarge} to={item.route}>
                 {item.icon}
-                <Text color="white" variant="body2" style={{ marginLeft: 8 }}>
+                <Text color={theme.colors.textInverted} variant="body2" style={{ marginLeft: 8 }}>
                   {item.label}
                 </Text>
               </StyledRouterButton>

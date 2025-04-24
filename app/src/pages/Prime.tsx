@@ -1,27 +1,24 @@
-import { Box, Grid, IconExternalLink, IconGlobe, Text } from '@centrifuge/fabric'
+import { Box, Grid, IconExternalLink, IconGlobe, Text, AnchorTextLink, FabricTheme } from '@centrifuge/fabric'
 import { useTheme } from 'styled-components'
-import { AnchorTextLink } from '../components/TextLink'
 import primePageImage from '../../assets/prime_page_image.svg'
 import { LayoutSection } from '../components/LayoutBase/LayoutSection'
-import { LightDarkTheme } from '../config'
 
 const PrimePage = () => {
-  const theme = useTheme() as LightDarkTheme
+  const theme = useTheme() as FabricTheme
   return (
     <>
       <LayoutSection alignItems="flex-start" pt={3} pb={3}>
         <Box display="flex" alignItems="center" ml={2}>
           <Box
-            backgroundColor="backgroundSecondary"
+            backgroundColor={theme.colors.backgroundSecondary}
             borderRadius={28}
-            height={40}
-            width={40}
-            border={`6px solid ${theme.colors.borderTertiary}`}
+            height={45}
+            width={45}
             display="flex"
             justifyContent="center"
             alignItems="center"
           >
-            <IconGlobe size={20} />
+            <IconGlobe size={20} color={theme.colors.textInverted} />
           </Box>
           <Text variant="heading1" style={{ marginLeft: 8 }}>
             Centrifuge Prime
