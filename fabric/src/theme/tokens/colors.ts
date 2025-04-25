@@ -1,17 +1,6 @@
 export const black = '#252B34'
 export const gold = '#FFC012'
-// light-grey-bkg #91969b21 = rgba(145, 150, 155, 0.13)
-// #F2F4F7
-// #F6F6F6
-// #E7E7E7
-// #CFCFCF
-// #91969B
-// #667085
-// #252B34
-// #91969b21
-// #6A7280
 
-// #7C8085
 export const grayScale = {
   10: '#F2F4F7',
   50: '#F6F6F6',
