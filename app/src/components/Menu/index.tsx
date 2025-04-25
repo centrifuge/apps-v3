@@ -18,8 +18,6 @@ import { useIsAboveBreakpoint } from '../../utils/useIsAboveBreakpoint'
 import { RouterLinkButton } from './RouterLinkButton'
 import { SubMenu } from './SubMenu'
 
-const COLOR = '#7C8085'
-
 export const StyledRouterButton = styled(Text)<{ isLarge?: boolean }>`
   display: flex;
   flex-direction: row;
@@ -30,12 +28,12 @@ export const StyledRouterButton = styled(Text)<{ isLarge?: boolean }>`
   border-radius: 4px;
   &:hover {
     & > div {
-      color: ${({ theme }) => theme.colors.textGold};
+      color: ${({ theme }) => theme.colors.backgroundButtonPrimaryHover};
     }
     & > svg {
-      color: ${({ theme }) => theme.colors.textGold};
+      color: ${({ theme }) => theme.colors.backgroundButtonPrimaryHover};
     }
-    background-color: rgba(145, 150, 155, 0.13);
+    background-color:${({ theme }) => theme.colors.backgroundInvertedHover};
   }
 `
 
@@ -43,15 +41,14 @@ const StyledRouterLinkButton = styled(RouterLinkButton)`
   width: 100%;
   margin-top: 12px;
   & > span {
-    background-color: ${COLOR};
+    background-color: ${({ theme }) => theme.colors.backgroundInvertedHover};
     border-color: transparent;
     color:${({ theme }) => theme.colors.textInverted}
     margin-bottom: 20px;
-    font-size: ${({ theme }) => theme.colors.textGold};
 
     &:hover {
-      box-shadow: 0px 0px 0px 3px #7c8085b3;
-      background-color: ${COLOR};
+      box-shadow: 0px 0px 0px 3px ${({ theme }) => theme.colors.focus};
+      background-color: ${({ theme }) => theme.colors.backgroundInvertedHover};
       color:${({ theme }) => theme.colors.textInverted}
     }
 

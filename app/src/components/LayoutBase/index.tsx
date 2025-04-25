@@ -98,7 +98,7 @@ export const LayoutBase = () => {
       {!isDesktop && (
         <MobileHeader>
           <Link to="/">
-            <LogoCentrifuge  color='red' />
+            <LogoCentrifuge  color={theme.colors.textInverted} />
           </Link>
           <Box display="flex" alignItems="center" marginLeft="auto">
             <Box mr={2} width={220}>

@@ -108,7 +108,7 @@ const StyledCheckbox = styled.input<{ variant: 'primary' | 'secondary' }>`
   ${({ theme, variant }) => `
       &:checked {
         border-color: ${variant === 'primary' ? theme.colors.borderSecondary : theme.colors.textPrimary};
-        background-color: ${variant === 'primary' ? theme.colors.textGold : 'white'};
+        background-color: ${variant === 'primary' ? theme.colors.backgroundButtonPrimary : theme.colors.backgroundPrimary};
       }
       &:checked::after {
         content: '';
@@ -117,7 +117,7 @@ const StyledCheckbox = styled.input<{ variant: 'primary' | 'secondary' }>`
         left: 5px;
         width: 4px;
         height: 8px;
-        border: solid ${variant === 'primary' ? 'white' : theme.colors.textPrimary};
+        border: solid ${variant === 'primary' ? theme.colors.textInverted : theme.colors.textPrimary};
         border-width: 0 1px 1px 0;
         transform: rotate(45deg);
       }

@@ -48,10 +48,10 @@ const Hitearea = styled.button<{ direction?: string }>`
 
 const Number = styled(Text)<{ isActive?: boolean; done: boolean }>`
   background-color: ${({ theme, isActive, done }) =>
-    isActive && !done ? theme.colors.textGold : done ? theme.colors.statusOkBg : 'transparent'};
+    isActive && !done ? theme.colors.borderButtonPrimaryHover : done ? theme.colors.statusOkBg : 'transparent'};
   border: ${({ theme, isActive, done }) =>
     isActive && !done
-      ? `1px solid ${theme.colors.textGold}`
+      ? `1px solid ${theme.colors.borderButtonPrimaryFocus}`
       : done
       ? `1px solid ${theme.colors.statusOk}`
       : `1.73px solid ${theme.colors.backgroundButtonPrimaryDisabled}`};

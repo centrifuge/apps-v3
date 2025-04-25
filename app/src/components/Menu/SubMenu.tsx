@@ -6,8 +6,6 @@ import { StyledRouterButton } from '.'
 import { useIsAboveBreakpoint } from '../../utils/useIsAboveBreakpoint'
 import { baseButton, primaryButton } from './styles'
 
-export const LIGHT_BACKGROUND = 'rgba(145, 150, 155, 0.13)'
-
 export const Toggle = styled(Text)<{ isActive?: boolean; stacked?: boolean }>`
   ${baseButton}
   ${primaryButton}
@@ -16,18 +14,18 @@ export const Toggle = styled(Text)<{ isActive?: boolean; stacked?: boolean }>`
     stacked ? '1fr' : `${theme.sizes.iconSmall}px 1fr ${theme.sizes.iconSmall}px`};
   color: ${({ theme }) => theme.colors.textInverted};
   border-radius: 4px;
-  background-color: ${({ isActive }) => (isActive ? LIGHT_BACKGROUND : 'transparent')};
+  background-color: ${({ isActive, theme }) => (isActive ? theme.colors.backgroundInvertedHover : 'transparent')};
   font-weight: 400;
 
   &:hover {
-    background-color: rgba(145, 150, 155, 0.13);
+    background-color: ${({ theme }) => theme.colors.backgroundInvertedHover};
 
     & span {
-      color: ${({ theme }) => theme.colors.textGold};
+      color: ${({ theme }) => theme.colors.textButtonTertiaryHover};
     }
 
     & svg {
-      color: ${({ theme }) => theme.colors.textGold};
+      color: ${({ theme }) => theme.colors.textButtonTertiaryHover};
     }
   }
 `
@@ -40,8 +38,8 @@ const RouterButton = styled(Text)`
   border-radius: 4px;
   font-family: ${({ theme }) => theme.fonts.standard};
   &:hover {
-    color: ${({ theme }) => theme.colors.textGold};
-    background-color: rgba(145, 150, 155, 0.13);
+    color: ${({ theme }) => theme.colors.textButtonTertiaryHover};
+    background-color: ${({ theme }) => theme.colors.backgroundInvertedHover};
   }
 `
 

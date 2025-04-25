@@ -9,7 +9,7 @@ export const BetaChip = styled(Text)(
     bg: 'statusPromote',
     borderRadius: 20,
     fontSize: '10px',
-    color: 'white',
+    color: `${(theme: { colors: { textInverted: any } }) => theme.colors.textInverted}`,
     whiteSpace: 'nowrap',
     lineHeight: '15px',
   })
