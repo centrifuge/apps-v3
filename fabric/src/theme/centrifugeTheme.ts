@@ -11,8 +11,18 @@ const brandCentrifuge = {
   accentSecondary: altairYellow,
 }
 
+const shadows =  {
+  cardInteractive: '1px 3px 6px rgba(0, 0, 0, 0.15)',
+  cardActive: ` 0 0 0 1px ${grayScale[600]}, 0 1px 5px rgba(0, 0, 0, 0.2)`,
+  cardOverlay: '4px 8px 24px rgba(0, 0, 0, 0.2)',
+  buttonPrimary: `0px 0px 0px 3px ${colorTheme.colors.shadowButtonPrimary}`,
+  buttonSecondary: `0px 0px 0px 3px ${colorTheme.colors.shadowButtonSecondary}`,
+  buttonInverted: `0px 0px 0px 3px ${colorTheme.colors.shadowButtonInverted}`,
+}
+
 export const centrifugeLightTheme: FabricTheme = {
   ...baseTheme,
+  shadows,
   scheme: 'light',
   colors: {
     ...brandCentrifuge,
@@ -35,6 +45,7 @@ export const centrifugeLightTheme: FabricTheme = {
 
 export const centrifugeDarkTheme: FabricTheme = {
   ...baseTheme,
+  shadows,
   scheme: 'dark',
   colors: {
     ...brandCentrifuge,

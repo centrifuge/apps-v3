@@ -99,7 +99,7 @@ const StyledOutline = styled.span`
   right: -4px;
   bottom: -4px;
   left: -4px;
-  border: 2px solid var(--fabric-focus);
+  border: 2px solid ${({ theme }) => theme.colors.focus};
   border-radius: 20px;
   border-color: ${({ theme }) => theme.colors.textPrimary};
 `
