@@ -139,6 +139,6 @@ const StyledOutline = styled.span`
   width: auto;
   height: auto;
   margin: auto;
-  border: 2px solid var(--fabric-focus);
+  border: 2px solid ${({ theme }) => theme.colors.focus};
   border-radius: 100%;
 `
