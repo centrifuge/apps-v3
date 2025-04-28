@@ -1,10 +1,10 @@
-import { Box, Grid, IconExternalLink, IconGlobe, Text, AnchorTextLink, FabricTheme } from '@centrifuge/fabric'
+import { Box, Grid, IconExternalLink, IconGlobe, Text, AnchorTextLink } from '@centrifuge/fabric'
 import { useTheme } from 'styled-components'
 import primePageImage from '../../assets/prime_page_image.svg'
 import { LayoutSection } from '../components/LayoutBase/LayoutSection'
 
 const PrimePage = () => {
-  const theme = useTheme() as FabricTheme
+  const theme = useTheme()
   return (
     <>
       <LayoutSection alignItems="flex-start" pt={3} pb={3}>

@@ -1,4 +1,4 @@
-import { Grid, IconChevronDown, IconChevronRight, Stack, Text, FabricTheme } from '@centrifuge/fabric'
+import { Grid, IconChevronDown, IconChevronRight, Stack, Text } from '@centrifuge/fabric'
 import * as React from 'react'
 import { Link } from 'react-router-dom'
 import styled, {useTheme} from 'styled-components'
@@ -72,7 +72,7 @@ export function ToggleMenu({
   setOpen: (open: boolean) => void
   links: string[]
 }) {
-  const theme = useTheme() as FabricTheme
+  const theme = useTheme()
   return (
     <>
       <Toggle
@@ -125,7 +125,7 @@ export function SubMenu({
 }) {
   const [open, setOpen] = React.useState(false)
   const isLarge = useIsAboveBreakpoint('L')
-  const theme = useTheme() as FabricTheme
+  const theme = useTheme()
   return (
     <>
       <Stack>

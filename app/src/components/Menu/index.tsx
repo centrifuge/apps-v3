@@ -8,8 +8,7 @@ import {
   IconPlus,
   IconSwitch,
   IconWallet,
-  Text,
-  FabricTheme
+  Text
 } from '@centrifuge/fabric'
 import { Link } from 'react-router-dom'
 import styled, {useTheme} from 'styled-components'
@@ -63,7 +62,7 @@ export function Menu() {
   const showSwaps = false // useFeatureFlags()
   const iconSize = 'iconSmall'
   const isLarge = useIsAboveBreakpoint('L')
-  const theme = useTheme() as FabricTheme
+  const theme = useTheme()
 
   const menuItems = [
     {

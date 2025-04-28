@@ -7,7 +7,6 @@ import styled, { useTheme } from 'styled-components'
 import { Positioner } from '../Positioner'
 import { Stack } from '../Stack'
 import { Text, TextProps } from '../Text'
-import { FabricTheme } from '../../theme'
 
 export type TooltipProps = TextProps & {
   title?: string
@@ -95,7 +94,7 @@ export function Tooltip({
 }: TooltipProps) {
   const triggerRef = React.useRef<HTMLButtonElement>(null)
   const overlayRef = React.useRef<HTMLDivElement>(null)
-  const theme = useTheme() as FabricTheme
+  const theme = useTheme()
   const config = { isDisabled: disabled, delay }
 
   const state = useTooltipTriggerState(config)

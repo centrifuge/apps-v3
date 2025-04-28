@@ -1,4 +1,4 @@
-import { Box, BoxProps, Shelf, Stack, Text, FabricTheme } from '@centrifuge/fabric'
+import { Box, BoxProps, Shelf, Stack, Text } from '@centrifuge/fabric'
 import { useTheme } from 'styled-components'
 import * as React from 'react'
 
@@ -11,7 +11,7 @@ type Props = {
 } & BoxProps
 
 export function LayoutSection({ title, titleAddition, subtitle, headerRight, children, gap = 2, ...boxProps }: Props) {
-  const theme = useTheme() as FabricTheme;
+  const theme = useTheme()
   return (
     <Stack as="section" gap={3} pt={20} pb={20} {...boxProps}>
       {(title || titleAddition || subtitle || headerRight) && (

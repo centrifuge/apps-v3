@@ -1,4 +1,4 @@
-import { Box, Drawer, IconButton, IconHamburger, IconX, FabricTheme } from '@centrifuge/fabric'
+import { Box, Drawer, IconButton, IconHamburger, IconX } from '@centrifuge/fabric'
 import { useEffect, useState } from 'react'
 import { Outlet, useLocation, Link } from 'react-router'
 import styled, {useTheme} from 'styled-components'
@@ -50,7 +50,7 @@ const Content = styled.main`
 const SidebarMenu = () => {
   const isMedium = useIsAboveBreakpoint('M')
   const isLarge = useIsAboveBreakpoint('L')
-  const theme = useTheme() as FabricTheme
+  const theme = useTheme()
   return (
     <>
       <Box>
@@ -79,7 +79,7 @@ export const LayoutBase = () => {
   const location = useLocation()
   const isDesktop = useIsAboveBreakpoint('L')
   const isMedium = useIsAboveBreakpoint('M')
-  const theme = useTheme() as FabricTheme
+  const theme = useTheme()
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   // Close the mobile menu when the location changes
