@@ -27,3 +27,4 @@ export const StyledGlobalStyle = createGlobalStyle`
     outline: none;
   }
 `
+export { StyledGlobalStyle as GlobalStyle }

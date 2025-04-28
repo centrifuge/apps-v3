@@ -66,3 +66,5 @@ export const centrifugeTheme = {
   light: centrifugeLightTheme,
   dark: centrifugeDarkTheme,
 }
+
+export default centrifugeLightTheme

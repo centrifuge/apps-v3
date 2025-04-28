@@ -11,7 +11,7 @@ import {
   Text
 } from '@centrifuge/fabric'
 import { Link } from 'react-router-dom'
-import styled, {useTheme} from 'styled-components'
+import styled from 'styled-components'
 import { useIsAboveBreakpoint } from '../../utils/useIsAboveBreakpoint'
 
 import { RouterLinkButton } from './RouterLinkButton'
@@ -62,34 +62,33 @@ export function Menu() {
   const showSwaps = false // useFeatureFlags()
   const iconSize = 'iconSmall'
   const isLarge = useIsAboveBreakpoint('L')
-  const theme = useTheme()
 
   const menuItems = [
     {
       label: 'Dashboard',
-      icon: <IconDashboard size={iconSize} color={theme.colors.textInverted} />,
+      icon: <IconDashboard size={iconSize} color="textInverted" />,
       subMenu: ['Account', 'Assets', 'Investors'],
       enabled: pools.length > 0,
       route: '/dashboard',
       withToggle: false,
     },
-    { label: 'Pools', icon: <IconInvestments size={iconSize} color={theme.colors.textInverted} />, route: '/pools', enabled: true },
-    { label: 'Portfolio', icon: <IconWallet size={iconSize} color={theme.colors.textInverted} />, route: '/portfolio', enabled: true },
-    { label: 'Prime', icon: <IconGlobe size={iconSize} color={theme.colors.textInverted} />, route: '/prime', enabled: true },
+    { label: 'Pools', icon: <IconInvestments size={iconSize} color="textInverted" />, route: '/pools', enabled: true },
+    { label: 'Portfolio', icon: <IconWallet size={iconSize} color="textInverted" />, route: '/portfolio', enabled: true },
+    { label: 'Prime', icon: <IconGlobe size={iconSize} color="textInverted" />, route: '/prime', enabled: true },
     {
       label: 'Governance',
-      icon: <IconGovernance size={iconSize} color={theme.colors.textInverted} />,
+      icon: <IconGovernance size={iconSize} color="textInverted" />,
       subMenu: ['Onchain voting', 'Offchain voting', 'Governance forum'],
       enabled: true,
       withToggle: true,
     },
     {
       label: 'NFTs',
-      icon: <IconNft size={iconSize} color={theme.colors.textInverted} />,
+      icon: <IconNft size={iconSize} color="textInverted" />,
       route: '/nfts',
       enabled: false // config.network !== 'centrifuge',
     },
-    { label: 'Swaps', icon: <IconSwitch size={iconSize} color={theme.colors.textInverted} />, route: '/swaps', enabled: showSwaps },
+    { label: 'Swaps', icon: <IconSwitch size={iconSize} color="textInverted" />, route: '/swaps', enabled: showSwaps },
   ]
 
   return (
@@ -103,7 +102,7 @@ export function Menu() {
             ) : (
               <StyledRouterButton as={Link} key={item.label + index} isLarge={isLarge} to={item.route}>
                 {item.icon}
-                <Text color={theme.colors.textInverted} variant="body2" style={{ marginLeft: 8 }}>
+                <Text color="textInverted" variant="body2" style={{ marginLeft: 8 }}>
                   {item.label}
                 </Text>
               </StyledRouterButton>

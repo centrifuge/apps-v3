@@ -1,16 +1,14 @@
 import { Box, Grid, IconExternalLink, IconGlobe, Text, AnchorTextLink } from '@centrifuge/fabric'
-import { useTheme } from 'styled-components'
 import primePageImage from '../../assets/prime_page_image.svg'
 import { LayoutSection } from '../components/LayoutBase/LayoutSection'
 
 const PrimePage = () => {
-  const theme = useTheme()
   return (
     <>
       <LayoutSection alignItems="flex-start" pt={3} pb={3}>
         <Box display="flex" alignItems="center" ml={2}>
           <Box
-            backgroundColor={theme.colors.backgroundSecondary}
+            backgroundColor="backgroundSecondary"
             borderRadius={28}
             height={45}
             width={45}
@@ -18,13 +16,13 @@ const PrimePage = () => {
             justifyContent="center"
             alignItems="center"
           >
-            <IconGlobe size={20} color={theme.colors.textInverted} />
+            <IconGlobe size={20} color="textPrimary" />
           </Box>
           <Text variant="heading1" style={{ marginLeft: 8 }}>
             Centrifuge Prime
           </Text>
         </Box>
-        <Box borderBottom={`1px solid ${theme.colors.borderPrimary}`} pb={2} mx={2} />
+        <Box borderBottom={`1px solid borderPrimary`} pb={2} mx={2} />
         <Grid
           gridTemplateColumns={['1fr', '1fr 1fr']}
           gap={6}
@@ -56,7 +54,7 @@ const PrimePage = () => {
           </Box>
         </Grid>
       </LayoutSection>
-      <Box borderBottom={`1px solid ${theme.colors.borderPrimary}`} pb={3} />
+      <Box borderBottom='1px solid borderPrimary' pb={3} />
       <DaoPortfoliosTable />
     </>
   )

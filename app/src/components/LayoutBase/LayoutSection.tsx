@@ -1,5 +1,4 @@
 import { Box, BoxProps, Shelf, Stack, Text } from '@centrifuge/fabric'
-import { useTheme } from 'styled-components'
 import * as React from 'react'
 
 type Props = {
@@ -11,7 +10,6 @@ type Props = {
 } & BoxProps
 
 export function LayoutSection({ title, titleAddition, subtitle, headerRight, children, gap = 2, ...boxProps }: Props) {
-  const theme = useTheme()
   return (
     <Stack as="section" gap={3} pt={20} pb={20} {...boxProps}>
       {(title || titleAddition || subtitle || headerRight) && (
@@ -24,13 +22,13 @@ export function LayoutSection({ title, titleAddition, subtitle, headerRight, chi
                     {title}
                   </Text>
                 )}
-                <Text variant="body2" color={theme.colors.textInverted}>
+                <Text variant="body2" color="textInverted">
                   {titleAddition}
                 </Text>
               </Shelf>
             )}
             {subtitle && (
-              <Text variant="body2" as="small" color={theme.colors.textInverted}>
+              <Text variant="body2" as="small" color="textInverted">
                 {subtitle}
               </Text>
             )}

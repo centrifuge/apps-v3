@@ -1,6 +1,5 @@
 import { useModal, useOverlay } from '@react-aria/overlays'
 import * as React from 'react'
-import { useTheme } from 'styled-components'
 import { IconX } from '../../icon'
 import { Button } from '../Button'
 import { Shelf } from '../Shelf'
@@ -15,7 +14,6 @@ type BannerProps = {
 }
 
 export function Banner({ children, title, ...props }: BannerProps) {
-  const theme = useTheme()
   const ref = React.useRef<HTMLDivElement>(null)
   const { overlayProps } = useOverlay({ ...props }, ref)
   const { modalProps } = useModal()
@@ -23,7 +21,7 @@ export function Banner({ children, title, ...props }: BannerProps) {
   return props.isOpen ? (
     <Shelf
       position="fixed"
-      zIndex={theme.zIndices.overlay}
+      zIndex="overlay"
       bottom="24px"
       left="0"
       right="0"
@@ -39,22 +37,22 @@ export function Banner({ children, title, ...props }: BannerProps) {
         py="2"
         px="2"
         maxWidth="540px"
-        backgroundColor={theme.colors.backgroundInverted}
-        style={{ boxShadow: theme.shadows.cardInteractive }}
+        backgroundColor="backgroundInverted"
+        style={{ boxShadow: "cardInteractive" }}
       >
         <Shelf gap="1">
-          <Text color={theme.colors.textInverted} variant="heading4">
+          <Text color="textInverted" variant="heading4">
             {title}
           </Text>
           <Button
             variant="tertiary"
             small
-            icon={<IconX size={24} height="24px" color={theme.colors.textInverted} />}
+            icon={<IconX size={24} height="24px" color="textInverted" />}
             onClick={props.onClose}
             style={{ marginLeft: 'auto' }}
           />
         </Shelf>
-        <Text variant="body1" color={theme.colors.textInverted} style={{ paddingRight: '12px' }}>
+        <Text variant="body1" color="textInverted" style={{ paddingRight: '12px' }}>
           {children}
         </Text>
       </Stack>
