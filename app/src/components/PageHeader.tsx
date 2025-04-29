@@ -1,9 +1,7 @@
 import { Box, Shelf, Stack, Text } from '@centrifuge/fabric'
 import * as React from 'react'
-import { useTheme } from 'styled-components'
 import { ContextActions } from './ContextActions'
 import { NavLink } from 'react-router-dom'
-import { LightDarkTheme } from '../config'
 
 type Props = {
   title: React.ReactNode
@@ -33,11 +31,8 @@ export function PageHeader({
   icon,
   actions,
   border = true,
-  parent,
   children,
 }: Props) {
-  const theme = useTheme() as LightDarkTheme
-
   return (
     <Box
       as="header"
@@ -46,11 +41,11 @@ export function PageHeader({
       top={[-20, -26, 0]}
       zIndex="sticky"
       style={{
-        boxShadow: border ? `0 1px 0 ${theme.colors.borderPrimary}` : undefined,
+        boxShadow: border ? `0 1px 0 borderPrimary` : undefined,
       }}
       mb={3}
     >
-      <Shelf px={[2, 3]} py="20px" justifyContent="space-between" alignItems="center" backgroundColor="backgroundPage">
+      <Shelf px={[2, 3]} py={2} justifyContent="space-between" alignItems="center" backgroundColor="backgroundPage">
         <Shelf gap={2}>
           {icon}
           <Stack gap={0}>

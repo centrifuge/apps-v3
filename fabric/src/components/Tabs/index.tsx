@@ -57,14 +57,14 @@ const StyledTabsItem = styled.button<{
       paddingBottom: 2,
       color: $active ? 'textPrimary' : 'textSecondary',
       boxShadow: $active
-        ? `inset 0 -2px 0 ${variant === 'secondary' ? theme.colors.textPrimary : theme.colors.textGold}`
+        ? `inset 0 -2px 0 ${variant === 'secondary' ? theme.colors.textPrimary : theme.colors.textHighlight}`
         : showBorder
         ? `inset 0 -2px 0 ${theme.colors.backgroundTertiary}`
         : 'none',
       fontWeight: 400,
 
       '&:hover, &:active, &:focus-visible': {
-        color: $active ? 'textPrimary' : 'textGold',
+        color: $active ? 'textPrimary' : 'textHighlight',
       },
       ...styleOverrides,
     })

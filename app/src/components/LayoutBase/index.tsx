@@ -105,7 +105,7 @@ export const LayoutBase = () => {
             <IconButton>
               {mobileMenuOpen ? (
                 <IconX
-                  color="white"
+                  color="textInverted"
                   size="iconLarge"
                   onClick={() => {
                     setMobileMenuOpen(false)
@@ -113,7 +113,7 @@ export const LayoutBase = () => {
                 />
               ) : (
                 <IconHamburger
-                  color="white"
+                  color="textInverted"
                   size="iconLarge"
                   onClick={() => {
                     setMobileMenuOpen(true)

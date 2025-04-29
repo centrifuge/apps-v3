@@ -8,7 +8,7 @@ import {
   IconPlus,
   IconSwitch,
   IconWallet,
-  Text,
+  Text
 } from '@centrifuge/fabric'
 import { Link } from 'react-router-dom'
 import styled from 'styled-components'
@@ -16,8 +16,6 @@ import { useIsAboveBreakpoint } from '../../utils/useIsAboveBreakpoint'
 
 import { RouterLinkButton } from './RouterLinkButton'
 import { SubMenu } from './SubMenu'
-
-const COLOR = '#7C8085'
 
 export const StyledRouterButton = styled(Text)<{ isLarge?: boolean }>`
   display: flex;
@@ -29,12 +27,12 @@ export const StyledRouterButton = styled(Text)<{ isLarge?: boolean }>`
   border-radius: 4px;
   &:hover {
     & > div {
-      color: ${({ theme }) => theme.colors.textGold};
+      color: ${({ theme }) => theme.colors.backgroundButtonPrimaryHover};
     }
     & > svg {
-      color: ${({ theme }) => theme.colors.textGold};
+      color: ${({ theme }) => theme.colors.backgroundButtonPrimaryHover};
     }
-    background-color: rgba(145, 150, 155, 0.13);
+    background-color:${({ theme }) => theme.colors.backgroundInvertedHover};
   }
 `
 
@@ -42,16 +40,15 @@ const StyledRouterLinkButton = styled(RouterLinkButton)`
   width: 100%;
   margin-top: 12px;
   & > span {
-    background-color: ${COLOR};
+    background-color: ${({ theme }) => theme.colors.backgroundInvertedHover};
     border-color: transparent;
-    color: white;
+    color:${({ theme }) => theme.colors.textInverted}
     margin-bottom: 20px;
-    font-size: ${({ theme }) => theme.colors.textGold};
 
     &:hover {
-      box-shadow: 0px 0px 0px 3px #7c8085b3;
-      background-color: ${COLOR};
-      color: white;
+      box-shadow: 0px 0px 0px 3px ${({ theme }) => theme.colors.focus};
+      background-color: ${({ theme }) => theme.colors.backgroundInvertedHover};
+      color:${({ theme }) => theme.colors.textInverted}
     }
 
     &:active {
@@ -69,29 +66,29 @@ export function Menu() {
   const menuItems = [
     {
       label: 'Dashboard',
-      icon: <IconDashboard size={iconSize} color="white" />,
+      icon: <IconDashboard size={iconSize} color="textInverted" />,
       subMenu: ['Account', 'Assets', 'Investors'],
       enabled: pools.length > 0,
       route: '/dashboard',
       withToggle: false,
     },
-    { label: 'Pools', icon: <IconInvestments size={iconSize} color="white" />, route: '/pools', enabled: true },
-    { label: 'Portfolio', icon: <IconWallet size={iconSize} color="white" />, route: '/portfolio', enabled: true },
-    { label: 'Prime', icon: <IconGlobe size={iconSize} color="white" />, route: '/prime', enabled: true },
+    { label: 'Pools', icon: <IconInvestments size={iconSize} color="textInverted" />, route: '/pools', enabled: true },
+    { label: 'Portfolio', icon: <IconWallet size={iconSize} color="textInverted" />, route: '/portfolio', enabled: true },
+    { label: 'Prime', icon: <IconGlobe size={iconSize} color="textInverted" />, route: '/prime', enabled: true },
     {
       label: 'Governance',
-      icon: <IconGovernance size={iconSize} color="white" />,
+      icon: <IconGovernance size={iconSize} color="textInverted" />,
       subMenu: ['Onchain voting', 'Offchain voting', 'Governance forum'],
       enabled: true,
       withToggle: true,
     },
     {
       label: 'NFTs',
-      icon: <IconNft size={iconSize} color="white" />,
+      icon: <IconNft size={iconSize} color="textInverted" />,
       route: '/nfts',
       enabled: false // config.network !== 'centrifuge',
     },
-    { label: 'Swaps', icon: <IconSwitch size={iconSize} color="white" />, route: '/swaps', enabled: showSwaps },
+    { label: 'Swaps', icon: <IconSwitch size={iconSize} color="textInverted" />, route: '/swaps', enabled: showSwaps },
   ]
 
   return (
@@ -105,7 +102,7 @@ export function Menu() {
             ) : (
               <StyledRouterButton as={Link} key={item.label + index} isLarge={isLarge} to={item.route}>
                 {item.icon}
-                <Text color="white" variant="body2" style={{ marginLeft: 8 }}>
+                <Text color="textInverted" variant="body2" style={{ marginLeft: 8 }}>
                   {item.label}
                 </Text>
               </StyledRouterButton>

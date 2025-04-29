@@ -1,5 +1,5 @@
 import * as React from 'react'
-import styled, { useTheme } from 'styled-components'
+import styled from 'styled-components'
 import { Box } from '../Box'
 import { Text } from '../Text'
 
@@ -48,10 +48,10 @@ const Hitearea = styled.button<{ direction?: string }>`
 
 const Number = styled(Text)<{ isActive?: boolean; done: boolean }>`
   background-color: ${({ theme, isActive, done }) =>
-    isActive && !done ? theme.colors.textGold : done ? theme.colors.statusOkBg : 'transparent'};
+    isActive && !done ? theme.colors.borderButtonPrimaryHover : done ? theme.colors.statusOkBg : 'transparent'};
   border: ${({ theme, isActive, done }) =>
     isActive && !done
-      ? `1px solid ${theme.colors.textGold}`
+      ? `1px solid ${theme.colors.borderButtonPrimaryFocus}`
       : done
       ? `1px solid ${theme.colors.statusOk}`
       : `1.73px solid ${theme.colors.backgroundButtonPrimaryDisabled}`};
@@ -64,11 +64,10 @@ const Number = styled(Text)<{ isActive?: boolean; done: boolean }>`
 `
 
 const Line = ({ direction }: { direction: 'row' | 'column' }) => {
-  const theme = useTheme()
   return (
     <Box
-      borderTop={direction === 'row' ? `2px dashed ${theme.colors.backgroundButtonPrimaryDisabled}` : 'none'}
-      borderLeft={direction === 'column' ? `2px dashed ${theme.colors.backgroundButtonPrimaryDisabled}` : 'none'}
+      borderTop={direction === 'row' ? '2px dashed backgroundButtonPrimaryDisabled' : 'none'}
+      borderLeft={direction === 'column' ? '2px dashed backgroundButtonPrimaryDisabled' : 'none'}
       width={direction === 'row' ? '140px' : 0}
       height={direction === 'column' ? 80 : 0}
       mt={direction === 'row' ? 2 : 3}
@@ -90,7 +89,7 @@ export const Step = (props: StepProps & EnrichedStepProps) => {
         <Hitearea
           direction={direction}
           onClick={() => {
-            !empty && setActiveStep && setActiveStep((count as number) + 1)
+            if (!empty && setActiveStep) setActiveStep((count as number) + 1)
           }}
         >
           <Number variant="body3" isActive={isActive} done={props.isStepCompleted}>

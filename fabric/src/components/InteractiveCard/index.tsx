@@ -1,5 +1,5 @@
 import * as React from 'react'
-import styled, { useTheme } from 'styled-components'
+import styled from 'styled-components'
 import { IconChevronRight } from '../../icon'
 import { useControlledState } from '../../utils/useControlledState'
 import { Box } from '../Box'
@@ -42,7 +42,6 @@ export function InteractiveCard(props: InteractiveCardProps) {
 
   const [open, setOpen] = useControlledState(false, isOpen, setIsOpen)
   const [hovered, setHovered] = React.useState(false)
-  const theme = useTheme()
 
   function handleClick(e: React.MouseEvent<HTMLButtonElement>) {
     if (variant === 'collapsible') {
@@ -93,7 +92,7 @@ export function InteractiveCard(props: InteractiveCardProps) {
         <Box
           p={2}
           style={{
-            boxShadow: `0 -1px 0 ${theme.colors.borderPrimary}`,
+            boxShadow: "0 -1px 0 borderPrimary",
           }}
         >
           {secondaryHeader}
@@ -118,7 +117,6 @@ type ContentProps = {
 }
 
 function Content({ backgroundColor = 'none', children }: ContentProps) {
-  const { colors } = useTheme()
 
   return (
     <Box
@@ -127,7 +125,7 @@ function Content({ backgroundColor = 'none', children }: ContentProps) {
       borderBottomLeftRadius="card"
       borderBottomRightRadius="card"
       style={{
-        boxShadow: `0 -1px 0 ${colors.borderPrimary}`,
+        boxShadow: "0 -1px 0 borderPrimary",
       }}
     >
       {children}

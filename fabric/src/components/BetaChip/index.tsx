@@ -1,6 +1,7 @@
 import css from '@styled-system/css'
 import styled from 'styled-components'
 import { Text } from '../Text'
+import { FabricTheme } from '../../theme'
 
 export const BetaChip = styled(Text)(
   css({
@@ -9,7 +10,7 @@ export const BetaChip = styled(Text)(
     bg: 'statusPromote',
     borderRadius: 20,
     fontSize: '10px',
-    color: 'white',
+    color: `${(theme: FabricTheme) => theme.colors.textInverted}`,
     whiteSpace: 'nowrap',
     lineHeight: '15px',
   })

@@ -4,7 +4,7 @@ export function InvestmentDisclaimerDialog({ open, onClose }: { open: boolean; o
   return (
     <Dialog
       title="Investment disclaimer"
-      icon={<IconInfo height="24" width="24" />}
+      icon={<IconInfo height="3" width="3" />}
       isOpen={open}
       onClose={onClose}
       width="684px"

@@ -11,7 +11,7 @@ export function LayoutMain({
   children: React.ReactNode
 }) {
   return (
-    <Stack py={5} as="section" gap={3} pt={20} pb={20}>
+    <Stack py={5} as="section" gap={3}>
       <Stack gap={4}>
         <Stack>
           <Text as="h1" variant="heading1">

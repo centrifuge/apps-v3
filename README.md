@@ -83,6 +83,9 @@ Key architectural decisions:
 
 The `fabric` package is currently empty and reserved for future development of shared utilities, components, or other functionality that may be needed across the workspace.
 
+#### Styling and Props
+We're using styled components, and have our own theme defined as part of the exports from Fabric. The theme is used to define colors, fonts, and other design tokens, which we use either as plain strings as part of the component being a child of the theme provider (preference), or as part of a theme object when using useTheme. If there's a color or other prop value that you don't know where it comes from, check the theme in Fabric.
+
 ### Communication Between Packages
 
 - **API Communication**: The React app can communicate with the functions API using standard HTTP requests
