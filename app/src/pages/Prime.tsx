@@ -1,6 +1,5 @@
-import { Box, Grid, IconExternalLink, IconGlobe, Text } from '@centrifuge/fabric'
+import { Box, Grid, IconExternalLink, IconGlobe, Text, AnchorTextLink } from '@centrifuge/fabric'
 import { useTheme } from 'styled-components'
-import { AnchorTextLink } from '../components/TextLink'
 import primePageImage from '../../assets/prime_page_image.svg'
 import { LayoutSection } from '../components/LayoutBase/LayoutSection'
 import { LightDarkTheme } from '../config'
