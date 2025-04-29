@@ -209,7 +209,7 @@ export function ImageUpload({
               justifySelf="stretch"
               alignItems="center"
               justifyContent="center"
-              borderRadius="10px"
+              borderRadius="1"
               position="relative"
               p={3}
               style={{ opacity: fileUrl ? 0 : 1 }}

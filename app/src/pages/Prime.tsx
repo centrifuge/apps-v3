@@ -27,11 +27,11 @@ const PrimePage = () => {
           gridTemplateColumns={['1fr', '1fr 1fr']}
           gap={6}
           mt={2}
-          padding="0px 50px"
+          padding={[0, 6]}
           style={{ placeItems: 'center' }}
         >
           <Box>
-            <Text variant="body1" style={{ lineHeight: '25.6px' }}>
+            <Text variant="body1" style={{ lineHeight: '2' }}>
               Centrifuge Prime was built to meet the needs of large decentralized organizations and protocols. Through
               Centrifuge Prime, DeFi native organizations can integrate with the largest financial markets in the world
               and take advantage of real yields from real economic activity - all onchain. Assets tailored to your

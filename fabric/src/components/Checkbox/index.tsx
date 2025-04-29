@@ -24,7 +24,7 @@ export function Checkbox({
     <Box position="relative">
       <StyledLabel $extendedClickArea={!!extendedClickArea}>
         <Shelf as={Text} gap={1} alignItems="flex-start" position="relative">
-          <StyledWrapper minWidth="18px" height="18px" flex="0 0 18px" $hasLabel={!!label}>
+          <StyledWrapper minWidth="2" height="2" flex="0 0 2" $hasLabel={!!label}>
             <StyledCheckbox type="checkbox" {...checkboxProps} variant={variant} />
             <StyledOutline />
           </StyledWrapper>

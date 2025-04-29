@@ -22,21 +22,21 @@ export function Banner({ children, title, ...props }: BannerProps) {
     <Shelf
       position="fixed"
       zIndex="overlay"
-      bottom="24px"
+      bottom="3"
       left="0"
       right="0"
       justifyContent="end"
-      minWidth="500px"
+      minWidth="overlayMinWidth"
       px={2}
     >
       <Stack
         {...overlayProps}
         {...modalProps}
         ref={ref}
-        borderRadius="8px"
+        borderRadius="1"
         py="2"
         px="2"
-        maxWidth="540px"
+        maxWidth="overlayMaxWidth"
         backgroundColor="backgroundInverted"
         style={{ boxShadow: "cardInteractive" }}
       >
@@ -47,7 +47,7 @@ export function Banner({ children, title, ...props }: BannerProps) {
           <Button
             variant="tertiary"
             small
-            icon={<IconX size={24} height="24px" color="textInverted" />}
+            icon={<IconX size={24} height="3" color="textInverted" />}
             onClick={props.onClose}
             style={{ marginLeft: 'auto' }}
           />

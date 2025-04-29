@@ -443,18 +443,18 @@ export function AddressInput({
             network && (
               <Shelf
                 gap={1}
-                p="8px"
+                p="1"
                 border="1px solid"
                 borderColor="borderPrimary"
                 backgroundColor="backgroundPage"
                 borderRadius="input"
               >
                 {network === 'ethereum' ? (
-                  <IconEthereum size="20px" />
+                  <IconEthereum size="3" />
                 ) : network === 'centrifuge' ? (
-                  <IconCentrifuge size="20px" />
+                  <IconCentrifuge size="3" />
                 ) : network === 'loading' ? (
-                  <SpinningIconLoader size="20px" />
+                  <SpinningIconLoader size="3" />
                 ) : null}
               </Shelf>
             )

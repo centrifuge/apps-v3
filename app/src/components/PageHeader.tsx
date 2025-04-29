@@ -45,7 +45,7 @@ export function PageHeader({
       }}
       mb={3}
     >
-      <Shelf px={[2, 3]} py="20px" justifyContent="space-between" alignItems="center" backgroundColor="backgroundPage">
+      <Shelf px={[2, 3]} py={2} justifyContent="space-between" alignItems="center" backgroundColor="backgroundPage">
         <Shelf gap={2}>
           {icon}
           <Stack gap={0}>

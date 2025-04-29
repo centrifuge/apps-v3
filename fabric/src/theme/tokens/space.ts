@@ -3,6 +3,8 @@ const space = Object.assign(values, {
   gutterMobile: values[2],
   gutterTablet: values[2],
   gutterDesktop: values[3],
+  overlayMinWidth: 500,
+  overlayMaxWidth: 540,
 })
 
 export { space }

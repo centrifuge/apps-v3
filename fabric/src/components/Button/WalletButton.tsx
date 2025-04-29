@@ -27,7 +27,7 @@ const StyledButton = styled.button`
   outline: 0;
   border-radius: 4px;
   white-space: nowrap;
-  border: 3px solid transparent;
+  border: 3px solid red;
   width: 220px;
 `
 
@@ -70,7 +70,7 @@ export function WalletButton({
       >
         {alias && address ? (
           <Box position="relative" flex="1 1 auto">
-            <Shelf position="absolute" top="0" bottom="0" left="0" width="100%" m="auto" height="30px">
+            <Shelf position="absolute" top="0" bottom="0" left="0" width="100%" m="auto" height="4">
               <Text
                 fontSize={small ? 14 : 16}
                 color="textInverted"

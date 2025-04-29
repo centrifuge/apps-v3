@@ -27,13 +27,13 @@ export const Default = () => {
   }
 
   return (
-    <Stack gap="24px">
+    <Stack gap="3">
       <Stepper activeStep={activeStep} setActiveStep={setActiveStep}>
         <Step label="Authorised signer verification" />
         <Step label="Step 2" />
         <Step label="Step 3" />
       </Stepper>
-      <Shelf gap="12px">
+      <Shelf gap="2">
         <Button onClick={() => handlePreviousStep()} disabled={activeStep === 1}>
           Back Step
         </Button>
