@@ -22,13 +22,13 @@ export function LayoutSection({ title, titleAddition, subtitle, headerRight, chi
                     {title}
                   </Text>
                 )}
-                <Text variant="body2" color="textSecondary">
+                <Text variant="body2" color="textInverted">
                   {titleAddition}
                 </Text>
               </Shelf>
             )}
             {subtitle && (
-              <Text variant="body2" as="small" color="textSecondary">
+              <Text variant="body2" as="small" color="textInverted">
                 {subtitle}
               </Text>
             )}

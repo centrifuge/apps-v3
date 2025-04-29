@@ -17,9 +17,9 @@ const statusPromoteBg = '#f8107114'
 const colors = {
   textPrimary: grayScale[800],
   textSecondary: grayScale[500],
-  textDisabled: grayScale[900],
+  textDisabled: grayScale[600],
   textInverted: 'white',
-  textGold: gold,
+  textHighlight: gold,
 
   backgroundPrimary: 'white',
   backgroundSecondary: grayScale[50],
@@ -30,6 +30,7 @@ const colors = {
   backgroundInput: 'white',
   backgroundThumbnail: grayScale[500],
   backgroundInverted: grayScale[800],
+  backgroundInvertedHover: grayScale[900],
 
   borderPrimary: grayScale[100],
   borderSecondary: 'rgba(207, 207, 207, 0.50)',

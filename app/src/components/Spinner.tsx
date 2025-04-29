@@ -28,7 +28,7 @@ type SpinnerProps = ShelfProps & {
   size?: string | number
 }
 
-export function Spinner({ size = '48px', ...shelfProps }: SpinnerProps) {
+export function Spinner({ size = '6', ...shelfProps }: SpinnerProps) {
   const theme = useTheme()
   const sizePx = toPx(theme.sizes[size as ThemeSize] || size)
 

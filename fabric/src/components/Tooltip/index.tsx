@@ -94,7 +94,6 @@ export function Tooltip({
 }: TooltipProps) {
   const triggerRef = React.useRef<HTMLButtonElement>(null)
   const overlayRef = React.useRef<HTMLDivElement>(null)
-
   const config = { isDisabled: disabled, delay }
 
   const state = useTooltipTriggerState(config)
@@ -126,11 +125,11 @@ export function Tooltip({
               pointer={pointer}
             >
               {!!title && (
-                <Text variant="body3" fontWeight={600} color="white">
+                <Text variant="body3" fontWeight={600} color="textInverted">
                   {title}
                 </Text>
               )}
-              <Text variant="body4" color="white">
+              <Text variant="body4" color="textInverted">
                 {body}
               </Text>
             </Container>

@@ -46,8 +46,7 @@ const FormField = styled.input`
 `
 
 const Container = styled(Grid)<{ $disabled?: boolean; $active: boolean }>`
-  background-color: white;
-  border-radius: 8px;
+  background-color: ${({ theme }) => (theme.colors.backgroundPage)};
   position: relative;
   &::before {
     content: '';
@@ -210,7 +209,7 @@ export function ImageUpload({
               justifySelf="stretch"
               alignItems="center"
               justifyContent="center"
-              borderRadius="10px"
+              borderRadius="1"
               position="relative"
               p={3}
               style={{ opacity: fileUrl ? 0 : 1 }}

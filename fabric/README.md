@@ -17,52 +17,34 @@ yarn add @centrifuge/fabric react react-dom styled-components
 
 # npm
 npm install --save @centrifuge/fabric react react-dom styled-components
+
+# pnpm
+pnpm add --save @centrifuge/fabric react react-dom styled-components
 ```
 
-Import the `GlobalStyle` component, a theme, and `styled-components` `ThemeProvider` component, and add them to the root of your React app.
+If you have also forked the `app` repository, you can find the themeing configuration in [config](...app/src/config.ts) and provider implementation in [Root](../app/src/Root.tsx), otherwise you can import FabricProvider and use that in your project, which also includes the global styles
 
 ```jsx
-import { GlobalStyle } from '@centrifuge/fabric'
-import centrifugeLight from '@centrifuge/fabric/dist/theme/centrifugeLight'
-import { ThemeProvider } from 'styled-components'
+import React from 'react'
+import { FabricProvider } from '@centrifuge/fabric'
 
-function App() {
+export function Root() {
   return (
-    <ThemeProvider theme={centrifugeLight}>
-      <GlobalStyle />
-      {/* Rest of your React app */}
-    </ThemeProvider>
+    <>
+      {...}
+      <FabricProvider theme={theme}>
+          {...router or children or other components}
+      </FabricProvider>
+    </>
   )
-}
-```
-
-## Integration in the monorepo
-
-- Make sure the same version of `react` and `styled-components` is used (at moment of writing: `styled-components@5.3.1`)
-- Add the package directory in `apps/package.json` under the `workspaces` prop
-- Declare the module in `apps/tinlake-ui/declarations.d.ts`
-- Add the dependency to `apps/tinlake-ui/package.json`:
-  ```
-  "@centrifuge/fabric": "workspace:*",
-  ```
-- Change the `build:deps` script in `apps/tinlake-ui/package.json`:
-  - from
-    ```
-    "build:deps": "cd ../tinlake.js && yarn build && cd ../tinlake-ui"
-    ```
-  - to
-    ```
-    "build:deps:tinlake.js": "cd ../tinlake.js && yarn build && cd ../tinlake-ui",
-    "build:deps:fabric": "cd ../fabric && yarn build && cd ../tinlake-ui",
-    "build:deps": "yarn build:deps:tinlake.js && yarn build:deps:fabric"
-    ```
+}```
 
 ## Development
 
 ### With Storybook
 
 ```sh
-$ yarn storybook
+$ pnpm storybook
 ```
 
 Will start the Storybook to allow development of the components in isolation
@@ -70,11 +52,11 @@ Will start the Storybook to allow development of the components in isolation
 ### Watch mode
 
 ```sh
-$ yarn build --watch
+$ pnpm build --watch
 ```
 
-Will build locally and listen for changes, allowing to see the changes directly when working on `tinlake-ui`, for example
+Will build locally and listen for changes, allowing to see the changes directly when working on `app`, for example
 
 ### Publishing a new version
 
-Create a new branch and run `yarn bump`, which bumps the package version, updates the changelog, creates a commit and tags it. Push the branch/tag, which should publish the version to NPM. Open a PR to merge the changes to `main`. For generating the changelog, make sure to use the [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) spec in your commits, with `fabric` as the scope, e.g.: `feat(fabric): Add button component`
+Create a new branch and run `pnpm bump`, which bumps the package version, updates the changelog, creates a commit and tags it. Push the branch/tag, which should publish the version to NPM. Open a PR to merge the changes to `main`. For generating the changelog, make sure to use the [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) spec in your commits, with `fabric` as the scope, e.g.: `feat(fabric): Add button component`

@@ -11,17 +11,17 @@ const router = createHashRouter(routes)
 
 export function Root() {
   const [debugState, setDebugState] = React.useState(initialFlagsState)
-
+  const [theme, setTheme] = React.useState(config.themes.light)
   return (
     <>
       <HelmetProvider>
         <Head />
       </HelmetProvider>
-      <FabricProvider theme={config.themes.light}>
-        <DebugFlags onChange={(state) => setDebugState(state)}>
-        <RouterProvider router={router} />
-        </DebugFlags>
-      </FabricProvider>
+      <DebugFlags onChange={(state) => setDebugState(state)}>
+        <FabricProvider theme={theme}>
+          <RouterProvider router={router} />
+        </FabricProvider>
+      </DebugFlags>
     </>
   )
 }

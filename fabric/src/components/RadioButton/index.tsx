@@ -1,5 +1,5 @@
 import * as React from 'react'
-import styled, { useTheme } from 'styled-components'
+import styled from 'styled-components'
 import { Box } from '../Box'
 import { Flex } from '../Flex'
 import { Shelf } from '../Shelf'
@@ -35,14 +35,13 @@ export const RadioButton = ({
   id?: string
   border?: boolean
 } & RadioButtonProps) => {
-  const theme = useTheme()
 
   return (
-    // @ts-expect-error
+    // @ts-expect-error matching overload
     <Box
-      backgroundColor={theme.colors.backgroundPrimary}
+      backgroundColor="backgroundPrimary"
       borderRadius={8}
-      border={border ? `1px solid ${theme.colors.borderPrimary}` : 'none'}
+      border={border ? '1px solid borderPrimary' : 'none'}
       display="flex"
       flexDirection={icon ? 'row' : 'column'}
       justifyContent={icon ? 'space-between' : 'center'}
@@ -62,14 +61,13 @@ export const RadioButton = ({
 }
 
 export function RadioButtonInput({ label, errorMessage, textStyle, ...radioProps }: RadioButtonProps) {
-  const theme = useTheme()
   return (
     <label htmlFor={radioProps.id}>
       <Shelf
         as={Text}
         gap={1}
         alignItems="baseline"
-        backgroundColor={theme.colors.backgroundPrimary}
+        backgroundColor="backgroundPrimary"
         px={1}
         py={1}
         borderRadius={8}
@@ -101,7 +99,7 @@ const StyledOutline = styled.span`
   right: -4px;
   bottom: -4px;
   left: -4px;
-  border: 2px solid var(--fabric-focus);
+  border: 2px solid ${({ theme }) => theme.colors.focus};
   border-radius: 20px;
   border-color: ${({ theme }) => theme.colors.textPrimary};
 `

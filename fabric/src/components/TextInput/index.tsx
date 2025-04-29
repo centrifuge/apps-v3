@@ -1,5 +1,5 @@
 import * as React from 'react'
-import styled, { keyframes, useTheme } from 'styled-components'
+import styled, { keyframes } from 'styled-components'
 import { Box, Flex, IconCentrifuge, IconEthereum, IconLoader, IconSearch } from '../..'
 import { InputUnit, InputUnitProps, useContextId } from '../InputUnit'
 import { Shelf } from '../Shelf'
@@ -175,7 +175,7 @@ export function TextInputBox(
     small?: boolean
   }
 ) {
-  const { error, disabled, action, symbol, inputRef, inputElement, row, small, ...inputProps } = props
+  const { disabled, action, symbol, inputRef, inputElement, row, small, ...inputProps } = props
   return (
     <StyledInputBox hideBorder={!!row} alignItems="stretch" height={small ? '28px' : 'input'} disabled={disabled}>
       {inputElement ?? <StyledTextInput disabled={disabled} {...inputProps} id={useContextId()} ref={inputRef} />}
@@ -219,17 +219,16 @@ export function SearchInput({
   const defaultId = React.useId()
   id ??= defaultId
   const [isDropdownOpen, setDropdownOpen] = React.useState(false)
-  const theme = useTheme()
   const inputRef = React.useRef<HTMLInputElement>(null)
 
   const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
     setDropdownOpen(true)
-    onFocus && onFocus(e)
+    if (onFocus) onFocus(e)
   }
 
   const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
     setTimeout(() => setDropdownOpen(false), 200)
-    onBlur && onBlur(e)
+    if (onBlur) onBlur(e)
   }
 
   const handleClick = () => {
@@ -237,7 +236,7 @@ export function SearchInput({
   }
 
   const handleOptionClick = (option: DropdownOption) => {
-    onOptionSelect && onOptionSelect(option)
+    if (onOptionSelect) onOptionSelect(option)
     setDropdownOpen(false)
     inputRef.current?.focus()
   }
@@ -272,8 +271,8 @@ export function SearchInput({
             left: 0,
             right: 0,
             zIndex: 1000,
-            backgroundColor: theme.colors.backgroundPage,
-            border: `1px solid ${theme.colors.borderPrimary}`,
+            backgroundColor: "backgroundPage",
+            border: "1px solid borderPrimary",
             margin: 0,
             padding: 0,
             listStyle: 'none',
@@ -397,13 +396,11 @@ export type AddressInputProps = Omit<React.InputHTMLAttributes<HTMLInputElement>
 export function AddressInput({
   id,
   label,
-  secondaryLabel,
   disabled,
   errorMessage,
   onBlur,
   onChange,
   value = '',
-  clearIcon,
   ...inputProps
 }: AddressInputProps) {
   const defaultId = React.useId()
@@ -422,7 +419,6 @@ export function AddressInput({
   }
 
   function handleBlur(e: React.FocusEvent<HTMLInputElement>) {
-    const address = e.target.value
     setNetwork(null)
 
     if (onBlur) {
@@ -447,18 +443,18 @@ export function AddressInput({
             network && (
               <Shelf
                 gap={1}
-                p="8px"
+                p="1"
                 border="1px solid"
                 borderColor="borderPrimary"
                 backgroundColor="backgroundPage"
                 borderRadius="input"
               >
                 {network === 'ethereum' ? (
-                  <IconEthereum size="20px" />
+                  <IconEthereum size="3" />
                 ) : network === 'centrifuge' ? (
-                  <IconCentrifuge size="20px" />
+                  <IconCentrifuge size="3" />
                 ) : network === 'loading' ? (
-                  <SpinningIconLoader size="20px" />
+                  <SpinningIconLoader size="3" />
                 ) : null}
               </Shelf>
             )

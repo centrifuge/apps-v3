@@ -2,8 +2,6 @@ import { ResponsiveValue } from 'styled-system'
 
 type Status = 'Default' | 'Info' | 'Ok' | 'Warning' | 'Critical' | 'Promote'
 
-// Colors
-
 type StatusColorName = `status${Status}` | `status${Status}Bg`
 
 type AccentColorName =
@@ -16,7 +14,7 @@ type AccentColorName =
   | 'textSelected'
   | 'textInteractive'
   | 'textInteractiveHover'
-type TextColorName = `text${'Primary' | 'Secondary' | 'Disabled' | 'Inverted' | 'Gold'}`
+type TextColorName = `text${'Primary' | 'Secondary' | 'Disabled' | 'Inverted' | 'Highlight'}`
 type BorderColorName = `border${'Primary' | 'Secondary' | 'Tertiary'}`
 type BackgroundColorName = `background${
   | 'Primary'
@@ -27,7 +25,9 @@ type BackgroundColorName = `background${
   | 'Thumbnail'
   | 'AccentPrimary'
   | 'AccentSecondary'
-  | 'Inverted'}`
+  | 'Placeholder'
+  | 'Inverted'
+  | 'InvertedHover'}`
 type ButtonColorName =
   | `${'background' | 'text' | 'border'}Button${'Primary' | 'Secondary' | 'Tertiary' | 'Inverted'}${
       | ''
@@ -66,7 +66,7 @@ export type ThemeBreakpoints = BreakpointValue[] & {
   [k in BreakpointName]: BreakpointValue
 }
 
-type SizeName = 'dialog' | 'drawer' | 'container' | 'iconSmall' | 'iconMedium' | 'iconRegular' | 'iconLarge' | 'input'
+type SizeName = 'dialog' | 'drawer' | 'container' | 'iconSmall' | 'iconMedium' | 'iconRegular' | 'iconLarge' | 'input' | 'mainContent'
 type SizeValue = number
 
 type ThemeSizes = {

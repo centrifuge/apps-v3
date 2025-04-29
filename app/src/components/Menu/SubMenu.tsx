@@ -6,8 +6,6 @@ import { StyledRouterButton } from '.'
 import { useIsAboveBreakpoint } from '../../utils/useIsAboveBreakpoint'
 import { baseButton, primaryButton } from './styles'
 
-export const LIGHT_BACKGROUND = 'rgba(145, 150, 155, 0.13)'
-
 export const Toggle = styled(Text)<{ isActive?: boolean; stacked?: boolean }>`
   ${baseButton}
   ${primaryButton}
@@ -16,18 +14,18 @@ export const Toggle = styled(Text)<{ isActive?: boolean; stacked?: boolean }>`
     stacked ? '1fr' : `${theme.sizes.iconSmall}px 1fr ${theme.sizes.iconSmall}px`};
   color: ${({ theme }) => theme.colors.textInverted};
   border-radius: 4px;
-  background-color: ${({ isActive }) => (isActive ? LIGHT_BACKGROUND : 'transparent')};
+  background-color: ${({ isActive, theme }) => (isActive ? theme.colors.backgroundInvertedHover : 'transparent')};
   font-weight: 400;
 
   &:hover {
-    background-color: rgba(145, 150, 155, 0.13);
+    background-color: ${({ theme }) => theme.colors.backgroundInvertedHover};
 
     & span {
-      color: ${({ theme }) => theme.colors.textGold};
+      color: ${({ theme }) => theme.colors.textButtonTertiaryHover};
     }
 
     & svg {
-      color: ${({ theme }) => theme.colors.textGold};
+      color: ${({ theme }) => theme.colors.textButtonTertiaryHover};
     }
   }
 `
@@ -35,13 +33,13 @@ export const Toggle = styled(Text)<{ isActive?: boolean; stacked?: boolean }>`
 const RouterButton = styled(Text)`
   padding: 6px;
   margin-left: 28px;
-  color: white;
+  color: ${({ theme }) => theme.colors.textInverted};
   font-size: 14px;
   border-radius: 4px;
   font-family: ${({ theme }) => theme.fonts.standard};
   &:hover {
-    color: ${({ theme }) => theme.colors.textGold};
-    background-color: rgba(145, 150, 155, 0.13);
+    color: ${({ theme }) => theme.colors.textButtonTertiaryHover};
+    background-color: ${({ theme }) => theme.colors.backgroundInvertedHover};
   }
 `
 
@@ -85,7 +83,7 @@ export function ToggleMenu({
         onClick={() => setOpen(!open)}
       >
         {icon}
-        <Text color="white">{label}</Text>
+        <Text color="textInverted">{label}</Text>
         {open ? (
           <IconChevronDown size={['iconMedium', 'iconMedium', 'iconSmall']} />
         ) : (
@@ -99,7 +97,7 @@ export function ToggleMenu({
             return ( toLink ? (
             <RouterButton
               as={Link}
-              color="white"
+              color="textInverted"
               to={toLink}
               target="_blank"
               style={{ textDecoration: 'none' }}
@@ -135,28 +133,28 @@ export function SubMenu({
           <>
             {isLarge ? (
               <>
-                <StyledRouterButton as={Link} color="white" to={`/${label.toLowerCase()}`}>
+                <StyledRouterButton as={Link} color="textInverted" to={`/${label.toLowerCase()}`}>
                   {icon}
-                  <Text color="white" variant="body2" style={{ marginLeft: 8 }}>
+                  <Text color="textInverted" variant="body2" style={{ marginLeft: 8 }}>
                     {label}
                   </Text>
                 </StyledRouterButton>
                 {links.map((link) => (
-                  <RouterButton key={link} as={Link} color="white" to={`/${label.toLowerCase()}/${link.toLowerCase()}`}>
+                  <RouterButton key={link} as={Link} color="textInverted" to={`/${label.toLowerCase()}/${link.toLowerCase()}`}>
                     {link}
                   </RouterButton>
                 ))}
               </>
             ) : (
               <Stack>
-                <StyledRouterButton as={Link} color="white" to={`/${label.toLowerCase()}`}>
+                <StyledRouterButton as={Link} color="textInverted" to={`/${label.toLowerCase()}`}>
                   {icon}
-                  <Text color="white" variant="body2" style={{ marginLeft: 8 }}>
+                  <Text color="textInverted" variant="body2" style={{ marginLeft: 8 }}>
                     {label}
                   </Text>
                 </StyledRouterButton>
                 {links.map((link) => (
-                  <RouterButton key={link} as={Link} color="white" to={`/${label.toLowerCase()}/${link.toLowerCase()}`}>
+                  <RouterButton key={link} as={Link} color="textInverted" to={`/${label.toLowerCase()}/${link.toLowerCase()}`}>
                     {link}
                   </RouterButton>
                 ))}

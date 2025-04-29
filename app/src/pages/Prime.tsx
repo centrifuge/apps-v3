@@ -1,11 +1,12 @@
 import { Box, Grid, IconExternalLink, IconGlobe, Text, AnchorTextLink } from '@centrifuge/fabric'
+<<<<<<< HEAD
 import { useTheme } from 'styled-components'
+=======
+>>>>>>> main
 import primePageImage from '../../assets/prime_page_image.svg'
 import { LayoutSection } from '../components/LayoutBase/LayoutSection'
-import { LightDarkTheme } from '../config'
 
 const PrimePage = () => {
-  const theme = useTheme() as LightDarkTheme
   return (
     <>
       <LayoutSection alignItems="flex-start" pt={3} pb={3}>
@@ -13,29 +14,28 @@ const PrimePage = () => {
           <Box
             backgroundColor="backgroundSecondary"
             borderRadius={28}
-            height={40}
-            width={40}
-            border={`6px solid ${theme.colors.borderTertiary}`}
+            height={45}
+            width={45}
             display="flex"
             justifyContent="center"
             alignItems="center"
           >
-            <IconGlobe size={20} />
+            <IconGlobe size={20} color="textPrimary" />
           </Box>
           <Text variant="heading1" style={{ marginLeft: 8 }}>
             Centrifuge Prime
           </Text>
         </Box>
-        <Box borderBottom={`1px solid ${theme.colors.borderPrimary}`} pb={2} mx={2} />
+        <Box borderBottom={`1px solid borderPrimary`} pb={2} mx={2} />
         <Grid
           gridTemplateColumns={['1fr', '1fr 1fr']}
           gap={6}
           mt={2}
-          padding="0px 50px"
+          padding={[0, 6]}
           style={{ placeItems: 'center' }}
         >
           <Box>
-            <Text variant="body1" style={{ lineHeight: '25.6px' }}>
+            <Text variant="body1" style={{ lineHeight: '2' }}>
               Centrifuge Prime was built to meet the needs of large decentralized organizations and protocols. Through
               Centrifuge Prime, DeFi native organizations can integrate with the largest financial markets in the world
               and take advantage of real yields from real economic activity - all onchain. Assets tailored to your
@@ -58,7 +58,7 @@ const PrimePage = () => {
           </Box>
         </Grid>
       </LayoutSection>
-      <Box borderBottom={`1px solid ${theme.colors.borderPrimary}`} pb={3} />
+      <Box borderBottom='1px solid borderPrimary' pb={3} />
       <DaoPortfoliosTable />
     </>
   )
