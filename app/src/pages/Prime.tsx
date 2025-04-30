@@ -1,8 +1,4 @@
 import { Box, Grid, IconExternalLink, IconGlobe, Text, AnchorTextLink } from '@centrifuge/fabric'
-<<<<<<< HEAD
-import { useTheme } from 'styled-components'
-=======
->>>>>>> main
 import primePageImage from '../../assets/prime_page_image.svg'
 import { LayoutSection } from '../components/LayoutBase/LayoutSection'
 
