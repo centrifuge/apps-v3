@@ -1,14 +1,7 @@
 import * as React from 'react'
 import { debug, flagsConfig, genericFlagsConfig, Key } from './config'
 
-export type Flags = {
-  [T in Key]: (typeof flagsConfig)[T] extends { options: { [key: string]: string } }
-    ? string
-    : (typeof flagsConfig)[T]['default'] extends boolean
-    ? boolean
-    : (typeof flagsConfig)[T]['default']
-}
-
+export type Flags = Record<Key, string | boolean>
 interface Context {
   flags: Flags
   register: (id: number, keys: string[]) => void
@@ -16,29 +9,29 @@ interface Context {
 }
 
 export const defaultFlags: Flags = Object.entries(genericFlagsConfig).reduce((obj, [k, v]) => {
-  obj[k] = 'options' in v ? v.options[v.default] : v.default
+  obj[k as Key] = v.default
   return obj
-}, {} as any)
+}, {} as Flags)
 
 let persistedState: Flags | null = null
 try {
   const stored = localStorage.getItem('debugFlags') ?? ''
   persistedState = JSON.parse(stored[0] === '{' ? stored : '') as Flags
 } catch (e) {
-  //
+  console.error('Failed to parse debug flags from localStorage', e)
 }
 const flagKeys = Object.keys(flagsConfig)
 export const initialFlagsState: Flags = persistedState
   ? Object.entries(persistedState)
       .filter(([k]) => flagKeys.includes(k))
       .reduce((obj, [k, v]) => {
-        obj[k] = v
+        obj[k as Key] = v
         return obj
-      }, {} as any)
+      }, {} as Flags)
   : Object.entries(flagsConfig).reduce((obj, [k, v]) => {
-      obj[k] = v.default
+      obj[k as Key] = v.default
       return obj
-    }, {} as any)
+    }, {} as Flags)
 
 export const DebugFlagsContext = React.createContext<Context>({ flags: defaultFlags, register() {}, unregister() {} })
 
@@ -52,6 +45,7 @@ let i = 0
 export function useDebugFlags(): Flags {
   const [id] = React.useState(() => (i += 1))
   const ctx = React.useContext(DebugFlagsContext)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const tracked = React.useRef<any>({})
   const stateRef = React.useRef(ctx.flags)
   stateRef.current = ctx.flags
@@ -64,15 +58,12 @@ export function useDebugFlags(): Flags {
           return stateRef.current[prop]
         },
       }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   )
 
   React.useEffect(() => {
     ctx.register(id, Object.keys(tracked.current))
-
     return () => ctx.unregister(id)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return debug ? proxiedFlags : ctx.flags

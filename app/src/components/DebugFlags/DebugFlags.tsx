@@ -9,23 +9,26 @@ function DebugFlagsImpl({ children, onChange }: { children?: React.ReactNode; on
   const [tracked, setTracked] = React.useState({})
 
   const ctx = React.useMemo(
-    () => ({
-      flags: Object.entries(state).reduce((obj, [key, value]) => {
-        const conf = genericFlagsConfig[key as Key]
-        obj[key] = 'options' in conf ? conf.options[value as string] : value
-        return obj
-      }, {} as any),
+    () => {
+      const defaultEntries: [string, string|boolean][] = Object.entries(state)
+      const flags = {} as Partial<Flags>;
+      defaultEntries.forEach(([key, value]: [string, string|boolean]) => {
+          flags[key as Key] = value
+      })
+
+      return ({
+      flags: {...flags} as Flags,
       register(id: number, keys: string[]) {
         setTracked((prev) => ({ ...prev, [id]: keys }))
       },
       unregister(id: number) {
         setTracked((prev) => ({ ...prev, [id]: undefined }))
       },
-    }),
+    })},
     [state]
   )
 
-  const usedKeys = new Set(Object.values(tracked).flat())
+  const usedKeys = new Set(Object.values(tracked).flat()) as Set<Partial<Key>>
 
   React.useEffect(() => {
     onChange?.(state)
@@ -35,7 +38,6 @@ function DebugFlagsImpl({ children, onChange }: { children?: React.ReactNode; on
     if (!state.persistDebugFlags && localStorage.getItem('debugFlags')) {
       localStorage.removeItem('debugFlags')
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state])
 
   return (
@@ -44,7 +46,7 @@ function DebugFlagsImpl({ children, onChange }: { children?: React.ReactNode; on
       <Panel
         state={state}
         usedKeys={usedKeys}
-        onChange={(key: Key, val: any) => setState((prev) => ({ ...prev, [key]: val }))}
+        onChange={(key: Key, val: string | boolean) => setState((prev) => ({ ...prev, [key]: val }))}
       />
     </DebugFlagsContext.Provider>
   )
@@ -56,7 +58,7 @@ function Panel({
   onChange,
 }: {
   state: Flags
-  usedKeys: Partial<Flags>
+  usedKeys: Set<Partial<Key>>
   onChange: (key: Key, val: string | boolean) => void
 }) {
   const [open, setOpen] = React.useState(false)
@@ -80,7 +82,7 @@ function Panel({
       {open && (
         <StyledOpenPanel width={400} gap="1">
           {Object.entries(genericFlagsConfig).map(([key, obj]) => {
-            const used = usedKeys.has(key) || obj.alwaysShow
+            const used = usedKeys.has(key as Key) || obj.alwaysShow
             const value = state[key as Key]
             const visible = used || !!showUnusedFlags
 
@@ -94,18 +96,6 @@ function Panel({
                   onChange={(e) => onChange(key as Key, e.target.checked)}
                 />
               )
-            } else if (obj.type === 'select' && obj.options) {
-              el = (
-                <select name={key} value={value as string} onChange={(e) => onChange(key as Key, e.target.value)}>
-                  {Object.keys(obj.options).map((option, index) => (
-                    <option key={`${option}-${index}`} value={option}>
-                      {option}
-                    </option>
-                  ))}
-                </select>
-              )
-            } else if (obj.type === 'component') {
-              el = <obj.Component value={value} onChange={(val) => onChange(key as Key, val)} />
             } else {
               el = (
                 <input

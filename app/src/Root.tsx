@@ -10,8 +10,8 @@ import { routes } from './routes'
 const router = createHashRouter(routes)
 
 export function Root() {
-  const [debugState, setDebugState] = React.useState(initialFlagsState)
-  const [theme, setTheme] = React.useState(config.themes.light)
+  const [, setDebugState] = React.useState(initialFlagsState)
+  const [theme, ] = React.useState(config.themes.light)
   return (
     <>
       <HelmetProvider>
