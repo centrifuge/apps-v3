@@ -20,7 +20,7 @@ export function useCentrifugeTransaction() {
           tap((result) => {
             switch (result.type) {
               case 'SigningTransaction':
-                lastId = Math.random().toString(36).slice(2)
+                lastId = result.id
                 addOrUpdateTransaction({
                   id: lastId,
                   title: result.title,
@@ -62,6 +62,10 @@ export function useCentrifugeTransaction() {
   return {
     execute,
     reset: () => setStatus('idle'),
+    status,
+    isIdle: status === 'idle',
     isLoading: status === 'loading',
+    isSuccess: status === 'success',
+    isError: status === 'error',
   }
 }

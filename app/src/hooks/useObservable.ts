@@ -12,6 +12,7 @@ export function useObservable<T = void>(observable?: Observable<T>, _options?: O
     data: snapshot.data,
     error: snapshot.error,
     status: snapshot.status,
+    isIdle: snapshot.status === 'idle',
     isLoading: snapshot.status === 'loading',
     isSuccess: snapshot.status === 'success',
     isError: snapshot.status === 'error',
@@ -38,7 +39,7 @@ type CacheRecord<T> = {
   snapshot: {
     data?: T
     error?: unknown
-    status: 'loading' | 'error' | 'success'
+    status: 'idle' | 'loading' | 'success' | 'error'
   }
   // Allows observables to emit `undefined` and still be successful
   didEmitData: boolean
@@ -123,7 +124,7 @@ function useObservableInner<ObservableType extends Observable<any>>(observable?:
 }
 
 const noopSnapshot = {
-  status: 'loading' as const,
+  status: 'idle' as const,
 }
 const noopStore = {
   subscribe: () => () => {},

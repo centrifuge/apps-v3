@@ -1,7 +1,7 @@
 import { Button, Stack, Text } from '@centrifuge/fabric'
+import { useQueryErrorResetBoundary } from '@tanstack/react-query'
 import * as React from 'react'
 import { ErrorBoundary as ReactErrorBoundary } from 'react-error-boundary'
-import { useQueryErrorResetBoundary } from 'react-query'
 
 type ErrorCb = (args: { error: any; retry: () => void }) => React.ReactElement | null
 
@@ -12,9 +12,7 @@ type Props = {
 }
 
 export function LoadBoundary({ children, renderError }: Props) {
-  return (
-      <ErrorBoundary renderError={renderError}>{children}</ErrorBoundary>
-  )
+  return <ErrorBoundary renderError={renderError}>{children}</ErrorBoundary>
 }
 
 function ErrorBoundary({ children, renderError }: { children: React.ReactNode; renderError?: ErrorCb }) {

@@ -1,32 +1,36 @@
 import { Button, IconChevronDown, Menu, MenuItem, MenuItemGroup, Popover, Stack, Text } from '@centrifuge/fabric'
 import { ReactNode } from 'react'
-import { useAccount, useChains, useSwitchChain } from 'wagmi'
+import { useAccount, useChains, useConnect, useSwitchChain } from 'wagmi'
 
 type Props = {
-  networks: number[]
+  networks?: number[]
   children: ReactNode
   message?: string
 }
 
 export function ConnectionGuard({ networks, children, message = 'Unsupported network.' }: Props) {
   const { switchChain } = useSwitchChain()
+  const { connectors, connect } = useConnect()
   const chains = useChains()
   function getName(chainId: number) {
     const chain = chains.find((c) => c.id === chainId)
     return chain?.name || chainId.toString()
   }
 
-  const { isConnected, chainId } = useAccount()
+  const { chainId } = useAccount()
 
-  if (!isConnected) {
+  if (!chainId) {
     return (
       <Stack gap={2} pb={3}>
-        <Text variant="body3">Connect to continue</Text>
-        {/* Show connect button */}
+        <Text variant="body1">Connect to continue</Text>
+        {/* TODO: Update when we have a wallet connect library  */}
+        <Button onClick={() => connect({ connector: connectors[0] })} variant="secondary">
+          Connect
+        </Button>
       </Stack>
     )
   }
-  if (chainId && networks.includes(chainId)) {
+  if (!networks || networks.includes(chainId)) {
     return <>{children}</>
   }
 
