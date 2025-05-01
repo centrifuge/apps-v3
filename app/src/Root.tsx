@@ -1,8 +1,10 @@
-import React from 'react'
-import { createHashRouter, RouterProvider } from 'react-router-dom'
-import { HelmetProvider } from 'react-helmet-async'
 import { FabricProvider } from '@centrifuge/fabric'
+import React from 'react'
+import { HelmetProvider } from 'react-helmet-async'
+import { createHashRouter, RouterProvider } from 'react-router-dom'
 import { Head } from './components/Head'
+import { TransactionProvider } from './components/Transactions/TransactionsProvider'
+import { TransactionToasts } from './components/Transactions/TransactionToasts'
 import { config } from './config'
 import { routes } from './routes'
 
@@ -17,7 +19,10 @@ export function Root() {
         <Head />
       </HelmetProvider>
       <FabricProvider theme={theme}>
+        <TransactionProvider>
+          <TransactionToasts />
           <RouterProvider router={router} />
+        </TransactionProvider>
       </FabricProvider>
     </>
   )
