@@ -1,3 +1,4 @@
+import centrifugeLightTheme from './centrifugeTheme'
 import { baseTheme } from './tokens/baseTheme'
 import { blueScale, grayScale, yellowScale } from './tokens/colors'
 import { colorTheme } from './tokens/theme'
@@ -30,5 +31,8 @@ export const exampleOtherTheme: FabricTheme = {
     textSecondary: '#d3fbfc',
     textInverted: '#d3fbfc',
     backgroundSecondary: '#0b0d56',
-  }
+  },
+  shadows: {
+    ...centrifugeLightTheme.shadows,
+  },
 }
