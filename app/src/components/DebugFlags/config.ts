@@ -21,6 +21,11 @@ export type Key =
   | 'showUnusedFlags'
   | 'darkMode'
 export const flagsConfig = {
+  darkMode: {
+    alwaysShow: true,
+    default: false,
+    type: 'checkbox',
+  },
   address: {
     default: '',
     type: 'text',
@@ -31,10 +36,6 @@ export const flagsConfig = {
     type: 'checkbox',
   },
   showUnusedFlags: {
-    default: false,
-    type: 'checkbox',
-  },
-  darkMode: {
     default: false,
     type: 'checkbox',
   },

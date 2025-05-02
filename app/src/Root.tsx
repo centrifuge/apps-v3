@@ -10,15 +10,15 @@ import { routes } from './routes'
 const router = createHashRouter(routes)
 
 export function Root() {
-  const [, setDebugState] = React.useState(initialFlagsState)
-  const [theme, ] = React.useState(config.themes.light)
+  const [debugState, setDebugState] = React.useState(initialFlagsState)
+
   return (
     <>
       <HelmetProvider>
         <Head />
       </HelmetProvider>
       <DebugFlags onChange={(state) => setDebugState(state)}>
-        <FabricProvider theme={theme}>
+        <FabricProvider theme={debugState.darkMode ? config.themes.dark : config.themes.light}>
           <RouterProvider router={router} />
         </FabricProvider>
       </DebugFlags>
