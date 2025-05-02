@@ -96,18 +96,18 @@ export function Menu() {
       {menuItems.map((item, index) => {
         if (!item.enabled) return null
         return (
-          <>
+          <div key={item.label + index}>
             {item.subMenu ? (
               <SubMenu label={item.label} icon={item.icon} links={item.subMenu} withToggle={item.withToggle} />
             ) : (
-              <StyledRouterButton as={Link} key={item.label + index} isLarge={isLarge} to={item.route}>
+              <StyledRouterButton as={Link} isLarge={isLarge} to={item.route}>
                 {item.icon}
                 <Text color="textInverted" variant="body2" style={{ marginLeft: 8 }}>
                   {item.label}
                 </Text>
               </StyledRouterButton>
             )}
-          </>
+          </div>
         )
       })}
       {pools.length > 0 && <CreatePool />}

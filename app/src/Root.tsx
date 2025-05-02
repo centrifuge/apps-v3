@@ -1,4 +1,5 @@
 import { FabricProvider } from '@centrifuge/fabric'
+import { DebugFlags, initialFlagsState } from './components/DebugFlags'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import React from 'react'
 import { HelmetProvider } from 'react-helmet-async'
@@ -15,23 +16,25 @@ const router = createHashRouter(routes)
 const queryClient = new QueryClient()
 
 export function Root() {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [theme, setTheme] = React.useState(config.themes.light)
+  const [debugState, setDebugState] = React.useState(initialFlagsState)
+
   return (
     <>
       <HelmetProvider>
         <Head />
       </HelmetProvider>
-      <FabricProvider theme={theme}>
-        <WagmiProvider config={wagmiConfig}>
-          <QueryClientProvider client={queryClient}>
-            <TransactionProvider>
-              <TransactionToasts />
-              <RouterProvider router={router} />
-            </TransactionProvider>
-          </QueryClientProvider>
-        </WagmiProvider>
-      </FabricProvider>
+      <DebugFlags onChange={(state) => setDebugState(state)}>
+        <FabricProvider theme={debugState.darkMode ? config.themes.dark : config.themes.light}>
+          <WagmiProvider config={wagmiConfig}>
+            <QueryClientProvider client={queryClient}>
+              <TransactionProvider>
+                <TransactionToasts />
+                <RouterProvider router={router} />
+              </TransactionProvider>
+            </QueryClientProvider>
+          </WagmiProvider>
+        </FabricProvider>
+      </DebugFlags>
     </>
   )
 }

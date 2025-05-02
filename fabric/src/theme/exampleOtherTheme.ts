@@ -1,11 +1,21 @@
-import centrifugeLightTheme from './centrifugeTheme'
 import { baseTheme } from './tokens/baseTheme'
 import { blueScale, grayScale, yellowScale } from './tokens/colors'
 import { colorTheme } from './tokens/theme'
 import { FabricTheme } from './types'
 
+
+const shadows =  {
+  cardInteractive: '1px 3px 6px rgba(0, 0, 0, 0.15)',
+  cardActive: ` 0 0 0 1px ${grayScale[600]}, 0 1px 5px rgba(0, 0, 0, 0.2)`,
+  cardOverlay: '4px 8px 24px rgba(0, 0, 0, 0.2)',
+  buttonPrimary: `0px 0px 0px 3px ${colorTheme.colors.shadowButtonPrimary}`,
+  buttonSecondary: `0px 0px 0px 3px ${colorTheme.colors.shadowButtonSecondary}`,
+  buttonInverted: `0px 0px 0px 3px ${colorTheme.colors.shadowButtonInverted}`,
+}
+
 export const exampleOtherTheme: FabricTheme = {
   ...baseTheme,
+  shadows,
   scheme: 'dark',
   colors: {
     ...colorTheme.colors,
@@ -31,8 +41,5 @@ export const exampleOtherTheme: FabricTheme = {
     textSecondary: '#d3fbfc',
     textInverted: '#d3fbfc',
     backgroundSecondary: '#0b0d56',
-  },
-  shadows: {
-    ...centrifugeLightTheme.shadows,
-  },
+  }
 }
