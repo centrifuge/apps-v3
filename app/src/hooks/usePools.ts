@@ -8,14 +8,13 @@ export function usePools() {
   return useObservable(pools$)
 }
 
-export function usePool(poolId: PoolId) {
-  const pools = usePools()
-  const pool = pools.data?.find((p) => p.id.equals(poolId))
-  return pool
+export function usePool(poolId?: PoolId) {
+  const pool$ = useMemo(() => (poolId ? centrifuge.pool(poolId) : undefined), [poolId])
+  return useObservable(pool$)
 }
 
 export function usePoolDetails(poolId: PoolId) {
-  const pool = usePool(poolId)
+  const { data: pool } = usePool(poolId)
   const details$ = useMemo(() => pool?.details(), [pool])
   return useObservable(details$)
 }
