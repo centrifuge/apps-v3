@@ -1,5 +1,5 @@
 import { OperationConfirmedStatus, Transaction } from '@centrifuge/sdk'
-import { useState } from 'react'
+import { useMutation } from '@tanstack/react-query'
 import { lastValueFrom, tap } from 'rxjs'
 import { useConnectorClient } from 'wagmi'
 import { centrifuge } from '../centrifuge'
@@ -8,11 +8,15 @@ import { useTransactions } from '../components/Transactions/TransactionsProvider
 export function useCentrifugeTransaction() {
   const { updateTransaction, addOrUpdateTransaction } = useTransactions()
   const { data: client } = useConnectorClient()
-  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
+  const { mutateAsync, ...rest } = useMutation({
+    mutationFn: execute,
+  })
 
   async function execute(observable: Transaction) {
-    setStatus('loading')
-    centrifuge.setSigner(client!)
+    if (!client) {
+      throw new Error('No wallet connected')
+    }
+    centrifuge.setSigner(client)
     let lastId = ''
     try {
       const lastResult = await lastValueFrom(
@@ -45,10 +49,8 @@ export function useCentrifugeTransaction() {
           })
         )
       )
-      setStatus('success')
-      return (lastResult as OperationConfirmedStatus).receipt
+      return lastResult as OperationConfirmedStatus
     } catch (e) {
-      setStatus('error')
       if (lastId) {
         updateTransaction(lastId, {
           status: 'failed',
@@ -60,12 +62,7 @@ export function useCentrifugeTransaction() {
   }
 
   return {
-    execute,
-    reset: () => setStatus('idle'),
-    status,
-    isIdle: status === 'idle',
-    isLoading: status === 'loading',
-    isSuccess: status === 'success',
-    isError: status === 'error',
+    execute: mutateAsync,
+    ...rest,
   }
 }

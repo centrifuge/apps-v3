@@ -1,3 +1,4 @@
+import { Vault } from '@centrifuge/sdk'
 import { useMemo } from 'react'
 import { useAccount } from 'wagmi'
 import { centrifuge } from '../centrifuge'
@@ -19,4 +20,13 @@ export function useInvestorCurrencyBalances() {
     [investor, chainId]
   )
   return useObservable(balance$)
+}
+
+export function useInvestment(vault?: Vault) {
+  const { data: investor } = useInvestor()
+  const investment$ = useMemo(
+    () => (investor && vault ? vault.investment(investor.address) : undefined),
+    [investor, vault]
+  )
+  return useObservable(investment$)
 }
