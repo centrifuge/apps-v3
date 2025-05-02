@@ -1,12 +1,11 @@
 import { Box, Stack, Text } from '@centrifuge/fabric'
-import * as React from 'react'
 import { formatBalance } from '../../src/utils/formatting'
 import { LayoutSection } from '../components/LayoutBase/LayoutSection'
 import { PoolList } from '../components/PoolList'
 import { config } from '../config'
 
 export default function PoolsPage() {
-  const totalValueLocked = 999999999999999;
+  const totalValueLocked = 999999999999999
 
   return (
     <LayoutSection>

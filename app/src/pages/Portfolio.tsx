@@ -1,6 +1,8 @@
-import { Box, Button, Grid, IconWallet, Text } from '@centrifuge/fabric'
+import { Box, Button, Grid, GridRow, IconWallet, Text } from '@centrifuge/fabric'
 import styled from 'styled-components'
+import { useAccount } from 'wagmi'
 import { LayoutSection } from '../components/LayoutBase/LayoutSection'
+import { useInvestorCurrencyBalances } from '../hooks/useInvestor'
 
 const StyledGrid = styled(Grid)`
   height: 80vh;
@@ -22,20 +24,35 @@ const StyledGrid = styled(Grid)`
 `
 
 const PortfolioPage = () => {
+  const { address } = useAccount()
+  const { data: balances } = useInvestorCurrencyBalances()
   return (
     <Box mb={2} mx={2}>
       <LayoutSection alignItems="flex-start">
         <Text variant="heading1">Your portfolio</Text>
       </LayoutSection>
-      <StyledGrid>
-        <IconWallet size="iconMedium" />
-        <Text variant="body2" color="textSecondary">
-          Connect your wallet in order to view your portfolio.
-        </Text>
-        <Button variant="primary" onClick={() => {}} small>
-          Connect wallet
-        </Button>
-      </StyledGrid>
+      {address ? (
+        <Grid columns={2} gap={2}>
+          {balances?.map((balance, i) => (
+            <GridRow key={i}>
+              <Text>{balance.currency.name}</Text>
+              <Text>
+                {balance.balance.toFloat()} {balance.currency.symbol}
+              </Text>
+            </GridRow>
+          ))}
+        </Grid>
+      ) : (
+        <StyledGrid>
+          <IconWallet size="iconMedium" />
+          <Text variant="body2" color="textSecondary">
+            Connect your wallet in order to view your portfolio.
+          </Text>
+          <Button variant="primary" onClick={() => {}} small>
+            Connect wallet
+          </Button>
+        </StyledGrid>
+      )}
     </Box>
   )
 }
