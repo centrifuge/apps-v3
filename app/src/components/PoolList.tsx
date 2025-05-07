@@ -48,8 +48,8 @@ function PoolCard({ pool }: { pool: Pool }) {
 function UpdateTokenPrice({ shareClass }: { shareClass: ShareClass }) {
   const { execute, isPending } = useCentrifugeTransaction()
   async function updateTokenPrice() {
-    const receipt = await execute(shareClass.notifySharePrice(11155111))
-    console.log('transaction success', receipt)
+    const status = await execute(shareClass.notifySharePrice(11155111))
+    console.log('transaction success', status)
   }
   return (
     <ConnectionGuard>
