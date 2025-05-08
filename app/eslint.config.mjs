@@ -1,13 +1,10 @@
 // @ts-check
 
-import eslint from '@eslint/js';
-import tseslint from 'typescript-eslint';
+import eslint from '@eslint/js'
+import tseslint from 'typescript-eslint'
 
-export default tseslint.config(
-  eslint.configs.recommended,
-  tseslint.configs.recommended,
-  {
-    rules: {
+export default tseslint.config(eslint.configs.recommended, tseslint.configs.recommended, {
+  rules: {
     'prefer-arrow-callback': 'error',
     'no-new-func': 'error',
     'no-else-return': 'error',
@@ -93,9 +90,7 @@ export default tseslint.config(
     '@typescript-eslint/quotes': 'off',
     '@typescript-eslint/semi': ['off', null],
     '@typescript-eslint/type-annotation-spacing': 'off',
+    '@typescript-eslint/no-explicit-any': 'off',
   },
-    ignores: [
-      './functions/**',
-    ],
-}
-);
+  ignores: ['./functions/**'],
+})

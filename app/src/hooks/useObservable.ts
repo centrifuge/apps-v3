@@ -1,10 +1,14 @@
-import { useMemo, useReducer, useState, useSyncExternalStore } from 'react'
+import { useMemo, useReducer, useRef, useState, useSyncExternalStore } from 'react'
 import { catchError, of, share, timer, type Observable, type ObservedValueOf } from 'rxjs'
 import { map, tap } from 'rxjs/operators'
 
-export type ObservableOptions = {}
+export type ObservableOptions = never
 
-// eslint-disable-next-line no-unused-vars
+/**
+ * Hook to use an observable in a React component.
+ * @param observable The observable to subscribe to. Should be stable (e.g. memoized).
+ */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function useObservable<T = void>(observable?: Observable<T>, _options?: ObservableOptions) {
   const { snapshot, retry } = useObservableInner(observable)
 
@@ -48,6 +52,8 @@ type CacheRecord<T> = {
 const cache = new WeakMap<Observable<any>, CacheRecord<any>>()
 
 function useObservableInner<ObservableType extends Observable<any>>(observable?: ObservableType) {
+  useWarnIfNotStable(observable, "useObservable: observable is not stable. Don't forget to memoize it!")
+
   const [updateCount, forceUpdate] = useReducer((s) => s + 1, 0)
   const store = useMemo(() => {
     if (!observable) return
@@ -129,4 +135,20 @@ const noopSnapshot = {
 const noopStore = {
   subscribe: () => () => {},
   getSnapshot: () => noopSnapshot,
+}
+
+function useWarnIfNotStable(object?: unknown, message = 'object is not stable') {
+  if (import.meta.env.DEV) {
+    const ref = useRef({ hasObjectCount: 0, stableObjectCount: 0, lastObject: object })
+    if (object && ref.current.lastObject) {
+      ref.current.hasObjectCount++
+      if (ref.current.lastObject === object) {
+        ref.current.stableObjectCount++
+      }
+      if (ref.current.hasObjectCount === 10 && ref.current.stableObjectCount <= 1) {
+        console.warn(message, object)
+      }
+    }
+    ref.current.lastObject = object
+  }
 }
