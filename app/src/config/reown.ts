@@ -6,7 +6,7 @@ import { centrifuge } from '../centrifuge'
 import { injected } from 'wagmi/connectors'
 
 // 1. Get projectId from https://cloud.reown.com
-const projectId = 'YOUR_PROJECT_ID'
+const projectId = import.meta.env.VITE_WALLETCONNECT_ID;
 
 // 2. Create a metadata object - optional
 const metadata = {
