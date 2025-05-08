@@ -38,8 +38,5 @@ createAppKit({
   adapters: [wagmiAdapter],
   networks: typedChains,
   projectId,
-  metadata,
-  features: {
-    analytics: true // Optional - defaults to your Cloud configuration
-  }
+  metadata
 })
