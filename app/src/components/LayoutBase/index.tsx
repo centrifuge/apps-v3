@@ -6,6 +6,7 @@ import { useIsAboveBreakpoint } from '../../utils/useIsAboveBreakpoint'
 import { Footer } from '../Menu/Footer'
 import { Menu } from '../Menu'
 import { LogoCentrifuge, LogoCentrifugeText } from './LogoCentrifuge'
+import { WalletInfo } from './WalletInfo'
 
 const Sidebar = styled.aside`
   position: fixed;
@@ -89,7 +90,7 @@ export const LayoutBase = () => {
     <>
       {isDesktop && (
         <Box position="fixed" top="1rem" right="1rem" zIndex={1} mt={2} marginRight={1}>
-          WalletMenu
+        <WalletInfo />
         </Box>
       )}
 
@@ -99,9 +100,7 @@ export const LayoutBase = () => {
             <LogoCentrifuge />
           </Link>
           <Box display="flex" alignItems="center" marginLeft="auto">
-            <Box mr={2} width={220}>
-              WalletMenu
-            </Box>
+          <WalletInfo />
             <IconButton>
               {mobileMenuOpen ? (
                 <IconX
