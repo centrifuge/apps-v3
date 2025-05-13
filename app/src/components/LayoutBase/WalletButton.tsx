@@ -1,3 +1,9 @@
+import { useAccount } from 'wagmi'
+import { useDebugFlags } from '../DebugFlags'
+
 export const WalletButton = () => {
-  return <appkit-account-button />
+  const { address: accountAddress } = useAccount()
+  const { address: debugFlagAddress } = useDebugFlags()
+  const address = debugFlagAddress ? debugFlagAddress : accountAddress
+  return address ? <appkit-account-button /> : <appkit-connect-button />
 }
