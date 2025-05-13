@@ -9,7 +9,7 @@ import { Head } from './components/Head'
 import { TransactionProvider } from './components/Transactions/TransactionsProvider'
 import { TransactionToasts } from './components/Transactions/TransactionToasts'
 import { config } from './config'
-import { wagmiConfig } from './config/wagmi'
+import { wagmiAdapter } from './config/reown'
 import { routes } from './routes'
 
 const router = createHashRouter(routes)
@@ -25,7 +25,7 @@ export function Root() {
       </HelmetProvider>
       <DebugFlags onChange={(state) => setDebugState(state)}>
         <FabricProvider theme={debugState.darkMode ? config.themes.dark : config.themes.light}>
-          <WagmiProvider config={wagmiConfig}>
+          <WagmiProvider config={wagmiAdapter.wagmiConfig}>
             <QueryClientProvider client={queryClient}>
               <TransactionProvider>
                 <TransactionToasts />
