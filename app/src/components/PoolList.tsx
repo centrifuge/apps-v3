@@ -1,15 +1,13 @@
-import { Button, Card, Shelf, Stack, Text } from '@centrifuge/fabric'
-import type { Pool, ShareClass } from '@centrifuge/sdk'
-import { useCentrifugeTransaction } from '../hooks/useCentrifugeTransaction'
-import { usePoolDetails, usePools } from '../hooks/usePools'
-import { ConnectionGuard } from './ConnectionGuard'
+import { Grid, Shelf, Text } from '@centrifuge/fabric'
+import { usePools } from '../hooks/usePools'
 import { Spinner } from './Spinner'
+import { PoolCard } from './PoolCard'
 
 export function PoolList() {
   const { data: pools, isLoading } = usePools()
 
   return (
-    <Shelf p={4} justifyContent="center" textAlign="center">
+    <Shelf>
       {isLoading ? (
         <Spinner />
       ) : !pools?.length ? (
@@ -17,45 +15,12 @@ export function PoolList() {
           There are no pools yet
         </Text>
       ) : (
-        pools.map((p) => <PoolCard pool={p} />)
+        <Grid gridTemplateColumns={['1fr', '1fr 1fr', '1fr 1fr 1fr']} gap={2}>
+          {pools.map((p) => (
+            <PoolCard pool={p} />
+          ))}
+        </Grid>
       )}
     </Shelf>
-  )
-}
-
-function PoolCard({ pool }: { pool: Pool }) {
-  const { data: details } = usePoolDetails(pool.id)
-
-  return (
-    <Card>
-      <Stack gap={2}>
-        <Text variant="heading3">Pool {pool.id.toString()}</Text>
-        <Text>Tokens:</Text>
-        <Stack gap={2}>
-          {details?.shareClasses.map(({ details, shareClass }) => (
-            <Shelf gap={2}>
-              <Text> {details.name}</Text>
-              <Text>{details.symbol}</Text>
-              <UpdateTokenPrice shareClass={shareClass} />
-            </Shelf>
-          ))}
-        </Stack>
-      </Stack>
-    </Card>
-  )
-}
-
-function UpdateTokenPrice({ shareClass }: { shareClass: ShareClass }) {
-  const { execute, isPending } = useCentrifugeTransaction()
-  async function updateTokenPrice() {
-    const status = await execute(shareClass.notifySharePrice(11155111))
-    console.log('transaction success', status)
-  }
-  return (
-    <ConnectionGuard>
-      <Button onClick={updateTokenPrice} loading={isPending}>
-        Update token price
-      </Button>
-    </ConnectionGuard>
   )
 }
