@@ -15,7 +15,7 @@ export function PoolList() {
           There are no pools yet
         </Text>
       ) : (
-        <Grid gridTemplateColumns={['1fr', '1fr 1fr', '1fr 1fr 1fr']} gap={2}>
+        <Grid gridTemplateColumns={['1fr', '1fr 1fr', '1fr 1fr 1fr', '1fr 1fr 1fr 1fr']} gap={2}>
           {pools.map((p) => (
             <PoolCard pool={p} />
           ))}
