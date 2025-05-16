@@ -1,4 +1,4 @@
-import { VisualButton, VisualButtonProps } from '@centrifuge/fabric'
+import { VisualButton, VisualButtonProps, Text } from '@centrifuge/fabric'
 import { NavLink, NavLinkProps, useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
 // import { prefetchRoute } from './Root'
@@ -9,6 +9,8 @@ export type RouterLinkButtonProps = VisualButtonProps &
     goBack?: boolean
     to?: string
     newTab?: boolean
+    asText?: boolean
+    textProps?: any
   }
 
 const StyledLink = styled(NavLink)<{ $disabled?: boolean }>(
@@ -32,6 +34,8 @@ export function RouterLinkButton({
   to,
   children,
   newTab = false,
+  asText = false,
+  textProps,
   ...routeProps
 }: RouterLinkButtonProps) {
   const navigate = useNavigate()
@@ -53,21 +57,27 @@ export function RouterLinkButton({
       $disabled={loading || disabled}
       to={to || ''}
       {...routeProps}
-        onMouseOver={() => to && !goBack }
-        // && prefetchRoute(to)}
+      onMouseOver={() => to && !goBack}
+      // && prefetchRoute(to)}
       onClick={handleClick}
     >
-      <VisualButton
-        variant={variant}
-        small={small}
-        icon={icon}
-        iconRight={iconRight}
-        disabled={disabled}
-        loading={loading}
-        loadingMessage={loadingMessage}
-      >
-        {children}
-      </VisualButton>
+      {asText ? (
+        <Text variant="body2" color="textPrimary" {...textProps}>
+          {children}
+        </Text>
+      ) : (
+        <VisualButton
+          variant={variant}
+          small={small}
+          icon={icon}
+          iconRight={iconRight}
+          disabled={disabled}
+          loading={loading}
+          loadingMessage={loadingMessage}
+        >
+          {children}
+        </VisualButton>
+      )}
     </StyledLink>
   )
 }
