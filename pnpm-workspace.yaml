@@ -1,4 +1,4 @@
 packages:
-  - "app"
-  - "fabric"
-  - "functions"
+  - 'app'
+  - 'functions'
+  - 'centrifuge-permissionless'
