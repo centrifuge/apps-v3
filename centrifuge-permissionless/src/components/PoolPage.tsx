@@ -11,8 +11,6 @@ export const PoolPage = () => {
   const { selectedPoolId } = useSelectedPoolContext()
   const { data: pool, isLoading } = usePoolDetails(selectedPoolId as PoolId)
 
-  console.log(pool);
-
   if (isLoading || !pool) return null
 
   return (

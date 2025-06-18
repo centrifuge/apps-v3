@@ -1,8 +1,8 @@
+import { WagmiAdapter } from '@reown/appkit-adapter-wagmi'
+import type { AppKitNetwork } from '@reown/appkit/networks'
 import { createAppKit } from '@reown/appkit/react'
 import { http } from 'wagmi'
-import { WagmiAdapter } from '@reown/appkit-adapter-wagmi'
 import { injected } from 'wagmi/connectors'
-import type { AppKitNetwork } from '@reown/appkit/networks'
 import { centrifuge } from '../centrifuge'
 
 const projectId = import.meta.env.VITE_REOWN_APP_ID!

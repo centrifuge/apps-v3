@@ -1,80 +1,69 @@
-import { Box, Button } from '@chakra-ui/react'
-import { FormikProvider, useFormik } from 'formik'
-import { infoText } from '../../../utils/infoText'
-import InvestorRequirementsPanel from './InvestorRequirementsPanel'
-import AmountPanel from '../AmountPanel'
-import SuccessfulPanel from '../SuccessfulIPanel'
-import { InfoWrapper } from '../InfoWrapper'
+import { Balance, Vault } from '@centrifuge/sdk'
+import { Box } from '@chakra-ui/react'
+import { useCentrifugeTransaction } from '../../../hooks/useCentrifugeTransaction'
+import { useInvestment, useVaultDetails } from '../../../hooks/useVaults'
+import { z } from 'zod'
+import { Form, useForm, safeParse, numberInputMin, createBalanceSchema } from '../../../forms'
+import { useMemo, useState } from 'react'
+import { type InvestActionType, InvestAction, InvestFormDefaultValues } from '../components/defaults'
+import { InvestTabForm } from './forms/InvestTabForm'
 
-type Steps = 1 | 2 | 3
+export default function InvestTab({ vault }: { vault: Vault }) {
+  const { data: vaultDetails } = useVaultDetails(vault)
+  const { data: investment } = useInvestment(vault)
+  const { execute, isPending } = useCentrifugeTransaction()
+  const [actionType, setActionType] = useState<InvestActionType>(InvestAction.INVEST_AMOUNT)
 
-export type FormValues = {
-  amount: number
-  amountToReceive: number
-  investorRequirements: string[]
-  step: Steps
-}
+  // TODO: remove this console log before deploying
+  console.log('investment', investment, vaultDetails)
 
-export default function InvestTab() {
-  const form = useFormik<FormValues>({
-    initialValues: {
-      amount: 0,
-      amountToReceive: 0,
-      investorRequirements: [],
-      step: 1,
-    },
-    onSubmit: (values) => {
-      console.log(values)
-    },
-  })
-
-  const getButtonText = () => {
-    const step = form.values.step
-    if (step === 1) return 'Invest'
-    if (step === 2) return 'Confirm'
-    if (step === 3) return 'Invest more'
+  function invest(amount: Balance) {
+    execute(vault.increaseInvestOrder(amount))
   }
 
-  const { step } = form.values
+  // TODO: Add any necessary refinements for validation checks
+  const schema = z.object({
+    amount: createBalanceSchema(vaultDetails?.investmentCurrency.decimals ?? 6, z.number().min(0.01)),
+    amountToReceive: numberInputMin(0),
+    requirement_nonUsCitizen: z.boolean().refine((val) => val === true, {
+      message: 'Non-US citizen requirement must be confirmed',
+    }),
+    requirement_nonSanctionedList: z.boolean().refine((val) => val === true, {
+      message: 'Non-sanctioned list requirement must be confirmed',
+    }),
+    requirement_redeemLater: z.boolean().refine((val) => val === true, {
+      message: 'Redeem later requirement must be confirmed',
+    }),
+    investorRequirements: z.array(z.boolean()).length(3, 'Array must contain exactly 3 requirements'),
+  })
+
+  const form = useForm({
+    schema,
+    defaultValues: InvestFormDefaultValues,
+    mode: 'onChange',
+    onSubmit: (values) => {
+      console.log('Invest form values: ', values)
+      // Since amount is now of type Balance, we can directly pass it to the invest function
+      // invest(values.amount)
+      setActionType(InvestAction.SUCCESS)
+    },
+    onSubmitError: (error) => console.error('Invest form submission error:', error),
+  })
+
+  const { watch } = form
+  const [amount] = watch(['amount'])
+
+  const parsedAmount = useMemo(() => safeParse(schema.shape.amount, amount) ?? 0, [amount, schema.shape.amount])
 
   // const isDisabled =
   //   form.values.amount === 0 ||
   //   form.values.investorRequirements.length !== 3;
 
-  const isDisabled = false
-
   return (
-    <FormikProvider value={form}>
+    <Form form={form}>
       <Box mt={4}>
-        {step === 1 && <AmountPanel isInvesting />}
-        {step === 2 && <InvestorRequirementsPanel />}
-        {step === 3 && <SuccessfulPanel isInvesting />}
-
-        <Button
-          background="backgroundButtonHighlight"
-          color="textPrimary"
-          transition="box-shadow 0.2s ease"
-          _hover={{
-            boxShadow: 'xs',
-          }}
-          onClick={() => {
-            const { step } = form.values
-            if (step !== 3) {
-              form.setFieldValue('step', (form.values.step + 1) as Steps)
-            }
-            if (step === 3) {
-              form.setFieldValue('step', 1)
-            }
-          }}
-          disabled={isDisabled}
-          width="100%"
-          mt={4}
-        >
-          {getButtonText()}
-        </Button>
-
-        {step === 1 && form.values.amount === 0 && <InfoWrapper text={infoText.redeem} />}
+        <InvestTabForm actionType={actionType} parsedAmount={parsedAmount} setActionType={setActionType} />
       </Box>
-    </FormikProvider>
+    </Form>
   )
 }

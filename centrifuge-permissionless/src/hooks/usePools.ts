@@ -1,8 +1,8 @@
 import { PoolId } from '@centrifuge/sdk'
 import { useMemo } from 'react'
+import { combineLatest, switchMap } from 'rxjs'
 import { centrifuge } from '../centrifuge'
 import { useObservable } from './useObservable'
-import { combineLatest, switchMap } from 'rxjs'
 
 const IDS = ['281474976710657']
 
@@ -31,4 +31,10 @@ export function useAllPoolDetails() {
   )
 
   return useObservable(details$)
+}
+
+export function usePoolNetworks(poolId?: PoolId) {
+  const { data: pool } = usePool(poolId)
+  const vaults$ = useMemo(() => (pool ? pool?.activeNetworks() : undefined), [pool])
+  return useObservable(vaults$)
 }

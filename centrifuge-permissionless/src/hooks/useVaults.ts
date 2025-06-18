@@ -1,19 +1,20 @@
-import { useEffect, useMemo, useState } from "react";
-import { useChainId } from "wagmi";
-import { combineLatest, of } from "rxjs";
-import { switchMap, map, catchError } from "rxjs/operators";
-import { centrifuge } from "../centrifuge";
-import type { PoolId, ShareClassId, Vault } from "@centrifuge/sdk";
-import { useObservable } from "./useObservable";
+import type { PoolNetwork, ShareClassId, Vault } from '@centrifuge/sdk'
+import { useMemo } from 'react'
+import { useAccount } from 'wagmi'
+import { useObservable } from './useObservable'
 
-interface VaultWithMeta extends Vault {
-  shareClassId: ShareClassId;
-  asset: string;
+export function useVaults(poolNetwork?: PoolNetwork, scId?: ShareClassId) {
+  const vaults$ = useMemo(() => (poolNetwork && scId ? poolNetwork.vaults(scId) : undefined), [poolNetwork, scId])
+  return useObservable(vaults$)
 }
 
-export function useVaults(poolId: PoolId) {
-  const pool$ = useMemo(() => useObservable(centrifuge.pool(poolId)), [poolId]);
-  
+export function useVaultDetails(vault?: Vault) {
+  const vaultDetails$ = useMemo(() => (vault ? vault.details() : undefined), [vault])
+  return useObservable(vaultDetails$)
+}
 
-  return {}
+export function useInvestment(vault?: Vault) {
+  const { address } = useAccount()
+  const investment$ = useMemo(() => (vault && address ? vault.investment(address) : undefined), [vault, address])
+  return useObservable(investment$)
 }
