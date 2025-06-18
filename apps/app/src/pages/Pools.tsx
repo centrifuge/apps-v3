@@ -1,5 +1,5 @@
 import { Box, Stack, Text } from '@centrifuge/fabric'
-import { formatBalance } from '../../src/utils/formatting'
+import { formatBalance } from '../utils/formatting'
 import { LayoutSection } from '../components/LayoutBase/LayoutSection'
 import { PoolList } from '../components/PoolList'
 import { config } from '../config'

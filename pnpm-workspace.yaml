@@ -1,4 +1,3 @@
 packages:
-  - 'app'
-  - 'functions'
-  - 'centrifuge-permissionless'
+  - 'apps/*'
+  - 'packages/*'

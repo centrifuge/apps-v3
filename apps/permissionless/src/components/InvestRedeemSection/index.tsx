@@ -3,14 +3,14 @@ import { Flex, Heading, Stack, Text } from '@chakra-ui/react'
 import { useEffect, useState, type ComponentType, type Dispatch } from 'react'
 import { useChainId } from 'wagmi'
 import { useGeolocation } from '../../hooks/useGeolocation'
-import { usePoolNetworks } from '../../hooks/usePools'
-import { useVaults } from '../../hooks/useVaults'
-import type { PoolDetails } from '../../utils/types'
 import { ConnectionGuard } from '../ConnectionGuard'
 import { Tabs } from '../Tabs'
 import { InfoWrapper } from './components/InfoWrapper'
 import InvestTab from './InvestTab/InvestTab'
 import RedeemTab from './RedeemTab/RedeemTab'
+import type { PoolDetails } from '@centrifuge/utils'
+import { usePoolNetworks } from '@centrifuge/hooks'
+import { useVaults } from '@centrifuge/hooks'
 
 const RestrictedCountry = () => {
   return (

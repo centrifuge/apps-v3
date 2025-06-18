@@ -5,6 +5,7 @@ import { createHtmlPlugin } from 'vite-plugin-html'
 import { config } from './src/config'
 
 export default defineConfig({
+  root: 'src',
   plugins: [
     react(),
     tsconfigPaths(),
@@ -17,4 +18,11 @@ export default defineConfig({
       },
     }),
   ],
+  build: {
+    outDir: '../dist',
+    emptyOutDir: true,
+  },
+  server: {
+    port: 3001,
+  },
 })
