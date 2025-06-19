@@ -39,7 +39,6 @@ export function TransactionToasts() {
           type,
           duration,
           isClosable: true, // Adds a close button
-          placement: 'top-end',
           onCloseComplete: () => {
             // Be sure to update tx as dismissed
             updateTransaction(tx.id, { dismissed: true })
