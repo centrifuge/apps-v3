@@ -1,7 +1,7 @@
 import { Box, Button, Flex, Grid, Heading, Icon, Text } from '@chakra-ui/react'
 import { GrDownload } from 'react-icons/gr'
-import { LineChart } from './Charts/LineChart'
-import { formatPercentage } from '../utils/formatting'
+import { LineChart } from './charts/LineChart'
+import { formatPercentage } from '@centrifuge/shared'
 import type { PoolMetadata } from '@centrifuge/sdk'
 import type { PoolDetails } from '../utils/types'
 

@@ -1,18 +1,19 @@
 import { PoolId } from '@centrifuge/sdk'
 import { useMemo } from 'react'
 import { combineLatest, switchMap } from 'rxjs'
-import { centrifuge } from '../centrifuge'
 import { useObservable } from './useObservable'
+import { useCentrifuge } from './CentrifugeContext'
 
 const IDS = ['281474976710657']
 
-const pools$ = centrifuge.pools()
-
 export function usePools() {
+  const centrifuge = useCentrifuge()
+  const pools$ = useMemo(() => centrifuge.pools(), [centrifuge])
   return useObservable(pools$)
 }
 
 export function usePool(poolId?: PoolId) {
+  const centrifuge = useCentrifuge()
   const pool$ = useMemo(() => (poolId ? centrifuge.pool(poolId) : undefined), [poolId])
   return useObservable(pool$)
 }
@@ -24,6 +25,7 @@ export function usePoolDetails(poolId?: PoolId) {
 }
 
 export function useAllPoolDetails() {
+  const centrifuge = useCentrifuge()
   const details$ = useMemo(
     () => combineLatest(IDS.map((id) => centrifuge.pool(new PoolId(id)).pipe(switchMap((pool) => pool.details())))),
 

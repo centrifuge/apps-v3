@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import { PoolId } from '@centrifuge/sdk'
+import { usePools } from '@centrifuge/shared'
 
 const SelectedPoolContext = createContext<
   | {

@@ -1,6 +1,6 @@
 import type { PoolMetadata } from '@centrifuge/sdk'
 import { Box, Flex, Heading } from '@chakra-ui/react'
-import { formatPercentage } from '../utils/formatting'
+import { formatPercentage } from '@centrifuge/shared'
 import { mockMetadata } from '../utils/mockMetadata'
 import DataTable, { type ColumnDefinition } from './DataTable'
 import { Tooltip } from './Tooltip'

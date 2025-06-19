@@ -8,6 +8,7 @@
     "build": "tsc -b && vite build"
   },
   "dependencies": {
-    "@centrifuge/forms": "workspace:*"
+    "@centrifuge/forms": "workspace:*",
+    "@centrifuge/shared": "workspace:*"
   }
 }

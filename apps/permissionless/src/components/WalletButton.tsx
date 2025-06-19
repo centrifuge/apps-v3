@@ -1,7 +1,7 @@
 import { useAccount } from 'wagmi'
 import { Button } from '@chakra-ui/react'
 import { useAppKit } from '@reown/appkit/react'
-import { truncateAddress } from '../utils/formatting'
+import { truncateAddress } from '@centrifuge/shared'
 
 export default function WalletButton() {
   const { open } = useAppKit()

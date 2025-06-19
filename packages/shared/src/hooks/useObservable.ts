@@ -1,6 +1,7 @@
 import { useMemo, useReducer, useRef, useState, useSyncExternalStore } from 'react'
 import { catchError, of, share, timer, type Observable, type ObservedValueOf } from 'rxjs'
 import { map, tap } from 'rxjs/operators'
+import { isTestEnv } from '../utils/config'
 
 export type ObservableOptions = never
 
@@ -138,7 +139,7 @@ const noopStore = {
 }
 
 function useWarnIfNotStable(object?: unknown, message = 'object is not stable') {
-  if (import.meta.env.DEV) {
+  if (isTestEnv) {
     const ref = useRef({
       hasObjectCount: 0,
       stableObjectCount: 0,

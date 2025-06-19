@@ -1,6 +1,6 @@
 import { Box, Button, Flex, Heading, Icon, Text } from '@chakra-ui/react'
 import { IoMdCheckmarkCircleOutline } from 'react-icons/io'
-import { useFormContext } from '../../../forms'
+import { useFormContext } from '@centrifuge/forms'
 import { InvestAction, RedeemAction, type InvestActionType, type RedeemActionType } from './defaults'
 import type { Dispatch, SetStateAction } from 'react'
 

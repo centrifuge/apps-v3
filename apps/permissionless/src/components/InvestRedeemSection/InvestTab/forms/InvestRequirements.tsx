@@ -1,5 +1,5 @@
 import { Box, Flex, Heading, Text } from '@chakra-ui/react'
-import { useFormContext, Checkbox, SubmitButton } from '../../../../forms'
+import { useFormContext, Checkbox, SubmitButton } from '@centrifuge/forms'
 
 const options = [
   { name: 'requirement_nonUsCitizen', label: 'I am a non-US citizen or entity' },

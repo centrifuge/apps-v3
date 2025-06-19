@@ -8,9 +8,8 @@ import { Tabs } from '../Tabs'
 import { InfoWrapper } from './components/InfoWrapper'
 import InvestTab from './InvestTab/InvestTab'
 import RedeemTab from './RedeemTab/RedeemTab'
-import type { PoolDetails } from '@centrifuge/utils'
-import { usePoolNetworks } from '@centrifuge/hooks'
-import { useVaults } from '@centrifuge/hooks'
+import type { PoolDetails } from '@centrifuge/shared'
+import { usePoolNetworks, useVaults } from '@centrifuge/shared'
 
 const RestrictedCountry = () => {
   return (

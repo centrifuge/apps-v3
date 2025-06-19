@@ -1,6 +1,6 @@
 import { Box, Flex, Grid, Heading, Stack, Text } from '@chakra-ui/react'
 import { useSelectedPoolContext } from '../contexts/useSelectedPoolContext'
-import { usePoolDetails } from '../hooks/usePools'
+import { usePoolDetails } from '@centrifuge/shared'
 import { PoolId } from '@centrifuge/sdk'
 import { PoolPerformanceChart } from './PoolPerformanceChart'
 import { InvestRedeemSection } from './InvestRedeemSection'
