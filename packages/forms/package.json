@@ -1,0 +1,14 @@
+{
+  "name": "@centrifuge/forms",
+  "version": "0.1.0",
+  "main": "src/index.ts",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "react-hook-form": "^7.0.0",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@hookform/resolvers": "^5.1.1"
+  }
+}

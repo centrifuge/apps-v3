@@ -3,8 +3,10 @@
 A modern monorepo workspace using pnpm with multiple packages:
 
 - `app`: A React application using React Router v7 in framework mode and Vite
-- `fabric`: An empty package for future development
+- `permissionless`: A react application using vite
 - `functions`: A Nitro-powered API server
+- `forms`: A package to reuse forms within our apps
+- `shared`: A reusable package for our hooks and utils functions
 
 ## Quick Start
 
@@ -20,9 +22,11 @@ pnpm dev
 # Or start individually:
 pnpm dev:app      # Start React app only
 pnpm dev:functions  # Start Nitro API server only
+pnpm dev:permissionless # Start permissionless app only
 ```
 
 The React app will be available at: http://localhost:3001/ (or another available port)
+The Permissionless app will be available at: http://localhost:3003/ (or another available port)
 The API server will be available at: http://localhost:3002/ (as configured in functions/.env)
 
 Sample API endpoint: http://localhost:3002/api/hello
@@ -79,12 +83,13 @@ Key architectural decisions:
 
 2. **TypeScript Support**: Full TypeScript support for type-safe API development
 
-#### Fabric Package
+#### Centrifuge permissionless
 
-The `fabric` package is currently empty and reserved for future development of shared utilities, components, or other functionality that may be needed across the workspace.
+React app using vite
 
 #### Styling and Props
-We're using styled components, and have our own theme defined as part of the exports from Fabric. The theme is used to define colors, fonts, and other design tokens, which we use either as plain strings as part of the component being a child of the theme provider (preference), or as part of a theme object when using useTheme. If there's a color or other prop value that you don't know where it comes from, check the theme in Fabric.
+
+We're using chakra UI, we have a defined theme within shakra, for more info consult chakra docs
 
 ### Communication Between Packages
 
@@ -118,3 +123,7 @@ pnpm --filter app build
 # Build the API server
 pnpm --filter functions build
 ```
+
+#### Testing
+
+TBD
