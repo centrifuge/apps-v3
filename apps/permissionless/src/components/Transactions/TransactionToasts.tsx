@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import { Toaster, toaster } from '../toaster'
 import { useTransactions } from './TransactionProvider'
 
 export function TransactionToasts() {
@@ -8,7 +9,6 @@ export function TransactionToasts() {
 
   useEffect(() => {
     transactions
-
       .filter((tx) => !tx.dismissed && !['creating', 'unconfirmed'].includes(tx.status))
       .forEach((tx) => {
         if (shownToastIds.current[tx.id]) return
@@ -32,9 +32,21 @@ export function TransactionToasts() {
 
         const duration = type === 'loading' ? null : type === 'error' ? 60_000 : 10_000
 
-        // TODO: create toaste
+        // Create toast
+        toaster.create({
+          title: tx.title,
+          description,
+          type,
+          duration,
+          isClosable: true, // Adds a close button
+          placement: 'top-end',
+          onCloseComplete: () => {
+            // Be sure to update tx as dismissed
+            updateTransaction(tx.id, { dismissed: true })
+          },
+        })
       })
   }, [transactions, updateTransaction])
 
-  return null
+  return <Toaster />
 }
