@@ -3,8 +3,10 @@
 A modern monorepo workspace using pnpm with multiple packages:
 
 - `app`: A React application using React Router v7 in framework mode and Vite
-- `centrifuge-permissionless`: A react application using vite
+- `permissionless`: A react application using vite
 - `functions`: A Nitro-powered API server
+- `forms`: A package to reuse forms within our apps
+- `shared`: A reusable package for our hooks and utils functions
 
 ## Quick Start
 
@@ -20,11 +22,11 @@ pnpm dev
 # Or start individually:
 pnpm dev:app      # Start React app only
 pnpm dev:functions  # Start Nitro API server only
-pnpm dev:centrifuge-permissionless # Start permissionless app only
+pnpm dev:permissionless # Start permissionless app only
 ```
 
 The React app will be available at: http://localhost:3001/ (or another available port)
-The Permissionless app will be available at: http://localhost:5174/ (or another available port)
+The Permissionless app will be available at: http://localhost:3003/ (or another available port)
 The API server will be available at: http://localhost:3002/ (as configured in functions/.env)
 
 Sample API endpoint: http://localhost:3002/api/hello
