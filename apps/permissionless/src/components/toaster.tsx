@@ -7,7 +7,7 @@ export const toaster = createToaster({
   max: 3,
 })
 
-// TODO: fix types
+// TODO: fix types //
 /* eslint-disable */
 export const Toaster = () => {
   return (
