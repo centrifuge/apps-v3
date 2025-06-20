@@ -22,13 +22,11 @@ export function InvestRequirements() {
       <Flex flexDirection="column" gap={4} mt={4} mb={4}>
         {options.map((option, index) => (
           <Checkbox
+            key={option.name}
             name={option.name}
             label={option.label}
-            size="lg"
-            key={option.name}
             variant="outline"
-            borderRadius={10}
-            colorPalette="textPrimary"
+            size="lg"
             onChange={(checked) => {
               const updatedRequirements = [...investorRequirements]
               updatedRequirements.splice(index, 1, checked)
@@ -37,15 +35,7 @@ export function InvestRequirements() {
           />
         ))}
       </Flex>
-      <SubmitButton
-        background="backgroundButtonHighlight"
-        color="textPrimary"
-        transition="box-shadow 0.2s ease"
-        _hover={{
-          boxShadow: 'xs',
-        }}
-        width="100%"
-      >
+      <SubmitButton colorPalette="yellow" width="100%">
         Confirm
       </SubmitButton>
     </Box>

@@ -46,12 +46,7 @@ export function SuccessPanel(props: SuccessPanelProps) {
         <Text alignSelf="flex-end">USDC</Text>
       </Flex>
       <Button
-        background="backgroundButtonHighlight"
-        color="textPrimary"
-        transition="box-shadow 0.2s ease"
-        _hover={{
-          boxShadow: 'xs',
-        }}
+        colorPalette="yellow"
         type="button"
         onClick={() => {
           if (isInvesting) {

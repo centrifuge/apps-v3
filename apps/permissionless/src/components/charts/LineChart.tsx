@@ -7,11 +7,11 @@ type DataPoint = {
 }
 
 export const LineChart = ({ data }: { data: DataPoint[] }) => {
-  const [backgroundTertiary, textHighlight, borderPrimary, textSecondary] = useToken('colors', [
-    'backgroundTertiary',
-    'textHighlight',
-    'borderPrimary',
-    'textSecondary',
+  const [bgTertiary, borderPrimary, textHighlight, textSecondary] = useToken('colors', [
+    'bg-tertiary',
+    'border-primary',
+    'text-highlight',
+    'text-secondary',
   ])
 
   const formatMonth = (ts: string) => {
@@ -32,7 +32,7 @@ export const LineChart = ({ data }: { data: DataPoint[] }) => {
 
           <CartesianGrid stroke={borderPrimary} vertical={false} />
 
-          <Bar dataKey="tvl" barSize={20} fill={backgroundTertiary} fillOpacity={1} strokeWidth={0} />
+          <Bar dataKey="tvl" barSize={20} fill={bgTertiary} fillOpacity={1} strokeWidth={0} />
 
           <Line type="monotone" dataKey="price" stroke={textHighlight} dot={false} strokeWidth={2} />
 

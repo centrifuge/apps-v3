@@ -14,13 +14,13 @@ const system = createSystem(defaultConfig, chosenThemeConfig)
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <CentrifugeProvider client={centrifuge}>
-      <TransactionProvider>
-        <ChakraProvider value={system}>
+      <ChakraProvider value={system}>
+        <TransactionProvider>
           <SelectedPoolProvider>
             <Root />
           </SelectedPoolProvider>
-        </ChakraProvider>
-      </TransactionProvider>
+        </TransactionProvider>
+      </ChakraProvider>
     </CentrifugeProvider>
   </StrictMode>
 )

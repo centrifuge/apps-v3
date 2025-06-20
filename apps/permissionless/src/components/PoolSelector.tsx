@@ -1,6 +1,6 @@
 import { SegmentGroup } from '@chakra-ui/react'
 import { PoolId } from '@centrifuge/sdk'
-import { useAllPoolDetails } from '../hooks/usePools'
+import { useAllPoolDetails } from '@centrifuge/shared'
 import { useSelectedPoolContext } from '../contexts/useSelectedPoolContext'
 
 export const PoolSelector = () => {
@@ -17,17 +17,17 @@ export const PoolSelector = () => {
   return (
     <SegmentGroup.Root
       value={displayPools.find((pool) => pool.value === selectedPoolId?.toString())?.label}
-      onValueChange={(e) => {
-        const selectedPool = displayPools.find((pool) => pool.label === e.value)
+      onValueChange={(details: { value: string }) => {
+        const selectedPool = displayPools.find((pool) => pool.label === details.value)
         if (selectedPool) {
           setSelectedPoolId(new PoolId(selectedPool.value))
         }
       }}
-      bg="backgroundTertiary"
+      bg="bg-tertiary"
       padding={2}
       borderRadius="10px"
     >
-      <SegmentGroup.Indicator bg="textInverted" />
+      <SegmentGroup.Indicator bg="text-inverted" />
       <SegmentGroup.Items w="full" borderRadius="10px" border="none" items={displayPools?.map((pool) => pool.label)} />
     </SegmentGroup.Root>
   )

@@ -21,7 +21,7 @@ const DataTable = <RowType extends { id?: string | number }>({
   data,
   size = 'sm',
 }: DataTableProps<RowType>) => {
-  const [backgroundSecondary] = useToken('colors', 'borderPrimary')
+  const [backgroundSecondary] = useToken('colors', 'border-primary')
   return (
     <Table.Root
       size={size}
