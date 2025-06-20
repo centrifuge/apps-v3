@@ -181,6 +181,7 @@ export function BalanceInput<TFieldValues extends FieldValues = FieldValues>(pro
           onKeyDown={handleKeyPress}
           onPaste={handlePaste}
           inputMode="decimal" // Shows numeric keypad on mobile
+          variant={rest.variant ?? 'outline'}
         />
       </InputGroup>
       <Field.ErrorText>{errorMessage}</Field.ErrorText>

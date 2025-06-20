@@ -167,7 +167,7 @@ export function LegendItem({ color, label, value }: { color?: string; label: str
     <Box display="flex" flexDir="column" justifyContent="flex-start">
       <Box display="flex" alignItems="center" gap={2}>
         {color && <SmallCircle color={color} />}
-        <Text color="textDisabled" fontWeight={500} fontSize="xs">
+        <Text color="gray.600" fontWeight={500} fontSize="xs">
           {label}
         </Text>
       </Box>
@@ -181,26 +181,17 @@ export const PoolPerformanceChart = ({ pool }: { pool: PoolDetails }) => {
 
   return (
     <Box
-      bg="backgroundPrimary"
+      bg="bg-primary"
       width="100%"
       padding={6}
       borderRadius={10}
       border="1px solid"
-      borderColor="borderPrimary"
+      borderColor="border-primary"
       shadow="xs"
     >
       <Flex justifyContent="space-between" alignItems="center" mb={6}>
         <Heading size="sm">Performance</Heading>
-        <Button
-          backgroundColor="backgroundButtonPrimary"
-          color="textPrimary"
-          transition="box-shadow 0.2s ease"
-          _hover={{
-            boxShadow: 'xs',
-          }}
-          fontSize="xs"
-          fontWeight={600}
-        >
+        <Button variant="subtle" type="button">
           <Icon size="sm">
             <GrDownload />
           </Icon>
@@ -208,8 +199,8 @@ export const PoolPerformanceChart = ({ pool }: { pool: PoolDetails }) => {
         </Button>
       </Flex>
       <Grid gridTemplateColumns="160px 140px 120px" gap={0} mb={12}>
-        <LegendItem color="backgroundTertiary" label="TVL USDC" value="37,492,485" />
-        <LegendItem color="textHighlight" label="Token price" value="1.057" />
+        <LegendItem color="bg-tertiary" label="TVL USDC" value="37,492,485" />
+        <LegendItem color="text-highlight" label="Token price" value="1.057" />
         <LegendItem label="Target APY" value={targetApy} />
       </Grid>
       <LineChart data={chartData} />

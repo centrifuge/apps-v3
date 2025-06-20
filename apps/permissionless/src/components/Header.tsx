@@ -7,7 +7,7 @@ export function Header() {
   return (
     <Box display="flex" justifyContent="space-between" alignItems="center">
       <Box width={40}>
-        <LogoCentrifugeText fill="textPrimary" />
+        <LogoCentrifugeText fill="text-primary" />
       </Box>
       {/* <PoolSelector /> */}
       <WalletButton />
