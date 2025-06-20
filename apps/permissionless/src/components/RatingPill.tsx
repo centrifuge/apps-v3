@@ -28,7 +28,7 @@ export const RatingPill = ({ rating }: { rating: FirstRating }) => {
   const logo = logos.find((logo) => rating.agency?.toLowerCase().includes(logo.agency))
   if (!rating) return null
   return (
-    <Badge variant="outline" p={2} borderRadius="full" borderColor="borderPrimary">
+    <Badge variant="outline">
       <Icon>
         <Image src={logo?.logo || spLogo} alt={rating.agency} />
       </Icon>

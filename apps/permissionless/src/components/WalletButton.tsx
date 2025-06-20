@@ -18,7 +18,7 @@ export default function WalletButton() {
   ) : (
     <Button
       onClick={handleConnect}
-      backgroundColor="backgroundButtonSecondary"
+      backgroundColor="gray.800"
       variant="solid"
       transition="box-shadow 0.2s ease"
       _hover={{

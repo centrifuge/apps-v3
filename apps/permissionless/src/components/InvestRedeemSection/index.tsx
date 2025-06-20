@@ -8,8 +8,8 @@ import { Tabs } from '../Tabs'
 import { InfoWrapper } from './components/InfoWrapper'
 import InvestTab from './InvestTab/InvestTab'
 import RedeemTab from './RedeemTab/RedeemTab'
-import type { PoolDetails } from '@centrifuge/shared'
 import { usePoolNetworks, useVaults } from '@centrifuge/shared'
+import type { PoolDetails } from '../../utils/types'
 
 const RestrictedCountry = () => {
   return (
@@ -33,7 +33,7 @@ export function InvestRedeemSection({ pool: poolDetails }: { pool: PoolDetails }
     <Flex
       direction="column"
       border="1px solid"
-      borderColor="borderPrimary"
+      borderColor="border-primary"
       borderRadius="10px"
       shadow="xs"
       bg="white"

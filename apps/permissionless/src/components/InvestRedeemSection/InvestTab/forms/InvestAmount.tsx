@@ -30,7 +30,7 @@ export default function InvestAmount({
     <Box>
       <Flex justify="space-between" mb={2}>
         <Text fontWeight={500}>You pay</Text>
-        <Text color="textPrimary" opacity={0.5} alignSelf="flex-end">
+        <Text opacity={0.5} alignSelf="flex-end">
           (min: {formatBalanceAbbreviated(minAmount, 2, pool?.currency.symbol)})
         </Text>
       </Flex>
@@ -39,24 +39,16 @@ export default function InvestAmount({
         decimals={6}
         displayDecimals={6}
         placeholder="0.00"
-        size="2xl"
-        background="backgroundPrimary"
-        borderRadius={10}
-        fontSize="2xl"
         inputGroupProps={{
           endAddon: `${currency?.symbol || 'USDC'}`,
-          endAddonProps: {
-            background: 'backgroundPrimary',
-            borderRadius: '0px 10px 10px 0px',
-          },
         }}
       />
       <Flex mt={2} justify="space-between">
         <Flex>
-          <Badge background="backgroundTertiary" color="textPrimary" opacity={0.5} borderRadius={10} px={3} h="24px">
+          <Badge background="bg-tertiary" color="text-primary" opacity={0.5} borderRadius={10} px={3} h="24px">
             MAX
           </Badge>
-          <Text color="textPrimary" opacity={0.5} alignSelf="flex-end" ml={2}>
+          <Text color="text-primary" opacity={0.5} alignSelf="flex-end" ml={2}>
             {formatBalance(balance ?? 0, currency?.symbol)}
           </Text>
         </Flex>
@@ -71,30 +63,16 @@ export default function InvestAmount({
             name="amountToReceive"
             type="text"
             placeholder="0.00"
-            size="2xl"
-            background="backgroundPrimary"
-            borderRadius={10}
             disabled
-            _disabled={{
-              opacity: 1,
-            }}
+            variant="outline"
             inputGroupProps={{
               endAddon: 'deJTRYS',
-              endAddonProps: {
-                background: 'backgroundPrimary',
-                borderRadius: '0px 10px 10px 0px',
-              },
             }}
           />
         </>
       )}
       <Button
-        background="backgroundButtonHighlight"
-        color="textPrimary"
-        transition="box-shadow 0.2s ease"
-        _hover={{
-          boxShadow: 'xs',
-        }}
+        colorPalette="yellow"
         type="button"
         onClick={() => setActionType(InvestAction.INVESTOR_REQUIREMENTS)}
         disabled={parsedAmount === 0}

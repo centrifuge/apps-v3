@@ -19,7 +19,14 @@ export function SubmitButton<T extends FieldValues = FieldValues>({
   const isDisabled = disabled || formState.isSubmitting || (disableOnInvalid && !formState.isValid)
 
   return (
-    <Button {...props} type="submit" disabled={isDisabled} loading={formState.isSubmitting} loadingText={loadingText}>
+    <Button
+      {...props}
+      type="submit"
+      disabled={isDisabled}
+      loading={formState.isSubmitting}
+      loadingText={loadingText}
+      mt={4}
+    >
       {children}
     </Button>
   )

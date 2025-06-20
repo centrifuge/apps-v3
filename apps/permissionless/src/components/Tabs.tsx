@@ -17,9 +17,9 @@ export const Tabs = ({ elements }: TabsProps) => {
         lazyMount
         unmountOnExit
         defaultValue={elements[0].value}
-        colorScheme="textHighlight"
+        colorPalette="yellow"
         size="lg"
-        variant="plain"
+        variant="line"
         h="100%"
       >
         <Box>
@@ -29,7 +29,7 @@ export const Tabs = ({ elements }: TabsProps) => {
                 {element.label}
               </ChakraTabs.Trigger>
             ))}
-            <ChakraTabs.Indicator bg="textHighlight" height="2px" borderRadius="1px" bottom="0" />
+            <ChakraTabs.Indicator bg="text-highlight" height="2px" borderRadius="1px" bottom="0" />
           </ChakraTabs.List>
         </Box>
 
@@ -39,7 +39,7 @@ export const Tabs = ({ elements }: TabsProps) => {
               key={element.value}
               value={element.value}
               flex="1"
-              bg="backgroundAccentPrimary"
+              bg="bg-accent"
               px={4}
               py={3}
               overflowY="auto"
