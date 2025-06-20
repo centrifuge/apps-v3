@@ -1,5 +1,5 @@
-import { Flex, Box, Tabs as ChakraTabs } from '@chakra-ui/react'
 import type { CSSProperties } from 'react'
+import { Flex, Box, Tabs as ChakraTabs } from '@chakra-ui/react'
 
 interface TabsProps {
   elements: {

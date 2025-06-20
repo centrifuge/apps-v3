@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { TransactionToasts } from './TransactionToasts'
+import { TransactionToasts } from '@components/Transactions/TransactionToasts'
 
 export type TransactionStatus = 'creating' | 'unconfirmed' | 'pending' | 'succeeded' | 'failed'
 export type Transaction = {

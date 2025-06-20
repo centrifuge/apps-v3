@@ -3,10 +3,10 @@
 import React from 'react'
 import { Image, type ImageProps, Flex, Box } from '@chakra-ui/react'
 
-import EthereumSvg from '../assets/logos/ethereum.svg'
-import ArbitrumSvg from '../assets/logos/arbitrum.svg'
-import CeloSvg from '../assets/logos/celo.svg'
-import BaseSvg from '../assets/logos/base.svg'
+import EthereumSvg from '@assets/logos/ethereum.svg'
+import ArbitrumSvg from '@assets/logos/arbitrum.svg'
+import CeloSvg from '@assets/logos/celo.svg'
+import BaseSvg from '@assets/logos/base.svg'
 
 export type Network = 'ethereum' | 'arbitrum' | 'celo' | 'base'
 

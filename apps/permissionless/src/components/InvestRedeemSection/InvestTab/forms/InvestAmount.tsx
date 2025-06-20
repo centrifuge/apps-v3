@@ -1,17 +1,17 @@
+import type { Dispatch, SetStateAction } from 'react'
 import { Badge, Box, Button, Flex, Text } from '@chakra-ui/react'
-import { NetworkIcons, type Network } from '../../../NetworkIcon'
-import { useSelectedPoolContext } from '../../../../contexts/useSelectedPoolContext'
+import { BalanceInput, Input } from '@centrifuge/forms'
 import { Balance, PoolId } from '@centrifuge/sdk'
 import { formatBalance, formatBalanceAbbreviated, usePortfolio, usePoolDetails } from '@centrifuge/shared'
-import { BalanceInput, Input } from '@centrifuge/forms'
-import type { Dispatch, SetStateAction } from 'react'
-import { InvestAction, type InvestActionType } from '../../components/defaults'
-import { InfoWrapper } from '../../components/InfoWrapper'
-import { infoText } from '../../../../utils/infoText'
+import { NetworkIcons, type Network } from '@components/NetworkIcon'
+import { useSelectedPoolContext } from '@contexts/useSelectedPoolContext'
+import { infoText } from '@utils/infoText'
+import { InvestAction, type InvestActionType } from '@components/InvestRedeemSection/components/defaults'
+import { InfoWrapper } from '@components/InvestRedeemSection/components/InfoWrapper'
 
 const networks: Network[] = ['ethereum', 'arbitrum', 'celo', 'base']
 
-export default function InvestAmount({
+export function InvestAmount({
   parsedAmount,
   setActionType,
 }: {
@@ -20,8 +20,10 @@ export default function InvestAmount({
 }) {
   const { data: portfolio } = usePortfolio()
   const { selectedPoolId } = useSelectedPoolContext()
-  const { data: pool } = usePoolDetails(selectedPoolId as PoolId)
-  const minAmount = Object.values(pool?.metadata?.shareClasses || {})[0].minInitialInvestment || 0
+  const { data: pool } = usePoolDetails(selectedPoolId)
+  const minAmount = pool?.metadata?.shareClasses
+    ? (Object.values(pool?.metadata?.shareClasses || {})[0].minInitialInvestment ?? 0)
+    : 0
 
   const currency = portfolio?.[0]?.currency
   const balance = portfolio?.[0]?.balance

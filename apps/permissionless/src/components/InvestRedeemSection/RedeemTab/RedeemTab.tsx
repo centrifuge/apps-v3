@@ -1,12 +1,16 @@
-import { Balance, type Vault } from '@centrifuge/sdk'
-import { Box } from '@chakra-ui/react'
-import { z } from 'zod'
-import { useCentrifugeTransaction } from '../../../hooks/useCentrifugeTransaction'
-import { useInvestment, useVaultDetails } from '@centrifuge/shared'
-import { createBalanceSchema, Form, numberInputMin, safeParse, useForm } from '@centrifuge/forms'
 import { useMemo, useState } from 'react'
-import { RedeemAction, RedeemFormDefaultValues, type RedeemActionType } from '../components/defaults'
-import { RedeemTabForm } from './forms/RedeemTabForm'
+import { z } from 'zod'
+import { Box } from '@chakra-ui/react'
+import { createBalanceSchema, Form, numberInputMin, safeParse, useForm } from '@centrifuge/forms'
+import { Balance, type Vault } from '@centrifuge/sdk'
+import { useInvestment, useVaultDetails } from '@centrifuge/shared'
+import { useCentrifugeTransaction } from '@hooks/useCentrifugeTransaction'
+import {
+  RedeemAction,
+  RedeemFormDefaultValues,
+  type RedeemActionType,
+} from '@components/InvestRedeemSection/components/defaults'
+import { RedeemTabForm } from '@components/InvestRedeemSection/RedeemTab/forms/RedeemTabForm'
 
 export default function RedeemTab({ vault }: { vault: Vault }) {
   const { data: vaultDetails } = useVaultDetails(vault)

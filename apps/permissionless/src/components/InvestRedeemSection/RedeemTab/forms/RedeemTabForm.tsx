@@ -1,9 +1,9 @@
-import type { Balance } from '@centrifuge/sdk'
-import { type RedeemActionType, RedeemAction } from '../../components/defaults'
 import { type Dispatch, type SetStateAction } from 'react'
-import { SuccessPanel } from '../../components/SuccessPanel'
-import { CancelRedeem } from './CancelRedeem'
-import { RedeemAmount } from './RedeemAmount'
+import type { Balance } from '@centrifuge/sdk'
+import { type RedeemActionType, RedeemAction } from '@components/InvestRedeemSection/components/defaults'
+import { SuccessPanel } from '@components/InvestRedeemSection/components/SuccessPanel'
+import { CancelRedeem } from '@components/InvestRedeemSection/RedeemTab/forms/CancelRedeem'
+import { RedeemAmount } from '@components/InvestRedeemSection/RedeemTab/forms/RedeemAmount'
 
 interface RedeemTabFormProps {
   actionType: RedeemActionType
