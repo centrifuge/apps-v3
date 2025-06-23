@@ -34,14 +34,14 @@ export function SuccessPanel(props: SuccessPanelProps) {
       <Flex alignItems="center" gap={2} justifyContent="space-between" mt={6}>
         <Box>
           <Text fontWeight={500}>You {isInvesting ? 'invested' : 'redeemed'}</Text>
-          <Heading fontSize="2xl">{getValues('amount')}</Heading>
+          <Heading fontSize="2xl">{getValues('amount').toString()}</Heading>
         </Box>
         <Text alignSelf="flex-end">USDC</Text>
       </Flex>
       <Flex alignItems="center" gap={2} justifyContent="space-between" mt={6}>
         <Box>
           <Text fontWeight={500}>{isInvesting ? 'Token amount' : 'You receive'}</Text>
-          <Heading fontSize="2xl">{getValues('amountToReceive')}</Heading>
+          <Heading fontSize="2xl">{getValues('amountToReceive').toString()}</Heading>
         </Box>
         <Text alignSelf="flex-end">USDC</Text>
       </Flex>
