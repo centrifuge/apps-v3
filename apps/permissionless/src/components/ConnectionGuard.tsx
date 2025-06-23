@@ -1,7 +1,7 @@
-import { Button, Menu, Stack, Text } from '@chakra-ui/react'
-import { useAppKit } from '@reown/appkit/react'
 import type { ReactNode } from 'react'
 import { useAccount, useChains, useSwitchChain } from 'wagmi'
+import { Button, Menu, Stack, Text } from '@chakra-ui/react'
+import { useAppKit } from '@reown/appkit/react'
 
 type Props = {
   networks?: number[]

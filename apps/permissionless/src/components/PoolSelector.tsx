@@ -1,7 +1,7 @@
 import { SegmentGroup } from '@chakra-ui/react'
 import { PoolId } from '@centrifuge/sdk'
 import { useAllPoolDetails } from '@centrifuge/shared'
-import { useSelectedPoolContext } from '../contexts/useSelectedPoolContext'
+import { useSelectedPoolContext } from '@contexts/useSelectedPoolContext'
 
 export const PoolSelector = () => {
   const { data: pools } = useAllPoolDetails()

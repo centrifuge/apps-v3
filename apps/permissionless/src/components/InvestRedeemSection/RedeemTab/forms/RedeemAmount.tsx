@@ -1,11 +1,11 @@
+import type { Dispatch, SetStateAction } from 'react'
 import { Badge, Box, Flex, Text } from '@chakra-ui/react'
+import { BalanceInput, Input, SubmitButton } from '@centrifuge/forms'
 import { Balance } from '@centrifuge/sdk'
 import { usePortfolio, formatBalance } from '@centrifuge/shared'
-import { BalanceInput, Input, SubmitButton } from '@centrifuge/forms'
-import type { Dispatch, SetStateAction } from 'react'
-import { type RedeemActionType } from '../../components/defaults'
-import { InfoWrapper } from '../../components/InfoWrapper'
-import { infoText } from '../../../../utils/infoText'
+import { type RedeemActionType } from '@components/InvestRedeemSection/components/defaults'
+import { InfoWrapper } from '@components/InvestRedeemSection/components/InfoWrapper'
+import { infoText } from '@utils/infoText'
 
 export function RedeemAmount({
   parsedAmount,

@@ -1,9 +1,9 @@
-import type { Balance } from '@centrifuge/sdk'
-import { type InvestActionType, InvestAction } from '../../components/defaults'
 import { type Dispatch, type SetStateAction } from 'react'
-import { InvestRequirements } from './InvestRequirements'
-import { SuccessPanel } from '../../components/SuccessPanel'
-import InvestAmount from './InvestAmount'
+import type { Balance } from '@centrifuge/sdk'
+import { type InvestActionType, InvestAction } from '@components/InvestRedeemSection/components/defaults'
+import { SuccessPanel } from '@components/InvestRedeemSection/components/SuccessPanel'
+import { InvestAmount } from '@components/InvestRedeemSection/InvestTab/forms/InvestAmount'
+import { InvestRequirements } from '@components/InvestRedeemSection/InvestTab/forms/InvestRequirements'
 
 interface InvestTabFormProps {
   actionType: InvestActionType

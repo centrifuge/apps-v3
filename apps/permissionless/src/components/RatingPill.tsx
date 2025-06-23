@@ -1,5 +1,5 @@
-import type { PoolMetadata } from '@centrifuge/sdk'
 import { Badge, Icon, Image, Text } from '@chakra-ui/react'
+import type { PoolMetadata } from '@centrifuge/sdk'
 
 type RatingsArray = NonNullable<PoolMetadata['pool']['poolRatings']>
 

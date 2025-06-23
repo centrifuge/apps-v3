@@ -1,10 +1,10 @@
 import type { Dispatch, SetStateAction } from 'react'
-import { useFormContext } from '@centrifuge/forms'
-import { Box, Button, Flex, Heading, Text } from '@chakra-ui/react'
 import { FaRegClock } from 'react-icons/fa6'
-import { infoText } from '../../../../utils/infoText'
-import { InfoWrapper } from '../../components/InfoWrapper'
-import { RedeemAction, type RedeemActionType } from '../../components/defaults'
+import { Box, Button, Flex, Heading, Text } from '@chakra-ui/react'
+import { useFormContext } from '@centrifuge/forms'
+import { infoText } from '@utils/infoText'
+import { RedeemAction, type RedeemActionType } from '@components/InvestRedeemSection/components/defaults'
+import { InfoWrapper } from '@components/InvestRedeemSection/components/InfoWrapper'
 
 interface CancelRedeemProps {
   setActionType: Dispatch<SetStateAction<RedeemActionType>>

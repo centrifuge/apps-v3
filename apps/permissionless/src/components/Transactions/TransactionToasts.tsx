@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
-import { Toaster, toaster } from '../toaster'
-import { useTransactions } from './TransactionProvider'
+import { Toaster, toaster } from '@components/toaster'
+import { useTransactions } from '@components/Transactions/TransactionProvider'
 
 export function TransactionToasts() {
   const { transactions, updateTransaction } = useTransactions()

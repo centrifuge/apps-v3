@@ -3,7 +3,7 @@ import type { AppKitNetwork } from '@reown/appkit/networks'
 import { createAppKit } from '@reown/appkit/react'
 import { http } from 'wagmi'
 import { injected } from 'wagmi/connectors'
-import { centrifuge } from '../centrifuge'
+import { centrifuge } from '@config/centrifuge'
 
 const projectId = import.meta.env.VITE_REOWN_APP_ID!
 

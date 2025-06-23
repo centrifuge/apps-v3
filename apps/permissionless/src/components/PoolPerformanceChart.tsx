@@ -1,9 +1,9 @@
-import { Box, Button, Flex, Grid, Heading, Icon, Text } from '@chakra-ui/react'
 import { GrDownload } from 'react-icons/gr'
-import { LineChart } from './charts/LineChart'
+import { Box, Button, Flex, Grid, Heading, Icon, Text } from '@chakra-ui/react'
+// import type { PoolMetadata } from '@centrifuge/sdk'
 import { formatPercentage } from '@centrifuge/shared'
-import type { PoolMetadata } from '@centrifuge/sdk'
-import type { PoolDetails } from '../utils/types'
+import { LineChart } from '@components/charts/LineChart'
+import type { PoolDetails } from '@utils/types'
 
 export const chartData = [
   {
