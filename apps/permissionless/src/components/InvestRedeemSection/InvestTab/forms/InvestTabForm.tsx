@@ -4,17 +4,19 @@ import { type InvestActionType, InvestAction } from '@components/InvestRedeemSec
 import { SuccessPanel } from '@components/InvestRedeemSection/components/SuccessPanel'
 import { InvestAmount } from '@components/InvestRedeemSection/InvestTab/forms/InvestAmount'
 import { InvestRequirements } from '@components/InvestRedeemSection/InvestTab/forms/InvestRequirements'
+import { VaultDetails } from '@utils/types'
 
 interface InvestTabFormProps {
   actionType: InvestActionType
   parsedAmount: 0 | Balance
+  vaultDetails?: VaultDetails
   setActionType: Dispatch<SetStateAction<InvestActionType>>
 }
 
-export function InvestTabForm({ actionType, parsedAmount, setActionType }: InvestTabFormProps) {
+export function InvestTabForm({ actionType, parsedAmount, vaultDetails, setActionType }: InvestTabFormProps) {
   switch (actionType) {
     case InvestAction.INVEST_AMOUNT:
-      return <InvestAmount parsedAmount={parsedAmount} setActionType={setActionType} />
+      return <InvestAmount parsedAmount={parsedAmount} setActionType={setActionType} vaultDetails={vaultDetails} />
     case InvestAction.INVESTOR_REQUIREMENTS:
       return <InvestRequirements />
     case InvestAction.SUCCESS:

@@ -1,6 +1,6 @@
-import type { Dispatch, SetStateAction } from 'react'
+import { useMemo, type Dispatch, type SetStateAction } from 'react'
 import { Badge, Box, Button, Flex, Text } from '@chakra-ui/react'
-import { BalanceInput, Input } from '@centrifuge/forms'
+import { BalanceInput, useFormContext } from '@centrifuge/forms'
 import { Balance, PoolId } from '@centrifuge/sdk'
 import { formatBalance, formatBalanceAbbreviated, usePortfolio, usePoolDetails } from '@centrifuge/shared'
 import { NetworkIcons, type Network } from '@components/NetworkIcon'
@@ -8,25 +8,46 @@ import { useSelectedPoolContext } from '@contexts/useSelectedPoolContext'
 import { infoText } from '@utils/infoText'
 import { InvestAction, type InvestActionType } from '@components/InvestRedeemSection/components/defaults'
 import { InfoWrapper } from '@components/InvestRedeemSection/components/InfoWrapper'
+import { VaultDetails } from '@utils/types'
 
 const networks: Network[] = ['ethereum', 'arbitrum', 'celo', 'base']
 
-export function InvestAmount({
-  parsedAmount,
-  setActionType,
-}: {
+interface InvestAmountProps {
   parsedAmount: 0 | Balance
+  vaultDetails?: VaultDetails
   setActionType: Dispatch<SetStateAction<InvestActionType>>
-}) {
+}
+
+export function InvestAmount({ parsedAmount, vaultDetails, setActionType }: InvestAmountProps) {
   const { data: portfolio } = usePortfolio()
   const { selectedPoolId } = useSelectedPoolContext()
   const { data: pool } = usePoolDetails(selectedPoolId)
+  const { setValue } = useFormContext()
+
+  const investmentCurrencyChainId = vaultDetails?.investmentCurrency?.chainId
   const minAmount = pool?.metadata?.shareClasses
     ? (Object.values(pool?.metadata?.shareClasses || {})[0].minInitialInvestment ?? 0)
     : 0
 
-  const currency = portfolio?.[0]?.currency
-  const balance = portfolio?.[0]?.balance
+  const portfolioInvestmentAsset = portfolio?.find((asset) => asset.currency.chainId === investmentCurrencyChainId)
+  const portfolioCurrency = portfolioInvestmentAsset?.currency
+  const portfolioBalance = portfolioInvestmentAsset?.balance
+
+  const shareClass = pool?.shareClasses.find((asset) => asset.shareClass.pool.chainId === investmentCurrencyChainId)
+  const navPerShare = shareClass?.details.navPerShare
+
+  const hasInvestmentCurrency = portfolioCurrency?.chainId === vaultDetails?.investmentCurrency?.chainId
+  const hasNoInvestmentCurrency = !hasInvestmentCurrency || portfolioBalance?.isZero
+  const infoLabel = hasNoInvestmentCurrency ? infoText().portfolioMissingInvestmentCurrency : infoText().redeem
+
+  useMemo(() => {
+    if (parsedAmount === 0 || !shareClass || navPerShare === undefined) {
+      return setValue('amountToReceive', '0')
+    }
+
+    const redeemAmount = parsedAmount.mul(navPerShare)
+    setValue('amountToReceive', redeemAmount.toFloat().toString())
+  }, [parsedAmount, shareClass, navPerShare])
 
   return (
     <Box>
@@ -41,8 +62,9 @@ export function InvestAmount({
         decimals={6}
         displayDecimals={6}
         placeholder="0.00"
+        // disabled={!hasInvestmentCurrency}
         inputGroupProps={{
-          endAddon: `${currency?.symbol || 'USDC'}`,
+          endAddon: `${portfolioCurrency?.symbol || 'USDC'}`,
         }}
       />
       <Flex mt={2} justify="space-between">
@@ -51,7 +73,7 @@ export function InvestAmount({
             MAX
           </Badge>
           <Text color="text-primary" opacity={0.5} alignSelf="flex-end" ml={2}>
-            {formatBalance(balance ?? 0, currency?.symbol)}
+            {formatBalance(portfolioBalance ?? 0, portfolioCurrency?.symbol)}
           </Text>
         </Flex>
         <NetworkIcons networks={networks} />
@@ -61,12 +83,12 @@ export function InvestAmount({
           <Text fontWeight={500} mt={6} mb={2}>
             You receive
           </Text>
-          <Input
+          <BalanceInput
             name="amountToReceive"
-            type="text"
+            decimals={navPerShare?.decimals}
+            displayDecimals={navPerShare?.decimals}
             placeholder="0.00"
             disabled
-            variant="outline"
             inputGroupProps={{
               endAddon: 'deJTRYS',
             }}
@@ -83,7 +105,7 @@ export function InvestAmount({
       >
         Invest
       </Button>
-      {parsedAmount === 0 && <InfoWrapper text={infoText.redeem} />}
+      <InfoWrapper text={infoLabel} type={hasNoInvestmentCurrency ? 'error' : 'info'} />
     </Box>
   )
 }

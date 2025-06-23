@@ -27,8 +27,8 @@ export default function RedeemTab({ vault }: { vault: Vault }) {
 
   // TODO: Add necessary refinements for validation checks
   const schema = z.object({
-    amount: createBalanceSchema(vaultDetails?.investmentCurrency.decimals ?? 6, z.number().min(0.01)),
-    amountToReceive: numberInputMin(0),
+    amount: createBalanceSchema(vaultDetails?.shareCurrency.decimals ?? 18, z.number().min(0.01)),
+    amountToReceive: createBalanceSchema(vaultDetails?.investmentCurrency.decimals ?? 6, z.number().min(0.01)),
   })
 
   const form = useForm({
@@ -52,7 +52,12 @@ export default function RedeemTab({ vault }: { vault: Vault }) {
   return (
     <Form form={form}>
       <Box mt={4}>
-        <RedeemTabForm actionType={actionType} parsedAmount={parsedAmount} setActionType={setActionType} />
+        <RedeemTabForm
+          actionType={actionType}
+          parsedAmount={parsedAmount}
+          vaultDetails={vaultDetails}
+          setActionType={setActionType}
+        />
       </Box>
     </Form>
   )

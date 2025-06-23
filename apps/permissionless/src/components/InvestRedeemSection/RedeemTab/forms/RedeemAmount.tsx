@@ -1,22 +1,49 @@
-import type { Dispatch, SetStateAction } from 'react'
 import { Badge, Box, Flex, Text } from '@chakra-ui/react'
-import { BalanceInput, Input, SubmitButton } from '@centrifuge/forms'
+import { BalanceInput, SubmitButton, useFormContext } from '@centrifuge/forms'
 import { Balance } from '@centrifuge/sdk'
-import { usePortfolio, formatBalance } from '@centrifuge/shared'
-import { type RedeemActionType } from '@components/InvestRedeemSection/components/defaults'
+import { usePortfolio, formatBalance, usePoolDetails } from '@centrifuge/shared'
 import { InfoWrapper } from '@components/InvestRedeemSection/components/InfoWrapper'
 import { infoText } from '@utils/infoText'
+import { VaultDetails } from '@utils/types'
+import { useSelectedPoolContext } from '@contexts/useSelectedPoolContext'
+import { useMemo } from 'react'
+import { formatUnits, parseUnits } from 'viem'
 
-export function RedeemAmount({
-  parsedAmount,
-}: {
+interface RedeemAmountProps {
   parsedAmount: 0 | Balance
-  setActionType?: Dispatch<SetStateAction<RedeemActionType>>
-}) {
-  const { data: portfolio } = usePortfolio()
+  vaultDetails: VaultDetails
+}
 
-  const currency = portfolio?.[0]?.currency
-  const balance = portfolio?.[0]?.balance
+export function RedeemAmount({ parsedAmount, vaultDetails }: RedeemAmountProps) {
+  const { data: portfolio } = usePortfolio()
+  const { selectedPoolId } = useSelectedPoolContext()
+  const { data: pool } = usePoolDetails(selectedPoolId)
+  const { setValue } = useFormContext()
+
+  const investmentCurrencyChainId = vaultDetails?.investmentCurrency?.chainId
+  const shareAsset = vaultDetails?.shareCurrency.address
+
+  const portfolioShareAsset = portfolio?.find((asset) => asset.currency.address === shareAsset)
+  const portfolioShareCurrency = portfolioShareAsset?.currency
+  const portfolioShareBalance = portfolioShareAsset?.balance
+
+  const portfolioInvestmentAsset = portfolio?.find((asset) => asset.currency.chainId === investmentCurrencyChainId)
+  const portfolioInvestmentCurrency = portfolioInvestmentAsset?.currency
+
+  const shareClass = pool?.shareClasses.find((asset) => asset.shareClass.pool.chainId === investmentCurrencyChainId)
+  const navPerShare = shareClass?.details.navPerShare
+
+  useMemo(() => {
+    if (parsedAmount === 0 || !shareClass || navPerShare === undefined) {
+      return setValue('amountToReceive', '0')
+    }
+
+    const receiveAmount = parseUnits(parsedAmount.div(navPerShare).toString(), portfolioShareCurrency?.decimals ?? 18)
+    const formattedReceiveAmount = Number(formatUnits(receiveAmount, 18))
+      .toFixed(portfolioInvestmentCurrency?.decimals ?? 6)
+      .toString()
+    setValue('amountToReceive', formattedReceiveAmount)
+  }, [parsedAmount, shareClass, navPerShare])
 
   return (
     <Box>
@@ -25,11 +52,10 @@ export function RedeemAmount({
       </Text>
       <BalanceInput
         name="amount"
-        decimals={6}
-        displayDecimals={6}
+        decimals={portfolioShareCurrency?.decimals}
         placeholder="0.00"
         inputGroupProps={{
-          endAddon: `${currency?.symbol || 'USDC'}`,
+          endAddon: 'deJTRYS',
         }}
       />
       <Flex mt={2} justify="space-between">
@@ -38,7 +64,7 @@ export function RedeemAmount({
             MAX
           </Badge>
           <Text color="text-primary" opacity={0.5} alignSelf="flex-end" ml={2}>
-            {formatBalance(balance ?? 0, currency?.symbol)}
+            {formatBalance(portfolioShareBalance ?? 0, portfolioShareCurrency?.symbol)}
           </Text>
         </Flex>
       </Flex>
@@ -47,22 +73,21 @@ export function RedeemAmount({
           <Text fontWeight={500} mt={6} mb={2}>
             You receive
           </Text>
-          <Input
+          <BalanceInput
             name="amountToReceive"
-            type="text"
             placeholder="0.00"
+            decimals={portfolioInvestmentCurrency?.decimals}
             disabled
             inputGroupProps={{
-              endAddon: 'deJTRYS',
+              endAddon: `${portfolioInvestmentCurrency?.symbol || 'USDC'}`,
             }}
-            variant="outline"
           />
         </>
       )}
       <SubmitButton colorPalette="yellow" disabled={parsedAmount === 0} width="100%">
         Redeem
       </SubmitButton>
-      {parsedAmount === 0 && <InfoWrapper text={infoText.redeem} />}
+      {parsedAmount === 0 && <InfoWrapper text={infoText().redeem} />}
     </Box>
   )
 }

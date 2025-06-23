@@ -16,18 +16,18 @@ export function CancelRedeem({ setActionType }: CancelRedeemProps) {
   return (
     <Box>
       <Heading>Rdemption in progress</Heading>
-      <InfoWrapper text={infoText.cancelRedeem} title="Redemption in progress" icon={<FaRegClock />} />
+      <InfoWrapper text={infoText().cancelRedeem} title="Redemption in progress" icon={<FaRegClock />} />
       <Flex mt={4} justify="space-between">
         <Text fontWeight="bold" color="info">
           Redeeming
         </Text>
-        <Text color="info">{getValues('amount')}</Text>
+        <Text color="info">{getValues('amount').toString()}</Text>
       </Flex>
       <Flex mt={4} justify="space-between">
         <Text fontWeight="bold" color="info">
           You receive
         </Text>
-        <Text color="info">{getValues('amountToReceive')}</Text>
+        <Text color="info">{getValues('amountToReceive').toString()}</Text>
       </Flex>
       <Button
         type="button"

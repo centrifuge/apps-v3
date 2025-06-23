@@ -28,7 +28,7 @@ export default function InvestTab({ vault }: { vault: Vault }) {
   // TODO: Add any necessary refinements for validation checks
   const schema = z.object({
     amount: createBalanceSchema(vaultDetails?.investmentCurrency.decimals ?? 6, z.number().min(0.01)),
-    amountToReceive: numberInputMin(0),
+    amountToReceive: createBalanceSchema(vaultDetails?.shareCurrency.decimals ?? 18, z.number().min(0.01)),
     requirement_nonUsCitizen: z.boolean().refine((val) => val === true, {
       message: 'Non-US citizen requirement must be confirmed',
     }),
@@ -66,7 +66,12 @@ export default function InvestTab({ vault }: { vault: Vault }) {
   return (
     <Form form={form}>
       <Box mt={4}>
-        <InvestTabForm actionType={actionType} parsedAmount={parsedAmount} setActionType={setActionType} />
+        <InvestTabForm
+          actionType={actionType}
+          parsedAmount={parsedAmount}
+          vaultDetails={vaultDetails}
+          setActionType={setActionType}
+        />
       </Box>
     </Form>
   )
