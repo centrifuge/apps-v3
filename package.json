@@ -7,13 +7,15 @@
     "preinstall": "npx only-allow pnpm",
     "dev:app": "pnpm --filter app dev",
     "dev:permissionless": "pnpm --filter permissionless dev",
+    "dev:launchpad": "pnpm --filter launchpad dev",
     "dev:functions": "pnpm --filter functions dev",
     "build:app": "pnpm --filter app build",
     "build:functions": "pnpm --filter functions build",
     "build:permissionless": "pnpm --filter permissionless build",
+    "build:launchpad": "pnpm --filter launchpad build",
     "build:packages": "pnpm --filter @centrifuge/* --parallel build",
-    "dev": "concurrently \"pnpm dev:app\" \"pnpm dev:functions\" \"pnpm dev:permissionless\"",
-    "lint": "concurrently \"pnpm --filter app lint\"",
+    "dev": "concurrently \"pnpm dev:app\" \"pnpm dev:functions\" \"pnpm dev:permissionless\" \"pnpm dev:launchpad\"",
+    "lint": "concurrently \"pnpm --filter app lint\" \"pnpm --filter launchpad lint\" \"pnpm --filter permissionless lint\"",
     "lint:fix": "npm run lint -- --fix"
   },
   "dependencies": {
