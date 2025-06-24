@@ -2,13 +2,14 @@ import { useMemo, type Dispatch, type SetStateAction } from 'react'
 import { Badge, Box, Button, Flex, Text } from '@chakra-ui/react'
 import { BalanceInput, useFormContext } from '@centrifuge/forms'
 import { Balance } from '@centrifuge/sdk'
-import { formatBalance, formatBalanceAbbreviated, usePortfolio, usePoolDetails } from '@centrifuge/shared'
+import { formatBalanceAbbreviated, usePortfolio, usePoolDetails } from '@centrifuge/shared'
 import { NetworkIcons, type Network } from '@components/NetworkIcon'
 import { useSelectedPoolContext } from '@contexts/useSelectedPoolContext'
 import { infoText } from '@utils/infoText'
 import { InvestAction, type InvestActionType } from '@components/InvestRedeemSection/components/defaults'
 import { InfoWrapper } from '@components/InvestRedeemSection/components/InfoWrapper'
 import { VaultDetails } from '@utils/types'
+import { formatBalance, formatBalanceToString } from '@centrifuge/shared'
 
 const networks: Network[] = ['ethereum', 'arbitrum', 'celo', 'base']
 
@@ -34,10 +35,14 @@ export function InvestAmount({ isDisabled, parsedAmount, vaultDetails, setAction
   const portfolioInvestmentAsset = portfolio?.find((asset) => asset.currency.chainId === investmentCurrencyChainId)
   const portfolioCurrency = portfolioInvestmentAsset?.currency
   const portfolioBalance = portfolioInvestmentAsset?.balance
+  const defaultBalance = portfolioBalance ?? ({ value: 0n, decimals: 6 } as unknown as Balance)
 
   // Get the share class info for calculating shares amount to receive
   const shareClass = pool?.shareClasses.find((asset) => asset.shareClass.pool.chainId === investmentCurrencyChainId)
   const navPerShare = shareClass?.details.navPerShare
+  const shareDecimals = shareClass?.details.navPerShare.decimals
+
+  console.log({ pool, shareClass })
 
   // Check if the user has the necessary investment currency to invest
   const hasInvestmentCurrency = portfolioCurrency?.chainId === vaultDetails?.investmentCurrency?.chainId
@@ -50,7 +55,7 @@ export function InvestAmount({ isDisabled, parsedAmount, vaultDetails, setAction
       return setValue('amountToReceive', '0')
     }
 
-    const redeemAmount = parsedAmount.mul(navPerShare).toFloat().toFixed(18)
+    const redeemAmount = formatBalanceToString(parsedAmount.mul(navPerShare), shareDecimals)
     setValue('amountToReceive', redeemAmount)
   }, [parsedAmount, shareClass, navPerShare])
 
@@ -64,8 +69,7 @@ export function InvestAmount({ isDisabled, parsedAmount, vaultDetails, setAction
       </Flex>
       <BalanceInput
         name="amount"
-        decimals={6}
-        displayDecimals={6}
+        decimals={portfolioCurrency?.decimals}
         placeholder="0.00"
         // disabled={!hasInvestmentCurrency}
         inputGroupProps={{
@@ -74,11 +78,22 @@ export function InvestAmount({ isDisabled, parsedAmount, vaultDetails, setAction
       />
       <Flex mt={2} justify="space-between">
         <Flex>
-          <Badge background="bg-tertiary" color="text-primary" opacity={0.5} borderRadius={10} px={3} h="24px">
+          <Badge
+            background="bg-tertiary"
+            color="text-primary"
+            opacity={0.5}
+            borderRadius={10}
+            px={3}
+            h="24px"
+            onClick={() => setValue('amount', formatBalanceToString(defaultBalance, portfolioCurrency?.decimals ?? 6))}
+            borderColor="gray.500 !important"
+            border="1px solid"
+            cursor="pointer"
+          >
             MAX
           </Badge>
           <Text color="text-primary" opacity={0.5} alignSelf="flex-end" ml={2}>
-            {formatBalance(portfolioBalance ?? 0, portfolioCurrency?.symbol)}
+            {formatBalance(defaultBalance, portfolioCurrency?.symbol)}
           </Text>
         </Flex>
         <NetworkIcons networks={networks} />

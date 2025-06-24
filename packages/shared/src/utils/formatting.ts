@@ -1,6 +1,6 @@
 import type { Balance } from '@centrifuge/sdk'
 import Decimal from 'decimal.js-light'
-import type { Address } from 'viem'
+import { formatUnits, type Address } from 'viem'
 
 export function truncateAddress(string: Address) {
   const first = string.slice(0, 7)
@@ -34,11 +34,11 @@ export function formatBalanceAbbreviated(
   let formattedAmount = ''
 
   if (absVal >= 1e9) {
-    formattedAmount = (amountNumber / 1e9).toFixed(displayDecimals) + 'B'
+    formattedAmount = `${(amountNumber / 1e9).toFixed(displayDecimals)}B`
   } else if (absVal >= 1e6) {
-    formattedAmount = (amountNumber / 1e6).toFixed(displayDecimals) + 'M'
+    formattedAmount = `${(amountNumber / 1e6).toFixed(displayDecimals)}M`
   } else if (absVal >= 1e3) {
-    formattedAmount = (amountNumber / 1e3).toFixed(displayDecimals) + 'K'
+    formattedAmount = `${(amountNumber / 1e3).toFixed(displayDecimals)}K`
   } else {
     const rounded = val.toFixed(displayDecimals)
     const parts = rounded.split('.')
@@ -66,4 +66,32 @@ export function formatBalance(
     maximumFractionDigits: precision,
   })
   return currency ? `${formattedAmount} ${currency}` : formattedAmount
+}
+
+export function divideBigInts(numerator: bigint, denominator: bigint, decimals: number) {
+  const scaledNumerator = numerator * 10n ** BigInt(decimals)
+  return scaledNumerator / denominator
+}
+
+export function formatBigintToString(bigInt: bigint, bigintDecimals: number, formatDecimals?: number) {
+  const decimals = formatDecimals || bigintDecimals
+  return Number(formatUnits(bigInt, bigintDecimals)).toFixed(decimals)
+}
+
+export function formatDivideBigInts(
+  numerator: bigint,
+  denominator: bigint,
+  bigintDecimals: number,
+  formatDecimals?: number
+) {
+  const result = divideBigInts(numerator, denominator, bigintDecimals)
+  const formattedResult = formatBigintToString(result, bigintDecimals, formatDecimals)
+
+  return formattedResult
+}
+
+export function formatBalanceToString(amount: Balance, precision = 0) {
+  if (!(typeof amount === 'object' && 'decimals' in amount)) return null
+
+  return amount.toFloat().toFixed(precision)
 }

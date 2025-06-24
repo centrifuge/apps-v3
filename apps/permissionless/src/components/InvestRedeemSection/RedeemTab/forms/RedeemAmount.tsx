@@ -2,12 +2,17 @@ import { useMemo } from 'react'
 import { Badge, Box, Flex, Text } from '@chakra-ui/react'
 import { BalanceInput, SubmitButton, useFormContext } from '@centrifuge/forms'
 import { Balance } from '@centrifuge/sdk'
-import { usePortfolio, formatBalance, usePoolDetails } from '@centrifuge/shared'
+import {
+  usePortfolio,
+  formatBalance,
+  formatBalanceToString,
+  formatDivideBigInts,
+  usePoolDetails,
+} from '@centrifuge/shared'
 import { InfoWrapper } from '@components/InvestRedeemSection/components/InfoWrapper'
 import { infoText } from '@utils/infoText'
 import { VaultDetails } from '@utils/types'
 import { useSelectedPoolContext } from '@contexts/useSelectedPoolContext'
-import { formatDivideBigInts } from '@utils/numberUtils'
 
 interface RedeemAmountProps {
   isDisabled: boolean
@@ -27,7 +32,7 @@ export function RedeemAmount({ isDisabled, parsedAmount, vaultDetails }: RedeemA
   // Get info on the users shares holdings in their wallet
   const portfolioShareAsset = portfolio?.find((asset) => asset.currency.address === shareAsset)
   const portfolioShareCurrency = portfolioShareAsset?.currency
-  const portfolioShareBalance = portfolioShareAsset?.balance
+  const defaultShareBalance = portfolioShareAsset?.balance ?? ({ value: 0n, decimals: 6 } as unknown as Balance)
 
   // Get info on the users investment asset that shares will be converted into
   const portfolioInvestmentAsset = portfolio?.find((asset) => asset.currency.chainId === investmentCurrencyChainId)
@@ -53,6 +58,7 @@ export function RedeemAmount({ isDisabled, parsedAmount, vaultDetails }: RedeemA
       redeemAmountDecimals,
       portfolioInvestmentCurrency?.decimals
     )
+
     setValue('amountToReceive', receiveAmount)
   }, [parsedAmount, shareClass, navPerShare])
 
@@ -72,11 +78,24 @@ export function RedeemAmount({ isDisabled, parsedAmount, vaultDetails }: RedeemA
       />
       <Flex mt={2} justify="space-between">
         <Flex>
-          <Badge background="bg-tertiary" color="text-primary" opacity={0.5} borderRadius={10} px={3} h="24px">
+          <Badge
+            background="bg-tertiary"
+            color="text-primary"
+            opacity={0.5}
+            borderRadius={10}
+            px={3}
+            h="24px"
+            borderColor="gray.500 !important"
+            border="1px solid"
+            cursor="pointer"
+            onClick={() =>
+              setValue('amount', formatBalanceToString(defaultShareBalance, portfolioShareCurrency?.decimals ?? 6))
+            }
+          >
             MAX
           </Badge>
           <Text color="text-primary" opacity={0.5} alignSelf="flex-end" ml={2}>
-            {formatBalance(portfolioShareBalance ?? 0, portfolioShareCurrency?.symbol)}
+            {formatBalance(defaultShareBalance, portfolioShareCurrency?.symbol)}
           </Text>
         </Flex>
       </Flex>
