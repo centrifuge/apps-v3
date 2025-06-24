@@ -1,7 +1,7 @@
-import type { ReactNode } from 'react'
-import { useAccount, useChains, useSwitchChain } from 'wagmi'
 import { Button, Menu, Stack, Text } from '@chakra-ui/react'
 import { useAppKit } from '@reown/appkit/react'
+import type { ReactNode } from 'react'
+import { useAccount, useChains, useSwitchChain } from 'wagmi'
 
 type Props = {
   networks?: number[]
@@ -38,7 +38,7 @@ export function ConnectionGuard({ networks, children, message = 'Unsupported net
         <Button onClick={() => switchChain({ chainId: networks[0] })}>Switch to {getName(networks[0])}</Button>
       ) : (
         <Menu.Root>
-          <Menu.Trigger>
+          <Menu.Trigger asChild>
             <Button>Switch network</Button>
           </Menu.Trigger>
           <Menu.Positioner>
