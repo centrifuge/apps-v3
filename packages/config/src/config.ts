@@ -1,5 +1,5 @@
-import { LogoCentrifuge, LogoCentrifugeText } from './components/LogoCentrifuge'
-import { lightTheme } from './theme/lightTheme'
+import { LogoCentrifuge, LogoCentrifugeText } from '@centrifuge/ui'
+import { lightTheme } from '@centrifuge/ui'
 import type { createSystem } from '@chakra-ui/react'
 
 export type EnvironmentConfig = {
@@ -14,7 +14,8 @@ export type EnvironmentConfig = {
 export const config: EnvironmentConfig = {
   name: 'Centrifuge App',
   logo: [LogoCentrifuge, LogoCentrifugeText],
-  logoUrl: '/assets/centrifuge.svg',
+  // TODO: add logo
+  logoUrl: '/',
   themes: {
     light: lightTheme,
   },

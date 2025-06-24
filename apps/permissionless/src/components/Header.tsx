@@ -1,6 +1,6 @@
 import { Box } from '@chakra-ui/react'
 import WalletButton from '@components/WalletButton'
-import { config } from '../config'
+import { config } from '@centrifuge/config'
 
 export function Header() {
   const [_, LogoCentrifugeText] = config.logo

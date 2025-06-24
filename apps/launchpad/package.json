@@ -11,7 +11,11 @@
   },
   "dependencies": {
     "@react-router/node": "^7.6.2",
-    "isbot": "^5"
+    "isbot": "^5",
+    "@centrifuge/forms": "workspace:*",
+    "@centrifuge/shared": "workspace:*",
+    "@centrifuge/config": "workspace:*",
+    "@centrifuge/ui": "workspace:*"
   },
   "devDependencies": {
     "@eslint/js": "^9.25.0",
