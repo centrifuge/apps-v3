@@ -1,12 +1,11 @@
-import { type OperationConfirmedStatus, type Transaction } from '@centrifuge/sdk'
-import { useMutation } from '@tanstack/react-query'
 import { lastValueFrom, tap } from 'rxjs'
 import { useConnectorClient } from 'wagmi'
-import { useCentrifuge } from './CentrifugeContext'
-import { useTransactions } from './TransactionProvider'
+import { useMutation } from '@tanstack/react-query'
+import { type OperationConfirmedStatus, type Transaction } from '@centrifuge/sdk'
+import { useTransactions } from '@centrifuge/shared'
+import { centrifuge } from '../centrifuge'
 
 export function useCentrifugeTransaction() {
-  const centrifuge = useCentrifuge()
   const { updateTransaction, addOrUpdateTransaction } = useTransactions()
   const { data: client } = useConnectorClient()
   const { mutateAsync, ...rest } = useMutation({

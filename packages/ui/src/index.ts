@@ -1,3 +1,4 @@
 export * from './components/index'
 export * from './theme/index'
-export * from './components/ChakraCentrifugeProvider'
+export * from './types/index'
+export * from './ChakraCentrifugeProvider'

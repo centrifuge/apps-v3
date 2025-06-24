@@ -1,17 +1,27 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { Root } from './Root'
-import { AppKitProvider, config } from '@centrifuge/config'
+import { WalletProvider } from '@centrifuge/wallet'
 import { SelectedPoolProvider } from './contexts/useSelectedPoolContext'
 import { CentrifugeProvider } from '@centrifuge/shared'
-import { centrifuge } from './centrifuge'
+import { centrifuge, networks } from './centrifuge'
 import { TransactionProvider } from './components/Transactions/TransactionProvider'
-import { ChakraCentrifugeProvider } from '@centrifuge/ui'
+import { ChakraCentrifugeProvider, lightTheme, LogoCentrifuge, LogoCentrifugeText } from '@centrifuge/ui'
+
+// TODO: should be easy to whitelist
+const config = {
+  themes: {
+    light: lightTheme,
+  },
+  defaultTheme: 'light',
+}
+
+console.log('VITE_REOWN_APP_ID:', import.meta.env.VITE_REOWN_APP_ID)
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <CentrifugeProvider client={centrifuge}>
-      <AppKitProvider projectId={import.meta.env.VITE_REOWN_APP_ID!} centrifugeConfig={centrifuge}>
+      <WalletProvider projectId={import.meta.env.VITE_REOWN_APP_ID!} networks={networks}>
         <ChakraCentrifugeProvider config={config}>
           <TransactionProvider>
             <SelectedPoolProvider>
@@ -19,7 +29,7 @@ createRoot(document.getElementById('root')!).render(
             </SelectedPoolProvider>
           </TransactionProvider>
         </ChakraCentrifugeProvider>
-      </AppKitProvider>
+      </WalletProvider>
     </CentrifugeProvider>
   </StrictMode>
 )

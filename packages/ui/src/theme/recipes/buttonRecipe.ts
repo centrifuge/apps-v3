@@ -30,6 +30,12 @@ export const buttonRecipe = defineRecipe({
         fontSize: 'xs',
         fontWeight: 600,
       },
+      outline: {
+        background: 'transparent',
+        color: 'text-inverted',
+        fontSize: 'sm',
+        fontWeight: 600,
+      },
     },
   },
   defaultVariants: {

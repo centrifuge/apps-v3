@@ -1,7 +1,6 @@
 import { useMemo, useReducer, useRef, useState, useSyncExternalStore } from 'react'
 import { catchError, of, share, timer, type Observable, type ObservedValueOf } from 'rxjs'
 import { map, tap } from 'rxjs/operators'
-import { isTestEnv } from '../utils/config'
 
 export type ObservableOptions = never
 
@@ -139,21 +138,22 @@ const noopStore = {
 }
 
 function useWarnIfNotStable(object?: unknown, message = 'object is not stable') {
-  if (isTestEnv) {
-    const ref = useRef({
-      hasObjectCount: 0,
-      stableObjectCount: 0,
-      lastObject: object,
-    })
-    if (object && ref.current.lastObject) {
-      ref.current.hasObjectCount++
-      if (ref.current.lastObject === object) {
-        ref.current.stableObjectCount++
-      }
-      if (ref.current.hasObjectCount === 10 && ref.current.stableObjectCount <= 1) {
-        console.warn(message, object)
-      }
-    }
-    ref.current.lastObject = object
-  }
+  // TODO: not working with launchpad SSR, fix
+  // if (isTestEnv) {
+  //  const ref = useRef({
+  //    hasObjectCount: 0,
+  //    stableObjectCount: 0,
+  //    lastObject: object,
+  //  })
+  //  if (object && ref.current.lastObject) {
+  //    ref.current.hasObjectCount++
+  //    if (ref.current.lastObject === object) {
+  //      ref.current.stableObjectCount++
+  //    }
+  //if (ref.current.hasObjectCount === 10 && ref.current.stableObjectCount <= 1) {
+  //  console.warn(message, object)
+  //}
+  //  }
+  //  ref.current.lastObject = object
+  //}
 }

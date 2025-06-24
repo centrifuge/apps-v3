@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react'
+import { ReactNode } from 'react'
 import { ChakraProvider, createSystem, defaultConfig } from '@chakra-ui/react'
 
 export interface ChakraCentrifugeProviderProps {
