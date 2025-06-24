@@ -17,9 +17,8 @@
       "@config/*": ["src/config/*"],
       "@contexts/*": ["src/contexts/*"],
       "@hooks/*": ["src/hooks/*"],
-      "@theme/": ["src/theme/"],
-      "@theme/*": ["src/theme/*"],
-      "@utils/*": ["src/utils/*"]
+      "@utils/*": ["src/utils/*"],
+      "@routes/*": ["src/routes/*"]
     }
   },
   "include": ["src", "vite-env.d.ts"]

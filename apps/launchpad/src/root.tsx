@@ -1,4 +1,6 @@
 import { Links, Meta, Outlet, Scripts, ScrollRestoration } from 'react-router'
+import { AppKitProvider } from '@centrifuge/config'
+import { centrifuge } from './centrifuge'
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -20,5 +22,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function Root() {
-  return <Outlet />
+  return (
+    <AppKitProvider projectId={import.meta.env.VITE_REOWN_APP_ID!} centrifugeConfig={centrifuge}>
+      <Outlet />
+    </AppKitProvider>
+  )
 }
