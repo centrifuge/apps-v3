@@ -23,3 +23,5 @@ dist
 !.env.catalyst
 !.env.production
 !.env.ff-prod
+
+.react-router/

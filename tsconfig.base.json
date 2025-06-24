@@ -17,7 +17,7 @@
       "path": "packages/forms"
     },
     {
-      "path": "packages/hooks"
+      "path": "packages/shared"
     }
   ]
 }
