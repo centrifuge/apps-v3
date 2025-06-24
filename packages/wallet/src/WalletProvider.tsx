@@ -2,9 +2,9 @@ import { ReactNode, useMemo } from 'react'
 import { WagmiProvider } from 'wagmi'
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi'
 import { createAppKit } from '@reown/appkit/react'
-import type { AppKitNetwork } from '@reown/appkit/networks'
 import { http } from 'wagmi'
 import { injected } from 'wagmi/connectors'
+import type { AppKitNetwork } from '@reown/appkit/networks'
 
 export interface WalletProviderProps {
   projectId: string

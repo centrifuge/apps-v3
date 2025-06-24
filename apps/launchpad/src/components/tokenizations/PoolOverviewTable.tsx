@@ -35,15 +35,7 @@ export const PoolOverviewTable = () => {
             ))}
           </Table.Row>
         </Table.Header>
-        <Table.Body>
-          {items.map((item) => (
-            <Table.Row key={item.id}>
-              <Table.Cell>{item.name}</Table.Cell>
-              <Table.Cell>{item.category}</Table.Cell>
-              <Table.Cell textAlign="end">{item.price}</Table.Cell>
-            </Table.Row>
-          ))}
-        </Table.Body>
+        <Table.Body></Table.Body>
       </Table.Root>
     </>
   )
