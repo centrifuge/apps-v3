@@ -10,11 +10,12 @@ import { useSelectedPoolContext } from '@contexts/useSelectedPoolContext'
 import { formatDivideBigInts } from '@utils/numberUtils'
 
 interface RedeemAmountProps {
+  isDisabled: boolean
   parsedAmount: 0 | Balance
-  vaultDetails: VaultDetails
+  vaultDetails?: VaultDetails
 }
 
-export function RedeemAmount({ parsedAmount, vaultDetails }: RedeemAmountProps) {
+export function RedeemAmount({ isDisabled, parsedAmount, vaultDetails }: RedeemAmountProps) {
   const { data: portfolio } = usePortfolio()
   const { selectedPoolId } = useSelectedPoolContext()
   const { data: pool } = usePoolDetails(selectedPoolId)
@@ -23,18 +24,22 @@ export function RedeemAmount({ parsedAmount, vaultDetails }: RedeemAmountProps) 
   const investmentCurrencyChainId = vaultDetails?.investmentCurrency?.chainId
   const shareAsset = vaultDetails?.shareCurrency.address
 
+  // Get info on the users shares holdings in their wallet
   const portfolioShareAsset = portfolio?.find((asset) => asset.currency.address === shareAsset)
   const portfolioShareCurrency = portfolioShareAsset?.currency
   const portfolioShareBalance = portfolioShareAsset?.balance
 
+  // Get info on the users investment asset that shares will be converted into
   const portfolioInvestmentAsset = portfolio?.find((asset) => asset.currency.chainId === investmentCurrencyChainId)
   const portfolioInvestmentCurrency = portfolioInvestmentAsset?.currency
 
+  // Get the share class info for handling conversion calculation
   const shareClass = pool?.shareClasses.find((asset) => asset.shareClass.pool.chainId === investmentCurrencyChainId)
   const navPerShare = shareClass?.details.navPerShare
 
+  // Calculate and update the amount the user will receive in the investment asset based on shares sold
   useMemo(() => {
-    if (parsedAmount === 0 || !shareClass || navPerShare === undefined) {
+    if (parsedAmount === 0 || !shareClass || !navPerShare) {
       return setValue('amountToReceive', '0')
     }
 
@@ -63,6 +68,7 @@ export function RedeemAmount({ parsedAmount, vaultDetails }: RedeemAmountProps) 
         inputGroupProps={{
           endAddon: 'deJTRYS',
         }}
+        // disabled={!portfolioShareCurrency}
       />
       <Flex mt={2} justify="space-between">
         <Flex>
@@ -90,7 +96,7 @@ export function RedeemAmount({ parsedAmount, vaultDetails }: RedeemAmountProps) 
           />
         </>
       )}
-      <SubmitButton colorPalette="yellow" disabled={parsedAmount === 0} width="100%">
+      <SubmitButton colorPalette="yellow" disabled={isDisabled} width="100%">
         Redeem
       </SubmitButton>
       {parsedAmount === 0 && <InfoWrapper text={infoText().redeem} />}

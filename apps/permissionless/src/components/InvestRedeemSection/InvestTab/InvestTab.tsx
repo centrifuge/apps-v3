@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { z } from 'zod'
 import { Box } from '@chakra-ui/react'
-import { Form, useForm, safeParse, numberInputMin, createBalanceSchema } from '@centrifuge/forms'
+import { Form, useForm, safeParse, createBalanceSchema } from '@centrifuge/forms'
 import { Balance, Vault } from '@centrifuge/sdk'
 import { useInvestment, useVaultDetails } from '@centrifuge/shared'
 import { useCentrifugeTransaction } from '@hooks/useCentrifugeTransaction'
@@ -59,15 +59,14 @@ export default function InvestTab({ vault }: { vault: Vault }) {
 
   const parsedAmount = useMemo(() => safeParse(schema.shape.amount, amount) ?? 0, [amount, schema.shape.amount])
 
-  // const isDisabled =
-  //   form.values.amount === 0 ||
-  //   form.values.investorRequirements.length !== 3;
+  const isDisabled = !vaultDetails || !investment || parsedAmount === 0 || isPending
 
   return (
     <Form form={form}>
       <Box mt={4}>
         <InvestTabForm
           actionType={actionType}
+          isDisabled={isDisabled}
           parsedAmount={parsedAmount}
           vaultDetails={vaultDetails}
           setActionType={setActionType}

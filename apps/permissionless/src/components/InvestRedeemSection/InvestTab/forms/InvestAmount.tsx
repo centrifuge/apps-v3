@@ -1,7 +1,7 @@
 import { useMemo, type Dispatch, type SetStateAction } from 'react'
 import { Badge, Box, Button, Flex, Text } from '@chakra-ui/react'
 import { BalanceInput, useFormContext } from '@centrifuge/forms'
-import { Balance, PoolId } from '@centrifuge/sdk'
+import { Balance } from '@centrifuge/sdk'
 import { formatBalance, formatBalanceAbbreviated, usePortfolio, usePoolDetails } from '@centrifuge/shared'
 import { NetworkIcons, type Network } from '@components/NetworkIcon'
 import { useSelectedPoolContext } from '@contexts/useSelectedPoolContext'
@@ -13,12 +13,13 @@ import { VaultDetails } from '@utils/types'
 const networks: Network[] = ['ethereum', 'arbitrum', 'celo', 'base']
 
 interface InvestAmountProps {
+  isDisabled: boolean
   parsedAmount: 0 | Balance
   vaultDetails?: VaultDetails
   setActionType: Dispatch<SetStateAction<InvestActionType>>
 }
 
-export function InvestAmount({ parsedAmount, vaultDetails, setActionType }: InvestAmountProps) {
+export function InvestAmount({ isDisabled, parsedAmount, vaultDetails, setActionType }: InvestAmountProps) {
   const { data: portfolio } = usePortfolio()
   const { selectedPoolId } = useSelectedPoolContext()
   const { data: pool } = usePoolDetails(selectedPoolId)
@@ -29,24 +30,28 @@ export function InvestAmount({ parsedAmount, vaultDetails, setActionType }: Inve
     ? (Object.values(pool?.metadata?.shareClasses || {})[0].minInitialInvestment ?? 0)
     : 0
 
+  // Get user investment asset info
   const portfolioInvestmentAsset = portfolio?.find((asset) => asset.currency.chainId === investmentCurrencyChainId)
   const portfolioCurrency = portfolioInvestmentAsset?.currency
   const portfolioBalance = portfolioInvestmentAsset?.balance
 
+  // Get the share class info for calculating shares amount to receive
   const shareClass = pool?.shareClasses.find((asset) => asset.shareClass.pool.chainId === investmentCurrencyChainId)
   const navPerShare = shareClass?.details.navPerShare
 
+  // Check if the user has the necessary investment currency to invest
   const hasInvestmentCurrency = portfolioCurrency?.chainId === vaultDetails?.investmentCurrency?.chainId
   const hasNoInvestmentCurrency = !hasInvestmentCurrency || portfolioBalance?.isZero
   const infoLabel = hasNoInvestmentCurrency ? infoText().portfolioMissingInvestmentCurrency : infoText().redeem
 
+  // Calculate and update amount to receive based on user input on amount to invest
   useMemo(() => {
     if (parsedAmount === 0 || !shareClass || navPerShare === undefined) {
       return setValue('amountToReceive', '0')
     }
 
-    const redeemAmount = parsedAmount.mul(navPerShare)
-    setValue('amountToReceive', redeemAmount.toFloat().toString())
+    const redeemAmount = parsedAmount.mul(navPerShare).toFloat().toFixed(18)
+    setValue('amountToReceive', redeemAmount)
   }, [parsedAmount, shareClass, navPerShare])
 
   return (
@@ -99,7 +104,7 @@ export function InvestAmount({ parsedAmount, vaultDetails, setActionType }: Inve
         colorPalette="yellow"
         type="button"
         onClick={() => setActionType(InvestAction.INVESTOR_REQUIREMENTS)}
-        disabled={parsedAmount === 0}
+        disabled={isDisabled}
         width="100%"
         mt={4}
       >

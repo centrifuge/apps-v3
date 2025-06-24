@@ -8,15 +8,22 @@ import { VaultDetails } from '@utils/types'
 
 interface RedeemTabFormProps {
   actionType: RedeemActionType
+  isDisabled: boolean
   parsedAmount: 0 | Balance
-  vaultDetails: VaultDetails
+  vaultDetails?: VaultDetails
   setActionType: Dispatch<SetStateAction<RedeemActionType>>
 }
 
-export function RedeemTabForm({ actionType, parsedAmount, vaultDetails, setActionType }: RedeemTabFormProps) {
+export function RedeemTabForm({
+  actionType,
+  isDisabled,
+  parsedAmount,
+  vaultDetails,
+  setActionType,
+}: RedeemTabFormProps) {
   switch (actionType) {
     case RedeemAction.REDEEM_AMOUNT:
-      return <RedeemAmount parsedAmount={parsedAmount} vaultDetails={vaultDetails} setActionType={setActionType} />
+      return <RedeemAmount isDisabled={isDisabled} parsedAmount={parsedAmount} vaultDetails={vaultDetails} />
     case RedeemAction.CANCEL:
       return <CancelRedeem setActionType={setActionType} />
     case RedeemAction.SUCCESS:

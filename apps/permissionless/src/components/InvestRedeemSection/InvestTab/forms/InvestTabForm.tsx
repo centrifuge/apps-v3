@@ -8,15 +8,29 @@ import { VaultDetails } from '@utils/types'
 
 interface InvestTabFormProps {
   actionType: InvestActionType
+  isDisabled: boolean
   parsedAmount: 0 | Balance
   vaultDetails?: VaultDetails
   setActionType: Dispatch<SetStateAction<InvestActionType>>
 }
 
-export function InvestTabForm({ actionType, parsedAmount, vaultDetails, setActionType }: InvestTabFormProps) {
+export function InvestTabForm({
+  actionType,
+  isDisabled,
+  parsedAmount,
+  vaultDetails,
+  setActionType,
+}: InvestTabFormProps) {
   switch (actionType) {
     case InvestAction.INVEST_AMOUNT:
-      return <InvestAmount parsedAmount={parsedAmount} setActionType={setActionType} vaultDetails={vaultDetails} />
+      return (
+        <InvestAmount
+          isDisabled={isDisabled}
+          parsedAmount={parsedAmount}
+          setActionType={setActionType}
+          vaultDetails={vaultDetails}
+        />
+      )
     case InvestAction.INVESTOR_REQUIREMENTS:
       return <InvestRequirements />
     case InvestAction.SUCCESS:
