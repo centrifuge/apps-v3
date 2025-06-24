@@ -6,7 +6,7 @@
     "noEmit": true,
     "module": "esnext",
     "target": "esnext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "types": ["vite/client"],
     "paths": {
       "@assets/*": ["src/assets/*"],
