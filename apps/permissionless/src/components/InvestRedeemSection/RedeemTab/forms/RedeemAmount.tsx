@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { Badge, Box, Flex, Text } from '@chakra-ui/react'
 import { BalanceInput, SubmitButton, useFormContext } from '@centrifuge/forms'
 import { Balance } from '@centrifuge/sdk'
@@ -6,8 +7,7 @@ import { InfoWrapper } from '@components/InvestRedeemSection/components/InfoWrap
 import { infoText } from '@utils/infoText'
 import { VaultDetails } from '@utils/types'
 import { useSelectedPoolContext } from '@contexts/useSelectedPoolContext'
-import { useMemo } from 'react'
-import { formatUnits, parseUnits } from 'viem'
+import { formatDivideBigInts } from '@utils/numberUtils'
 
 interface RedeemAmountProps {
   parsedAmount: 0 | Balance
@@ -38,11 +38,17 @@ export function RedeemAmount({ parsedAmount, vaultDetails }: RedeemAmountProps) 
       return setValue('amountToReceive', '0')
     }
 
-    const receiveAmount = parseUnits(parsedAmount.div(navPerShare).toString(), portfolioShareCurrency?.decimals ?? 18)
-    const formattedReceiveAmount = Number(formatUnits(receiveAmount, 18))
-      .toFixed(portfolioInvestmentCurrency?.decimals ?? 6)
-      .toString()
-    setValue('amountToReceive', formattedReceiveAmount)
+    const redeemAmountDecimals = portfolioShareCurrency?.decimals ?? 18
+    const redeemAmount = parsedAmount.toBigInt()
+    const navPerShareAmount = navPerShare.toBigInt()
+
+    const receiveAmount = formatDivideBigInts(
+      redeemAmount,
+      navPerShareAmount,
+      redeemAmountDecimals,
+      portfolioInvestmentCurrency?.decimals
+    )
+    setValue('amountToReceive', receiveAmount)
   }, [parsedAmount, shareClass, navPerShare])
 
   return (
@@ -52,7 +58,7 @@ export function RedeemAmount({ parsedAmount, vaultDetails }: RedeemAmountProps) 
       </Text>
       <BalanceInput
         name="amount"
-        decimals={portfolioShareCurrency?.decimals}
+        decimals={portfolioShareCurrency?.decimals ?? 18}
         placeholder="0.00"
         inputGroupProps={{
           endAddon: 'deJTRYS',
