@@ -1,5 +1,5 @@
 import { Button as ChakraButton } from '@chakra-ui/react'
-import { ButtonColorPalette, ButtonVariant } from '@ui/types/Button.type'
+import { ButtonColorPalette, ButtonVariant } from '../types/Button'
 
 export const Button = ({
   colorPalette = 'yellow',
