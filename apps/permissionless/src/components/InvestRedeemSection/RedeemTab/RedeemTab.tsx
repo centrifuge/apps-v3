@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { z } from 'zod'
 import { Box } from '@chakra-ui/react'
-import { createBalanceSchema, Form, numberInputMin, safeParse, useForm } from '@centrifuge/forms'
+import { createBalanceSchema, Form, safeParse, useForm } from '@centrifuge/forms'
 import { Balance, type Vault } from '@centrifuge/sdk'
 import { useInvestment, useVaultDetails } from '@centrifuge/shared'
 import { useCentrifugeTransaction } from '@hooks/useCentrifugeTransaction'
@@ -27,8 +27,8 @@ export default function RedeemTab({ vault }: { vault: Vault }) {
 
   // TODO: Add necessary refinements for validation checks
   const schema = z.object({
-    amount: createBalanceSchema(vaultDetails?.investmentCurrency.decimals ?? 6, z.number().min(0.01)),
-    amountToReceive: numberInputMin(0),
+    amount: createBalanceSchema(vaultDetails?.shareCurrency.decimals ?? 18, z.number().min(0.01)),
+    amountToReceive: createBalanceSchema(vaultDetails?.investmentCurrency.decimals ?? 6, z.number().min(0.01)),
   })
 
   const form = useForm({
@@ -38,7 +38,7 @@ export default function RedeemTab({ vault }: { vault: Vault }) {
     onSubmit: (values) => {
       console.log('Redeem values: ', values)
       // Since amount is now of type Balance, we can directly pass it to the redeem function
-      // redeem(values.amount)
+      redeem(values.amount)
       setActionType(RedeemAction.CANCEL)
     },
     onSubmitError: (error) => console.error('Redeem form submission error:', error),
@@ -48,11 +48,18 @@ export default function RedeemTab({ vault }: { vault: Vault }) {
   const amount = watch('amount')
 
   const parsedAmount = useMemo(() => safeParse(schema.shape.amount, amount) ?? 0, [amount, schema.shape.amount])
+  const isDisabled = isPending || !vaultDetails || !investment || parsedAmount === 0
 
   return (
-    <Form form={form}>
-      <Box mt={4}>
-        <RedeemTabForm actionType={actionType} parsedAmount={parsedAmount} setActionType={setActionType} />
+    <Form form={form} style={{ height: '100%' }}>
+      <Box mt={4} height="100%">
+        <RedeemTabForm
+          actionType={actionType}
+          isDisabled={isDisabled}
+          parsedAmount={parsedAmount}
+          vaultDetails={vaultDetails}
+          setActionType={setActionType}
+        />
       </Box>
     </Form>
   )

@@ -38,7 +38,7 @@ export function InvestRedeemSection({ pool: poolDetails }: { pool: PoolDetails }
       shadow="xs"
       bg="white"
       h="100%"
-      pt={4}
+      overflow="hidden"
     >
       <Tabs
         elements={[
@@ -99,7 +99,7 @@ function VaultGuard({
       {!vault ? (
         <Text>No vaults found for this pool on this network.</Text>
       ) : (
-        <Stack>
+        <Stack height="100%">
           {/* Render vault selector here if there's multiple vaults */}
           <Tab vault={vault} />
         </Stack>

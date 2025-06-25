@@ -1,23 +1,45 @@
-import { type Dispatch, type SetStateAction } from 'react'
+import { useState, type Dispatch, type SetStateAction } from 'react'
 import type { Balance } from '@centrifuge/sdk'
 import { type RedeemActionType, RedeemAction } from '@components/InvestRedeemSection/components/defaults'
 import { SuccessPanel } from '@components/InvestRedeemSection/components/SuccessPanel'
 import { CancelRedeem } from '@components/InvestRedeemSection/RedeemTab/forms/CancelRedeem'
 import { RedeemAmount } from '@components/InvestRedeemSection/RedeemTab/forms/RedeemAmount'
+import { VaultDetails } from '@utils/types'
 
 interface RedeemTabFormProps {
   actionType: RedeemActionType
+  isDisabled: boolean
   parsedAmount: 0 | Balance
+  vaultDetails?: VaultDetails
   setActionType: Dispatch<SetStateAction<RedeemActionType>>
 }
 
-export function RedeemTabForm({ actionType, parsedAmount, setActionType }: RedeemTabFormProps) {
+export function RedeemTabForm({
+  actionType,
+  isDisabled,
+  parsedAmount,
+  vaultDetails,
+  setActionType,
+}: RedeemTabFormProps) {
+  const [currencies, setCurrencies] = useState({
+    investCurrency: 'deJTRYS',
+    receiveCurrency: 'USDC',
+  })
+
   switch (actionType) {
     case RedeemAction.REDEEM_AMOUNT:
-      return <RedeemAmount parsedAmount={parsedAmount} setActionType={setActionType} />
+      return (
+        <RedeemAmount
+          isDisabled={isDisabled}
+          parsedAmount={parsedAmount}
+          vaultDetails={vaultDetails}
+          currencies={currencies}
+          setCurrencies={setCurrencies}
+        />
+      )
     case RedeemAction.CANCEL:
-      return <CancelRedeem setActionType={setActionType} />
+      return <CancelRedeem setActionType={setActionType} currencies={currencies} />
     case RedeemAction.SUCCESS:
-      return <SuccessPanel setActionType={setActionType} />
+      return <SuccessPanel currencies={currencies} setActionType={setActionType} />
   }
 }

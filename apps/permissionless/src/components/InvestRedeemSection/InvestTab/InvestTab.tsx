@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { z } from 'zod'
 import { Box } from '@chakra-ui/react'
-import { Form, useForm, safeParse, numberInputMin, createBalanceSchema } from '@centrifuge/forms'
+import { Form, useForm, safeParse, createBalanceSchema } from '@centrifuge/forms'
 import { Balance, Vault } from '@centrifuge/sdk'
 import { useInvestment, useVaultDetails } from '@centrifuge/shared'
 import { useCentrifugeTransaction } from '@hooks/useCentrifugeTransaction'
@@ -28,7 +28,7 @@ export default function InvestTab({ vault }: { vault: Vault }) {
   // TODO: Add any necessary refinements for validation checks
   const schema = z.object({
     amount: createBalanceSchema(vaultDetails?.investmentCurrency.decimals ?? 6, z.number().min(0.01)),
-    amountToReceive: numberInputMin(0),
+    amountToReceive: createBalanceSchema(vaultDetails?.shareCurrency.decimals ?? 18, z.number().min(0.01)),
     requirement_nonUsCitizen: z.boolean().refine((val) => val === true, {
       message: 'Non-US citizen requirement must be confirmed',
     }),
@@ -48,7 +48,7 @@ export default function InvestTab({ vault }: { vault: Vault }) {
     onSubmit: (values) => {
       console.log('Invest form values: ', values)
       // Since amount is now of type Balance, we can directly pass it to the invest function
-      // invest(values.amount)
+      invest(values.amount)
       setActionType(InvestAction.SUCCESS)
     },
     onSubmitError: (error) => console.error('Invest form submission error:', error),
@@ -59,14 +59,18 @@ export default function InvestTab({ vault }: { vault: Vault }) {
 
   const parsedAmount = useMemo(() => safeParse(schema.shape.amount, amount) ?? 0, [amount, schema.shape.amount])
 
-  // const isDisabled =
-  //   form.values.amount === 0 ||
-  //   form.values.investorRequirements.length !== 3;
+  const isDisabled = !vaultDetails || !investment || parsedAmount === 0 || isPending
 
   return (
-    <Form form={form}>
-      <Box mt={4}>
-        <InvestTabForm actionType={actionType} parsedAmount={parsedAmount} setActionType={setActionType} />
+    <Form form={form} style={{ height: '100%' }}>
+      <Box mt={4} height="100%">
+        <InvestTabForm
+          actionType={actionType}
+          isDisabled={isDisabled}
+          parsedAmount={parsedAmount}
+          vaultDetails={vaultDetails}
+          setActionType={setActionType}
+        />
       </Box>
     </Form>
   )

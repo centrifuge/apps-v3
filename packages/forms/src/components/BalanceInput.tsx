@@ -32,7 +32,8 @@ export interface BalanceInputProps<TFieldValues extends FieldValues = FieldValue
 }
 
 export function BalanceInput<TFieldValues extends FieldValues = FieldValues>(props: BalanceInputProps<TFieldValues>) {
-  const { disabled, inputGroupProps, name, rules, onChange, onBlur, decimals = 6, displayDecimals = 6, ...rest } = props
+  const { disabled, inputGroupProps, name, rules, onChange, onBlur, decimals = 6, displayDecimals, ...rest } = props
+  const currentDisplayDecimals = displayDecimals || decimals
 
   const { control, trigger } = useFormContext<TFieldValues>()
 
@@ -69,7 +70,7 @@ export function BalanceInput<TFieldValues extends FieldValues = FieldValues>(pro
       displayValue = value
     }
 
-    return limitDecimals(displayValue, displayDecimals)
+    return limitDecimals(displayValue, currentDisplayDecimals)
   }
 
   const mergedOnChange = (e: ReactChangeEvent<HTMLInputElement>) => {
@@ -78,7 +79,7 @@ export function BalanceInput<TFieldValues extends FieldValues = FieldValues>(pro
     // Prevent invalid input patterns
     if (value === '' || value === '.' || /^\d*\.?\d*$/.test(value)) {
       // Limit decimal places in real-time
-      value = limitDecimals(value, displayDecimals)
+      value = limitDecimals(value, currentDisplayDecimals)
 
       e.target.value = value
 
@@ -101,6 +102,17 @@ export function BalanceInput<TFieldValues extends FieldValues = FieldValues>(pro
   }
 
   const mergedOnBlur = (e: ReactFocusEvent<HTMLInputElement>) => {
+    // Format the value with fixed decimal places when user leaves the field
+    const currentValue = e.target.value
+    if (currentValue && currentValue !== '' && currentValue !== '.') {
+      const numericValue = parseFloat(currentValue)
+
+      if (!isNaN(numericValue)) {
+        const formattedValue = numericValue.toFixed(currentDisplayDecimals)
+        field.onChange(formattedValue)
+      }
+    }
+
     field.onBlur()
     trigger(name)
 
@@ -116,7 +128,7 @@ export function BalanceInput<TFieldValues extends FieldValues = FieldValues>(pro
     const numericValue = pastedText.replace(/[^0-9.]/g, '')
 
     if (/^\d*\.?\d*$/.test(numericValue)) {
-      const limitedValue = limitDecimals(numericValue, displayDecimals)
+      const limitedValue = limitDecimals(numericValue, currentDisplayDecimals)
       const syntheticEvent = {
         target: { value: limitedValue },
       } as React.ChangeEvent<HTMLInputElement>
@@ -151,7 +163,7 @@ export function BalanceInput<TFieldValues extends FieldValues = FieldValues>(pro
     // Check if adding this character would exceed decimal limit
     if (currentValue.includes('.')) {
       const decimalPart = currentValue.split('.')[1]
-      if (decimalPart && decimalPart.length >= displayDecimals && key !== '.') {
+      if (decimalPart && decimalPart.length >= currentDisplayDecimals && key !== '.') {
         e.preventDefault()
         return
       }

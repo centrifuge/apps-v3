@@ -18,12 +18,12 @@ export const inputRecipe = defineRecipe({
       },
     },
     size: {
-      '2xl': {
-        fontSize: '2xl',
+      lg: {
+        fontSize: 'lg',
       },
     },
   },
   defaultVariants: {
-    size: '2xl',
+    size: 'lg',
   },
 })
