@@ -4,7 +4,7 @@ import { combineLatest, switchMap } from 'rxjs'
 import { useObservable } from './useObservable'
 import { useCentrifuge } from './CentrifugeContext'
 
-const IDS = ['281474976710657']
+const IDS = ['281474976710658']
 
 export function usePools() {
   const centrifuge = useCentrifuge()

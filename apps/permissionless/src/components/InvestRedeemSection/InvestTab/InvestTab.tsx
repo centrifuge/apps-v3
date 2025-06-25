@@ -48,7 +48,7 @@ export default function InvestTab({ vault }: { vault: Vault }) {
     onSubmit: (values) => {
       console.log('Invest form values: ', values)
       // Since amount is now of type Balance, we can directly pass it to the invest function
-      // invest(values.amount)
+      invest(values.amount)
       setActionType(InvestAction.SUCCESS)
     },
     onSubmitError: (error) => console.error('Invest form submission error:', error),

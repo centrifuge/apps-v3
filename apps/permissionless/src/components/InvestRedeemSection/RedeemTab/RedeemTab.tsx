@@ -38,7 +38,7 @@ export default function RedeemTab({ vault }: { vault: Vault }) {
     onSubmit: (values) => {
       console.log('Redeem values: ', values)
       // Since amount is now of type Balance, we can directly pass it to the redeem function
-      // redeem(values.amount)
+      redeem(values.amount)
       setActionType(RedeemAction.CANCEL)
     },
     onSubmitError: (error) => console.error('Redeem form submission error:', error),
