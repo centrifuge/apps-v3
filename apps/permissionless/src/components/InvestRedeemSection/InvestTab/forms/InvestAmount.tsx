@@ -1,4 +1,4 @@
-import { useMemo, type Dispatch, type SetStateAction } from 'react'
+import { useEffect, useMemo, type Dispatch, type SetStateAction } from 'react'
 import { Badge, Box, Button, Flex, Text } from '@chakra-ui/react'
 import { BalanceInput, useFormContext } from '@centrifuge/forms'
 import { Balance } from '@centrifuge/sdk'
@@ -17,10 +17,19 @@ interface InvestAmountProps {
   isDisabled: boolean
   parsedAmount: 0 | Balance
   vaultDetails?: VaultDetails
+  currencies: { investCurrency: string; receiveCurrency: string }
+  setCurrencies: Dispatch<SetStateAction<{ investCurrency: string; receiveCurrency: string }>>
   setActionType: Dispatch<SetStateAction<InvestActionType>>
 }
 
-export function InvestAmount({ isDisabled, parsedAmount, vaultDetails, setActionType }: InvestAmountProps) {
+export function InvestAmount({
+  isDisabled,
+  parsedAmount,
+  vaultDetails,
+  currencies,
+  setCurrencies,
+  setActionType,
+}: InvestAmountProps) {
   const { data: portfolio } = usePortfolio()
   const { selectedPoolId } = useSelectedPoolContext()
   const { data: pool } = usePoolDetails(selectedPoolId)
@@ -42,8 +51,6 @@ export function InvestAmount({ isDisabled, parsedAmount, vaultDetails, setAction
   const navPerShare = shareClass?.details.navPerShare
   const shareDecimals = shareClass?.details.navPerShare.decimals
 
-  console.log({ pool, shareClass })
-
   // Check if the user has the necessary investment currency to invest
   const hasInvestmentCurrency = portfolioCurrency?.chainId === vaultDetails?.investmentCurrency?.chainId
   const hasNoInvestmentCurrency = !hasInvestmentCurrency || portfolioBalance?.isZero
@@ -59,6 +66,15 @@ export function InvestAmount({ isDisabled, parsedAmount, vaultDetails, setAction
     setValue('amountToReceive', redeemAmount)
   }, [parsedAmount, shareClass, navPerShare])
 
+  useEffect(
+    () =>
+      setCurrencies({
+        investCurrency: portfolioCurrency?.symbol ?? 'USDC',
+        receiveCurrency: shareClass?.details.symbol ?? 'deJTRYS',
+      }),
+    [portfolioCurrency, shareClass]
+  )
+
   return (
     <Box>
       <Flex justify="space-between" mb={2}>
@@ -73,7 +89,7 @@ export function InvestAmount({ isDisabled, parsedAmount, vaultDetails, setAction
         placeholder="0.00"
         // disabled={!hasInvestmentCurrency}
         inputGroupProps={{
-          endAddon: `${portfolioCurrency?.symbol || 'USDC'}`,
+          endAddon: currencies.investCurrency,
         }}
       />
       <Flex mt={2} justify="space-between">
@@ -110,7 +126,7 @@ export function InvestAmount({ isDisabled, parsedAmount, vaultDetails, setAction
             placeholder="0.00"
             disabled
             inputGroupProps={{
-              endAddon: 'deJTRYS',
+              endAddon: currencies.receiveCurrency,
             }}
           />
         </>

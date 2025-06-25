@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { Dispatch, SetStateAction, useEffect, useMemo } from 'react'
 import { Badge, Box, Flex, Text } from '@chakra-ui/react'
 import { BalanceInput, SubmitButton, useFormContext } from '@centrifuge/forms'
 import { Balance } from '@centrifuge/sdk'
@@ -18,9 +18,11 @@ interface RedeemAmountProps {
   isDisabled: boolean
   parsedAmount: 0 | Balance
   vaultDetails?: VaultDetails
+  currencies: { investCurrency: string; receiveCurrency: string }
+  setCurrencies: Dispatch<SetStateAction<{ investCurrency: string; receiveCurrency: string }>>
 }
 
-export function RedeemAmount({ isDisabled, parsedAmount, vaultDetails }: RedeemAmountProps) {
+export function RedeemAmount({ isDisabled, parsedAmount, vaultDetails, currencies, setCurrencies }: RedeemAmountProps) {
   const { data: portfolio } = usePortfolio()
   const { selectedPoolId } = useSelectedPoolContext()
   const { data: pool } = usePoolDetails(selectedPoolId)
@@ -62,6 +64,15 @@ export function RedeemAmount({ isDisabled, parsedAmount, vaultDetails }: RedeemA
     setValue('amountToReceive', receiveAmount)
   }, [parsedAmount, shareClass, navPerShare])
 
+  useEffect(
+    () =>
+      setCurrencies({
+        investCurrency: portfolioShareCurrency?.symbol ?? 'deJTRYS',
+        receiveCurrency: portfolioInvestmentCurrency?.symbol ?? 'USDC',
+      }),
+    [portfolioShareCurrency, portfolioInvestmentCurrency]
+  )
+
   return (
     <Box>
       <Text fontWeight={500} mb={2}>
@@ -72,7 +83,7 @@ export function RedeemAmount({ isDisabled, parsedAmount, vaultDetails }: RedeemA
         decimals={portfolioShareCurrency?.decimals ?? 18}
         placeholder="0.00"
         inputGroupProps={{
-          endAddon: 'deJTRYS',
+          endAddon: currencies.investCurrency,
         }}
         // disabled={!portfolioShareCurrency}
       />
@@ -110,7 +121,7 @@ export function RedeemAmount({ isDisabled, parsedAmount, vaultDetails }: RedeemA
             decimals={portfolioInvestmentCurrency?.decimals}
             disabled
             inputGroupProps={{
-              endAddon: `${portfolioInvestmentCurrency?.symbol || 'USDC'}`,
+              endAddon: currencies.receiveCurrency,
             }}
           />
         </>

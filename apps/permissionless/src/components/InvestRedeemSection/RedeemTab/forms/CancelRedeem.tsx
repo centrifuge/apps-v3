@@ -7,27 +7,34 @@ import { RedeemAction, type RedeemActionType } from '@components/InvestRedeemSec
 import { InfoWrapper } from '@components/InvestRedeemSection/components/InfoWrapper'
 
 interface CancelRedeemProps {
+  currencies: { investCurrency: string; receiveCurrency: string }
   setActionType: Dispatch<SetStateAction<RedeemActionType>>
 }
 
-export function CancelRedeem({ setActionType }: CancelRedeemProps) {
+export function CancelRedeem({ currencies, setActionType }: CancelRedeemProps) {
   const { getValues } = useFormContext()
+  const redeemText = `${getValues('amount').toString()} ${currencies.investCurrency}`
+  const receiveText = `${getValues('amountToReceive').toString()} ${currencies.receiveCurrency}`
 
   return (
     <Box>
       <Heading>Rdemption in progress</Heading>
       <InfoWrapper text={infoText().cancelRedeem} title="Redemption in progress" icon={<FaRegClock />} />
       <Flex mt={4} justify="space-between">
-        <Text fontWeight="bold" color="info">
+        <Text fontWeight="bold" color="info" fontSize="md">
           Redeeming
         </Text>
-        <Text color="info">{getValues('amount').toString()}</Text>
+        <Text color="info" whiteSpace="normal" wordWrap="break-word" textAlign="right">
+          {redeemText}
+        </Text>
       </Flex>
       <Flex mt={4} justify="space-between">
         <Text fontWeight="bold" color="info">
           You receive
         </Text>
-        <Text color="info">{getValues('amountToReceive').toString()}</Text>
+        <Text color="info" whiteSpace="normal" wordWrap="break-word" textAlign="right">
+          {receiveText}
+        </Text>
       </Flex>
       <Button
         type="button"
