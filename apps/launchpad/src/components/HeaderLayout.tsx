@@ -31,7 +31,7 @@ export default function HeaderLayout() {
             <Tabs.Root lazyMount unmountOnExit defaultValue={tabs[0].path} colorPalette="yellow" maxW="fit-content">
               <Tabs.List>
                 {tabs.map((tab) => (
-                  <Tabs.Trigger value={tab.path} color="white">
+                  <Tabs.Trigger value={tab.path} color="white" key={tab.path}>
                     {tab.label}
                   </Tabs.Trigger>
                 ))}

@@ -1,34 +1,14 @@
+import { ShareClass } from '@centrifuge/sdk'
 import { Table } from '@chakra-ui/react'
 
 const columns = ['Pool', 'Investments', 'Redemptions', 'Token', 'Networks', 'APY', 'NAV (USDC)', 'TokenPrice']
-const pools = [
-  {
-    name: 'Janus Henderson Anemoy Treasury Fund',
-    investments: 1000000,
-    redemptions: 1000000,
-    token: 'SC1',
-    networks: 1000000,
-    apy: 1000000,
-    nav: 1000000,
-    tokenPrice: 1000000,
-  },
-  {
-    name: 'Janus AAA CLO ETF',
-    investments: 1000000,
-    redemptions: 1000000,
-    token: 1000000,
-    networks: 1000000,
-    apy: 1000000,
-    nav: 1000000,
-    tokenPrice: 1000000,
-  },
-]
 
+// TODO: table MAYBE should be reusable, is the only table of this type in the app
 export const PoolOverviewTable = () => {
   return (
     <>
-      <Table.Root size="sm" variant="outline" striped>
-        <Table.Header>
+      <Table.Root size="sm" variant="outline" striped borderRadius="md" borderColor="1px solid border-primary">
+        <Table.Header backgroundColor="white">
           <Table.Row>
             {columns.map((column) => (
               <Table.ColumnHeader key={column}>{column}</Table.ColumnHeader>

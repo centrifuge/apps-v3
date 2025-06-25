@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { Toaster, toaster } from '@centrifuge/ui'
-import { useTransactions } from '@components/Transactions/TransactionProvider'
+import { useTransactions } from './TransactionProvider'
 
 export function TransactionToasts() {
   const { transactions, updateTransaction } = useTransactions()
