@@ -2,6 +2,7 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "baseUrl": ".",
+    "outDir": "dist",
     "jsx": "react-jsx",
     "noEmit": true,
     "module": "esnext",
@@ -18,5 +19,5 @@
       "@utils/*": ["src/utils/*"]
     }
   },
-  "include": ["src", "vite-env.d.ts", "vite.config.ts", "../../packages/ui/src/components/WalletButton.tsx"]
+  "include": ["src", "vite-env.d.ts", "vite.config.ts"]
 }

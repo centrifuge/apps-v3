@@ -42,7 +42,7 @@ export function Checkbox<TFieldValues extends FieldValues = FieldValues>(props: 
         id={name}
         disabled={isDisabled}
         onBlur={() => trigger(name)} // Trigger validation on blur
-        onCheckedChange={({ checked }) => {
+        onCheckedChange={({ checked }: { checked: any }) => {
           field.onChange(checked)
           if (checked !== 'indeterminate') {
             onChange?.(checked) // Call any additional onChange from props
@@ -50,6 +50,7 @@ export function Checkbox<TFieldValues extends FieldValues = FieldValues>(props: 
         }}
       >
         <ChakraCheckbox.HiddenInput />
+        {/* @ts-expect-error */}
         <ChakraCheckbox.Control borderColor="black" borderRadius={4} />
         <ChakraCheckbox.Label>{label}</ChakraCheckbox.Label>
       </ChakraCheckbox.Root>
