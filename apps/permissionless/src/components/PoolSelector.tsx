@@ -17,7 +17,8 @@ export const PoolSelector = () => {
   return (
     <SegmentGroup.Root
       value={displayPools.find((pool) => pool.value === selectedPoolId?.toString())?.label}
-      onValueChange={(details: { value: string }) => {
+      onValueChange={(details: { value: string | null }) => {
+        if (!details.value) return
         const selectedPool = displayPools.find((pool) => pool.label === details.value)
         if (selectedPool) {
           setSelectedPoolId(new PoolId(selectedPool.value))
@@ -27,9 +28,7 @@ export const PoolSelector = () => {
       padding={2}
       borderRadius="10px"
     >
-      {/* @ts-expect-error */}
       <SegmentGroup.Indicator bg="text-inverted" />
-      {/* @ts-expect-error */}
       <SegmentGroup.Items w="full" borderRadius="10px" border="none" items={displayPools?.map((pool) => pool.label)} />
     </SegmentGroup.Root>
   )

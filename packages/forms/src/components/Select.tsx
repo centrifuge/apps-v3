@@ -40,7 +40,6 @@ export function Select<TFieldValues extends FieldValues = FieldValues>(props: Cu
   })
 
   const handleChange = async (details: SelectValueChangeDetails<{ label: string; value: string }>) => {
-    // @ts-expect-error
     const value = details?.value?.[0]
     field.onChange(value === '' ? undefined : value) // Call react-hook-form's onChange with the selected value
     setValue(value === '' ? [] : [value]) // Update local state for controlled component
