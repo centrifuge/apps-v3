@@ -1,6 +1,12 @@
 import { Links, Meta, Outlet, Scripts, ScrollRestoration } from 'react-router'
-import { AppKitProvider } from '@centrifuge/config'
-import { centrifuge } from './centrifuge'
+import { WalletProvider } from '@centrifuge/wallet'
+import { ChakraCentrifugeProvider, ChakraCentrifugeProviderProps } from '@centrifuge/ui'
+import { centrifuge, networks } from './centrifuge'
+import { CentrifugeProvider, TransactionProvider } from '@centrifuge/shared'
+
+const config = {
+  themeKey: 'light' as ChakraCentrifugeProviderProps['themeKey'],
+}
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -23,8 +29,14 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
 export default function Root() {
   return (
-    <AppKitProvider projectId={import.meta.env.VITE_REOWN_APP_ID!} centrifugeConfig={centrifuge}>
-      <Outlet />
-    </AppKitProvider>
+    <CentrifugeProvider client={centrifuge}>
+      <TransactionProvider>
+        <WalletProvider projectId={import.meta.env.VITE_REOWN_APP_ID!} networks={networks}>
+          <ChakraCentrifugeProvider themeKey={config.themeKey}>
+            <Outlet />
+          </ChakraCentrifugeProvider>
+        </WalletProvider>
+      </TransactionProvider>
+    </CentrifugeProvider>
   )
 }

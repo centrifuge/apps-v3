@@ -1,8 +1,11 @@
-export default function Dashboard() {
+import { Stack } from '@chakra-ui/react'
+import { PoolOverviewTable } from '@components/tokenizations/PoolOverviewTable'
+
+export default function Tokenizations() {
   return (
-    <main className="p-4">
-      <h1 className="text-2xl font-bold mb-2">Dashboard</h1>
-      <p>Welcome to your app! This is the main page.</p>
-    </main>
+    <Stack>
+      <PoolOverviewTable />
+      <p>aaa</p>
+    </Stack>
   )
 }

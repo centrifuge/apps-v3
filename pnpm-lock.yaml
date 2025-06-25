@@ -144,9 +144,6 @@ importers:
 
   apps/launchpad:
     dependencies:
-      '@centrifuge/config':
-        specifier: workspace:*
-        version: link:../../packages/config
       '@centrifuge/forms':
         specifier: workspace:*
         version: link:../../packages/forms
@@ -156,6 +153,9 @@ importers:
       '@centrifuge/ui':
         specifier: workspace:*
         version: link:../../packages/ui
+      '@centrifuge/wallet':
+        specifier: workspace:*
+        version: link:../../packages/wallet
       '@react-router/node':
         specifier: ^7.6.2
         version: 7.6.2(react-router@7.6.2(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(typescript@5.8.3)
@@ -190,9 +190,6 @@ importers:
 
   apps/permissionless:
     dependencies:
-      '@centrifuge/config':
-        specifier: workspace:*
-        version: link:../../packages/config
       '@centrifuge/forms':
         specifier: workspace:*
         version: link:../../packages/forms
@@ -202,12 +199,9 @@ importers:
       '@centrifuge/ui':
         specifier: workspace:*
         version: link:../../packages/ui
-
-  packages/config:
-    dependencies:
-      '@centrifuge/ui':
+      '@centrifuge/wallet':
         specifier: workspace:*
-        version: link:../ui
+        version: link:../../packages/wallet
 
   packages/forms:
     dependencies:
@@ -225,6 +219,12 @@ importers:
   packages/shared: {}
 
   packages/ui: {}
+
+  packages/wallet:
+    dependencies:
+      '@centrifuge/ui':
+        specifier: workspace:*
+        version: link:../ui
 
 packages:
 

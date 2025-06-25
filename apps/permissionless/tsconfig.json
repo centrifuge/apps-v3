@@ -18,5 +18,5 @@
       "@utils/*": ["src/utils/*"]
     }
   },
-  "include": ["src", "vite-env.d.ts", "vite.config.ts"]
+  "include": ["src", "vite-env.d.ts", "vite.config.ts", "../../packages/ui/src/components/WalletButton.tsx"]
 }

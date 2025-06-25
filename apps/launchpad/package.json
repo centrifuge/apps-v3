@@ -14,7 +14,7 @@
     "isbot": "^5",
     "@centrifuge/forms": "workspace:*",
     "@centrifuge/shared": "workspace:*",
-    "@centrifuge/config": "workspace:*",
+    "@centrifuge/wallet": "workspace:*",
     "@centrifuge/ui": "workspace:*"
   },
   "devDependencies": {

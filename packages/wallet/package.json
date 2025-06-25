@@ -1,5 +1,5 @@
 {
-  "name": "@centrifuge/config",
+  "name": "@centrifuge/wallet",
   "version": "0.1.0",
   "main": "src/index.ts",
   "license": "MIT",
