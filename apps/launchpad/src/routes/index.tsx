@@ -3,7 +3,7 @@ import { PoolOverviewTable } from '@components/tokenizations/PoolOverviewTable'
 
 export default function Tokenizations() {
   return (
-    <Stack>
+    <Stack gap={4} mt={4}>
       <PoolOverviewTable />
       <p>aaa</p>
     </Stack>

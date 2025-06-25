@@ -1,42 +1,71 @@
-import { Table } from '@chakra-ui/react'
+import { HStack, Image, Text, Button, Tooltip, chakra } from '@chakra-ui/react'
+import { FaEthereum, FaCog } from 'react-icons/fa'
+import { DataTable, Column } from '../shared/DataTable'
 
-const columns = ['Pool', 'Investments', 'Redemptions', 'Token', 'Networks', 'APY', 'NAV (USDC)', 'TokenPrice']
-const pools = [
-  {
-    name: 'Janus Henderson Anemoy Treasury Fund',
-    investments: 1000000,
-    redemptions: 1000000,
-    token: 'SC1',
-    networks: 1000000,
-    apy: 1000000,
-    nav: 1000000,
-    tokenPrice: 1000000,
-  },
-  {
-    name: 'Janus AAA CLO ETF',
-    investments: 1000000,
-    redemptions: 1000000,
-    token: 1000000,
-    networks: 1000000,
-    apy: 1000000,
-    nav: 1000000,
-    tokenPrice: 1000000,
-  },
-]
+export function PoolOverviewTable() {
+  const columns = [
+    {
+      key: 'pool',
+      header: 'Pool',
+      render: (p) => (
+        <HStack>
+          <Image boxSize="24px" src={p.iconUrl} alt={p.name} />
+          <Text fontWeight="medium">{p.name}</Text>
+        </HStack>
+      ),
+      minW: '200px',
+    },
+    { key: 'investments', header: 'Investments', accessor: 'investments', isNumeric: true },
+    { key: 'redemptions', header: 'Redemptions', accessor: 'redemptions', isNumeric: true },
+    {
+      key: 'token',
+      header: 'Token',
+      render: (p) => (
+        <HStack>
+          {p.networkIcon ?? <FaEthereum />}
+          <Text>{p.tokenSymbol}</Text>
+        </HStack>
+      ),
+    },
+    {
+      key: 'apy',
+      header: (
+        <HStack>
+          <Text>APY</Text>
+          <chakra.span fontSize="xs">▼</chakra.span>
+        </HStack>
+      ),
+      accessor: 'apy',
+      isNumeric: true,
+    },
+    {
+      key: 'nav',
+      header: (
+        <HStack>
+          <Text>NAV (USDC)</Text>
+          <chakra.span fontSize="xs">▼</chakra.span>
+        </HStack>
+      ),
+      accessor: 'nav',
+      isNumeric: true,
+    },
+    {
+      key: 'price',
+      header: (
+        <HStack>
+          <Text>Token price</Text>
+          <chakra.span fontSize="xs">▼</chakra.span>
+        </HStack>
+      ),
+      accessor: 'price',
+      isNumeric: true,
+    },
+    {
+      key: 'actions',
+      header: '',
+      render: (p) => <Button size="xs">Accounts</Button>,
+    },
+  ]
 
-export const PoolOverviewTable = () => {
-  return (
-    <>
-      <Table.Root size="sm" variant="outline" striped>
-        <Table.Header>
-          <Table.Row>
-            {columns.map((column) => (
-              <Table.ColumnHeader key={column}>{column}</Table.ColumnHeader>
-            ))}
-          </Table.Row>
-        </Table.Header>
-        <Table.Body></Table.Body>
-      </Table.Root>
-    </>
-  )
+  return <DataTable columns={columns} data={[]} />
 }
