@@ -95,3 +95,18 @@ export function formatBalanceToString(amount: Balance, precision = 0) {
 
   return amount.toFloat().toFixed(precision)
 }
+
+export function ipfsToHttp(uri: string, gateway: string | string[] = 'https://ipfs.io'): string {
+  const gateways = Array.isArray(gateway) ? gateway : [gateway]
+
+  const build = (prefix: 'ipfs' | 'ipns', path: string) =>
+    `${gateways[0].replace(/\/+$/, '')}/${prefix}/${path.replace(/^\/+/, '')}`
+
+  if (uri.startsWith('ipfs://')) {
+    return build('ipfs', uri.slice(7))
+  }
+  if (uri.startsWith('ipns://')) {
+    return build('ipns', uri.slice(7))
+  }
+  return uri
+}

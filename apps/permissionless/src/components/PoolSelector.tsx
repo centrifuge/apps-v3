@@ -17,7 +17,8 @@ export const PoolSelector = () => {
   return (
     <SegmentGroup.Root
       value={displayPools.find((pool) => pool.value === selectedPoolId?.toString())?.label}
-      onValueChange={(details: { value: string }) => {
+      onValueChange={(details: { value: string | null }) => {
+        if (!details.value) return
         const selectedPool = displayPools.find((pool) => pool.label === details.value)
         if (selectedPool) {
           setSelectedPoolId(new PoolId(selectedPool.value))
