@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import { Toaster, toaster } from '@components/toaster'
+import { Toaster, toaster } from '@centrifuge/ui'
 import { useTransactions } from '@components/Transactions/TransactionProvider'
 
 export function TransactionToasts() {

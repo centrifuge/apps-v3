@@ -1,26 +1,29 @@
-import { ChakraProvider, createSystem, defaultConfig } from '@chakra-ui/react'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { Root } from './Root'
-import { config } from './config'
+import { WalletProvider } from '@centrifuge/wallet'
 import { SelectedPoolProvider } from './contexts/useSelectedPoolContext'
 import { CentrifugeProvider } from '@centrifuge/shared'
-import { centrifuge } from './centrifuge'
+import { centrifuge, networks } from './centrifuge'
 import { TransactionProvider } from './components/Transactions/TransactionProvider'
+import { ChakraCentrifugeProvider, ChakraCentrifugeProviderProps } from '@centrifuge/ui'
 
-const chosenThemeConfig = config.themes[config.defaultTheme]
-const system = createSystem(defaultConfig, chosenThemeConfig)
+const config = {
+  themeKey: 'light' as ChakraCentrifugeProviderProps['themeKey'],
+}
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <CentrifugeProvider client={centrifuge}>
-      <ChakraProvider value={system}>
-        <TransactionProvider>
-          <SelectedPoolProvider>
-            <Root />
-          </SelectedPoolProvider>
-        </TransactionProvider>
-      </ChakraProvider>
+      <WalletProvider projectId={import.meta.env.VITE_REOWN_APP_ID!} networks={networks}>
+        <ChakraCentrifugeProvider themeKey={config.themeKey}>
+          <TransactionProvider>
+            <SelectedPoolProvider>
+              <Root />
+            </SelectedPoolProvider>
+          </TransactionProvider>
+        </ChakraCentrifugeProvider>
+      </WalletProvider>
     </CentrifugeProvider>
   </StrictMode>
 )

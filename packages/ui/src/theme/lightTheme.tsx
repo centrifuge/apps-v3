@@ -1,5 +1,5 @@
 import { defineConfig } from '@chakra-ui/react'
-import { yellowPalette, blackPalette, grayPalette, bluePalette, white, blackScale } from './colors'
+import { yellowPalette, blackPalette, grayPalette, bluePalette, white, blackScale, grayScale } from './colors'
 import { buttonRecipe } from './recipes/buttonRecipe'
 import { inputRecipe } from './recipes/inputRecipe'
 import { checkboxRecipe } from './recipes/checkboxRecipe'
@@ -10,6 +10,7 @@ export const lightTheme = defineConfig({
   globalCss: {
     body: {
       color: blackScale[800],
+      backgroundColor: grayScale[50],
     },
     button: {
       color: blackScale[800],

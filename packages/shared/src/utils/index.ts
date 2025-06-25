@@ -1,4 +1,4 @@
-export { isTestEnv } from './config'
+// export { isTestEnv } from './config'
 export {
   formatBalance,
   formatBalanceAbbreviated,

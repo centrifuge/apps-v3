@@ -11,7 +11,6 @@
     "paths": {
       "@assets/*": ["src/assets/*"],
       "@components/*": ["src/components/*"],
-      "@config/*": ["src/config/*"],
       "@contexts/*": ["src/contexts/*"],
       "@hooks/*": ["src/hooks/*"],
       "@theme/": ["src/theme/"],
@@ -19,5 +18,5 @@
       "@utils/*": ["src/utils/*"]
     }
   },
-  "include": ["src", "vite-env.d.ts"]
+  "include": ["src", "vite-env.d.ts", "vite.config.ts", "../../packages/ui/src/components/WalletButton.tsx"]
 }
