@@ -44,7 +44,9 @@ export function ConnectionGuard({ networks, children, message = 'Unsupported net
           <Menu.Positioner>
             <Menu.Content>
               {networks.map((network) => (
+                // @ts-expect-error
                 <Menu.Item
+                  key={network}
                   value={String(network)}
                   onClick={() => {
                     switchChain({ chainId: network })

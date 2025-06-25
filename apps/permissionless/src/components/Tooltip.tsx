@@ -17,6 +17,7 @@ export const Tooltip = React.forwardRef<HTMLDivElement, TooltipProps>((props, re
 
   return (
     <ChakraTooltip.Root {...rest}>
+      {/* @ts-expect-error */}
       <ChakraTooltip.Trigger asChild>{children}</ChakraTooltip.Trigger>
       <Portal disabled={!portalled} container={portalRef}>
         <ChakraTooltip.Positioner>

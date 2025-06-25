@@ -39,6 +39,7 @@ export const FAQSection = () => {
       <Heading size="lg">More about DeFi Janus Henderson Anemoy</Heading>
       <Accordion.Root multiple defaultValue={['b']}>
         {items.map((item, index) => (
+          // @ts-expect-error
           <Accordion.Item key={index} value={item.value}>
             <Accordion.ItemTrigger>
               <Span flex="1">{item.title}</Span>

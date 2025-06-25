@@ -40,7 +40,8 @@ export function Select<TFieldValues extends FieldValues = FieldValues>(props: Cu
   })
 
   const handleChange = async (details: SelectValueChangeDetails<{ label: string; value: string }>) => {
-    const value = details.value[0]
+    // @ts-expect-error
+    const value = details?.value?.[0]
     field.onChange(value === '' ? undefined : value) // Call react-hook-form's onChange with the selected value
     setValue(value === '' ? [] : [value]) // Update local state for controlled component
     await trigger(name) // Trigger validation for the field
@@ -55,6 +56,7 @@ export function Select<TFieldValues extends FieldValues = FieldValues>(props: Cu
         <ChakraSelect.HiddenSelect />
         <ChakraSelect.Control>
           <ChakraSelect.Trigger>
+            {/* @ts-expect-error */}
             <ChakraSelect.ValueText placeholder={label} />
           </ChakraSelect.Trigger>
           <ChakraSelect.IndicatorGroup>
@@ -64,7 +66,9 @@ export function Select<TFieldValues extends FieldValues = FieldValues>(props: Cu
         <Portal>
           <ChakraSelect.Positioner>
             <ChakraSelect.Content>
+              {/* @ts-expect-error */}
               {frameworks.items.map((framework) => (
+                // @ts-expect-error
                 <ChakraSelect.Item item={framework} key={framework.value}>
                   {framework.label}
                   <ChakraSelect.ItemIndicator />

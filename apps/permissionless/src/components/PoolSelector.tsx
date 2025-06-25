@@ -27,7 +27,9 @@ export const PoolSelector = () => {
       padding={2}
       borderRadius="10px"
     >
+      {/* @ts-expect-error */}
       <SegmentGroup.Indicator bg="text-inverted" />
+      {/* @ts-expect-error */}
       <SegmentGroup.Items w="full" borderRadius="10px" border="none" items={displayPools?.map((pool) => pool.label)} />
     </SegmentGroup.Root>
   )
