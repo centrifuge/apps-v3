@@ -51,8 +51,8 @@ export default function RedeemTab({ vault }: { vault: Vault }) {
   const isDisabled = isPending || !vaultDetails || !investment || parsedAmount === 0
 
   return (
-    <Form form={form}>
-      <Box mt={4}>
+    <Form form={form} style={{ height: '100%' }}>
+      <Box mt={4} height="100%">
         <RedeemTabForm
           actionType={actionType}
           isDisabled={isDisabled}

@@ -62,8 +62,8 @@ export default function InvestTab({ vault }: { vault: Vault }) {
   const isDisabled = !vaultDetails || !investment || parsedAmount === 0 || isPending
 
   return (
-    <Form form={form}>
-      <Box mt={4}>
+    <Form form={form} style={{ height: '100%' }}>
+      <Box mt={4} height="100%">
         <InvestTabForm
           actionType={actionType}
           isDisabled={isDisabled}

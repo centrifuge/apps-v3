@@ -26,8 +26,15 @@ export function SuccessPanel(props: SuccessPanelProps) {
   const buttonText = isInvesting ? 'Invest more' : 'Redeem more'
 
   return (
-    <Box>
-      <Flex alignItems="flex-start" flexDirection="column" gap={2} justifyContent="space-between" width="100%">
+    <Box height="100%">
+      <Flex
+        alignItems="flex-start"
+        flexDirection="column"
+        gap={2}
+        justifyContent="space-between"
+        width="100%"
+        height="100%"
+      >
         <Box width="100%">
           <Flex alignItems="center" gap={2} justifyContent="space-between">
             <Heading>{isInvesting ? 'Investment' : 'Redemption'} successful</Heading>
@@ -53,6 +60,7 @@ export function SuccessPanel(props: SuccessPanelProps) {
         <Button
           colorPalette="yellow"
           type="button"
+          mb={4}
           onClick={() => {
             if (isInvesting) {
               props.setActionType(InvestAction.INVEST_AMOUNT)
