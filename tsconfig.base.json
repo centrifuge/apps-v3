@@ -17,7 +17,13 @@
       "path": "packages/forms"
     },
     {
-      "path": "packages/hooks"
+      "path": "packages/shared"
+    },
+    {
+      "path": "packages/wallet"
+    },
+    {
+      "path": "packages/ui"
     }
   ]
 }

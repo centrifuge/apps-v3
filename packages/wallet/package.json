@@ -1,0 +1,10 @@
+{
+  "name": "@centrifuge/wallet",
+  "version": "0.1.0",
+  "main": "src/index.ts",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "@centrifuge/ui": "workspace:*"
+  }
+}
