@@ -59,7 +59,7 @@ const columns: ColumnDefinition<Row>[] = [
 ]
 
 export const UnderlyingCollateralSection = () => {
-  const data: Row[] = Object.values(mockMetadata.shareClasses || {}).map((sc, idx) => ({
+  const data = Object.values(mockMetadata.shareClasses || {}).map((sc, idx) => ({
     id: idx,
     fund: mockMetadata.pool.name,
     assetType: mockMetadata.pool.asset.class,
@@ -72,7 +72,7 @@ export const UnderlyingCollateralSection = () => {
   return (
     <Flex flexDirection="column" gap={4}>
       <Heading size="lg">Underlying Collateral</Heading>
-      <DataTable columns={columns} data={data} size="sm" />
+      <DataTable columns={columns} data={data as Row[]} size="sm" />
     </Flex>
   )
 }
