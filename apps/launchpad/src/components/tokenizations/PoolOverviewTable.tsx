@@ -1,24 +1,26 @@
-import { useAllPoolDetails, usePool, usePools } from '@centrifuge/shared'
-import { Box, Heading, Image, Stack, Table } from '@chakra-ui/react'
+import { useAllPoolDetails } from '@centrifuge/shared'
+import { Box, Heading, Image, Stack } from '@chakra-ui/react'
 import DataTable, { ColumnDefinition } from './DataTable'
 import { ipfsToHttp } from '@centrifuge/shared/src/utils/formatting'
 
 type Row = {
   id: string
-  name: string
-  icon: { uri: string } | undefined
-  shareClasses: { token: string; apy: string; tokenPrice: string }[]
+  poolName: string
+  iconUri: string
+  token: string
+  apy: string
+  tokenPrice: string
 }
 
 const columns: ColumnDefinition<Row>[] = [
   {
     header: 'Pool',
     accessor: 'name',
-    render: ({ icon, name }: Row) => {
+    render: ({ poolName, iconUri }: Row) => {
       return (
         <Box>
-          <Image src={ipfsToHttp(icon?.uri ?? '')} alt={name} />
-          <Heading>{name}</Heading>
+          <Image src={ipfsToHttp(iconUri ?? '')} alt={poolName} />
+          <Heading>{poolName}</Heading>
         </Box>
       )
     },
