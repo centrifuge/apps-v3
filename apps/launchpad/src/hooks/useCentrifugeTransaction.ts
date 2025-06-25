@@ -2,7 +2,7 @@ import { lastValueFrom, tap } from 'rxjs'
 import { useConnectorClient } from 'wagmi'
 import { useMutation } from '@tanstack/react-query'
 import { type OperationConfirmedStatus, type Transaction } from '@centrifuge/sdk'
-import { useTransactions } from '@centrifuge/shared'
+import { useTransactions } from '@components/transactions/TransactionProvider'
 import { centrifuge } from '../centrifuge'
 
 export function useCentrifugeTransaction() {

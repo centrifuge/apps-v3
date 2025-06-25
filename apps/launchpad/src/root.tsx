@@ -2,7 +2,11 @@ import { Links, Meta, Outlet, Scripts, ScrollRestoration } from 'react-router'
 import { WalletProvider } from '@centrifuge/wallet'
 import { ChakraCentrifugeProvider, ChakraCentrifugeProviderProps } from '@centrifuge/ui'
 import { centrifuge, networks } from './centrifuge'
-import { CentrifugeProvider, TransactionProvider } from '@centrifuge/shared'
+import { CentrifugeProvider } from '@centrifuge/shared'
+import { TransactionProvider } from '@components/transactions/TransactionProvider'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+
+const queryClient = new QueryClient()
 
 const config = {
   themeKey: 'light' as ChakraCentrifugeProviderProps['themeKey'],
@@ -29,14 +33,16 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
 export default function Root() {
   return (
-    <CentrifugeProvider client={centrifuge}>
-      <TransactionProvider>
+    <QueryClientProvider client={queryClient}>
+      <CentrifugeProvider client={centrifuge}>
         <WalletProvider projectId={import.meta.env.VITE_REOWN_APP_ID!} networks={networks}>
           <ChakraCentrifugeProvider themeKey={config.themeKey}>
-            <Outlet />
+            <TransactionProvider>
+              <Outlet />
+            </TransactionProvider>
           </ChakraCentrifugeProvider>
         </WalletProvider>
-      </TransactionProvider>
-    </CentrifugeProvider>
+      </CentrifugeProvider>
+    </QueryClientProvider>
   )
 }
