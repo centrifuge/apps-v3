@@ -16,7 +16,8 @@
     "build:packages": "pnpm --filter @centrifuge/* --parallel build",
     "dev": "concurrently \"pnpm dev:app\" \"pnpm dev:functions\" \"pnpm dev:permissionless\" \"pnpm dev:launchpad\"",
     "lint": "concurrently \"pnpm --filter app lint\" \"pnpm --filter launchpad lint\" \"pnpm --filter permissionless lint\"",
-    "lint:fix": "npm run lint -- --fix"
+    "lint:fix": "npm run lint -- --fix",
+    "deploy:permissionless": "pnpm --filter permissionless build && pnpm --filter permissionless wrangler publish"
   },
   "dependencies": {
     "@ark-ui/react": "^5.15.1",
