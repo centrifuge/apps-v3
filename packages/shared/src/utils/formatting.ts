@@ -1,4 +1,4 @@
-import type { Balance } from '@centrifuge/sdk'
+import { Balance } from '@centrifuge/sdk'
 import Decimal from 'decimal.js-light'
 import { formatUnits, type Address } from 'viem'
 
@@ -54,40 +54,44 @@ export function formatBalance(
   currency?: string,
   precision = 0,
   minPrecision = precision
-) {
+): string {
   let val: Decimal
+
   if (typeof amount === 'number' || typeof amount === 'string') {
     val = new Decimal(amount.toString())
+  } else if (amount instanceof Balance) {
+    val = amount.toDecimal()
+  } else if (amount instanceof Decimal) {
+    val = amount
   } else {
-    val = amount as Decimal
+    console.warn('Unsupported amount type provided to formatBalance. Defaulting to 0.', amount)
+    val = new Decimal(0)
   }
-  const formattedAmount = amount.toLocaleString('en', {
+
+  const fixedString = val.toFixed(precision)
+  const numToFormat = parseFloat(fixedString)
+
+  const formattedAmount = numToFormat.toLocaleString('en', {
     minimumFractionDigits: minPrecision,
     maximumFractionDigits: precision,
   })
+
   return currency ? `${formattedAmount} ${currency}` : formattedAmount
 }
 
 export function divideBigInts(numerator: bigint, denominator: bigint, decimals: number) {
   const scaledNumerator = numerator * 10n ** BigInt(decimals)
-  return scaledNumerator / denominator
+  const result = scaledNumerator / denominator
+
+  return Object.assign(result, {
+    formatToString: (bigintDecimals: number, formatDecimals?: number) =>
+      formatBigintToString(result, bigintDecimals, formatDecimals),
+  })
 }
 
 export function formatBigintToString(bigInt: bigint, bigintDecimals: number, formatDecimals?: number) {
   const decimals = formatDecimals || bigintDecimals
   return Number(formatUnits(bigInt, bigintDecimals)).toFixed(decimals)
-}
-
-export function formatDivideBigInts(
-  numerator: bigint,
-  denominator: bigint,
-  bigintDecimals: number,
-  formatDecimals?: number
-) {
-  const result = divideBigInts(numerator, denominator, bigintDecimals)
-  const formattedResult = formatBigintToString(result, bigintDecimals, formatDecimals)
-
-  return formattedResult
 }
 
 export function formatBalanceToString(amount: Balance, precision = 0) {

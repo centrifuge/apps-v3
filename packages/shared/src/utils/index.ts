@@ -3,7 +3,7 @@ export {
   formatBalance,
   formatBalanceAbbreviated,
   formatBalanceToString,
-  formatDivideBigInts,
+  formatBigintToString,
   formatPercentage,
   truncateAddress,
 } from './formatting'
