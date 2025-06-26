@@ -1,27 +1,13 @@
-import { Box, Flex, Grid, Heading, Stack, Text } from '@chakra-ui/react'
-import { useChainId } from 'wagmi'
-import { useAllInvestments, usePoolDetails, usePoolNetworks, useVaults, useVaultsDetails } from '@centrifuge/shared'
-import { PoolId } from '@centrifuge/sdk'
+import { Box, Flex, Grid, Heading, Stack } from '@chakra-ui/react'
 import { Button } from '@centrifuge/ui'
 import { AccountPage } from '@components/account/AccountPage'
 import { useMemo } from 'react'
-import { useParams } from 'react-router'
+import { usePoolProvider } from '@contexts/PoolProvider'
 
 // TODO: FOR MVP, we are assuming one share class per pool
 // Routing must be fix to handle multiple share classes per pool
 export default function Account() {
-  const params = useParams()
-  const poolId = params.poolId
-  const connectedChainId = useChainId()
-  const { data: poolDetails } = usePoolDetails(new PoolId(poolId ?? ''))
-  const { data: networks } = usePoolNetworks(poolDetails?.id)
-  const network = networks?.find((n) => n.chainId === connectedChainId)
-  // TODO: For MVP, we are assuming one share class per pool
-  const shareClass = poolDetails?.shareClasses?.[0]
-  const scId = shareClass?.details.id
-  const { data: vaults } = useVaults(network, scId)
-  const { data: vaultsDetails } = useVaultsDetails(vaults)
-  const { data: allInvestments } = useAllInvestments(vaults)
+  const { shareClass, vaultsDetails, allInvestments } = usePoolProvider()
 
   const totalNav = useMemo(() => {
     return shareClass?.details.navPerShare.mul(shareClass.details.totalIssuance)
