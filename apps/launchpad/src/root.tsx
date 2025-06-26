@@ -5,6 +5,7 @@ import { centrifuge, networks } from './centrifuge'
 import { CentrifugeProvider } from '@centrifuge/shared'
 import { TransactionProvider } from '@components/transactions/TransactionProvider'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { PoolProvider } from '@contexts/PoolProvider'
 
 const queryClient = new QueryClient()
 
@@ -38,7 +39,9 @@ export default function Root() {
         <WalletProvider projectId={import.meta.env.VITE_REOWN_APP_ID!} networks={networks}>
           <ChakraCentrifugeProvider themeKey={config.themeKey}>
             <TransactionProvider>
-              <Outlet />
+              <PoolProvider>
+                <Outlet />
+              </PoolProvider>
             </TransactionProvider>
           </ChakraCentrifugeProvider>
         </WalletProvider>

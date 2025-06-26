@@ -25,10 +25,14 @@ export const buttonRecipe = defineRecipe({
     },
     variant: {
       subtle: {
-        background: 'gray.100',
+        background: 'gray.10',
         color: 'text-inverted',
-        fontSize: 'xs',
+        fontSize: 'sm',
         fontWeight: 600,
+        _hover: {
+          background: 'gray.0',
+          boxShadow: 'md',
+        },
       },
       outline: {
         background: 'transparent',
