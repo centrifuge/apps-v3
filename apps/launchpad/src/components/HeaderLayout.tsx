@@ -4,6 +4,7 @@ import { LogoCentrifugeText } from '@centrifuge/ui'
 import { WalletButton } from '@centrifuge/wallet'
 import { Box, Container, Stack, Tabs } from '@chakra-ui/react'
 import { Outlet, useLocation, useParams, useNavigate } from 'react-router'
+import { useMemo } from 'react'
 
 // Main page tabs
 const MAIN_TABS = [
@@ -59,14 +60,17 @@ export default function HeaderLayout() {
   const location = useLocation()
   const params = useParams()
   const navigate = useNavigate()
-  const poolId = params.id
+  const poolId = params.poolId
 
-  const { data: poolsDetails } = usePoolDetails(new PoolId(poolId ?? ''))
+  const memoizedPoolId = useMemo(() => {
+    return poolId ? new PoolId(poolId) : undefined
+  }, [poolId])
+
+  const { data: poolsDetails } = usePoolDetails(memoizedPoolId)
   const shareClasses = poolsDetails?.shareClasses.map((shareClass) => shareClass.details.symbol)
 
   const tabs = getTabsForRoute(location.pathname, poolId, shareClasses)
 
-  // Find the active tab based on current path
   const activeTab = tabs.find((tab) => location.pathname === tab.path)
 
   const handleTabChange = (details: { value: string }) => {
