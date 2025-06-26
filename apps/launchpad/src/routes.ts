@@ -9,7 +9,6 @@ export default [
 
     // Account page
     route('/account/:poolId', './routes/account.tsx'),
-    route('/account/:poolId/:shareClass', './routes/account.tsx'),
 
     // Orders page
     route('/orders/:poolId/approve', './routes/orders/approve.tsx'),

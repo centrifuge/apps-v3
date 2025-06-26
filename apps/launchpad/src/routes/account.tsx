@@ -10,7 +10,8 @@ import { useParams } from 'react-router'
 // TODO: FOR MVP, we are assuming one share class per pool
 // Routing must be fix to handle multiple share classes per pool
 export default function Account() {
-  const poolId = useParams().id
+  const params = useParams()
+  const poolId = params.poolId
   const connectedChainId = useChainId()
   const { data: poolDetails } = usePoolDetails(new PoolId(poolId ?? ''))
   const { data: networks } = usePoolNetworks(poolDetails?.id)
