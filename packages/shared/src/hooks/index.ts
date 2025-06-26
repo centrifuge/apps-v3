@@ -1,5 +1,5 @@
 export { usePools, usePool, usePoolDetails, useAllPoolDetails, usePoolNetworks } from './usePools'
-export { useVaults, useVaultDetails, useInvestment } from './useVaults'
+export { useVaults, useVaultDetails, useVaultsDetails, useInvestment, useAllInvestments } from './useVaults'
 export { useInvestor, usePortfolio } from './useInvestor'
 export { CentrifugeProvider, useCentrifuge } from './CentrifugeContext'
 export { useObservable } from './useObservable'
