@@ -96,7 +96,9 @@ export const PoolOverviewTable = () => {
 
   return (
     <Stack>
-      <Heading>Pool overview</Heading>
+      <Heading size="md" my="4">
+        Pool overview
+      </Heading>
       <DataTable columns={columns} data={flattenedData ?? []} />
     </Stack>
   )
