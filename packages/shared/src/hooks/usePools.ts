@@ -16,7 +16,7 @@ export function usePool(poolId?: PoolId) {
   return useObservable(pool$)
 }
 
-export function usePoolDetails(poolId?: PoolId) {
+export function usePoolDetails(poolId: PoolId) {
   const { data: pool } = usePool(poolId)
   const details$ = useMemo(() => (pool ? pool?.details() : undefined), [pool])
   return useObservable(details$)

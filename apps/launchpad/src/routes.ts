@@ -9,6 +9,7 @@ export default [
 
     // Account page
     route('/account/:poolId', './routes/account.tsx'),
+    route('/account/:poolId/:shareClass', './routes/account.tsx'),
 
     // Nav Page
     route('/nav/:shareClassId/:poolId', './routes/nav.tsx'),
