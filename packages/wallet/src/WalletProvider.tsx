@@ -31,7 +31,8 @@ export const WalletProvider = ({ projectId, networks, children }: WalletProvider
       adapters: [wagmiAdapter],
       networks: networks as [AppKitNetwork, ...AppKitNetwork[]],
       projectId,
-      features: { email: false, socials: false },
+      features: { email: false, socials: false, swaps: false, send: false },
+      themeMode: 'light',
     })
   }, [wagmiAdapter, projectId, networks])
 
