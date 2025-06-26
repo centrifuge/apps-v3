@@ -2,7 +2,7 @@ export const black = '#252B34'
 export const white = '#FFFFFF'
 
 export const grayScale = {
-  10: '#F2F4F7',
+  10: '#3B424D',
   50: '#F6F6F6',
   100: '#E7E7E7',
   300: '#CFCFCF',

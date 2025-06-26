@@ -1,10 +1,11 @@
 import { PoolId } from '@centrifuge/sdk'
-import { useAllPoolDetails, usePoolDetails } from '@centrifuge/shared'
+import { usePoolDetails } from '@centrifuge/shared'
 import { LogoCentrifugeText } from '@centrifuge/ui'
 import { WalletButton } from '@centrifuge/wallet'
-import { Box, Container, Stack, Tabs } from '@chakra-ui/react'
+import { Box, Container, Stack, Tabs, Button, Heading, IconButton, Text, Flex } from '@chakra-ui/react'
 import { Outlet, useLocation, useParams, useNavigate } from 'react-router'
 import { useMemo } from 'react'
+import { IoArrowBackSharp, IoSettingsSharp } from 'react-icons/io5'
 
 // Main page tabs
 const MAIN_TABS = [
@@ -68,10 +69,11 @@ export default function HeaderLayout() {
 
   const { data: poolsDetails } = usePoolDetails(memoizedPoolId)
   const shareClasses = poolsDetails?.shareClasses.map((shareClass) => shareClass.details.symbol)
+  const poolName = poolsDetails?.metadata?.pool?.name ?? 'Pool'
 
   const tabs = getTabsForRoute(location.pathname, poolId, shareClasses)
-
   const activeTab = tabs.find((tab) => location.pathname === tab.path)
+  const isHomepage = location.pathname === '/'
 
   const handleTabChange = (details: { value: string }) => {
     navigate(details.value)
@@ -81,11 +83,27 @@ export default function HeaderLayout() {
     <Stack>
       <Box backgroundColor="text-primary" w="100%">
         <Container maxW="container.xl">
-          <Box display="flex" justifyContent="space-between" alignItems="center">
-            <LogoCentrifugeText size={24} fill="white" />
-            <WalletButton colorPalette={['gray', 'gray']} variant={['outline', 'outline']} />
-          </Box>
-          <Box>
+          <Stack gap={4}>
+            <Flex justifyContent="space-between" alignItems="center">
+              <LogoCentrifugeText size={24} fill="white" />
+              <WalletButton colorPalette={['gray', 'gray']} variant={['outline', 'outline']} />
+            </Flex>
+
+            {!isHomepage && (
+              <Flex justifyContent="space-between" alignItems="center">
+                <IconButton onClick={() => navigate(-1)} aria-label="go back" rounded="full">
+                  <IoArrowBackSharp />
+                </IconButton>
+                <Heading size="xl" color="white">
+                  {poolName}
+                </Heading>
+                <Button colorPalette="gray" variant="subtle">
+                  <IoSettingsSharp />
+                  <Text>Settings</Text>
+                </Button>
+              </Flex>
+            )}
+
             <Tabs.Root
               value={activeTab?.path || tabs[0]?.path}
               onValueChange={handleTabChange}
@@ -100,9 +118,10 @@ export default function HeaderLayout() {
                 ))}
               </Tabs.List>
             </Tabs.Root>
-          </Box>
+          </Stack>
         </Container>
       </Box>
+
       <Container maxW="container.xl">
         <Outlet />
       </Container>
