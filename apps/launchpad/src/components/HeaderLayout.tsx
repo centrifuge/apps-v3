@@ -1,7 +1,7 @@
 import { LogoCentrifugeText } from '@centrifuge/ui'
 import { WalletButton } from '@centrifuge/wallet'
 import { Box, Container, Stack, Tabs } from '@chakra-ui/react'
-import { Outlet, useLocation } from 'react-router'
+import { Link, Outlet, useLocation } from 'react-router'
 
 const TABS = [
   {
@@ -31,9 +31,11 @@ export default function HeaderLayout() {
             <Tabs.Root lazyMount unmountOnExit defaultValue={tabs[0].path} colorPalette="yellow" maxW="fit-content">
               <Tabs.List>
                 {tabs.map((tab) => (
-                  <Tabs.Trigger value={tab.path} color="white" key={tab.path}>
-                    {tab.label}
-                  </Tabs.Trigger>
+                  <Link key={tab.path} to={tab.path}>
+                    <Tabs.Trigger value={tab.path} color="white" key={tab.path}>
+                      {tab.label}
+                    </Tabs.Trigger>
+                  </Link>
                 ))}
               </Tabs.List>
             </Tabs.Root>
