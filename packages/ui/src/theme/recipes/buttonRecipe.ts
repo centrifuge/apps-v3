@@ -26,7 +26,7 @@ export const buttonRecipe = defineRecipe({
     variant: {
       subtle: {
         background: 'gray.100',
-        color: 'gray.800',
+        color: 'text-inverted',
         fontSize: 'xs',
         fontWeight: 600,
       },

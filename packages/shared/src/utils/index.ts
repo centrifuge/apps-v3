@@ -7,3 +7,4 @@ export {
   formatPercentage,
   truncateAddress,
 } from './formatting'
+export { networkToName } from './networkToName'
