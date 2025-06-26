@@ -1,11 +1,9 @@
-import { PoolId } from '@centrifuge/sdk'
-import { usePoolDetails } from '@centrifuge/shared'
 import { LogoCentrifugeText } from '@centrifuge/ui'
 import { WalletButton } from '@centrifuge/wallet'
 import { Box, Container, Stack, Tabs, Button, Heading, IconButton, Text, Flex } from '@chakra-ui/react'
 import { Outlet, useLocation, useParams, useNavigate } from 'react-router'
-import { useMemo } from 'react'
 import { IoArrowBackSharp, IoSettingsSharp } from 'react-icons/io5'
+import { usePoolProvider } from '@contexts/PoolProvider'
 
 // Main page tabs
 const MAIN_TABS = [
@@ -40,12 +38,15 @@ const getOrdersTabs = (accountId: string) => [
 ]
 
 // Account page tabs
-const getAccountTabs = (accountId: string, labels: string[]) => [
-  ...labels.map((label) => ({
+const getAccountTabs = (accountId: string, labels: string[]) => {
+  if (labels.length === 0) {
+    return []
+  }
+  return labels.map((label) => ({
     label,
     path: `/account/${accountId}/${label}`,
-  })),
-]
+  }))
+}
 
 function getTabsForRoute(pathname: string, accountId?: string, labels?: string[]) {
   if (pathname.includes('/orders/') && accountId) {
@@ -59,21 +60,18 @@ function getTabsForRoute(pathname: string, accountId?: string, labels?: string[]
 
 export default function HeaderLayout() {
   const location = useLocation()
-  const params = useParams()
   const navigate = useNavigate()
+  const params = useParams()
   const poolId = params.poolId
+  const { poolDetails, shareClass: shareClasses } = usePoolProvider()
 
-  const memoizedPoolId = useMemo(() => {
-    return poolId ? new PoolId(poolId) : undefined
-  }, [poolId])
-
-  const { data: poolsDetails } = usePoolDetails(memoizedPoolId)
-  const shareClasses = poolsDetails?.shareClasses.map((shareClass) => shareClass.details.symbol)
-  const poolName = poolsDetails?.metadata?.pool?.name ?? 'Pool'
+  const poolName = poolDetails?.metadata?.pool?.name ?? 'Pool'
 
   const tabs = getTabsForRoute(location.pathname, poolId, shareClasses)
   const activeTab = tabs.find((tab) => location.pathname === tab.path)
   const showPoolName = location.pathname !== '/' && location.pathname !== '/investors'
+
+  console.log(tabs)
 
   const handleTabChange = (details: { value: string }) => {
     navigate(details.value)
