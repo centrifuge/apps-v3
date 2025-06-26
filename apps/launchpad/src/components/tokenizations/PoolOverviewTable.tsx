@@ -1,9 +1,10 @@
-import { useAllPoolDetails } from '@centrifuge/shared'
-import { Flex, Heading, Image, Stack, Text } from '@chakra-ui/react'
-import DataTable, { ColumnDefinition } from './DataTable'
-import { ipfsToHttp } from '@centrifuge/shared/src/utils/formatting'
+import { Link } from 'react-router'
+import { Button, Flex, Heading, Image, Stack, Text } from '@chakra-ui/react'
 import { Balance } from '@centrifuge/sdk'
+import { useAllPoolDetails } from '@centrifuge/shared'
+import { ipfsToHttp } from '@centrifuge/shared/src/utils/formatting'
 import { BalanceDisplay, NetworkIcon } from '@centrifuge/ui'
+import DataTable, { ColumnDefinition } from './DataTable'
 
 type Row = {
   id: string
@@ -55,6 +56,20 @@ const columns: ColumnDefinition<Row>[] = [
     header: 'Token Price',
     accessor: 'tokenPrice',
     render: ({ tokenPrice }) => <BalanceDisplay balance={tokenPrice} />,
+  },
+  {
+    header: '',
+    accessor: '',
+    render: ({ id }) => {
+      const navId = id.split('-')[0]
+      return (
+        <Link to={`/account/${navId}`}>
+          <Button colorPalette="gray" size="xs">
+            Accounts
+          </Button>
+        </Link>
+      )
+    },
   },
 ]
 
