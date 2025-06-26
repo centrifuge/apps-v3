@@ -5,7 +5,6 @@ export default function Tokenizations() {
   return (
     <Stack>
       <PoolOverviewTable />
-      <p>aaa</p>
     </Stack>
   )
 }

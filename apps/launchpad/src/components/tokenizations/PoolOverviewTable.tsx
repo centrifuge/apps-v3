@@ -1,5 +1,5 @@
 import { useAllPoolDetails } from '@centrifuge/shared'
-import { Flex, Heading, Image, Stack } from '@chakra-ui/react'
+import { Flex, Heading, Image, Stack, Text } from '@chakra-ui/react'
 import DataTable, { ColumnDefinition } from './DataTable'
 import { ipfsToHttp } from '@centrifuge/shared/src/utils/formatting'
 import { Balance } from '@centrifuge/sdk'
@@ -8,10 +8,10 @@ import { BalanceDisplay, NetworkIcon } from '@centrifuge/ui'
 type Row = {
   id: string
   poolName: string
-  iconUri: string
+  iconUri?: string
   token: string
   networks: number
-  apy: string
+  apy: number
   nav: Balance
   tokenPrice: Balance
 }
@@ -36,15 +36,19 @@ const columns: ColumnDefinition<Row>[] = [
   {
     header: 'Networks',
     accessor: 'networks',
-    render: () => <NetworkIcon network="ethereum" />,
+    textAlign: 'center',
+    render: ({ networks }) => <NetworkIcon networkId={networks} width="100%" />,
   },
   {
     header: 'APY',
     accessor: 'apy',
+    textAlign: 'center',
+    render: ({ apy }) => <Text>{apy.toString()}</Text>,
   },
   {
     header: 'Nav',
     accessor: 'nav',
+    textAlign: 'center',
     render: ({ nav }) => <BalanceDisplay balance={nav} />,
   },
   {
@@ -60,14 +64,16 @@ export const PoolOverviewTable = () => {
   const data =
     pools?.map((pool) => {
       const shareClassDetails = Object.values(pool.shareClasses)
+      const metaShareClassKeys = pool.metadata?.shareClasses ? Object.keys(pool.metadata?.shareClasses) : []
+      const apy = pool.metadata?.shareClasses[metaShareClassKeys[0]].apyPercentage ?? 0
+
       return {
-        // currency: pool.currency,
         id: pool.id,
         name: pool.metadata?.pool.name ?? 'RWA Portfolio',
         icon: pool.metadata?.pool.icon,
         shareClasses: shareClassDetails.map((sc) => ({
           token: sc.details.symbol,
-          apy: pool.metadata?.shareClasses?.apy ?? '-',
+          apy,
           tokenPrice: sc.details.navPerShare,
           totalIssuance: sc.details.totalIssuance,
           networks: sc.shareClass.pool.chainId,
@@ -77,7 +83,6 @@ export const PoolOverviewTable = () => {
 
   const flattenedData = data.flatMap((d) =>
     d.shareClasses.map((sc) => ({
-      // currency: d.currency,
       id: `${d.id}-${sc.token}`,
       poolName: d.name,
       iconUri: d.icon?.uri,
