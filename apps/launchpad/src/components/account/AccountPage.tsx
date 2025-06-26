@@ -50,10 +50,6 @@ export function AccountPage({
     [allInvestments]
   )
 
-  console.log('vault details', vaultsDetails)
-  console.log('all investments', allInvestments)
-  console.log('share class', shareClass)
-
   return (
     <Box mb={8}>
       <Grid templateColumns="repeat(2, 1fr)" gap={4} mt={4}>
