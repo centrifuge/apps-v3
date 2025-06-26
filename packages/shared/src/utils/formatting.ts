@@ -64,7 +64,6 @@ export function formatBalance(
   } else if (amount instanceof Decimal) {
     val = amount
   } else {
-    console.warn('Unsupported amount type provided to formatBalance. Defaulting to 0.', amount)
     val = new Decimal(0)
   }
 
