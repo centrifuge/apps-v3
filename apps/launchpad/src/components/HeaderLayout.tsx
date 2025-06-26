@@ -73,7 +73,7 @@ export default function HeaderLayout() {
 
   const tabs = getTabsForRoute(location.pathname, poolId, shareClasses)
   const activeTab = tabs.find((tab) => location.pathname === tab.path)
-  const isHomepage = location.pathname === '/'
+  const showPoolName = location.pathname !== '/' && location.pathname !== '/investors'
 
   const handleTabChange = (details: { value: string }) => {
     navigate(details.value)
@@ -89,7 +89,7 @@ export default function HeaderLayout() {
               <WalletButton colorPalette={['gray', 'gray']} variant={['outline', 'outline']} />
             </Flex>
 
-            {!isHomepage && (
+            {showPoolName && (
               <Flex justifyContent="space-between" alignItems="center">
                 <IconButton onClick={() => navigate(-1)} aria-label="go back" rounded="full">
                   <IoArrowBackSharp />
