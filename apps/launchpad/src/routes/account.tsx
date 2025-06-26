@@ -5,16 +5,17 @@ import { PoolId } from '@centrifuge/sdk'
 import { Button } from '@centrifuge/ui'
 import { AccountPage } from '@components/account/AccountPage'
 import { useMemo } from 'react'
-
-// TODO: Update ID once we hook the nav
-const ID = '281474976710657'
+import { useParams } from 'react-router'
 
 // TODO: FOR MVP, we are assuming one share class per pool
+// Routing must be fix to handle multiple share classes per pool
 export default function Account() {
+  const poolId = useParams().id
   const connectedChainId = useChainId()
-  const { data: poolDetails } = usePoolDetails(new PoolId(ID))
+  const { data: poolDetails } = usePoolDetails(new PoolId(poolId ?? ''))
   const { data: networks } = usePoolNetworks(poolDetails?.id)
   const network = networks?.find((n) => n.chainId === connectedChainId)
+  // TODO: For MVP, we are assuming one share class per pool
   const shareClass = poolDetails?.shareClasses?.[0]
   const scId = shareClass?.details.id
   const { data: vaults } = useVaults(network, scId)
@@ -34,6 +35,7 @@ export default function Account() {
             {totalNav?.toString() ?? '0'} {shareClass?.details.symbol}
           </Heading>
         </Stack>
+
         <Button label="Update NAV" onClick={() => {}} size="sm" width="150px" />
       </Flex>
       {shareClass && (

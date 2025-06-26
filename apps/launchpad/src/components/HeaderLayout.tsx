@@ -1,24 +1,78 @@
+import { PoolId } from '@centrifuge/sdk'
+import { useAllPoolDetails, usePoolDetails } from '@centrifuge/shared'
 import { LogoCentrifugeText } from '@centrifuge/ui'
 import { WalletButton } from '@centrifuge/wallet'
 import { Box, Container, Stack, Tabs } from '@chakra-ui/react'
-import { Outlet, useLocation } from 'react-router'
+import { Outlet, useLocation, useParams, useNavigate } from 'react-router'
 
-const TABS = [
+// Main page tabs
+const MAIN_TABS = [
   {
     label: 'Tokenizations',
-    belongsTo: '/',
     path: '/',
   },
   {
     label: 'Investors',
-    belongsTo: '/',
     path: '/investors',
   },
 ]
 
+// Orders page tabs
+const getOrdersTabs = (accountId: string) => [
+  {
+    label: 'Approve investments',
+    path: `/orders/${accountId}/approve`,
+  },
+  {
+    label: 'Issue shares',
+    path: `/orders/${accountId}/issue`,
+  },
+  {
+    label: 'Approve Redemptions',
+    path: `/orders/${accountId}/approveRedeem`,
+  },
+  {
+    label: 'Revoke shares',
+    path: `/orders/${accountId}/revokeRedeem`,
+  },
+]
+
+// Account page tabs
+const getAccountTabs = (accountId: string, labels: string[]) => [
+  ...labels.map((label) => ({
+    label,
+    path: `/account/${accountId}/${label}`,
+  })),
+]
+
+function getTabsForRoute(pathname: string, accountId?: string, labels?: string[]) {
+  if (pathname.includes('/orders/') && accountId) {
+    return getOrdersTabs(accountId)
+  }
+  if (pathname.startsWith('/account') && accountId) {
+    return getAccountTabs(accountId, labels ?? [])
+  }
+  return MAIN_TABS
+}
+
 export default function HeaderLayout() {
   const location = useLocation()
-  const tabs = TABS.filter((tab) => location.pathname.startsWith(tab.belongsTo))
+  const params = useParams()
+  const navigate = useNavigate()
+  const poolId = params.id
+
+  const { data: poolsDetails } = usePoolDetails(new PoolId(poolId ?? ''))
+  const shareClasses = poolsDetails?.shareClasses.map((shareClass) => shareClass.details.symbol)
+
+  const tabs = getTabsForRoute(location.pathname, poolId, shareClasses)
+
+  // Find the active tab based on current path
+  const activeTab = tabs.find((tab) => location.pathname === tab.path)
+
+  const handleTabChange = (details: { value: string }) => {
+    navigate(details.value)
+  }
+
   return (
     <Stack>
       <Box backgroundColor="text-primary" w="100%">
@@ -28,7 +82,12 @@ export default function HeaderLayout() {
             <WalletButton colorPalette={['gray', 'gray']} variant={['outline', 'outline']} />
           </Box>
           <Box>
-            <Tabs.Root lazyMount unmountOnExit defaultValue={tabs[0].path} colorPalette="yellow" maxW="fit-content">
+            <Tabs.Root
+              value={activeTab?.path || tabs[0]?.path}
+              onValueChange={handleTabChange}
+              colorPalette="yellow"
+              maxW="fit-content"
+            >
               <Tabs.List>
                 {tabs.map((tab) => (
                   <Tabs.Trigger value={tab.path} color="white" key={tab.path}>
