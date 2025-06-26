@@ -6,7 +6,8 @@ import { Button } from '@centrifuge/ui'
 import { AccountPage } from '@components/account/AccountPage'
 import { useMemo } from 'react'
 
-const ID = '281474976710658'
+// TODO: Update ID once we hook the nav
+const ID = '281474976710657'
 
 // TODO: FOR MVP, we are assuming one share class per pool
 export default function Account() {
