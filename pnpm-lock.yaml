@@ -221,7 +221,11 @@ importers:
 
   packages/shared: {}
 
-  packages/ui: {}
+  packages/ui:
+    dependencies:
+      '@centrifuge/shared':
+        specifier: workspace:*
+        version: link:../shared
 
   packages/wallet:
     dependencies:

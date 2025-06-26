@@ -2,17 +2,12 @@ import { Dispatch, SetStateAction, useEffect, useMemo } from 'react'
 import { Badge, Box, Flex, Text } from '@chakra-ui/react'
 import { BalanceInput, SubmitButton, useFormContext } from '@centrifuge/forms'
 import { Balance } from '@centrifuge/sdk'
-import {
-  usePortfolio,
-  formatBalance,
-  formatBalanceToString,
-  formatDivideBigInts,
-  usePoolDetails,
-} from '@centrifuge/shared'
+import { usePortfolio, formatBalance, formatBalanceToString, usePoolDetails } from '@centrifuge/shared'
 import { InfoWrapper } from '@components/InvestRedeemSection/components/InfoWrapper'
 import { infoText } from '@utils/infoText'
 import { VaultDetails } from '@utils/types'
 import { useSelectedPoolContext } from '@contexts/useSelectedPoolContext'
+import { divideBigInts } from '@centrifuge/shared/src/utils/formatting'
 
 interface RedeemAmountProps {
   isDisabled: boolean
@@ -54,11 +49,8 @@ export function RedeemAmount({ isDisabled, parsedAmount, vaultDetails, currencie
     const redeemAmount = parsedAmount.toBigInt()
     const navPerShareAmount = navPerShare.toBigInt()
 
-    const receiveAmount = formatDivideBigInts(
-      redeemAmount,
-      navPerShareAmount,
-      redeemAmountDecimals,
-      portfolioInvestmentCurrency?.decimals
+    const receiveAmount = divideBigInts(redeemAmount, navPerShareAmount, redeemAmountDecimals).formatToString(
+      portfolioInvestmentCurrency?.decimals ?? 6
     )
 
     setValue('amountToReceive', receiveAmount)

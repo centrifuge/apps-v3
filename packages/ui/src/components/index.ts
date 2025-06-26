@@ -1,4 +1,5 @@
 export * from './LogoCentrifuge'
+export * from './BalanceDisplay'
 export * from './Button'
 export * from './Card'
 export * from './NetworkIcon'

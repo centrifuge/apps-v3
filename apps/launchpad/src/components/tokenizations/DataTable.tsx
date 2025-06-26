@@ -35,9 +35,14 @@ const DataTable = <RowType extends { id?: string | number }>({
       }}
     >
       <Table.Header>
-        <Table.Row style={{ backgroundColor: TABLE_HEADER_COLOR }}>
+        <Table.Row backgroundColor={TABLE_HEADER_COLOR}>
           {columns.map((col) => (
-            <Table.ColumnHeader key={String(col.accessor)} textAlign={col.textAlign ?? 'start'}>
+            <Table.ColumnHeader
+              key={String(col.accessor)}
+              textAlign={col.textAlign ?? 'start'}
+              color="gray.500"
+              fontSize="xs"
+            >
               {col.header}
             </Table.ColumnHeader>
           ))}
