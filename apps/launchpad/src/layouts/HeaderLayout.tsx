@@ -8,7 +8,6 @@ import { useMemo } from 'react'
 import { IoArrowBackSharp, IoSettingsSharp } from 'react-icons/io5'
 
 interface HeaderLayoutHandle {
-  title?: string
   hasSettings?: boolean
   hasTabs?: boolean
 }
@@ -75,7 +74,6 @@ export default function HeaderLayout() {
   const currentHandle = currentRoute?.handle as HeaderLayoutHandle
   const hasSettings = currentHandle ? currentHandle.hasSettings : true
   const hasTabs = currentHandle ? currentHandle.hasTabs : true
-  const title = currentHandle ? currentHandle.title : undefined
 
   const memoizedPoolId = useMemo(() => {
     return poolId ? new PoolId(poolId) : undefined
@@ -117,7 +115,7 @@ export default function HeaderLayout() {
                   textAlign={!hasSettings ? 'center' : 'inherit'}
                   mr={!hasSettings ? '110px' : '0'}
                 >
-                  {title || poolName}
+                  {poolName}
                 </Heading>
                 {hasSettings ? (
                   <Button colorPalette="gray" variant="subtle">
