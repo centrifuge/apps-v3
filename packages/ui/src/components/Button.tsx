@@ -1,5 +1,8 @@
-import { Button as ChakraButton } from '@chakra-ui/react'
-import { ButtonColorPalette, ButtonVariant } from '../types/Button'
+import { Button as ChakraButton, type ButtonProps as ChakraButtonProps } from '@chakra-ui/react'
+
+interface ButtonProps extends ChakraButtonProps {
+  label: string
+}
 
 export const Button = ({
   colorPalette = 'yellow',
@@ -8,13 +11,7 @@ export const Button = ({
   onClick,
   variant = 'solid',
   ...props
-}: {
-  colorPalette?: ButtonColorPalette
-  disabled?: boolean
-  label: string
-  onClick: () => void
-  variant?: ButtonVariant
-}) => {
+}: ButtonProps) => {
   return (
     <ChakraButton
       colorPalette={colorPalette}
