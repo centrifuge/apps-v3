@@ -1,7 +1,7 @@
 import { type RouteConfig, layout, index, route } from '@react-router/dev/routes'
 
 export default [
-  layout('./components/HeaderLayout.tsx', [
+  layout('./layouts/HeaderLayout.tsx', [
     index('./routes/index.tsx'),
 
     // Investors page
@@ -9,6 +9,9 @@ export default [
 
     // Account page
     route('/account/:poolId', './routes/account.tsx'),
+
+    // Nav Page
+    route('/nav/:shareClassId', './routes/nav.tsx'),
 
     // Orders page
     route('/orders/:poolId/approve', './routes/orders/approve.tsx'),

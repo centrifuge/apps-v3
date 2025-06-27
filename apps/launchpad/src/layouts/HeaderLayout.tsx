@@ -3,9 +3,15 @@ import { usePoolDetails } from '@centrifuge/shared'
 import { LogoCentrifugeText } from '@centrifuge/ui'
 import { WalletButton } from '@centrifuge/wallet'
 import { Box, Container, Stack, Tabs, Button, Heading, IconButton, Text, Flex } from '@chakra-ui/react'
-import { Outlet, useLocation, useParams, useNavigate } from 'react-router'
+import { Outlet, useLocation, useMatches, useParams, useNavigate } from 'react-router'
 import { useMemo } from 'react'
 import { IoArrowBackSharp, IoSettingsSharp } from 'react-icons/io5'
+
+interface HeaderLayoutHandle {
+  title?: string
+  hasSettings?: boolean
+  hasTabs?: boolean
+}
 
 // Main page tabs
 const MAIN_TABS = [
@@ -63,6 +69,14 @@ export default function HeaderLayout() {
   const navigate = useNavigate()
   const poolId = params.poolId
 
+  // Use page component handle functions for header settings
+  const matches = useMatches()
+  const currentRoute = matches[matches.length - 1]
+  const currentHandle = currentRoute?.handle as HeaderLayoutHandle
+  const hasSettings = currentHandle ? currentHandle.hasSettings : true
+  const hasTabs = currentHandle ? currentHandle.hasTabs : true
+  const title = currentHandle ? currentHandle.title : undefined
+
   const memoizedPoolId = useMemo(() => {
     return poolId ? new PoolId(poolId) : undefined
   }, [poolId])
@@ -70,6 +84,8 @@ export default function HeaderLayout() {
   const { data: poolsDetails } = usePoolDetails(memoizedPoolId)
   const shareClasses = poolsDetails?.shareClasses.map((shareClass) => shareClass.details.symbol)
   const poolName = poolsDetails?.metadata?.pool?.name ?? 'Pool'
+
+  console.log({ poolsDetails, currentHandle })
 
   const tabs = getTabsForRoute(location.pathname, poolId, shareClasses)
   const activeTab = tabs.find((tab) => location.pathname === tab.path)
@@ -90,34 +106,44 @@ export default function HeaderLayout() {
             </Flex>
 
             {showPoolName && (
-              <Flex justifyContent="space-between" alignItems="center">
+              <Flex justifyContent={hasSettings ? 'space-between' : ''} alignItems="center" mb={!hasSettings ? 8 : 0}>
                 <IconButton onClick={() => navigate(-1)} aria-label="go back" rounded="full">
                   <IoArrowBackSharp />
                 </IconButton>
-                <Heading size="xl" color="white">
-                  {poolName}
+                <Heading
+                  size="xl"
+                  color="white"
+                  width={hasSettings ? 'auto' : '100%'}
+                  textAlign={!hasSettings ? 'center' : 'inherit'}
+                  mr={!hasSettings ? '110px' : '0'}
+                >
+                  {title || poolName}
                 </Heading>
-                <Button colorPalette="gray" variant="subtle">
-                  <IoSettingsSharp />
-                  <Text>Settings</Text>
-                </Button>
+                {hasSettings ? (
+                  <Button colorPalette="gray" variant="subtle">
+                    <IoSettingsSharp />
+                    <Text>Settings</Text>
+                  </Button>
+                ) : null}
               </Flex>
             )}
 
-            <Tabs.Root
-              value={activeTab?.path || tabs[0]?.path}
-              onValueChange={handleTabChange}
-              colorPalette="yellow"
-              maxW="fit-content"
-            >
-              <Tabs.List>
-                {tabs.map((tab) => (
-                  <Tabs.Trigger value={tab.path} color="white" key={tab.path}>
-                    {tab.label}
-                  </Tabs.Trigger>
-                ))}
-              </Tabs.List>
-            </Tabs.Root>
+            {hasTabs ? (
+              <Tabs.Root
+                value={activeTab?.path || tabs[0]?.path}
+                onValueChange={handleTabChange}
+                colorPalette="yellow"
+                maxW="fit-content"
+              >
+                <Tabs.List>
+                  {tabs.map((tab) => (
+                    <Tabs.Trigger value={tab.path} color="white" key={tab.path}>
+                      {tab.label}
+                    </Tabs.Trigger>
+                  ))}
+                </Tabs.List>
+              </Tabs.Root>
+            ) : null}
           </Stack>
         </Container>
       </Box>
