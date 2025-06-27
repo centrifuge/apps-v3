@@ -13,6 +13,7 @@ import {
   Field,
   Input as ChakraInput,
   InputGroup,
+  NativeSelect,
 } from '@chakra-ui/react'
 import { useGetFormError } from '../hooks/useGetFormError'
 import { Balance } from '@centrifuge/sdk'
@@ -29,6 +30,31 @@ export interface BalanceInputProps<TFieldValues extends FieldValues = FieldValue
   onChange?: (value: string, balance?: Balance) => void
   onBlur?: React.FocusEventHandler<HTMLInputElement>
   inputGroupProps?: Omit<InputGroupProps, 'children'>
+  selectOptions?: { label: string; value: string }[]
+  onSelectChange?: (value: string) => void
+}
+
+const CurrencySelect = ({
+  options,
+  onChange,
+}: {
+  options: { label: string; value: string }[]
+  onChange: (value: string) => void
+}) => {
+  if (options.length === 0) return null
+
+  return (
+    <NativeSelect.Root size="xs" variant="plain" width="auto" me="-1">
+      <NativeSelect.Field fontSize="sm" onChange={(e) => onChange(e.target.value)}>
+        {options.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </NativeSelect.Field>
+      <NativeSelect.Indicator />
+    </NativeSelect.Root>
+  )
 }
 
 export function BalanceInput<TFieldValues extends FieldValues = FieldValues>(props: BalanceInputProps<TFieldValues>) {
@@ -41,7 +67,8 @@ export function BalanceInput<TFieldValues extends FieldValues = FieldValues>(pro
     onBlur,
     decimals = 6,
     displayDecimals,
-    label,
+    selectOptions,
+    onSelectChange,
     ...rest
   } = props
   const currentDisplayDecimals = displayDecimals || decimals
@@ -58,17 +85,6 @@ export function BalanceInput<TFieldValues extends FieldValues = FieldValues>(pro
     rules,
   })
 
-  // Helper function to limit decimal places in string
-  const limitDecimals = (value: string, maxDecimals: number): string => {
-    if (!value || value === '' || value === '.') return value
-
-    const parts = value.split('.')
-    if (parts.length <= 1) return value
-
-    const limitedDecimalPart = parts[1].slice(0, maxDecimals)
-    return `${parts[0]}.${limitedDecimalPart}`
-  }
-
   // Convert field value to display string
   const getDisplayValue = (value: Balance | number | string): string => {
     let displayValue = ''
@@ -81,7 +97,7 @@ export function BalanceInput<TFieldValues extends FieldValues = FieldValues>(pro
       displayValue = value
     }
 
-    return limitDecimals(displayValue, currentDisplayDecimals)
+    return displayValue
   }
 
   const mergedOnChange = (e: ReactChangeEvent<HTMLInputElement>) => {
@@ -89,11 +105,6 @@ export function BalanceInput<TFieldValues extends FieldValues = FieldValues>(pro
 
     // Prevent invalid input patterns
     if (value === '' || value === '.' || /^\d*\.?\d*$/.test(value)) {
-      // Limit decimal places in real-time
-      value = limitDecimals(value, currentDisplayDecimals)
-
-      e.target.value = value
-
       field.onChange(value)
 
       if (onChange) {
@@ -139,9 +150,8 @@ export function BalanceInput<TFieldValues extends FieldValues = FieldValues>(pro
     const numericValue = pastedText.replace(/[^0-9.]/g, '')
 
     if (/^\d*\.?\d*$/.test(numericValue)) {
-      const limitedValue = limitDecimals(numericValue, currentDisplayDecimals)
       const syntheticEvent = {
-        target: { value: limitedValue },
+        target: { value: numericValue },
       } as React.ChangeEvent<HTMLInputElement>
       mergedOnChange(syntheticEvent)
     }
@@ -190,8 +200,10 @@ export function BalanceInput<TFieldValues extends FieldValues = FieldValues>(pro
 
   return (
     <Field.Root invalid={isError}>
-      {label ? <Field.Label>{label}</Field.Label> : null}
-      <InputGroup {...inputGroupProps}>
+      <InputGroup
+        {...inputGroupProps}
+        endElement={<CurrencySelect onChange={onSelectChange || (() => {})} options={selectOptions ?? []} />}
+      >
         <ChakraInput
           {...rest}
           id={name}

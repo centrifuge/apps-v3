@@ -2,14 +2,14 @@ import { useEffect, useState, type ComponentType, type Dispatch } from 'react'
 import { useChainId } from 'wagmi'
 import { Flex, Heading, Stack, Text } from '@chakra-ui/react'
 import type { Vault } from '@centrifuge/sdk'
-import { usePoolNetworks, useVaults } from '@centrifuge/shared'
+import { usePoolNetworks, useVaults, useVaultsDetails } from '@centrifuge/shared'
 import { useGeolocation } from '@hooks/useGeolocation'
 import { ConnectionGuard } from '@components/ConnectionGuard'
 import { Tabs } from '@components/Tabs'
 import { InfoWrapper } from '@components/InvestRedeemSection/components/InfoWrapper'
 import InvestTab from '@components/InvestRedeemSection/InvestTab/InvestTab'
 import RedeemTab from '@components/InvestRedeemSection/RedeemTab/RedeemTab'
-import type { PoolDetails } from '@utils/types'
+import type { PoolDetails, VaultDetails } from '@utils/types'
 
 const RestrictedCountry = () => {
   return (
