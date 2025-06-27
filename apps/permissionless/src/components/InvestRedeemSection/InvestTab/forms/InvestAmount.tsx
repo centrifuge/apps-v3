@@ -1,8 +1,8 @@
 import { useEffect, useMemo, type Dispatch, type SetStateAction } from 'react'
 import { Badge, Box, Button, Flex, Text } from '@chakra-ui/react'
 import { BalanceInput, useFormContext } from '@centrifuge/forms'
-import { Balance } from '@centrifuge/sdk'
-import { formatBalanceAbbreviated, usePortfolio, usePoolDetails } from '@centrifuge/shared'
+import { Balance, Vault } from '@centrifuge/sdk'
+import { formatBalanceAbbreviated, usePortfolio, usePoolDetails, useVaultsDetails } from '@centrifuge/shared'
 import { NetworkIcons, type Network } from '@centrifuge/ui'
 import { useSelectedPoolContext } from '@contexts/useSelectedPoolContext'
 import { infoText } from '@utils/infoText'
@@ -20,6 +20,8 @@ interface InvestAmountProps {
   currencies: { investCurrency: string; receiveCurrency: string }
   setCurrencies: Dispatch<SetStateAction<{ investCurrency: string; receiveCurrency: string }>>
   setActionType: Dispatch<SetStateAction<InvestActionType>>
+  setVault: Dispatch<Vault>
+  vaults: Vault[]
 }
 
 export function InvestAmount({
@@ -29,16 +31,26 @@ export function InvestAmount({
   currencies,
   setCurrencies,
   setActionType,
+  setVault,
+  vaults,
 }: InvestAmountProps) {
+  const { data: vaultsDetails } = useVaultsDetails(vaults)
   const { data: portfolio } = usePortfolio()
   const { selectedPoolId } = useSelectedPoolContext()
   const { data: pool } = usePoolDetails(selectedPoolId)
   const { setValue } = useFormContext()
 
+  const investmentCurrencies = vaultsDetails?.map((vault) => ({
+    label: vault.investmentCurrency.symbol,
+    value: vault.investmentCurrency.symbol,
+  }))
+
+  // TODO: change vault
+  const changeVault = (value: string) => {
+    console.log('changeVault', value)
+  }
+
   const investmentCurrencyChainId = vaultDetails?.investmentCurrency?.chainId
-  const minAmount = pool?.metadata?.shareClasses
-    ? (Object.values(pool?.metadata?.shareClasses || {})[0].minInitialInvestment ?? 0)
-    : 0
 
   // Get user investment asset info
   const portfolioInvestmentAsset = portfolio?.find((asset) => asset.currency.chainId === investmentCurrencyChainId)
@@ -53,7 +65,7 @@ export function InvestAmount({
 
   // Check if the user has the necessary investment currency to invest
   const hasInvestmentCurrency = portfolioCurrency?.chainId === vaultDetails?.investmentCurrency?.chainId
-  const hasNoInvestmentCurrency = !hasInvestmentCurrency || portfolioBalance?.isZero
+  const hasNoInvestmentCurrency = !hasInvestmentCurrency || portfolioBalance?.isZero()
   const infoLabel = hasNoInvestmentCurrency ? infoText().portfolioMissingInvestmentCurrency : infoText().redeem
 
   // Calculate and update amount to receive based on user input on amount to invest
@@ -79,18 +91,13 @@ export function InvestAmount({
     <Box>
       <Flex justify="space-between" mb={2}>
         <Text fontWeight={500}>You pay</Text>
-        <Text opacity={0.5} alignSelf="flex-end">
-          (min: {formatBalanceAbbreviated(minAmount, 2, pool?.currency.symbol)})
-        </Text>
       </Flex>
       <BalanceInput
         name="amount"
         decimals={portfolioCurrency?.decimals}
         placeholder="0.00"
-        // disabled={!hasInvestmentCurrency}
-        inputGroupProps={{
-          endAddon: currencies.investCurrency,
-        }}
+        selectOptions={investmentCurrencies}
+        onSelectChange={(e: string) => changeVault(e)}
       />
       <Flex mt={2} justify="space-between">
         <Flex>
@@ -101,7 +108,7 @@ export function InvestAmount({
             borderRadius={10}
             px={3}
             h="24px"
-            onClick={() => setValue('amount', formatBalanceToString(defaultBalance, portfolioCurrency?.decimals ?? 6))}
+            onClick={() => setValue('amount', defaultBalance)}
             borderColor="gray.500 !important"
             border="1px solid"
             cursor="pointer"
@@ -112,7 +119,7 @@ export function InvestAmount({
             {formatBalance(defaultBalance, portfolioCurrency?.symbol)}
           </Text>
         </Flex>
-        <NetworkIcons networks={networks} />
+        {/* <NetworkIcons networks={networks} /> */}
       </Flex>
       {parsedAmount !== 0 && (
         <>

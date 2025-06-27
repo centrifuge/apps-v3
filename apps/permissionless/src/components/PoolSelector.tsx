@@ -25,11 +25,11 @@ export const PoolSelector = () => {
         }
       }}
       bg="bg-tertiary"
-      padding={2}
       borderRadius="10px"
+      size="sm"
     >
       <SegmentGroup.Indicator bg="text-inverted" />
-      <SegmentGroup.Items w="full" borderRadius="10px" border="none" items={displayPools?.map((pool) => pool.label)} />
+      <SegmentGroup.Items borderRadius="10px" border="none" items={displayPools?.map((pool) => pool.label)} />
     </SegmentGroup.Root>
   )
 }
