@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router'
+import { useNavigate, useParams } from 'react-router'
 import { Box, Flex, Heading, Stack } from '@chakra-ui/react'
 import { Button } from '@centrifuge/ui'
 import { AccountPage } from '@components/account/AccountPage'
@@ -8,6 +8,7 @@ import { usePoolProvider } from '@contexts/PoolProvider'
 // TODO: FOR MVP, we are assuming one share class per pool
 // Routing must be fix to handle multiple share classes per pool
 export default function Account() {
+  const { poolId } = useParams()
   const { shareClass, vaultsDetails, allInvestments } = usePoolProvider()
   const navigate = useNavigate()
   const shareClassId = shareClass?.shareClass?.id.raw ?? ''
@@ -26,7 +27,7 @@ export default function Account() {
           </Heading>
         </Stack>
 
-        <Button label="Update NAV" onClick={() => navigate(`/nav/${shareClassId}`)} size="sm" width="150px" />
+        <Button label="Update NAV" onClick={() => navigate(`/nav/${shareClassId}/${poolId}`)} size="sm" width="150px" />
       </Flex>
       {shareClass && (
         <AccountPage

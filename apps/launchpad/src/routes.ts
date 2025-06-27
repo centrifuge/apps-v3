@@ -11,7 +11,7 @@ export default [
     route('/account/:poolId', './routes/account.tsx'),
 
     // Nav Page
-    route('/nav/:shareClassId', './routes/nav.tsx'),
+    route('/nav/:shareClassId/:poolId', './routes/nav.tsx'),
 
     // Orders page
     route('/orders/:poolId/approve', './routes/orders/approve.tsx'),
