@@ -9,7 +9,7 @@ export function App() {
 
   return (
     <Box bg="bg-secondary" w="100%" minH="100vh">
-      <Box maxW={{ base: '95vw', xl: '70vw' }} mx="auto" px={{ base: 4, md: 8 }} py={{ base: 4, md: 8 }}>
+      <Box maxW={{ base: '95vw', xl: '80vw' }} mx="auto" px={{ base: 4, md: 8 }} py={{ base: 4, md: 8 }}>
         {isLoading ? (
           <LandingPageSkeleton />
         ) : (

@@ -17,7 +17,7 @@ export const SelectedPoolProvider = ({ children }: { children: React.ReactNode }
 
   useEffect(() => {
     if (pools?.length) {
-      setSelectedPoolId(pools[1].id)
+      setSelectedPoolId(pools[0].id)
     }
   }, [pools])
 

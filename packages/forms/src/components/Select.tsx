@@ -55,7 +55,6 @@ export function Select<TFieldValues extends FieldValues = FieldValues>(props: Cu
         <ChakraSelect.HiddenSelect />
         <ChakraSelect.Control>
           <ChakraSelect.Trigger>
-            {/* @ts-expect-error */}
             <ChakraSelect.ValueText placeholder={label} />
           </ChakraSelect.Trigger>
           <ChakraSelect.IndicatorGroup>
@@ -65,9 +64,7 @@ export function Select<TFieldValues extends FieldValues = FieldValues>(props: Cu
         <Portal>
           <ChakraSelect.Positioner>
             <ChakraSelect.Content>
-              {/* @ts-expect-error */}
               {frameworks.items.map((framework) => (
-                // @ts-expect-error
                 <ChakraSelect.Item item={framework} key={framework.value}>
                   {framework.label}
                   <ChakraSelect.ItemIndicator />

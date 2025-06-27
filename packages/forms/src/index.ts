@@ -3,7 +3,6 @@ export { BalanceInput } from './components/BalanceInput'
 export { Checkbox } from './components/Checkbox'
 export { Form } from './components/Form'
 export { Input } from './components/Input'
-export { Select } from './components/Select'
 export { SubmitButton } from './components/SubmitButton'
 
 // hooks

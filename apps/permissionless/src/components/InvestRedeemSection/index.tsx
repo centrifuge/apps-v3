@@ -23,6 +23,7 @@ const RestrictedCountry = () => {
 export function InvestRedeemSection({ pool: poolDetails }: { pool: PoolDetails }) {
   const { data: location } = useGeolocation()
   const [vault, setVault] = useState<Vault>()
+  const [vaults, setVaults] = useState<Vault[]>()
 
   const kycCountries = poolDetails?.metadata?.onboarding?.kycRestrictedCountries ?? []
   const kybCountries = poolDetails?.metadata?.onboarding?.kybRestrictedCountries ?? []
@@ -48,7 +49,14 @@ export function InvestRedeemSection({ pool: poolDetails }: { pool: PoolDetails }
             body: isRestrictedCountry ? (
               <RestrictedCountry />
             ) : (
-              <VaultGuard pool={poolDetails} tab={InvestTab} vault={vault} setVault={setVault} />
+              <VaultGuard
+                pool={poolDetails}
+                tab={InvestTab}
+                vault={vault}
+                setVault={setVault}
+                vaults={vaults}
+                setVaults={setVaults}
+              />
             ),
           },
           {
@@ -57,7 +65,14 @@ export function InvestRedeemSection({ pool: poolDetails }: { pool: PoolDetails }
             body: isRestrictedCountry ? (
               <RestrictedCountry />
             ) : (
-              <VaultGuard pool={poolDetails} tab={RedeemTab} vault={vault} setVault={setVault} />
+              <VaultGuard
+                pool={poolDetails}
+                tab={RedeemTab}
+                vault={vault}
+                setVault={setVault}
+                vaults={vaults}
+                setVaults={setVaults}
+              />
             ),
           },
         ]}
@@ -71,11 +86,15 @@ function VaultGuard({
   tab: Tab,
   vault,
   setVault,
+  setVaults,
+  vaults,
 }: {
   pool: PoolDetails
-  tab: ComponentType<{ vault: Vault }>
+  tab: ComponentType<{ vault: Vault; setVault: Dispatch<Vault>; vaults: Vault[] }>
   vault?: Vault
   setVault: Dispatch<Vault | undefined>
+  setVaults: Dispatch<Vault[] | undefined>
+  vaults?: Vault[]
 }) {
   const connectedChainId = useChainId()
   // Assuming one share class per pool
@@ -83,13 +102,15 @@ function VaultGuard({
   const { data: networks } = usePoolNetworks(poolDetails.id)
   const chainIds = networks?.map((network) => network.chainId) ?? []
   const network = networks?.find((n) => n.chainId === connectedChainId)
-  const { data: vaults } = useVaults(network, scId)
+  const { data } = useVaults(network, scId)
 
   useEffect(() => {
-    if (vaults?.length && (!vault || !vaults.includes(vault))) {
-      setVault(vaults[0])
+    if (data?.length && (!vault || !data.includes(vault))) {
+      setVault(data[0])
     }
-  })
+
+    setVaults(data)
+  }, [data, vault, setVault, setVaults])
 
   return (
     <ConnectionGuard
@@ -100,8 +121,7 @@ function VaultGuard({
         <Text>No vaults found for this pool on this network.</Text>
       ) : (
         <Stack height="100%">
-          {/* Render vault selector here if there's multiple vaults */}
-          <Tab vault={vault} />
+          <Tab vault={vault} setVault={setVault} vaults={vaults ?? []} />
         </Stack>
       )}
     </ConnectionGuard>

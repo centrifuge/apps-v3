@@ -50,7 +50,6 @@ export function Checkbox<TFieldValues extends FieldValues = FieldValues>(props: 
         }}
       >
         <ChakraCheckbox.HiddenInput />
-        {/* @ts-expect-error */}
         <ChakraCheckbox.Control borderColor="black" borderRadius={4} />
         <ChakraCheckbox.Label>{label}</ChakraCheckbox.Label>
       </ChakraCheckbox.Root>
