@@ -1,4 +1,5 @@
-import { Box, Flex, Grid, Heading, Stack } from '@chakra-ui/react'
+import { useNavigate } from 'react-router'
+import { Box, Flex, Heading, Stack } from '@chakra-ui/react'
 import { Button } from '@centrifuge/ui'
 import { AccountPage } from '@components/account/AccountPage'
 import { useMemo } from 'react'
@@ -8,9 +9,11 @@ import { usePoolProvider } from '@contexts/PoolProvider'
 // Routing must be fix to handle multiple share classes per pool
 export default function Account() {
   const { shareClass, vaultsDetails, allInvestments } = usePoolProvider()
+  const navigate = useNavigate()
+  const shareClassId = shareClass?.shareClass?.id.raw ?? ''
 
   const totalNav = useMemo(() => {
-    return shareClass?.details.navPerShare.mul(shareClass.details.totalIssuance)
+    return shareClass?.details.navPerShare.mul(shareClass?.details.totalIssuance)
   }, [shareClass])
 
   return (
@@ -23,7 +26,7 @@ export default function Account() {
           </Heading>
         </Stack>
 
-        <Button label="Update NAV" onClick={() => {}} size="sm" width="150px" />
+        <Button label="Update NAV" onClick={() => navigate(`/nav/${shareClassId}`)} size="sm" width="150px" />
       </Flex>
       {shareClass && (
         <AccountPage
