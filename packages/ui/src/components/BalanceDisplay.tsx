@@ -1,19 +1,24 @@
 import { useMemo } from 'react'
 import { Balance } from '@centrifuge/sdk'
 import { formatBalance } from '@centrifuge/shared'
-import { Text } from '@chakra-ui/react'
+import { Text, TextProps } from '@chakra-ui/react'
 
-interface BalanceDisplayProps {
-  balance: Balance
+interface BalanceDisplayProps extends TextProps {
+  balance: Balance | number
   currency?: string
   precision?: number
   minPrecision?: number
 }
 
-export function BalanceDisplay({ balance, currency, precision = 2, minPrecision = 2 }: BalanceDisplayProps) {
+export function BalanceDisplay(props: BalanceDisplayProps) {
+  const { balance, currency, precision = 2, minPrecision = 2, ...rest } = props
   const formattedValue = useMemo(() => {
     return formatBalance(balance, currency, precision, minPrecision)
   }, [balance, currency, precision, minPrecision])
 
-  return <Text color="gray.800">{formattedValue}</Text>
+  return (
+    <Text color="gray.800" {...rest}>
+      {formattedValue}
+    </Text>
+  )
 }
