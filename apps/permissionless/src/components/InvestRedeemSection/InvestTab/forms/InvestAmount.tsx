@@ -119,7 +119,7 @@ export function InvestAmount({
             {formatBalance(defaultBalance, portfolioCurrency?.symbol)}
           </Text>
         </Flex>
-        <NetworkIcons networks={networks} />
+        {/* <NetworkIcons networks={networks} /> */}
       </Flex>
       {parsedAmount !== 0 && (
         <>
