@@ -2,6 +2,6 @@
   "name": "permissionless",
   "compatibility_date": "2025-06-25",
   "assets": {
-    "main": "./dist"
+    "directory": "./dist"
   }
 }
