@@ -1,27 +1,31 @@
 import { Dispatch, SetStateAction, useEffect, useMemo } from 'react'
 import { Badge, Box, Flex, Text } from '@chakra-ui/react'
 import { BalanceInput, SubmitButton, useFormContext } from '@centrifuge/forms'
-import { Balance } from '@centrifuge/sdk'
-import { usePortfolio, formatBalance, formatBalanceToString, usePoolDetails } from '@centrifuge/shared'
+import { Balance, Vault } from '@centrifuge/sdk'
+import { usePortfolio, formatBalance, usePoolDetails, useVaultDetails } from '@centrifuge/shared'
 import { InfoWrapper } from '@components/InvestRedeemSection/components/InfoWrapper'
 import { infoText } from '@utils/infoText'
-import { VaultDetails } from '@utils/types'
 import { useSelectedPoolContext } from '@contexts/useSelectedPoolContext'
-import { divideBigInts } from '@centrifuge/shared/src/utils/formatting'
 
 interface RedeemAmountProps {
   isDisabled: boolean
   parsedAmount: 0 | Balance
-  vaultDetails?: VaultDetails
+  vault?: Vault
   currencies: { investCurrency: string; receiveCurrency: string }
   setCurrencies: Dispatch<SetStateAction<{ investCurrency: string; receiveCurrency: string }>>
 }
 
-export function RedeemAmount({ isDisabled, parsedAmount, vaultDetails, currencies, setCurrencies }: RedeemAmountProps) {
+export function RedeemAmount({ isDisabled, parsedAmount, vault, currencies, setCurrencies }: RedeemAmountProps) {
   const { data: portfolio } = usePortfolio()
   const { selectedPoolId } = useSelectedPoolContext()
   const { data: pool } = usePoolDetails(selectedPoolId)
+  const { data: vaultDetails } = useVaultDetails(vault)
   const { setValue } = useFormContext()
+
+  const shareClass = pool?.shareClasses.find(
+    (sc) => sc.details.id.raw.toString() === vault?.shareClass.id.raw.toString()
+  )
+  const navPerShare = shareClass?.details.navPerShare
 
   const investmentCurrencyChainId = vaultDetails?.investmentCurrency?.chainId
   const shareAsset = vaultDetails?.shareCurrency.address
@@ -29,15 +33,11 @@ export function RedeemAmount({ isDisabled, parsedAmount, vaultDetails, currencie
   // Get info on the users shares holdings in their wallet
   const portfolioShareAsset = portfolio?.find((asset) => asset.currency.address === shareAsset)
   const portfolioShareCurrency = portfolioShareAsset?.currency
-  const defaultShareBalance = portfolioShareAsset?.balance ?? ({ value: 0n, decimals: 6 } as unknown as Balance)
+  const defaultShareBalance = portfolioShareAsset?.balance ?? 0
 
   // Get info on the users investment asset that shares will be converted into
   const portfolioInvestmentAsset = portfolio?.find((asset) => asset.currency.chainId === investmentCurrencyChainId)
   const portfolioInvestmentCurrency = portfolioInvestmentAsset?.currency
-
-  // Get the share class info for handling conversion calculation
-  const shareClass = pool?.shareClasses.find((asset) => asset.shareClass.pool.chainId === investmentCurrencyChainId)
-  const navPerShare = shareClass?.details.navPerShare
 
   // Calculate and update the amount the user will receive in the investment asset based on shares sold
   useMemo(() => {
@@ -45,24 +45,16 @@ export function RedeemAmount({ isDisabled, parsedAmount, vaultDetails, currencie
       return setValue('amountToReceive', '0')
     }
 
-    const redeemAmountDecimals = portfolioShareCurrency?.decimals ?? 18
-    const redeemAmount = parsedAmount.toBigInt()
-    const navPerShareAmount = navPerShare.toBigInt()
-
-    const receiveAmount = divideBigInts(redeemAmount, navPerShareAmount, redeemAmountDecimals).formatToString(
-      portfolioInvestmentCurrency?.decimals ?? 6
-    )
-
-    setValue('amountToReceive', receiveAmount)
+    setValue('amountToReceive', parsedAmount.div(navPerShare))
   }, [parsedAmount, shareClass, navPerShare])
 
   useEffect(
     () =>
       setCurrencies({
-        investCurrency: portfolioShareCurrency?.symbol ?? 'deJTRYS',
-        receiveCurrency: portfolioInvestmentCurrency?.symbol ?? 'USDC',
+        investCurrency: shareClass?.details.symbol ?? '',
+        receiveCurrency: vaultDetails?.investmentCurrency.symbol ?? '',
       }),
-    [portfolioShareCurrency, portfolioInvestmentCurrency]
+    [shareClass, vaultDetails]
   )
 
   return (
@@ -77,7 +69,6 @@ export function RedeemAmount({ isDisabled, parsedAmount, vaultDetails, currencie
         inputGroupProps={{
           endAddon: currencies.investCurrency,
         }}
-        // disabled={!portfolioShareCurrency}
       />
       <Flex mt={2} justify="space-between">
         <Flex>
@@ -91,9 +82,7 @@ export function RedeemAmount({ isDisabled, parsedAmount, vaultDetails, currencie
             borderColor="gray.500 !important"
             border="1px solid"
             cursor="pointer"
-            onClick={() =>
-              setValue('amount', formatBalanceToString(defaultShareBalance, portfolioShareCurrency?.decimals ?? 6))
-            }
+            onClick={() => setValue('amount', defaultShareBalance.toString())}
           >
             MAX
           </Badge>

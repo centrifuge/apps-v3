@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { Dispatch, useMemo, useState } from 'react'
 import { z } from 'zod'
 import { Box } from '@chakra-ui/react'
 import { Form, useForm, safeParse, createBalanceSchema } from '@centrifuge/forms'
@@ -12,14 +12,19 @@ import {
 } from '@components/InvestRedeemSection/components/defaults'
 import { InvestTabForm } from '@components/InvestRedeemSection/InvestTab/forms/InvestTabForm'
 
-export default function InvestTab({ vault }: { vault: Vault }) {
+export default function InvestTab({
+  vault,
+  setVault,
+  vaults,
+}: {
+  vault: Vault
+  setVault: Dispatch<Vault>
+  vaults: Vault[]
+}) {
   const { data: vaultDetails } = useVaultDetails(vault)
   const { data: investment } = useInvestment(vault)
   const { execute, isPending } = useCentrifugeTransaction()
   const [actionType, setActionType] = useState<InvestActionType>(InvestAction.INVEST_AMOUNT)
-
-  // TODO: remove this console log before deploying
-  console.log('investment', investment, vaultDetails)
 
   function invest(amount: Balance) {
     execute(vault.increaseInvestOrder(amount))
@@ -46,8 +51,6 @@ export default function InvestTab({ vault }: { vault: Vault }) {
     defaultValues: InvestFormDefaultValues,
     mode: 'onChange',
     onSubmit: (values) => {
-      console.log('Invest form values: ', values)
-      // Since amount is now of type Balance, we can directly pass it to the invest function
       invest(values.amount)
       setActionType(InvestAction.SUCCESS)
     },
@@ -70,6 +73,8 @@ export default function InvestTab({ vault }: { vault: Vault }) {
           parsedAmount={parsedAmount}
           vaultDetails={vaultDetails}
           setActionType={setActionType}
+          setVault={setVault}
+          vaults={vaults}
         />
       </Box>
     </Form>

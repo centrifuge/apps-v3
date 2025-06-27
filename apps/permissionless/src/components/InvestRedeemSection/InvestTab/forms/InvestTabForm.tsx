@@ -1,5 +1,5 @@
 import { useState, type Dispatch, type SetStateAction } from 'react'
-import type { Balance } from '@centrifuge/sdk'
+import type { Balance, Vault } from '@centrifuge/sdk'
 import { type InvestActionType, InvestAction } from '@components/InvestRedeemSection/components/defaults'
 import { SuccessPanel } from '@components/InvestRedeemSection/components/SuccessPanel'
 import { InvestAmount } from '@components/InvestRedeemSection/InvestTab/forms/InvestAmount'
@@ -12,6 +12,8 @@ interface InvestTabFormProps {
   parsedAmount: 0 | Balance
   vaultDetails?: VaultDetails
   setActionType: Dispatch<SetStateAction<InvestActionType>>
+  setVault: Dispatch<Vault>
+  vaults: Vault[]
 }
 
 export function InvestTabForm({
@@ -20,6 +22,8 @@ export function InvestTabForm({
   parsedAmount,
   vaultDetails,
   setActionType,
+  setVault,
+  vaults,
 }: InvestTabFormProps) {
   const [currencies, setCurrencies] = useState({
     investCurrency: 'USDC',
@@ -36,6 +40,8 @@ export function InvestTabForm({
           vaultDetails={vaultDetails}
           currencies={currencies}
           setCurrencies={setCurrencies}
+          setVault={setVault}
+          vaults={vaults}
         />
       )
     case InvestAction.INVESTOR_REQUIREMENTS:

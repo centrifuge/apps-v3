@@ -3,7 +3,7 @@ import { z } from 'zod'
 import { Box } from '@chakra-ui/react'
 import { createBalanceSchema, Form, safeParse, useForm } from '@centrifuge/forms'
 import { Balance, type Vault } from '@centrifuge/sdk'
-import { useInvestment, useVaultDetails } from '@centrifuge/shared'
+import { useInvestment, usePortfolio, useVaultDetails } from '@centrifuge/shared'
 import { useCentrifugeTransaction } from '@hooks/useCentrifugeTransaction'
 import {
   RedeemAction,
@@ -19,7 +19,7 @@ export default function RedeemTab({ vault }: { vault: Vault }) {
   const [actionType, setActionType] = useState<RedeemActionType>(RedeemAction.REDEEM_AMOUNT)
 
   // TODO: remove this console log before deploying
-  console.log('investment', investment)
+  console.log('investment', vault)
 
   function redeem(amount: Balance) {
     execute(vault.increaseRedeemOrder(amount))
@@ -57,7 +57,7 @@ export default function RedeemTab({ vault }: { vault: Vault }) {
           actionType={actionType}
           isDisabled={isDisabled}
           parsedAmount={parsedAmount}
-          vaultDetails={vaultDetails}
+          vault={vault}
           setActionType={setActionType}
         />
       </Box>
