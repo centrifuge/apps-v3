@@ -32,7 +32,18 @@ export interface BalanceInputProps<TFieldValues extends FieldValues = FieldValue
 }
 
 export function BalanceInput<TFieldValues extends FieldValues = FieldValues>(props: BalanceInputProps<TFieldValues>) {
-  const { disabled, inputGroupProps, name, rules, onChange, onBlur, decimals = 6, displayDecimals, ...rest } = props
+  const {
+    disabled,
+    inputGroupProps,
+    name,
+    rules,
+    onChange,
+    onBlur,
+    decimals = 6,
+    displayDecimals,
+    label,
+    ...rest
+  } = props
   const currentDisplayDecimals = displayDecimals || decimals
 
   const { control, trigger } = useFormContext<TFieldValues>()
@@ -179,6 +190,7 @@ export function BalanceInput<TFieldValues extends FieldValues = FieldValues>(pro
 
   return (
     <Field.Root invalid={isError}>
+      {label ? <Field.Label>{label}</Field.Label> : null}
       <InputGroup {...inputGroupProps}>
         <ChakraInput
           {...rest}
