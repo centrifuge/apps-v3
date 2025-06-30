@@ -3,10 +3,6 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build"
-  },
   "dependencies": {
     "@react-router/node": "^7.6.2",
     "isbot": "^5",
