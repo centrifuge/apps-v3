@@ -1,1 +1,0 @@
-import{p}from"./chunk-NL6KNZEE-BfjKGAAH.js";import{B as i}from"./heading-DZ0Lsmhv.js";const l=({colorPalette:t="yellow",disabled:o,label:r,onClick:s,variant:n="solid",...e})=>p.jsx(i,{colorPalette:t,type:"button",onClick:s,disabled:o,variant:n,...e,children:r});export{l as B};

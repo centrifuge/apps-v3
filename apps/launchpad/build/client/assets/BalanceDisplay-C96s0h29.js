@@ -1,1 +1,0 @@
-import{a as c,p as i}from"./chunk-NL6KNZEE-BfjKGAAH.js";import{a as m}from"./NetworkIcon-BlRroYYC.js";import"./Toaster-DVn7MaYc.js";import{T as p}from"./text-CYDkTUb2.js";function y(e){const{balance:r,currency:o,precision:a=2,minPrecision:t=2,...s}=e,n=c.useMemo(()=>m(r,o,a,t),[r,o,a,t]);return i.jsx(p,{color:"gray.800",...s,children:n})}export{y as B};

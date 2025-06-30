@@ -1,1 +1,0 @@
-import{p as r}from"./chunk-NL6KNZEE-BfjKGAAH.js";import{C as t,b as e,c as i,a as x}from"./card-DT9moc5H.js";const c=({variant:s="outline",width:a,header:o,children:d})=>r.jsxs(t,{variant:s,width:a,children:[o&&r.jsx(e,{children:r.jsx(i,{children:o})}),r.jsx(x,{children:d})]},s);export{c as C};

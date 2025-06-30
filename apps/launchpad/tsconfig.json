@@ -5,11 +5,10 @@
     "outDir": "dist",
     "jsx": "react-jsx",
     "noEmit": true,
-    "module": "ESNext",
-    "target": "ESNext",
+    "module": "esnext",
+    "target": "esnext",
     "moduleResolution": "bundler",
     "skipLibCheck": true,
-    "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
     "types": ["vite/client"],
     "paths": {
