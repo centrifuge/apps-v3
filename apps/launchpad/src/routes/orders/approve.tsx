@@ -1,6 +1,6 @@
-import { Button, Card, NetworkIcon, Checkbox } from '@centrifuge/ui'
+import { Button, NetworkIcon, Checkbox, Card } from '@centrifuge/ui'
 import { Container, Grid, Heading, Box, Stack, Flex } from '@chakra-ui/react'
-import { BottomSection, HeaderSection } from './Sections'
+import { SectionWithCheckbox, SectionWithBalanceInput } from './Sections'
 import { usePoolProvider } from '@contexts/PoolProvider'
 import { networkToName } from '@centrifuge/shared'
 import { createBalanceSchema, Form, safeParse, useForm } from '@centrifuge/forms'
@@ -92,7 +92,9 @@ export default function Approve() {
           <Heading>Approve investments</Heading>
           <ApproveButton disabled={selectedVaults.length === 0} />
           <Box gridColumn="1 / -1" mt={4}>
-            <HeaderSection sections={sections} />
+            <Card>
+              <SectionWithBalanceInput sections={sections} />
+            </Card>
           </Box>
         </Grid>
         {/* TODO: add correct types */}
@@ -106,7 +108,7 @@ export default function Approve() {
                 </Flex>
                 <Checkbox onCheckedChange={() => onCheckedChange(vault.id)} />
               </Flex>
-              <BottomSection sections={bottomSections} />
+              <SectionWithCheckbox sections={bottomSections} />
             </Stack>
           </Box>
         ))}

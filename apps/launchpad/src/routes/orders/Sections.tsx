@@ -1,34 +1,32 @@
-import { BalanceInput, useFormContext } from '@centrifuge/forms'
+import { BalanceInput } from '@centrifuge/forms'
 import { Card, Checkbox } from '@centrifuge/ui'
-import { Box, Grid, Heading, Input, InputGroup, Stack } from '@chakra-ui/react'
+import { Box, Grid } from '@chakra-ui/react'
 
-export const HeaderSection = ({
+export const SectionWithBalanceInput = ({
   sections,
 }: {
   sections: { title: string; value: number; currency: string; decimals: number }[]
 }) => {
   return (
-    <Card>
-      <Grid gridTemplateColumns={`repeat(${sections.length}, 1fr)`} gap={4}>
-        {sections.map((section, index) => (
-          <BalanceInput
-            name={section.title}
-            decimals={section.decimals}
-            placeholder="0.00"
-            inputGroupProps={{
-              endAddon: 'USD',
-            }}
-            label={section.title}
-            disabled
-            key={`${section.title}-${index}`}
-          />
-        ))}
-      </Grid>
-    </Card>
+    <Grid gridTemplateColumns="1fr 1fr" gap={4}>
+      {sections.map((section, index) => (
+        <BalanceInput
+          name={section.title}
+          decimals={section.decimals}
+          placeholder="0.00"
+          inputGroupProps={{
+            endAddon: 'USD',
+          }}
+          label={section.title}
+          disabled
+          key={`${section.title}-${index}`}
+        />
+      ))}
+    </Grid>
   )
 }
 
-export const BottomSection = ({
+export const SectionWithCheckbox = ({
   sections,
 }: {
   sections: { title: string; value: number; currency: string; decimals: number; checkboxLabel: string }[]
