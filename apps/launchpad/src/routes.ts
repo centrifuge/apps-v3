@@ -4,20 +4,23 @@ export default [
   layout('./layouts/HeaderLayout.tsx', [
     index('./routes/index.tsx'),
 
-    // Investors page
+    // Investors
     route('/investors', './routes/investors.tsx'),
 
-    // Account page
+    // Account
     route('/account/:poolId', './routes/account.tsx'),
 
-    // Nav Page
+    // Nav
     route('/nav/:shareClassId/:poolId', './routes/nav.tsx'),
 
-    // Orders page
+    // Orders
     route('/orders/:poolId/approve', './routes/orders/approve.tsx'),
     route('/orders/:poolId/issue', './routes/orders/issue.tsx'),
     route('/orders/:poolId/approveRedeem', './routes/orders/approveRedeem.tsx'),
     route('/orders/:poolId/revokeRedeem', './routes/orders/revoke.tsx'),
+
+    // Pool settings
+    route('/settings/:poolId/poolAccess', './routes/settings/poolAccess.tsx'),
   ]),
   route('*', './routes/catchall.tsx'),
 ] satisfies RouteConfig

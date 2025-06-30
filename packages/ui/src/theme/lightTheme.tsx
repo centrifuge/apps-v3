@@ -99,7 +99,7 @@ export const lightTheme = defineConfig({
           value: { _light: 'colors.gray.100', _dark: 'colors.gray.50' },
         },
         'border-secondary': {
-          value: { _light: 'rgba(207, 207, 207, 0.50)' },
+          value: { _light: 'rgba(246, 246, 246, 1)' },
         },
         'border-tertiary': {
           value: { _light: 'colors.gray.10' },

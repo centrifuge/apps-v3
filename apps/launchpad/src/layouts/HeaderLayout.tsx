@@ -25,39 +25,51 @@ const MAIN_TABS = [
 ]
 
 // Orders page tabs
-const getOrdersTabs = (accountId: string) => [
+const getOrdersTabs = (poolId: string) => [
   {
     label: 'Approve investments',
-    path: `/orders/${accountId}/approve`,
+    path: `/orders/${poolId}/approve`,
   },
   {
     label: 'Issue shares',
-    path: `/orders/${accountId}/issue`,
+    path: `/orders/${poolId}/issue`,
   },
   {
     label: 'Approve Redemptions',
-    path: `/orders/${accountId}/approveRedeem`,
+    path: `/orders/${poolId}/approveRedeem`,
   },
   {
     label: 'Revoke shares',
-    path: `/orders/${accountId}/revokeRedeem`,
+    path: `/orders/${poolId}/revokeRedeem`,
   },
 ]
 
 // Account page tabs
-const getAccountTabs = (accountId: string, labels: string[]) => [
+const getAccountTabs = (poolId: string, labels: string[]) => [
   ...labels.map((label) => ({
     label,
-    path: `/account/${accountId}/${label}`,
+    path: `/account/${poolId}/${label}`,
   })),
 ]
 
-function getTabsForRoute(pathname: string, accountId?: string, labels?: string[]) {
-  if (pathname.includes('/orders/') && accountId) {
-    return getOrdersTabs(accountId)
+const getPoolSettingsTabs = (poolId: string) => [
+  {
+    label: 'Pool access',
+    path: `/${poolId}/poolAccess`,
+  },
+]
+
+function getTabsForRoute(pathname: string, poolId?: string, labels?: string[]) {
+  if (!poolId) return []
+
+  if (pathname.includes('/orders/')) {
+    return getOrdersTabs(poolId)
   }
-  if (pathname.startsWith('/account') && accountId) {
-    return getAccountTabs(accountId, labels ?? [])
+  if (pathname.startsWith('/account')) {
+    return getAccountTabs(poolId, labels ?? [])
+  }
+  if (pathname.startsWith('/settings')) {
+    return getPoolSettingsTabs(poolId)
   }
   return MAIN_TABS
 }
