@@ -2,6 +2,7 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "baseUrl": ".",
+    "outDir": "dist",
     "jsx": "react-jsx",
     "noEmit": true,
     "module": "ESNext",
@@ -22,5 +23,5 @@
       "@utils/*": ["src/utils/*"]
     }
   },
-  "include": ["src", "vite-env.d.ts"]
+  "include": ["src", "vite-env.d.ts", "vite.config.ts"]
 }

@@ -7,7 +7,6 @@ export default defineConfig(() => {
   const envDir = path.resolve(__dirname, '../../.env-config')
   return {
     envDir,
-
     plugins: [reactRouter(), tsconfigPaths()],
     server: {
       port: 3004,
