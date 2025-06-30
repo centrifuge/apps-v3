@@ -1,0 +1,41 @@
+name: 🔗 Cloudflare Preview URLs
+
+on:
+  push:
+    branches:
+      - '**'
+      - '!main'
+
+jobs:
+  get-previews:
+    runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Wait for deployment
+        run: sleep 30
+
+      - name: Get Launchpad preview URL
+        id: launchpad
+        uses: zentered/cloudflare-preview-url@v1.4.2
+        with:
+          cloudflare_project_id: centrifuge-v3-launchpad
+          wait_until_ready: true
+
+      - name: Output Launchpad URL
+        run: echo "🎉 Launchpad preview: https://${{ steps.launchpad.outputs.preview_url }}"
+
+      - name: Get Permissionless preview URL
+        id: permissionless
+        uses: zentered/cloudflare-preview-url@v1.4.2
+        with:
+          cloudflare_project_id: centrifuge-v3-permissionless
+          wait_until_ready: true
+
+      - name: Output Permissionless URL
+        run: echo "🚀 Permissionless preview: https://${{ steps.permissionless.outputs.preview_url }}"
