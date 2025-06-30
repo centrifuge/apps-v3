@@ -1,4 +1,4 @@
-name: 💬 Comment Workers Dev Preview URLs
+name: 💬 PR Preview URLs
 
 on:
   pull_request:
@@ -13,9 +13,7 @@ jobs:
 
       - name: Set preview URLs
         run: |
-          # strip out the first 8 chars of the commit SHA that triggered this PR
           SHORT_SHA=${GITHUB_SHA:0:8}
-          # your account subdomain (workers.dev)
           ACCOUNT_SUBDOMAIN=centrifuge-kf
           echo "LAUNCHPAD_URL=https://${SHORT_SHA}-launchpad.${ACCOUNT_SUBDOMAIN}.workers.dev" >> $GITHUB_ENV
           echo "PERMISSIONLESS_URL=https://${SHORT_SHA}-permissionless.${ACCOUNT_SUBDOMAIN}.workers.dev" >> $GITHUB_ENV
