@@ -83,8 +83,6 @@ export default function HeaderLayout() {
   const shareClasses = poolsDetails?.shareClasses.map((shareClass) => shareClass.details.symbol)
   const poolName = poolsDetails?.metadata?.pool?.name ?? 'Pool'
 
-  console.log({ poolsDetails, currentHandle })
-
   const tabs = getTabsForRoute(location.pathname, poolId, shareClasses)
   const activeTab = tabs.find((tab) => location.pathname === tab.path)
   const showPoolName = location.pathname !== '/' && location.pathname !== '/investors'

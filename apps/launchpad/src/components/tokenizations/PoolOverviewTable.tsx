@@ -1,10 +1,12 @@
 import { Link } from 'react-router'
 import { Button, Flex, Heading, Image, Stack, Text } from '@chakra-ui/react'
-import { Balance } from '@centrifuge/sdk'
-import { useAllPoolDetails } from '@centrifuge/shared'
+import { Balance, PoolId } from '@centrifuge/sdk'
+import { useAllPoolDetails, usePool } from '@centrifuge/shared'
 import { ipfsToHttp } from '@centrifuge/shared/src/utils/formatting'
 import { BalanceDisplay, NetworkIcon } from '@centrifuge/ui'
 import DataTable, { ColumnDefinition } from './DataTable'
+import { useCentrifugeTransaction } from '@hooks/useCentrifugeTransaction'
+import { mockMetadata } from './mockMetadata'
 
 type Row = {
   id: string
@@ -114,7 +116,7 @@ export const PoolOverviewTable = () => {
       <Heading size="md" my="4">
         Pool overview
       </Heading>
-      <DataTable columns={columns} data={flattenedData ?? []} />
+      {<DataTable columns={columns} data={flattenedData ?? []} />}
     </Stack>
   )
 }
