@@ -89,7 +89,7 @@ export const PoolOverviewTable = () => {
         shareClasses: shareClassDetails.map((sc) => ({
           token: sc.details.symbol,
           apy,
-          tokenPrice: sc.details.navPerShare,
+          tokenPrice: sc.details.pricePerShare,
           totalIssuance: sc.details.totalIssuance,
           networks: sc.shareClass.pool.chainId,
         })),

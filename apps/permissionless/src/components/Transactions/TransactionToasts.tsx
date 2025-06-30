@@ -37,7 +37,6 @@ export function TransactionToasts() {
           title: tx.title,
           description,
           type,
-          // @ts-expect-error
           duration,
           isClosable: true, // Adds a close button
           onCloseComplete: () => {

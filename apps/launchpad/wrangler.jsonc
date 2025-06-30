@@ -2,6 +2,6 @@
   "name": "launchpad",
   "compatibility_date": "2025-06-25",
   "assets": {
-    "directory": "./dist",
-  },
+    "directory": "./dist"
+  }
 }
