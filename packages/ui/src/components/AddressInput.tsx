@@ -39,6 +39,7 @@ export const AddressInput = ({ onClick, addresses }: AddressInputProps) => {
   const handleClick = () => {
     const valid = isAddress(value)
     setIsValid(valid)
+    if (addresses?.includes(value)) return
     if (valid) {
       const newAddresses = [...existingAddresses, value]
       setValue('')
