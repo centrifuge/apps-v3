@@ -17,7 +17,20 @@ export default function PoolManagers() {
           <AddressInput onClick={() => {}} addresses={['0x423420Ae467df6e90291fd0252c0A8a637C1e03f']} />
           <Stack>
             <Heading size="sm">Hub chain*</Heading>
-            <Flex alignItems="center" gap={2} border="1px solid" borderColor="border-primary" borderRadius="md" p={2}>
+            <Flex alignItems="center" gap={2} border="1px solid" borderColor="border-primary" borderRadius="md" p={1}>
+              <NetworkIcon />
+              <Text>Ethereum</Text>
+            </Flex>
+          </Stack>
+        </Grid>
+      </Card>
+      <Card mt={8}>
+        <Heading size="md">Spoke manager</Heading>
+        <Grid templateColumns="1fr 1fr" gap={4} mt={8}>
+          <AddressInput onClick={() => {}} addresses={['0x423420Ae467df6e90291fd0252c0A8a637C1e03f']} />
+          <Stack>
+            <Heading size="sm">Spoke chain*</Heading>
+            <Flex alignItems="center" gap={2} border="1px solid" borderColor="border-primary" borderRadius="md" p={1}>
               <NetworkIcon />
               <Text>Ethereum</Text>
             </Flex>
