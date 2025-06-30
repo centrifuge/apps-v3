@@ -1,9 +1,10 @@
 import { useState } from 'react'
-import { Field, Input, Group, IconButton, Stack, Text, Flex } from '@chakra-ui/react'
+import { Field, Input, Group, IconButton, Stack, Text, Flex, Box } from '@chakra-ui/react'
 import { isAddress } from 'viem'
 import { IoAddOutline } from 'react-icons/io5'
 import { FaRegTrashAlt } from 'react-icons/fa'
 import { truncateAddress } from '@centrifuge/shared'
+import { NetworkIcon } from './NetworkIcon'
 
 export interface AddressInputProps {
   onClick: (address: string | string[]) => void
@@ -19,11 +20,18 @@ export const AddressInputLabel = ({ address, onDelete }: { address: string; onDe
       justifyContent="space-between"
       border="1px solid"
       borderColor="border-primary"
-      borderRadius="md"
-      p={1}
       alignItems="center"
+      mt={4}
+      borderRadius={10}
+      pl={1}
+      pr={1}
+      w="full"
     >
       <Text fontSize="sm">{truncateAddress(address)}</Text>
+      <Flex alignItems="center" gap={2}>
+        <NetworkIcon />
+        <Text fontSize="sm">Ethereum</Text>
+      </Flex>
       <IconButton size="sm" backgroundColor="white" color="text-disabled" onClick={() => onDelete(address)}>
         <FaRegTrashAlt />
       </IconButton>
@@ -53,10 +61,10 @@ export const AddressInput = ({ onClick, addresses }: AddressInputProps) => {
   }
 
   return (
-    <Stack>
-      <Field.Root invalid={!isValid && value !== ''}>
-        <Field.Label>Wallet Address</Field.Label>
-        <Group attached w="full" maxW="sm">
+    <Field.Root invalid={!isValid && value !== ''}>
+      <Field.Label>Wallet Address</Field.Label>
+      <Group attached w="full" maxW="sm" display="flex" flexDirection="column" gap={2} alignItems="flex-start">
+        <Flex alignItems="flex-start" w="full">
           <Input
             flex="1"
             placeholder="Add wallet address"
@@ -68,6 +76,10 @@ export const AddressInput = ({ onClick, addresses }: AddressInputProps) => {
             onBlur={() => setIsValid(isAddress(value))}
             size="sm"
             background="border-secondary"
+            borderRadius={10}
+            borderTopRightRadius={0}
+            borderBottomRightRadius={0}
+            zIndex={1}
           />
           <IconButton
             onClick={handleClick}
@@ -76,16 +88,21 @@ export const AddressInput = ({ onClick, addresses }: AddressInputProps) => {
             backgroundColor="border-secondary"
             color="text-disabled"
             borderColor="border-primary"
+            borderTopLeftRadius={0}
+            borderBottomLeftRadius={0}
+            borderLeft="none"
+            variant="outline"
           >
             <IoAddOutline />
           </IconButton>
-        </Group>
+        </Flex>
 
-        {!isValid && value !== '' && <Field.ErrorText>Invalid address.</Field.ErrorText>}
-      </Field.Root>
-      {existingAddresses.length
-        ? existingAddresses.map((address) => <AddressInputLabel address={address} onDelete={handleDelete} />)
-        : null}
-    </Stack>
+        {existingAddresses.length
+          ? existingAddresses.map((address) => <AddressInputLabel address={address} onDelete={handleDelete} />)
+          : null}
+      </Group>
+
+      {!isValid && value !== '' && <Field.ErrorText>Invalid address.</Field.ErrorText>}
+    </Field.Root>
   )
 }
