@@ -17,7 +17,7 @@
     "lint:fix": "npm run lint -- --fix",
     "dev:permissionless": "pnpm --filter permissionless dev",
     "build:permissionless": "pnpm --filter permissionless build",
-    "deploy:permissionless": "pnpm run build:permissionless && pnpm --filter permissionless wrangler deploy"
+    "deploy:permissionless": "pnpm run build:permissionless && npx wrangler deploy --cwd=apps/permissionless"
   },
   "dependencies": {
     "@ark-ui/react": "^5.15.1",

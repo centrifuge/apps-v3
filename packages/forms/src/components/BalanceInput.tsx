@@ -13,6 +13,7 @@ import {
   Field,
   Input as ChakraInput,
   InputGroup,
+  NativeSelect,
 } from '@chakra-ui/react'
 import { useGetFormError } from '../hooks/useGetFormError'
 import { Balance } from '@centrifuge/sdk'
@@ -29,6 +30,31 @@ export interface BalanceInputProps<TFieldValues extends FieldValues = FieldValue
   onChange?: (value: string, balance?: Balance) => void
   onBlur?: React.FocusEventHandler<HTMLInputElement>
   inputGroupProps?: Omit<InputGroupProps, 'children'>
+  selectOptions?: { label: string; value: string }[]
+  onSelectChange?: (value: string) => void
+}
+
+const CurrencySelect = ({
+  options,
+  onChange,
+}: {
+  options: { label: string; value: string }[]
+  onChange: (value: string) => void
+}) => {
+  if (options.length === 0) return null
+
+  return (
+    <NativeSelect.Root size="xs" variant="plain" width="auto" me="-1">
+      <NativeSelect.Field fontSize="sm" onChange={(e) => onChange(e.target.value)}>
+        {options.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </NativeSelect.Field>
+      <NativeSelect.Indicator />
+    </NativeSelect.Root>
+  )
 }
 
 export function BalanceInput<TFieldValues extends FieldValues = FieldValues>(props: BalanceInputProps<TFieldValues>) {
@@ -41,7 +67,8 @@ export function BalanceInput<TFieldValues extends FieldValues = FieldValues>(pro
     onBlur,
     decimals = 6,
     displayDecimals,
-    label,
+    selectOptions,
+    onSelectChange,
     ...rest
   } = props
   const currentDisplayDecimals = displayDecimals || decimals
@@ -190,8 +217,21 @@ export function BalanceInput<TFieldValues extends FieldValues = FieldValues>(pro
 
   return (
     <Field.Root invalid={isError}>
-      {label ? <Field.Label>{label}</Field.Label> : null}
-      <InputGroup {...inputGroupProps}>
+      <InputGroup
+        {...inputGroupProps}
+        endElement={
+          selectOptions && selectOptions.length > 0 ? (
+            <CurrencySelect
+              options={selectOptions}
+              onChange={(value) => {
+                if (onSelectChange) {
+                  onSelectChange(value)
+                }
+              }}
+            />
+          ) : undefined
+        }
+      >
         <ChakraInput
           {...rest}
           id={name}
