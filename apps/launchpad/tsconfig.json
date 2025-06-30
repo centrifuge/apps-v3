@@ -8,8 +8,6 @@
     "module": "esnext",
     "target": "esnext",
     "moduleResolution": "bundler",
-    "skipLibCheck": true,
-    "allowSyntheticDefaultImports": true,
     "types": ["vite/client"],
     "paths": {
       "@assets/*": ["src/assets/*"],
