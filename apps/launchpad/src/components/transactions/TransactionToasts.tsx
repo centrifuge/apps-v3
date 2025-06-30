@@ -30,7 +30,7 @@ export function TransactionToasts() {
                 failed: 'Transaction failed',
               }[tx.status] || ''
 
-        const duration = type === 'loading' ? null : type === 'error' ? 60_000 : 10_000
+        const duration = type === 'loading' ? undefined : type === 'error' ? 60_000 : 10_000
 
         // Create toast
         toaster.create({
@@ -38,11 +38,7 @@ export function TransactionToasts() {
           description,
           type,
           duration,
-          isClosable: true, // Adds a close button
-          onCloseComplete: () => {
-            // Be sure to update tx as dismissed
-            updateTransaction(tx.id, { dismissed: true })
-          },
+          closable: true,
         })
       })
   }, [transactions, updateTransaction])

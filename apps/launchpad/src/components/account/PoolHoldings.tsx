@@ -38,10 +38,10 @@ const HOLDINGS = [
 type Row = {
   id: number
   asset: string
-  network: number
-  quantity: number
-  price: number
-  value: number
+  network: string | number
+  quantity: string
+  price: string
+  value: string
 }
 
 const columns: ColumnDefinition<Row>[] = [
@@ -59,8 +59,8 @@ const columns: ColumnDefinition<Row>[] = [
     render: (row: Row) => {
       return (
         <Flex align="center" gap={2}>
-          <NetworkIcon networkId={row.network} />
-          <Heading fontSize="xs">{networkToName(row.network)}</Heading>
+          <NetworkIcon networkId={Number(row.network)} />
+          <Heading fontSize="xs">{networkToName(Number(row.network))}</Heading>
         </Flex>
       )
     },
