@@ -1,13 +1,11 @@
-name: 🔗 Cloudflare Preview URLs
+name: 💬 Comment Cloudflare Preview URLs
 
 on:
-  push:
-    branches:
-      - '**'
-      - '!main'
+  pull_request:
+    types: [opened, synchronize, reopened]
 
 jobs:
-  get-previews:
+  comment-previews:
     runs-on: ubuntu-latest
     env:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -27,9 +25,6 @@ jobs:
           cloudflare_project_id: centrifuge-v3-launchpad
           wait_until_ready: true
 
-      - name: Output Launchpad URL
-        run: echo "🎉 Launchpad preview: https://${{ steps.launchpad.outputs.preview_url }}"
-
       - name: Get Permissionless preview URL
         id: permissionless
         uses: zentered/cloudflare-preview-url@v1.4.2
@@ -37,5 +32,11 @@ jobs:
           cloudflare_project_id: centrifuge-v3-permissionless
           wait_until_ready: true
 
-      - name: Output Permissionless URL
-        run: echo "🚀 Permissionless preview: https://${{ steps.permissionless.outputs.preview_url }}"
+      - name: Comment PR with preview URLs
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            🚀 **Launchpad preview**: https://${{ steps.launchpad.outputs.preview_url }}
+            🚀 **Permissionless preview**: https://${{ steps.permissionless.outputs.preview_url }}
