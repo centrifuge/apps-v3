@@ -10,18 +10,19 @@
     "dev:functions": "pnpm --filter functions dev",
     "build:app": "pnpm --filter app build",
     "build:functions": "pnpm --filter functions build",
-    "build:launchpad": "pnpm --filter launchpad build",
     "build:packages": "pnpm --filter @centrifuge/* --parallel build",
     "dev": "concurrently \"pnpm dev:app\" \"pnpm dev:functions\" \"pnpm dev:permissionless\" \"pnpm dev:launchpad\"",
     "lint": "concurrently \"pnpm --filter app lint\" \"pnpm --filter launchpad lint\" \"pnpm --filter permissionless lint\"",
     "lint:fix": "npm run lint -- --fix",
     "dev:permissionless": "pnpm --filter permissionless dev",
     "build:permissionless": "pnpm --filter permissionless build",
-    "deploy:permissionless": "pnpm run build:permissionless && npx wrangler deploy --cwd=apps/permissionless"
+    "build:launchpad": "pnpm --filter launchpad build",
+    "deploy:permissionless": "pnpm run build:permissionless && npx wrangler deploy --cwd=apps/permissionless",
+    "deploy:launchpad": "pnpm run build:launchpad && npx wrangler deploy --cwd=apps/launchpad"
   },
   "dependencies": {
     "@ark-ui/react": "^5.15.1",
-    "@centrifuge/sdk": "0.0.0-alpha.17",
+    "@centrifuge/sdk": "0.0.0-alpha.18",
     "@chakra-ui/react": "^3.19.1",
     "@chakra-ui/system": "^2.6.2",
     "@chakra-ui/theme": "^3.4.6",

@@ -1,2 +1,3 @@
 dist
 apps/permissionless/wrangler.jsonc
+apps/launchpad/wrangler.jsonc
