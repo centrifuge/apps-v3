@@ -4,15 +4,17 @@ import { useAllPoolDetails } from '@centrifuge/shared'
 import { useSelectedPoolContext } from '@contexts/useSelectedPoolContext'
 
 export const PoolSelector = () => {
-  const { data: pools } = useAllPoolDetails()
+  const { data: pools, isLoading } = useAllPoolDetails()
   const { selectedPoolId, setSelectedPoolId } = useSelectedPoolContext()
+
+  console.log(pools, isLoading)
 
   const displayPools = pools?.map((pool) => ({
     value: pool.id.toString(),
     label: pool.metadata?.pool?.name || pool.id.toString(),
   }))
 
-  if (pools?.length === 0 || !displayPools || pools?.length === 1) return null
+  if (isLoading || !displayPools) return null
 
   return (
     <SegmentGroup.Root
