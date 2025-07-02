@@ -1,11 +1,9 @@
 import { Pool, PoolId, ShareClass } from '@centrifuge/sdk'
 import { useMemo } from 'react'
-import { combineLatest, from, map, of, switchMap } from 'rxjs'
+import { combineLatest, from, map, of, switchMap, distinctUntilChanged, shareReplay } from 'rxjs'
 import { useObservable } from './useObservable'
 import { useCentrifuge } from './CentrifugeContext'
 import { Address } from 'viem'
-
-const EMPTY_POOLS = { data: [], isLoading: false }
 
 export function usePools() {
   const centrifuge = useCentrifuge()
@@ -13,22 +11,16 @@ export function usePools() {
   return useObservable(pools$)
 }
 
-export function usePoolsByManager(manager: Address | undefined) {
-  if (!manager) return EMPTY_POOLS
-
-  const { data: allPools } = usePools()
+export function usePoolsByManager(address: Address | undefined) {
+  const { data: pools } = usePools()
+  const stableKey = useMemo(() => pools?.map((p) => p.id).join(',') || '', [pools?.map((p) => p.id).join(',')])
 
   const pools$ = useMemo(() => {
-    if (!allPools || allPools.length === 0) {
-      return of<Pool[]>([])
-    }
-
-    const checked$ = allPools.map((pool) =>
-      from(pool.isManager(manager)).pipe(map((isMgr) => (isMgr ? pool : undefined)))
-    )
-
-    return combineLatest(checked$).pipe(map((maybePools) => maybePools.filter((p): p is Pool => !!p)))
-  }, [allPools, manager])
+    if (!address || !pools) return of([])
+    return combineLatest(
+      pools.map((pool) => pool.isManager(address).pipe(map((isManager) => (isManager ? pool : null))))
+    ).pipe(map((pools) => pools.filter((p) => p !== null)))
+  }, [stableKey, address])
 
   return useObservable(pools$)
 }
@@ -45,13 +37,15 @@ export function usePoolDetails(poolId?: PoolId) {
   return useObservable(details$)
 }
 
-export function useAllPoolDetails(ids: PoolId[]) {
+export function useAllPoolDetails(poolIds: PoolId[]) {
   const centrifuge = useCentrifuge()
 
-  const details$ = useMemo(
-    () => combineLatest(ids.map((id) => centrifuge.pool(id).pipe(switchMap((pool) => pool.details())))),
-    []
-  )
+  const poolIdsKey = useMemo(() => poolIds?.join(',') || '', [poolIds?.join(',')])
+
+  const details$ = useMemo(() => {
+    if (!poolIds?.length) return of([])
+    return combineLatest(poolIds.map((id) => centrifuge.pool(id).pipe(switchMap((pool) => pool.details()))))
+  }, [poolIdsKey, centrifuge])
 
   return useObservable(details$)
 }

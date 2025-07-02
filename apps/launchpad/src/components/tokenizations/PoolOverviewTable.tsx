@@ -1,12 +1,12 @@
 import { Link } from 'react-router'
 import { Box, Button, Flex, Heading, Image, Stack, Text } from '@chakra-ui/react'
-import { Balance } from '@centrifuge/sdk'
+import { Balance, Pool } from '@centrifuge/sdk'
 import { useAllPoolDetails } from '@centrifuge/shared'
 import { ipfsToHttp } from '@centrifuge/shared/src/utils/formatting'
 import { BalanceDisplay, NetworkIcon } from '@centrifuge/ui'
 import DataTable, { ColumnDefinition } from './DataTable'
 import { mockMetadata } from './mockMetadata'
-import { usePoolsByManager } from '@centrifuge/shared/src/hooks/usePools'
+import { usePool, usePools, usePoolsByManager } from '@centrifuge/shared/src/hooks/usePools'
 import { useAccount } from 'wagmi'
 import { Spinner } from '@chakra-ui/react'
 
@@ -79,9 +79,9 @@ const columns: ColumnDefinition<Row>[] = [
 
 export const PoolOverviewTable = () => {
   const { address } = useAccount()
-  const { data: allPools } = usePoolsByManager(address)
-  const poolIds = allPools?.map((pool) => pool.id)
-  const { data: pools, isLoading } = useAllPoolDetails(poolIds ?? [])
+  const { data: allPools, isLoading } = usePoolsByManager(address)
+  const poolIds = allPools?.map((p) => p.id) ?? []
+  const { data: pools, isLoading: isLoadingPools } = useAllPoolDetails(poolIds)
 
   const data =
     pools?.map((pool: any) => {
@@ -117,7 +117,7 @@ export const PoolOverviewTable = () => {
   )
 
   // TODO: add better UI for loading, skeleton??
-  if (isLoading)
+  if (isLoading || isLoadingPools)
     return (
       <Box display="flex" flexDirection="row" alignItems="center" justifyContent="center" height="100%" gap={2} mt={10}>
         <Spinner size="lg" />

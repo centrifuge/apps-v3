@@ -13,7 +13,6 @@ export default defineConfig(() => {
     plugins: [
       react(),
       tsconfigPaths(),
-      cloudflare(),
       createHtmlPlugin({
         inject: {
           data: {
