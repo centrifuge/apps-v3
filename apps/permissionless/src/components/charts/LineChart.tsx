@@ -1,16 +1,19 @@
 import { Box, useToken } from '@chakra-ui/react'
 import { ResponsiveContainer, ComposedChart, Line, Bar, CartesianGrid, XAxis, YAxis, Tooltip } from 'recharts'
+import { ChartTooltip } from '@centrifuge/ui'
 
 type DataPoint = {
   timestamp: string
   price: number
+  tvl: number
 }
 
 export const LineChart = ({ data }: { data: DataPoint[] }) => {
-  const [bgTertiary, borderPrimary, textHighlight, textSecondary] = useToken('colors', [
+  const [bgTertiary, borderPrimary, textHighlight, textPrimary, textSecondary] = useToken('colors', [
     'bg-tertiary',
     'border-primary',
     'text-highlight',
+    'text-primary',
     'text-secondary',
   ])
 
@@ -53,14 +56,9 @@ export const LineChart = ({ data }: { data: DataPoint[] }) => {
           />
 
           <Tooltip
-            labelFormatter={(labelTs) => {
-              const d = new Date(labelTs)
-              return d.toLocaleString('en-US', {
-                month: 'long',
-                year: 'numeric',
-              })
-            }}
-            formatter={(value: number) => [`${value}`, 'Price']}
+            content={<ChartTooltip textColor={textPrimary} borderColor={borderPrimary} />}
+            wrapperStyle={{ width: '298px', boxShadow: '1px 3px 6px rgba(0, 0, 0, 0.15)', borderRadius: '8px' }}
+            contentStyle={{ borderRadius: '8px', padding: 0, border: 'none' }}
           />
         </ComposedChart>
       </ResponsiveContainer>

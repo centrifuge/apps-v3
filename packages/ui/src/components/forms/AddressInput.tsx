@@ -1,10 +1,10 @@
 import { useState } from 'react'
-import { Field, Input, Group, IconButton, Stack, Text, Flex, Box } from '@chakra-ui/react'
+import { Field, Input, Group, IconButton, Text, Flex } from '@chakra-ui/react'
 import { isAddress } from 'viem'
 import { IoAddOutline } from 'react-icons/io5'
 import { FaRegTrashAlt } from 'react-icons/fa'
 import { truncateAddress } from '@centrifuge/shared'
-import { NetworkIcon } from './NetworkIcon'
+import { NetworkIcon } from '../elements/NetworkIcon'
 
 export interface AddressInputProps {
   onClick: (address: string | string[]) => void

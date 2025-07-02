@@ -6,6 +6,7 @@ import { usePortfolio, formatBalance, usePoolDetails, useVaultDetails } from '@c
 import { InfoWrapper } from '@components/InvestRedeemSection/components/InfoWrapper'
 import { infoText } from '@utils/infoText'
 import { useSelectedPoolContext } from '@contexts/useSelectedPoolContext'
+import { divideBigInts } from '@centrifuge/shared/src/utils/formatting'
 
 interface RedeemAmountProps {
   isDisabled: boolean
@@ -45,7 +46,15 @@ export function RedeemAmount({ isDisabled, parsedAmount, vault, currencies, setC
       return setValue('amountToReceive', '0')
     }
 
-    setValue('amountToReceive', parsedAmount.div(navPerShare))
+    const redeemAmountDecimals = portfolioInvestmentCurrency?.decimals ?? 6
+    const redeemAmount = parsedAmount.toBigInt()
+    const navPerShareAmount = navPerShare.toBigInt()
+
+    const receiveAmount = divideBigInts(redeemAmount, navPerShareAmount, redeemAmountDecimals).formatToString(
+      portfolioInvestmentCurrency?.decimals ?? 6
+    )
+
+    setValue('amountToReceive', receiveAmount)
   }, [parsedAmount, shareClass, navPerShare])
 
   useEffect(
