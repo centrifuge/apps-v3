@@ -1,13 +1,16 @@
-import { Pool, PoolId, ShareClass } from '@centrifuge/sdk'
+import { PoolId } from '@centrifuge/sdk'
 import { useMemo } from 'react'
-import { combineLatest, from, map, of, switchMap, distinctUntilChanged, shareReplay } from 'rxjs'
+import { combineLatest, map, of, switchMap } from 'rxjs'
 import { useObservable } from './useObservable'
 import { useCentrifuge } from './CentrifugeContext'
 import { Address } from 'viem'
 
 export function usePools() {
   const centrifuge = useCentrifuge()
-  const pools$ = useMemo(() => centrifuge.pools(), [centrifuge])
+  const pools$ = useMemo(
+    () => centrifuge.pools().pipe(map((pools) => pools.filter((p) => p.chainId === 11155111))),
+    [centrifuge]
+  )
   return useObservable(pools$)
 }
 
@@ -44,8 +47,9 @@ export function useAllPoolDetails(poolIds: PoolId[]) {
 
   const details$ = useMemo(() => {
     if (!poolIds?.length) return of([])
-    return combineLatest(poolIds.map((id) => centrifuge.pool(id).pipe(switchMap((pool) => pool.details()))))
-  }, [poolIdsKey, centrifuge])
+    // TODO: fix the hardcoded one, we need to update the metadata for existing pools or update sdk to return even if missing metadata
+    return combineLatest([poolIds[0]].map((id) => centrifuge.pool(id).pipe(switchMap((pool) => pool.details()))))
+  }, [poolIdsKey])
 
   return useObservable(details$)
 }
