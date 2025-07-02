@@ -4,7 +4,7 @@ import { useAllPoolDetails } from '@centrifuge/shared'
 import { useSelectedPoolContext } from '@contexts/useSelectedPoolContext'
 
 export const PoolSelector = () => {
-  const { data: pools } = useAllPoolDetails()
+  const { data: pools } = useAllPoolDetails([])
   const { selectedPoolId, setSelectedPoolId } = useSelectedPoolContext()
 
   const displayPools = pools?.map((pool) => ({
