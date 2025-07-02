@@ -27,29 +27,38 @@ export const SectionWithBalanceInput = ({
 }
 
 export const SectionWithCheckbox = ({
-  sections,
+  checkboxLabel,
+  currency,
+  decimals,
+  label,
+  onCheckedChange,
+  title,
 }: {
-  sections: { title: string; value: number; currency: string; decimals: number; checkboxLabel: string }[]
+  checkboxLabel: string
+  currency: string
+  decimals: number
+  label: string
+  onCheckedChange: (checked: boolean) => void
+  title: string
 }) => {
   return (
     <Card>
-      {sections.map((section) => (
-        <Grid key={section.title} gridTemplateColumns="1fr 160px" gap={4} alignItems="center">
-          <BalanceInput
-            name={section.title}
-            decimals={section.decimals}
-            placeholder="0.00"
-            inputGroupProps={{
-              endAddon: 'USDC',
-            }}
-            label={section.title}
-            disabled
-          />
-          <Box mt={6}>
-            <Checkbox label={section.checkboxLabel} />
-          </Box>
-        </Grid>
-      ))}
+      <Grid key={title} gridTemplateColumns="1fr 160px" gap={4} alignItems="center">
+        <BalanceInput
+          name={title}
+          decimals={decimals}
+          placeholder="0.00"
+          inputGroupProps={{
+            endAddon: currency,
+          }}
+          disabled
+          displayDecimals={6}
+          label={label}
+        />
+        <Box mt={6}>
+          <Checkbox label={checkboxLabel} onCheckedChange={onCheckedChange} />
+        </Box>
+      </Grid>
     </Card>
   )
 }

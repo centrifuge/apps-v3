@@ -1,38 +1,56 @@
+import { useEffect, useMemo } from 'react'
+import z from 'zod'
 import { Button, NetworkIcon, Checkbox, Card } from '@centrifuge/ui'
 import { Container, Grid, Heading, Box, Stack, Flex } from '@chakra-ui/react'
-import { SectionWithCheckbox, SectionWithBalanceInput } from './Sections'
 import { usePoolProvider } from '@contexts/PoolProvider'
 import { networkToName } from '@centrifuge/shared'
-import { createBalanceSchema, Form, safeParse, useForm } from '@centrifuge/forms'
-import z from 'zod'
-import { useEffect } from 'react'
+import { Form, useForm } from '@centrifuge/forms'
+import { SectionWithCheckbox, SectionWithBalanceInput } from './Sections'
+import { Vault } from '@centrifuge/sdk'
+
+/// TODO: WE NEED TO UPDATE TO USE THE SHARE CLASS VALUES AND NOT THE VAULT
+// wait for sdk
 
 const schema = z.object({
   selectedVaults: z.array(z.number()),
+  investments: z.array(z.number()),
 })
-
-const vaults = [
-  {
-    chainId: 11155111,
-    id: 1,
-  },
-]
 
 export const ApproveButton = ({ disabled }: { disabled: boolean }) => {
   return <Button label="Approve" onClick={() => {}} size="sm" width={163} disabled={disabled} />
 }
 
 export default function Approve() {
-  const isLoading = false
-  // const { isLoading, vaults } = usePoolProvider()
+  const { isLoading, investmentsPerVaults } = usePoolProvider()
+
+  const investments = useMemo(() => {
+    return investmentsPerVaults?.map((investment: any, index: number) => {
+      return {
+        ...investment,
+        chainId: investment.investmentCurrency.chainId,
+        id: `${investment.investmentCurrency.chainId}-${index}`,
+        pendingInvestCurrency: investment.pendingInvestCurrency,
+        currency: investment.investmentCurrency.symbol,
+        decimals: investment.investmentCurrency.decimals,
+      }
+    })
+  }, [investmentsPerVaults])
 
   useEffect(() => setValue('selectedVaults', []), [])
+  useEffect(() => {
+    if (investments) {
+      setValue(
+        'investments',
+        investments.map((investment: any) => investment.pendingInvestCurrency)
+      )
+    }
+  }, [investments])
 
   // TODO: add correct values when available on sdk
   // should be the sum of all investments for all the vaults
   const sections = [
     {
-      title: 'Approve investments',
+      title: 'Approved investments',
       value: 0,
       currency: 'USDC',
       decimals: 2,
@@ -45,20 +63,11 @@ export default function Approve() {
     },
   ]
 
-  const bottomSections = [
-    {
-      title: 'Approve investments',
-      value: 0,
-      currency: 'USDC',
-      decimals: 2,
-      checkboxLabel: 'Approve and issue',
-    },
-  ]
-
   const form = useForm({
     schema,
     defaultValues: {
       selectedVaults: [],
+      investments: [],
     },
     mode: 'onChange',
     onSubmit: (values) => {
@@ -81,8 +90,14 @@ export default function Approve() {
     }
   }
 
+  const onMulticallCheckedChange = (vault: any) => {}
+
   if (isLoading) {
     return <div>Loading...</div>
+  }
+
+  if (investments.length === 0) {
+    return <div>No investments found</div>
   }
 
   return (
@@ -98,17 +113,24 @@ export default function Approve() {
           </Box>
         </Grid>
         {/* TODO: add correct types */}
-        {vaults?.map((vault: any) => (
-          <Box key={vault.chainId} mt={8} mb={8}>
+        {investments?.map((investment: any, index: number) => (
+          <Box key={investment.id} mt={8} mb={8}>
             <Stack>
               <Flex justifyContent="space-between">
                 <Flex alignItems="center" gap={2}>
-                  <NetworkIcon networkId={vault.chainId} />
-                  <Heading size="md">{networkToName(vault.chainId)} Investments</Heading>
+                  <NetworkIcon networkId={investment.chainId} />
+                  <Heading size="md">{networkToName(investment.chainId)} Investments</Heading>
                 </Flex>
-                <Checkbox onCheckedChange={() => onCheckedChange(vault.id)} />
+                <Checkbox onCheckedChange={() => onCheckedChange(investment.chainId)} />
               </Flex>
-              <SectionWithCheckbox sections={bottomSections} />
+              <SectionWithCheckbox
+                title={`investments.${index}`}
+                decimals={investment.decimals}
+                currency={investment.currency}
+                checkboxLabel="Approve and issue"
+                label="Approve investments"
+                onCheckedChange={() => onMulticallCheckedChange(investment)}
+              />
             </Stack>
           </Box>
         ))}

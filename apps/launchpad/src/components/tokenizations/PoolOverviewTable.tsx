@@ -1,12 +1,14 @@
 import { Link } from 'react-router'
-import { Button, Flex, Heading, Image, Stack, Text } from '@chakra-ui/react'
-import { Balance, PoolId } from '@centrifuge/sdk'
-import { useAllPoolDetails, usePool } from '@centrifuge/shared'
+import { Box, Button, Flex, Heading, Image, Stack, Text } from '@chakra-ui/react'
+import { Balance } from '@centrifuge/sdk'
+import { useAllPoolDetails } from '@centrifuge/shared'
 import { ipfsToHttp } from '@centrifuge/shared/src/utils/formatting'
 import { BalanceDisplay, NetworkIcon } from '@centrifuge/ui'
 import DataTable, { ColumnDefinition } from './DataTable'
-import { useCentrifugeTransaction } from '@hooks/useCentrifugeTransaction'
 import { mockMetadata } from './mockMetadata'
+import { usePoolsByManager } from '@centrifuge/shared/src/hooks/usePools'
+import { useAccount } from 'wagmi'
+import { Spinner } from '@chakra-ui/react'
 
 type Row = {
   id: string
@@ -76,7 +78,10 @@ const columns: ColumnDefinition<Row>[] = [
 ]
 
 export const PoolOverviewTable = () => {
-  const { data: pools } = useAllPoolDetails()
+  const { address } = useAccount()
+  const { data: allPools } = usePoolsByManager(address)
+  const poolIds = allPools?.map((pool) => pool.id)
+  const { data: pools, isLoading } = useAllPoolDetails(poolIds ?? [])
 
   const data =
     pools?.map((pool) => {
@@ -87,11 +92,11 @@ export const PoolOverviewTable = () => {
       return {
         id: pool.id,
         name: pool.metadata?.pool.name ?? 'RWA Portfolio',
-        icon: pool.metadata?.pool.icon,
+        icon: pool.metadata?.pool.icon ?? mockMetadata.pool.icon,
         shareClasses: shareClassDetails.map((sc) => ({
           token: sc.details.symbol,
           apy,
-          tokenPrice: sc.details.navPerShare,
+          tokenPrice: sc.details.pricePerShare,
           totalIssuance: sc.details.totalIssuance,
           networks: sc.shareClass.pool.chainId,
         })),
@@ -110,6 +115,15 @@ export const PoolOverviewTable = () => {
       tokenPrice: sc.tokenPrice,
     }))
   )
+
+  // TODO: add better UI for loading, skeleton??
+  if (isLoading)
+    return (
+      <Box display="flex" flexDirection="row" alignItems="center" justifyContent="center" height="100%" gap={2} mt={10}>
+        <Spinner size="lg" />
+        <Heading size="md">Loading</Heading>
+      </Box>
+    )
 
   return (
     <Stack>
