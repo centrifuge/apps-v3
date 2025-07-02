@@ -2,7 +2,7 @@
   "name": "launchpad",
   "compatibility_date": "2025-06-30",
   "assets": {
-    "directory": "./dist/",
+    "directory": "./dist/client",
     "not_found_handling": "single-page-application"
   },
   "observability": {
