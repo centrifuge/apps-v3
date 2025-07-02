@@ -84,7 +84,7 @@ export const PoolOverviewTable = () => {
   const { data: pools, isLoading } = useAllPoolDetails(poolIds ?? [])
 
   const data =
-    pools?.map((pool) => {
+    pools?.map((pool: any) => {
       const shareClassDetails = Object.values(pool.shareClasses)
       const metaShareClassKeys = pool.metadata?.shareClasses ? Object.keys(pool.metadata?.shareClasses) : []
       const apy = pool.metadata?.shareClasses[metaShareClassKeys[0]].apyPercentage ?? 0
@@ -93,7 +93,7 @@ export const PoolOverviewTable = () => {
         id: pool.id,
         name: pool.metadata?.pool.name ?? 'RWA Portfolio',
         icon: pool.metadata?.pool.icon ?? mockMetadata.pool.icon,
-        shareClasses: shareClassDetails.map((sc) => ({
+        shareClasses: shareClassDetails.map((sc: any) => ({
           token: sc.details.symbol,
           apy,
           tokenPrice: sc.details.pricePerShare,
@@ -103,8 +103,8 @@ export const PoolOverviewTable = () => {
       }
     }) ?? []
 
-  const flattenedData = data.flatMap((d) =>
-    d.shareClasses.map((sc) => ({
+  const flattenedData = data.flatMap((d: any) =>
+    d.shareClasses.map((sc: any) => ({
       id: `${d.id}-${sc.token}`,
       poolName: d.name,
       iconUri: d.icon?.uri,

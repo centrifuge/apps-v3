@@ -2,6 +2,7 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tsconfigPaths from 'vite-tsconfig-paths'
 import { createHtmlPlugin } from 'vite-plugin-html'
+import { cloudflare } from '@cloudflare/vite-plugin'
 import path from 'path'
 
 export default defineConfig(() => {
@@ -12,6 +13,7 @@ export default defineConfig(() => {
     plugins: [
       react(),
       tsconfigPaths(),
+      cloudflare(),
       createHtmlPlugin({
         inject: {
           data: {
