@@ -25,7 +25,7 @@ export function RedeemAmount({ isDisabled, parsedAmount, vault, currencies, setC
   const shareClass = pool?.shareClasses.find(
     (sc) => sc.details.id.raw.toString() === vault?.shareClass.id.raw.toString()
   )
-  const navPerShare = shareClass?.details.navPerShare
+  const navPerShare = shareClass?.details.pricePerShare
 
   const investmentCurrencyChainId = vaultDetails?.investmentCurrency?.chainId
   const shareAsset = vaultDetails?.shareCurrency.address

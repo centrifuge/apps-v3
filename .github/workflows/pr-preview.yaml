@@ -7,33 +7,40 @@ on:
 jobs:
   comment-workers-previews:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Set preview URLs
-        env:
-          ACCOUNT_SUBDOMAIN: centrifuge-kf
-          PR_BRANCH: ${{ github.event.pull_request.head.ref }}
         run: |
-          SANITIZED=$(echo "${PR_BRANCH,,}" | tr '/_' '--')
-          echo "LAUNCHPAD_URL=https://${SANITIZED}-launchpad.${ACCOUNT_SUBDOMAIN}.workers.dev" >> $GITHUB_ENV
-          echo "PERMISSIONLESS_URL=https://${SANITIZED}-permissionless.${ACCOUNT_SUBDOMAIN}.workers.dev" >> $GITHUB_ENV
+          SHORT_SHA=${GITHUB_SHA:0:8}
+          ACCOUNT_SUBDOMAIN=centrifuge-kf
+          echo "LAUNCHPAD_URL=https://${SHORT_SHA}-launchpad.${ACCOUNT_SUBDOMAIN}.workers.dev" >> $GITHUB_ENV
+          echo "PERMISSIONLESS_URL=https://${SHORT_SHA}-permissionless.${ACCOUNT_SUBDOMAIN}.workers.dev" >> $GITHUB_ENV
 
-      - name: Find existing PR-preview comment
-        uses: peter-evans/find-comment@v3
-        id: find_preview
-        with:
-          issue-number: ${{ github.event.pull_request.number }}
-          body-includes: '<!-- PR preview URLs -->'
+      - name: Wait for previews to be ready
+        run: |
+          echo "Waiting up to 2 minutes for preview URLs to become healthy…"
+          for url in "${LAUNCHPAD_URL}" "${PERMISSIONLESS_URL}"; do
+            echo "- polling $url"
+            for i in {1..24}; do
+              if curl --silent --head --fail "$url" > /dev/null; then
+                echo "  ✅ $url is up!"
+                break
+              fi
+              sleep 5
+            done
+          done
 
       - name: Comment PR with preview URLs
         uses: peter-evans/create-or-update-comment@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           issue-number: ${{ github.event.pull_request.number }}
-          comment-id: ${{ steps.find_preview.outputs.comment-id }}
+          marker: '<!-- PR preview URLs -->'
           edit-mode: replace
           body: |
+            <!-- PR preview URLs -->
             🚀 **Launchpad preview**: ${{ env.LAUNCHPAD_URL }}
             🚀 **Permissionless preview**: ${{ env.PERMISSIONLESS_URL }}
