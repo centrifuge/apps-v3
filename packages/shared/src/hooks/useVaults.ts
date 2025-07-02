@@ -1,7 +1,7 @@
 import type { PoolNetwork, ShareClassId, Vault } from '@centrifuge/sdk'
 import { useMemo } from 'react'
 import { useAccount } from 'wagmi'
-import { combineLatest } from 'rxjs'
+import { combineLatest, of } from 'rxjs'
 import { useObservable } from './useObservable'
 
 export function useVaults(poolNetwork?: PoolNetwork, scId?: ShareClassId) {
@@ -31,15 +31,14 @@ export function useInvestment(vault?: Vault) {
   return useObservable(investment$)
 }
 
-export function useAllInvestments(vaults?: Vault[]) {
+export function useInvestmentsPerVaults(vaults?: Vault[]) {
   const { address } = useAccount()
-
-  const allInvestments$ = useMemo(() => {
-    if (!vaults || vaults.length === 0 || !address) return undefined
+  const investmentsPerVaults$ = useMemo(() => {
+    if (!vaults || vaults.length === 0 || !address) return of([])
 
     const investment$ = vaults.map((vault) => vault.investment(address))
     return combineLatest(investment$)
   }, [vaults, address])
 
-  return useObservable(allInvestments$)
+  return useObservable(investmentsPerVaults$)
 }

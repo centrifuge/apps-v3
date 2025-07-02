@@ -1,7 +1,13 @@
 import React, { createContext, useContext, useMemo } from 'react'
 import { useChainId } from 'wagmi'
 import { PoolId } from '@centrifuge/sdk'
-import { useAllInvestments, usePoolDetails, usePoolNetworks, useVaults, useVaultsDetails } from '@centrifuge/shared'
+import {
+  useInvestmentsPerVaults,
+  usePoolDetails,
+  usePoolNetworks,
+  useVaults,
+  useVaultsDetails,
+} from '@centrifuge/shared'
 import { useParams } from 'react-router'
 
 // TODO: fix types
@@ -13,7 +19,7 @@ interface PoolContextValue {
   scId: any
   vaults: any
   vaultsDetails: any
-  allInvestments: any
+  investmentsPerVaults: any
   isLoading: boolean
   error?: any
 }
@@ -47,9 +53,10 @@ export function PoolProvider({ children }: PoolProviderProps) {
 
   const { data: vaults, isLoading: vaultsLoading } = useVaults(network, scId)
   const { data: vaultsDetails, isLoading: vaultsDetailsLoading } = useVaultsDetails(vaults)
-  const { data: allInvestments, isLoading: allInvestmentsLoading } = useAllInvestments(vaults)
+  const { data: investmentsPerVaults, isLoading: investmentsPerVaultsLoading } = useInvestmentsPerVaults(vaults)
 
-  const isLoading = poolLoading || networksLoading || vaultsLoading || vaultsDetailsLoading || allInvestmentsLoading
+  const isLoading =
+    poolLoading || networksLoading || vaultsLoading || vaultsDetailsLoading || investmentsPerVaultsLoading
 
   const contextValue: PoolContextValue = {
     poolDetails,
@@ -59,7 +66,7 @@ export function PoolProvider({ children }: PoolProviderProps) {
     scId,
     vaults,
     vaultsDetails,
-    allInvestments,
+    investmentsPerVaults,
     isLoading,
     error: poolError,
   }

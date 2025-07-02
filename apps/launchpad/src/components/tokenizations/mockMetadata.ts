@@ -5,6 +5,10 @@ export const mockMetadata = {
       class: 'Public credit',
       subClass: 'US Treasuries',
     },
+    icon: {
+      uri: 'ipfs://QmTQwFU4zWuwhm3ft77G7wcP6LYBo6nfhy7aJ4Hd9j6ryG',
+      mime: 'image/png',
+    },
     investorType: 'Non-US Professional Investors',
     poolRatings: [
       {

@@ -69,6 +69,7 @@ export function BalanceInput<TFieldValues extends FieldValues = FieldValues>(pro
     displayDecimals,
     selectOptions,
     onSelectChange,
+    label,
     ...rest
   } = props
   const currentDisplayDecimals = displayDecimals || decimals
@@ -217,6 +218,7 @@ export function BalanceInput<TFieldValues extends FieldValues = FieldValues>(pro
 
   return (
     <Field.Root invalid={isError}>
+      {label && <Field.Label>{label}</Field.Label>}
       <InputGroup
         {...inputGroupProps}
         endElement={

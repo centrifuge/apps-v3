@@ -1,0 +1,39 @@
+name: 💬 PR Preview URLs
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  comment-workers-previews:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set preview URLs
+        env:
+          ACCOUNT_SUBDOMAIN: centrifuge-kf
+          PR_BRANCH: ${{ github.event.pull_request.head.ref }}
+        run: |
+          SANITIZED=$(echo "${PR_BRANCH,,}" | tr '/_' '--')
+          echo "LAUNCHPAD_URL=https://${SANITIZED}-launchpad.${ACCOUNT_SUBDOMAIN}.workers.dev" >> $GITHUB_ENV
+          echo "PERMISSIONLESS_URL=https://${SANITIZED}-permissionless.${ACCOUNT_SUBDOMAIN}.workers.dev" >> $GITHUB_ENV
+
+      - name: Find existing PR-preview comment
+        uses: peter-evans/find-comment@v3
+        id: find_preview
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body-includes: '<!-- PR preview URLs -->'
+
+      - name: Comment PR with preview URLs
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-id: ${{ steps.find_preview.outputs.comment-id }}
+          edit-mode: replace
+          body: |
+            🚀 **Launchpad preview**: ${{ env.LAUNCHPAD_URL }}
+            🚀 **Permissionless preview**: ${{ env.PERMISSIONLESS_URL }}

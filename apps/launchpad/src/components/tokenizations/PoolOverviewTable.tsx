@@ -1,10 +1,14 @@
 import { Link } from 'react-router'
-import { Button, Flex, Heading, Image, Stack, Text } from '@chakra-ui/react'
+import { Box, Button, Flex, Heading, Image, Stack, Text } from '@chakra-ui/react'
 import { Balance } from '@centrifuge/sdk'
 import { useAllPoolDetails } from '@centrifuge/shared'
 import { ipfsToHttp } from '@centrifuge/shared/src/utils/formatting'
 import { BalanceDisplay, NetworkIcon } from '@centrifuge/ui'
 import DataTable, { ColumnDefinition } from './DataTable'
+import { mockMetadata } from './mockMetadata'
+import { usePoolsByManager } from '@centrifuge/shared/src/hooks/usePools'
+import { useAccount } from 'wagmi'
+import { Spinner } from '@chakra-ui/react'
 
 type Row = {
   id: string
@@ -74,10 +78,13 @@ const columns: ColumnDefinition<Row>[] = [
 ]
 
 export const PoolOverviewTable = () => {
-  const { data: pools } = useAllPoolDetails()
+  const { address } = useAccount()
+  const { data: allPools } = usePoolsByManager(address)
+  const poolIds = allPools?.map((pool) => pool.id)
+  const { data: pools, isLoading } = useAllPoolDetails(poolIds ?? [])
 
   const data =
-    pools?.map((pool) => {
+    pools?.map((pool: any) => {
       const shareClassDetails = Object.values(pool.shareClasses)
       const metaShareClassKeys = pool.metadata?.shareClasses ? Object.keys(pool.metadata?.shareClasses) : []
       const apy = pool.metadata?.shareClasses[metaShareClassKeys[0]].apyPercentage ?? 0
@@ -85,19 +92,19 @@ export const PoolOverviewTable = () => {
       return {
         id: pool.id,
         name: pool.metadata?.pool.name ?? 'RWA Portfolio',
-        icon: pool.metadata?.pool.icon,
-        shareClasses: shareClassDetails.map((sc) => ({
+        icon: pool.metadata?.pool.icon ?? mockMetadata.pool.icon,
+        shareClasses: shareClassDetails.map((sc: any) => ({
           token: sc.details.symbol,
           apy,
-          tokenPrice: sc.details.navPerShare,
+          tokenPrice: sc.details.pricePerShare,
           totalIssuance: sc.details.totalIssuance,
           networks: sc.shareClass.pool.chainId,
         })),
       }
     }) ?? []
 
-  const flattenedData = data.flatMap((d) =>
-    d.shareClasses.map((sc) => ({
+  const flattenedData = data.flatMap((d: any) =>
+    d.shareClasses.map((sc: any) => ({
       id: `${d.id}-${sc.token}`,
       poolName: d.name,
       iconUri: d.icon?.uri,
@@ -109,12 +116,21 @@ export const PoolOverviewTable = () => {
     }))
   )
 
+  // TODO: add better UI for loading, skeleton??
+  if (isLoading)
+    return (
+      <Box display="flex" flexDirection="row" alignItems="center" justifyContent="center" height="100%" gap={2} mt={10}>
+        <Spinner size="lg" />
+        <Heading size="md">Loading</Heading>
+      </Box>
+    )
+
   return (
     <Stack>
       <Heading size="md" my="4">
         Pool overview
       </Heading>
-      <DataTable columns={columns} data={flattenedData ?? []} />
+      {<DataTable columns={columns} data={flattenedData ?? []} />}
     </Stack>
   )
 }
