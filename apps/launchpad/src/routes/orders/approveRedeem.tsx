@@ -108,7 +108,6 @@ export default function ApproveRedeem() {
                 </Flex>
                 <Checkbox onCheckedChange={() => onCheckedChange(vault.id)} />
               </Flex>
-              <SectionWithCheckbox sections={bottomSections} />
             </Stack>
           </Box>
         ))}
