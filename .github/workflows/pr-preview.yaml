@@ -14,11 +14,10 @@ jobs:
       - name: Set preview URLs
         env:
           ACCOUNT_SUBDOMAIN: centrifuge-kf
-          PR_BRANCH: ${{ github.event.pull_request.head.ref }}
         run: |
-          SANITIZED=$(echo "${PR_BRANCH,,}" | tr '/_' '--')
-          echo "LAUNCHPAD_URL=https://${SANITIZED}-launchpad.${ACCOUNT_SUBDOMAIN}.workers.dev" >> $GITHUB_ENV
-          echo "PERMISSIONLESS_URL=https://${SANITIZED}-permissionless.${ACCOUNT_SUBDOMAIN}.workers.dev" >> $GITHUB_ENV
+          SHORT_SHA=${GITHUB_SHA:0:8}
+          echo "LAUNCHPAD_URL=https://${SHORT_SHA}-launchpad.${ACCOUNT_SUBDOMAIN}.workers.dev" >> $GITHUB_ENV
+          echo "PERMISSIONLESS_URL=https://${SHORT_SHA}-permissionless.${ACCOUNT_SUBDOMAIN}.workers.dev" >> $GITHUB_ENV
 
       - name: Find existing PR-preview comment
         uses: peter-evans/find-comment@v3
