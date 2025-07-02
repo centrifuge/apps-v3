@@ -1,0 +1,28 @@
+name: 💬 PR Preview URLs
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  comment-workers-previews:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set preview URLs
+        run: |
+          SHORT_SHA=${GITHUB_SHA:0:8}
+          ACCOUNT_SUBDOMAIN=centrifuge-kf
+          echo "LAUNCHPAD_URL=https://${SHORT_SHA}-launchpad.${ACCOUNT_SUBDOMAIN}.workers.dev" >> $GITHUB_ENV
+          echo "PERMISSIONLESS_URL=https://${SHORT_SHA}-permissionless.${ACCOUNT_SUBDOMAIN}.workers.dev" >> $GITHUB_ENV
+
+      - name: Comment PR with preview URLs
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            🚀 **Launchpad preview**: ${{ env.LAUNCHPAD_URL }}
+            🚀 **Permissionless preview**: ${{ env.PERMISSIONLESS_URL }}
