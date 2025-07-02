@@ -6,6 +6,7 @@ import { formatBalanceToString, useNavPerNetwork, useObservable } from '@centrif
 import { FaRegChartBar } from 'react-icons/fa'
 import { Orders } from './Orders'
 import { PoolHoldings } from './PoolHoldings'
+import { useNavigate, useParams } from 'react-router'
 
 const calculateNav = (pricePerShare: Balance, numberOfShares: Balance) => {
   return pricePerShare.mul(numberOfShares)
@@ -14,22 +15,24 @@ const calculateNav = (pricePerShare: Balance, numberOfShares: Balance) => {
 export function AccountPage({
   vaultsDetails,
   investmentsPerVaults,
-  shareClass,
+  sc,
 }: {
   // TODO: types
   vaultsDetails: any[]
   investmentsPerVaults: any[]
-  shareClass: any
+  sc: any
 }) {
-  const { data: navPerNetwork, isLoading } = useNavPerNetwork(shareClass.shareClass)
+  const navigate = useNavigate()
+  const { poolId } = useParams()
+  const { data: navPerNetwork, isLoading } = useNavPerNetwork(sc.shareClass)
 
   const amounts = useMemo(() => {
     return {
-      totalNav: calculateNav(shareClass?.details.pricePerShare, shareClass.details.totalIssuance) ?? 0,
-      totalNavPerShare: shareClass?.details.pricePerShare ?? 0,
-      totalIssuance: shareClass?.details.totalIssuance ?? 0,
+      totalNav: calculateNav(sc?.details.pricePerShare, sc.details.totalIssuance) ?? 0,
+      totalNavPerShare: sc?.details.pricePerShare ?? 0,
+      totalIssuance: sc?.details.totalIssuance ?? 0,
     }
-  }, [shareClass])
+  }, [sc])
 
   const pendingInvestments = useMemo(
     () => investmentsPerVaults.map((investment) => investment.pendingInvestCurrency),
@@ -51,7 +54,7 @@ export function AccountPage({
               <Stack gap={0}>
                 <Heading fontSize="xs">NAV</Heading>
                 <Heading size="2xl">
-                  {formatBalanceToString(amounts.totalNav, 2) ?? '0'} {shareClass?.details.symbol}
+                  {formatBalanceToString(amounts.totalNav, 2) ?? '0'} {sc?.details.symbol}
                 </Heading>
               </Stack>
               <Separator mt={2} mb={2} />
@@ -59,7 +62,7 @@ export function AccountPage({
                 <Flex key={`${network.chainId}-${index}`} align="center" gap={2}>
                   <NetworkIcon networkId={network.chainId} boxSize="20px" />
                   <Text fontSize="sm">
-                    {formatBalanceToString(network.nav, 2) ?? '0'} {shareClass?.details.symbol}
+                    {formatBalanceToString(network.nav, 2) ?? '0'} {sc?.details.symbol}
                   </Text>
                 </Flex>
               ))}
@@ -69,7 +72,7 @@ export function AccountPage({
                 <Heading fontSize="xs">NAV per share</Heading>
                 <Flex justify="space-between" align="center" width="100%">
                   <Heading size="2xl">
-                    {formatBalanceToString(amounts.totalNavPerShare, 4) ?? '0'} {shareClass?.details.symbol}
+                    {formatBalanceToString(amounts.totalNavPerShare, 4) ?? '0'} {sc?.details.symbol}
                   </Heading>
                 </Flex>
               </Stack>
@@ -78,7 +81,7 @@ export function AccountPage({
                 <Flex key={`${network.chainId}-${index}`} align="center" gap={2}>
                   <NetworkIcon networkId={network.chainId} boxSize="20px" />
                   <Text fontSize="sm">
-                    {formatBalanceToString(network.pricePerShare, 2) ?? '0'} {shareClass?.details.symbol}
+                    {formatBalanceToString(network.pricePerShare, 2) ?? '0'} {sc?.details.symbol}
                   </Text>
                 </Flex>
               ))}
@@ -106,10 +109,16 @@ export function AccountPage({
           <Heading size="sm">Holdings</Heading>
           <Flex justify="space-between">
             <Heading size="3xl">39,139,062 USDC</Heading>
-            <Button label="Add holding" onClick={() => {}} colorPalette="gray" width="140px" size="sm" />
+            <Button
+              label="Add holding"
+              onClick={() => navigate(`/holdings/${poolId}/add/${sc.shareClass.id}`)}
+              colorPalette="gray"
+              width="140px"
+              size="sm"
+            />
           </Flex>
         </Stack>
-        <PoolHoldings shareClass={shareClass.shareClass} />
+        <PoolHoldings shareClass={sc.shareClass} />
       </Stack>
     </Box>
   )

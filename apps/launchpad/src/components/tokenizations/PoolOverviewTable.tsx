@@ -62,9 +62,9 @@ const columns: ColumnDefinition<Row>[] = [
     header: '',
     accessor: '',
     render: ({ id }) => {
-      const navId = id.split('-')[0]
+      const poolId = id.split('-')[0]
       return (
-        <Link to={`/account/${navId}`}>
+        <Link to={`/account/${poolId}`}>
           <Button colorPalette="gray" size="xs">
             Accounts
           </Button>
