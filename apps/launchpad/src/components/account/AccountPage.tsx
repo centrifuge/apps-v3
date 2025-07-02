@@ -2,7 +2,7 @@ import { Balance } from '@centrifuge/sdk'
 import { Button, Card, NetworkIcon } from '@centrifuge/ui'
 import { Box, Flex, Grid, Heading, Separator, Stack, Text } from '@chakra-ui/react'
 import { useMemo } from 'react'
-import { formatBalanceToString } from '@centrifuge/shared'
+import { formatBalanceToString, useNavPerNetwork, useObservable } from '@centrifuge/shared'
 import { FaRegChartBar } from 'react-icons/fa'
 import { Orders } from './Orders'
 import { PoolHoldings } from './PoolHoldings'
@@ -13,42 +13,34 @@ const calculateNav = (pricePerShare: Balance, numberOfShares: Balance) => {
 
 export function AccountPage({
   vaultsDetails,
-  allInvestments,
+  investmentsPerVaults,
   shareClass,
 }: {
   // TODO: types
   vaultsDetails: any[]
-  allInvestments: any[]
+  investmentsPerVaults: any[]
   shareClass: any
 }) {
-  const navPerNetwork = useMemo(() => {
-    return vaultsDetails.map((vault) => {
-      return {
-        network: vault.network.chainId,
-        nav:
-          shareClass.details.id.raw === vault.shareClass.id.raw
-            ? calculateNav(shareClass.details.navPerShare, shareClass.details.totalIssuance)
-            : 0,
-      }
-    })
-  }, [vaultsDetails, shareClass])
+  const { data: navPerNetwork, isLoading } = useNavPerNetwork(shareClass.shareClass)
 
   const amounts = useMemo(() => {
     return {
-      totalNav: calculateNav(shareClass?.details.navPerShare, shareClass.details.totalIssuance) ?? 0,
-      totalNavPerShare: shareClass?.details.navPerShare ?? 0,
+      totalNav: calculateNav(shareClass?.details.pricePerShare, shareClass.details.totalIssuance) ?? 0,
+      totalNavPerShare: shareClass?.details.pricePerShare ?? 0,
       totalIssuance: shareClass?.details.totalIssuance ?? 0,
     }
   }, [shareClass])
 
   const pendingInvestments = useMemo(
-    () => allInvestments.map((investment) => investment.pendingInvestCurrency),
-    [allInvestments]
+    () => investmentsPerVaults.map((investment) => investment.pendingInvestCurrency),
+    [investmentsPerVaults]
   )
   const pendingRedemptions = useMemo(
-    () => allInvestments.map((investment) => investment.pendingRedeemShares),
-    [allInvestments]
+    () => investmentsPerVaults.map((investment) => investment.pendingRedeemShares),
+    [investmentsPerVaults]
   )
+
+  if (isLoading) return <p>Loading....</p>
 
   return (
     <Box mb={8}>
@@ -63,12 +55,11 @@ export function AccountPage({
                 </Heading>
               </Stack>
               <Separator mt={2} mb={2} />
-              {navPerNetwork.map((nav) => (
-                <Flex key={nav.network} align="center" gap={2}>
-                  <NetworkIcon networkId={nav.network} boxSize="20px" />
+              {navPerNetwork?.map((network, index) => (
+                <Flex key={`${network.chainId}-${index}`} align="center" gap={2}>
+                  <NetworkIcon networkId={network.chainId} boxSize="20px" />
                   <Text fontSize="sm">
-                    {typeof nav.nav === 'number' ? '0' : (formatBalanceToString(nav.nav, 2) ?? '0')}{' '}
-                    {shareClass?.details.symbol}
+                    {formatBalanceToString(network.nav, 2) ?? '0'} {shareClass?.details.symbol}
                   </Text>
                 </Flex>
               ))}
@@ -80,9 +71,17 @@ export function AccountPage({
                   <Heading size="2xl">
                     {formatBalanceToString(amounts.totalNavPerShare, 4) ?? '0'} {shareClass?.details.symbol}
                   </Heading>
-                  <Text fontSize="sm">{formatBalanceToString(amounts.totalIssuance, 2) ?? '0'} shares issued</Text>
                 </Flex>
               </Stack>
+              <Separator mt={2} mb={2} />
+              {navPerNetwork?.map((network, index) => (
+                <Flex key={`${network.chainId}-${index}`} align="center" gap={2}>
+                  <NetworkIcon networkId={network.chainId} boxSize="20px" />
+                  <Text fontSize="sm">
+                    {formatBalanceToString(network.pricePerShare, 2) ?? '0'} {shareClass?.details.symbol}
+                  </Text>
+                </Flex>
+              ))}
             </Box>
           </Stack>
         </Card>
@@ -110,7 +109,7 @@ export function AccountPage({
             <Button label="Add holding" onClick={() => {}} colorPalette="gray" width="140px" size="sm" />
           </Flex>
         </Stack>
-        <PoolHoldings />
+        <PoolHoldings shareClass={shareClass.shareClass} />
       </Stack>
     </Box>
   )

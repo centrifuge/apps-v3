@@ -27,8 +27,8 @@ export function NavForm({ parsedNewTokenPrice }: NavFormProps) {
   const { setValue } = useFormContext()
   const networkName = useMemo(() => NETWORK_ID_MAP[network?.chainId]?.toUpperCase(), [network])
 
-  const navPerShare: number | Balance = shareClass?.details?.navPerShare ?? 0
-  const totalIssuance: number | Balance = shareClass?.details?.totalIssuance ?? 0
+  const navPerShare: Balance = shareClass?.details?.navPerShare ?? 0
+  const totalIssuance: Balance = shareClass?.details?.totalIssuance ?? 0
   const hasBalances = typeof navPerShare !== 'number' && typeof totalIssuance !== 'number'
 
   const currentNav = useMemo(

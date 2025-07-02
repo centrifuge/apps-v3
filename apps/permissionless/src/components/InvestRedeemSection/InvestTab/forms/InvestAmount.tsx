@@ -11,8 +11,6 @@ import { InfoWrapper } from '@components/InvestRedeemSection/components/InfoWrap
 import { VaultDetails } from '@utils/types'
 import { formatBalance, formatBalanceToString } from '@centrifuge/shared'
 
-const networks: Network[] = ['ethereum', 'arbitrum', 'celo', 'base']
-
 interface InvestAmountProps {
   isDisabled: boolean
   parsedAmount: 0 | Balance

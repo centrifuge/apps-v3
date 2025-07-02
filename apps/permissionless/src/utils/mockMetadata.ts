@@ -6,6 +6,10 @@ export const mockMetadata = {
       subClass: 'US Treasuries',
     },
     investorType: 'Non-US Professional Investors',
+    icon: {
+      uri: 'ipfs://QmTQwFU4zWuwhm3ft77G7wcP6LYBo6nfhy7aJ4Hd9j6ryG',
+      mime: 'image/png',
+    },
     poolRatings: [
       {
         agency: "Moody's",

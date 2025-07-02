@@ -3,8 +3,8 @@ import type { PoolMetadata } from '@centrifuge/sdk'
 import { formatPercentage } from '@centrifuge/shared'
 import DataTable, { type ColumnDefinition } from '@components/DataTable'
 import { RatingPill } from '@components/RatingPill'
-import { Tooltip } from '@components/Tooltip'
 import { mockMetadata } from '@utils/mockMetadata'
+import { Tooltip } from '@centrifuge/ui'
 
 type Row = {
   id: number

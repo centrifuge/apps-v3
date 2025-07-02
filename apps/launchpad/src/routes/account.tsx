@@ -8,13 +8,13 @@ import { usePoolProvider } from '@contexts/PoolProvider'
 // TODO: FOR MVP, we are assuming one share class per pool
 // Routing must be fix to handle multiple share classes per pool
 export default function Account() {
-  const { poolId } = useParams()
-  const { shareClass, vaultsDetails, allInvestments } = usePoolProvider()
   const navigate = useNavigate()
+  const { poolId } = useParams()
+  const { shareClass, vaultsDetails, investmentsPerVaults } = usePoolProvider()
   const shareClassId = shareClass?.shareClass?.id.raw ?? ''
 
   const totalNav = useMemo(() => {
-    return shareClass?.details.navPerShare.mul(shareClass?.details.totalIssuance)
+    return shareClass?.details.pricePerShare.mul(shareClass?.details.totalIssuance)
   }, [shareClass])
 
   return (
@@ -32,7 +32,7 @@ export default function Account() {
       {shareClass && (
         <AccountPage
           vaultsDetails={vaultsDetails ?? []}
-          allInvestments={allInvestments ?? []}
+          investmentsPerVaults={investmentsPerVaults ?? []}
           shareClass={shareClass}
         />
       )}
