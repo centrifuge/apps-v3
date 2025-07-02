@@ -92,7 +92,6 @@ const columns: ColumnDefinition<Row>[] = [
 export function PoolHoldings({ shareClass }: { shareClass: ShareClass }) {
   // TODO: still broken on sdk side
   const holdings = useHoldings(shareClass)
-  console.log(holdings)
   const data: Row[] = HOLDINGS.map((holding, idx) => ({
     id: idx,
     asset: holding.asset,

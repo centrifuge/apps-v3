@@ -33,7 +33,7 @@ export default function Account() {
         <AccountPage
           vaultsDetails={vaultsDetails ?? []}
           investmentsPerVaults={investmentsPerVaults ?? []}
-          shareClass={shareClass}
+          sc={shareClass}
         />
       )}
     </Box>

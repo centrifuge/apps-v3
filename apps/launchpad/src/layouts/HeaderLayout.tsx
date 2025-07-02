@@ -44,6 +44,14 @@ const getOrdersTabs = (poolId: string) => [
   },
 ]
 
+// Holdings page tabs
+const getHoldingsTabs = (poolId: string) => [
+  {
+    label: 'Add holdings',
+    path: `/holdings/${poolId}/add`,
+  },
+]
+
 // Account page tabs
 const getAccountTabs = (poolId: string, labels: string[]) => [
   ...labels.map((label) => ({
@@ -70,6 +78,9 @@ function getTabsForRoute(pathname: string, poolId?: string, labels?: string[]) {
   }
   if (pathname.startsWith('/settings')) {
     return getPoolSettingsTabs(poolId)
+  }
+  if (pathname.startsWith('/holdings')) {
+    return getHoldingsTabs(poolId)
   }
   return MAIN_TABS
 }
