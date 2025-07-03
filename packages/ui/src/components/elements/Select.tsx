@@ -18,7 +18,13 @@ export const Select = ({
     items: options,
   })
   return (
-    <ChakraSelect.Root collection={collection} size="sm" onValueChange={(e) => onSelect(e.value)} {...props}>
+    <ChakraSelect.Root
+      collection={collection}
+      size="sm"
+      onValueChange={(e) => onSelect(e.value)}
+      disabled={disabled}
+      {...props}
+    >
       <ChakraSelect.HiddenSelect />
       <ChakraSelect.Label>{label}</ChakraSelect.Label>
       <ChakraSelect.Control>
