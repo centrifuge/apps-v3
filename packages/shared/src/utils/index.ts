@@ -8,3 +8,4 @@ export {
   truncateAddress,
 } from './formatting'
 export { networkToName } from './networkToName'
+export { chainExplorer } from './chainExplorer'

@@ -56,14 +56,3 @@ export function usePoolNetworks(poolId?: PoolId) {
   const vaults$ = useMemo(() => (pool ? pool?.activeNetworks() : undefined), [pool])
   return useObservable(vaults$)
 }
-
-export const useAssets = (spokeChainId: number, hubChainId: number) => {
-  const centrifuge = useCentrifuge()
-
-  const asset$ = useMemo(() => {
-    if (!spokeChainId || !hubChainId) return undefined
-    return centrifuge.assets(11155111, 84532)
-  }, [spokeChainId, hubChainId])
-
-  return useObservable(asset$)
-}

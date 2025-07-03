@@ -1,29 +1,38 @@
 import { HStack, Portal, Select as ChakraSelect, createListCollection, Button, Text } from '@chakra-ui/react'
+import { useEffect, useState } from 'react'
 import { RiArrowDownSLine } from 'react-icons/ri'
 
 export const Select = ({
+  defaultValue,
   disabled,
   options,
   label,
   onSelect,
-  ...props
 }: {
+  defaultValue?: string[]
   disabled?: boolean
   options: { value: string; children?: string | number | React.ReactNode; label: string }[]
   label?: string
-  onSelect: (value: string[] | number[]) => void
-  props?: ChakraSelect.RootProps
+  onSelect: (value: any) => void
 }) => {
+  const [value, setValue] = useState<string[]>(defaultValue || [])
+
   const collection = createListCollection({
     items: options,
   })
+
+  const onValueChange = (value: string[]) => {
+    setValue(value)
+    onSelect(value)
+  }
+
   return (
     <ChakraSelect.Root
       collection={collection}
       size="sm"
-      onValueChange={(e) => onSelect(e.value)}
+      onValueChange={({ value }) => onValueChange(value)}
       disabled={disabled}
-      {...props}
+      value={value}
     >
       <ChakraSelect.HiddenSelect />
       <ChakraSelect.Label>{label}</ChakraSelect.Label>
@@ -38,8 +47,7 @@ export const Select = ({
           <ChakraSelect.Content minW="32">
             {options.map((option) => (
               <ChakraSelect.Item item={option} key={option.value}>
-                <HStack>{option.children ? option.children : <Text>{option.label}</Text>}</HStack>
-                <ChakraSelect.ItemIndicator />
+                {option.children ?? option.label}
               </ChakraSelect.Item>
             ))}
           </ChakraSelect.Content>
