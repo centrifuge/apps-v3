@@ -34,6 +34,8 @@ export function AccountPage({
     }
   }, [sc])
 
+  console.log(amounts)
+
   const pendingInvestments = useMemo(
     () => investmentsPerVaults.map((investment) => investment.pendingInvestCurrency),
     [investmentsPerVaults]
@@ -111,7 +113,7 @@ export function AccountPage({
             <Heading size="3xl">39,139,062 USDC</Heading>
             <Button
               label="Add holding"
-              onClick={() => navigate(`/holdings/${poolId}/add/${sc.shareClass.id}`)}
+              onClick={() => navigate(`/holdings/${poolId}/add`)}
               colorPalette="gray"
               width="140px"
               size="sm"

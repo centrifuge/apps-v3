@@ -23,7 +23,7 @@ export default [
     route('/settings/:poolId/poolAccess', './routes/settings/poolAccess.tsx'),
 
     // Pool Holdings
-    route('/holdings/:poolId/add/:shareClassId', './routes/holdings/add.tsx'),
+    route('/holdings/:poolId/add', './routes/holdings/add.tsx'),
   ]),
   route('*', './routes/catchall.tsx'),
 ] satisfies RouteConfig

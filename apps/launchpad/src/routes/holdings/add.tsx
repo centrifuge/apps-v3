@@ -1,35 +1,66 @@
-import { PoolNetwork } from '@centrifuge/sdk'
-import { networkToName } from '@centrifuge/shared'
-import { NetworkIcon, Select } from '@centrifuge/ui'
-import { Flex, Text } from '@chakra-ui/react'
+import z from 'zod'
+import { Flex, Heading } from '@chakra-ui/react'
+import { Form, useForm } from '@centrifuge/forms'
 import { usePoolProvider } from '@contexts/PoolProvider'
-import { useMemo } from 'react'
+import { AddHoldingForm } from '@components/holdings/addHoldingForm'
+import { Button, Card, Loader } from '@centrifuge/ui'
+import { AssetId, ShareClassId } from '@centrifuge/sdk'
+import { useCentrifugeTransaction } from '@hooks/useCentrifugeTransaction'
 
 export const handle = {
   hasSettings: false,
   hasTabs: true,
 }
 
-export default function Add() {
-  const { shareClass, networks } = usePoolProvider()
-  console.log(shareClass)
+const schema = z.object({
+  network: z.string(),
+  asset: z.instanceof(AssetId),
+  sc: z.instanceof(ShareClassId),
+})
 
-  const networkOptions = useMemo(() => {
-    if (!networks) return []
-    return networks.map((network: PoolNetwork) => ({
-      value: network.chainId,
-      children: (
-        <Flex gap={2} alignItems="center">
-          <NetworkIcon networkId={network.chainId} />
-          <Text>{networkToName(network.chainId)}</Text>
-        </Flex>
-      ),
-    }))
-  }, [networks])
+export default function Add() {
+  const { networks, isLoading, poolDetails, pool } = usePoolProvider()
+  const { execute, isPending } = useCentrifugeTransaction()
+
+  const form = useForm({
+    schema,
+    mode: 'onChange',
+    onSubmit: (values) => {
+      const { sc, asset } = values
+      const selectedShareClass = poolDetails?.shareClasses.find(
+        (shareClass: any) => shareClass.details.id.raw === sc.raw
+      )
+
+      // TODO: valuation contract should come from sdk
+      execute(
+        selectedShareClass?.shareClass.createHolding(asset, '0x6Bcb240d3e1f1C4321ECAFFDacB45691DC03bE5D', false, {
+          equity: 123,
+          gain: 123,
+          loss: 123,
+        })
+      )
+    },
+  })
+
+  const { asset, sc } = form.watch()
+
+  if (isLoading) return <Loader />
 
   return (
-    <div>
-      <Select options={networkOptions} />
-    </div>
+    <Form form={form}>
+      <Flex justifyContent="space-between" alignItems="center" mt={8} mb={8}>
+        <Heading>Add holding</Heading>
+        <Button
+          label="Save changes"
+          size="sm"
+          onClick={() => form.handleSubmit()}
+          disabled={!asset || !sc}
+          loading={isPending}
+        />
+      </Flex>
+      <Card>
+        <AddHoldingForm networks={networks} poolDetails={poolDetails} hubChainId={pool?.hubChainId} />
+      </Card>
+    </Form>
   )
 }

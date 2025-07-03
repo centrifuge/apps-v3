@@ -1,4 +1,4 @@
-import { PoolId } from '@centrifuge/sdk'
+import { PoolId, PoolNetwork } from '@centrifuge/sdk'
 import { useMemo } from 'react'
 import { combineLatest, map, of, switchMap } from 'rxjs'
 import { Address } from 'viem'
