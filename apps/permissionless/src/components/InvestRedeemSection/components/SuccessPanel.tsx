@@ -23,13 +23,11 @@ type SuccessPanelProps = InvestActionProps | RedeemActionProps
 // to ensure TypeScript can correctly infer the type based on the isInvesting property.
 export function SuccessPanel(props: SuccessPanelProps) {
   const { getValues } = useFormContext()
+  const { transactions } = useTransactions()
   const [txDescription, setTxDescription] = useState('Handling transaction')
   const [isTxSuccessful, setIsTxSuccessful] = useState(false)
   const [isTxFailed, setIsTxFailed] = useState(false)
-  const [txHash, setTxHash] = useState<string | null>(
-    '0x84568c28813859bcc1bbc50725b84319ec42329c7d099712c0c45155db0373ae'
-  )
-  const { transactions } = useTransactions()
+  const [txHash, setTxHash] = useState<string | null>(null)
   const [successColor, errorColor] = useToken('colors', ['success', 'error'])
 
   const activeTransactionIds = useRef<Record<string, string>>({})
@@ -87,7 +85,6 @@ export function SuccessPanel(props: SuccessPanelProps) {
   const buttonText = isInvesting ? 'Invest more' : 'Redeem more'
   const txHeaderColor = isTxSuccessful ? successColor : isTxFailed ? errorColor : 'inherit'
   const isButtonDisabled = !isTxSuccessful && !isTxFailed
-  console.log('SuccessPanel', { isTxSuccessful, isTxFailed, isButtonDisabled, transactions })
 
   return (
     <Box height="100%">
