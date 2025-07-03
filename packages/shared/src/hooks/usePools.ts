@@ -1,4 +1,4 @@
-import { PoolId } from '@centrifuge/sdk'
+import { PoolId, PoolNetwork } from '@centrifuge/sdk'
 import { useMemo } from 'react'
 import { combineLatest, map, of, switchMap } from 'rxjs'
 import { useObservable } from './useObservable'
@@ -7,10 +7,7 @@ import { Address } from 'viem'
 
 export function usePools() {
   const centrifuge = useCentrifuge()
-  const pools$ = useMemo(
-    () => centrifuge.pools().pipe(map((pools) => pools.filter((p) => p.chainId === 11155111))),
-    [centrifuge]
-  )
+  const pools$ = useMemo(() => centrifuge.pools(), [centrifuge])
   return useObservable(pools$)
 }
 
@@ -58,4 +55,15 @@ export function usePoolNetworks(poolId?: PoolId) {
   const { data: pool } = usePool(poolId)
   const vaults$ = useMemo(() => (pool ? pool?.activeNetworks() : undefined), [pool])
   return useObservable(vaults$)
+}
+
+export const useAssets = (spokeChainId: number, hubChainId: number) => {
+  const centrifuge = useCentrifuge()
+
+  const asset$ = useMemo(() => {
+    if (!spokeChainId || !hubChainId) return undefined
+    return centrifuge.assets(11155111, 84532)
+  }, [spokeChainId, hubChainId])
+
+  return useObservable(asset$)
 }

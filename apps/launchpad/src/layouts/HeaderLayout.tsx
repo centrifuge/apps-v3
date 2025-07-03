@@ -48,7 +48,7 @@ const getOrdersTabs = (poolId: string) => [
 const getHoldingsTabs = (poolId: string) => [
   {
     label: 'Add holdings',
-    path: `/holdings/${poolId}/add`,
+    path: `/holdings/add`,
   },
 ]
 

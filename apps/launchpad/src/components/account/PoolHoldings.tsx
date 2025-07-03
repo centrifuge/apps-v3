@@ -1,7 +1,7 @@
 import { ShareClass } from '@centrifuge/sdk'
 import { networkToName, useHoldings } from '@centrifuge/shared'
 import { NetworkIcon } from '@centrifuge/ui'
-import DataTable, { ColumnDefinition } from '@centrifuge/ui/src/components/DataTable'
+import { DataTable, ColumnDefinition } from '@centrifuge/ui'
 import { Box, Flex, Heading, Text } from '@chakra-ui/react'
 
 // TODO: add pool holdings from sdk once we have it
