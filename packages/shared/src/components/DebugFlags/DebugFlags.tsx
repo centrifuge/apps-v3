@@ -100,6 +100,7 @@ function Panel({
                   if (obj.type === 'checkbox') {
                     element = (
                       <Checkbox.Root
+                        key={key}
                         checked={value as boolean}
                         onChange={(e: ChangeEvent<HTMLInputElement>) => onChange(key as Key, e.target.checked)}
                       >
@@ -110,7 +111,7 @@ function Panel({
                     )
                   } else if (obj.type === 'select' && obj.options) {
                     element = (
-                      <NativeSelect.Root size="xl" variant="outline" width="auto" me="-1">
+                      <NativeSelect.Root key={key} size="xl" variant="outline" width="auto" me="-1">
                         <NativeSelect.Field
                           value={value as string}
                           onChange={(e) => onChange(key as Key, e.target.value)}
@@ -127,7 +128,7 @@ function Panel({
                     )
                   } else {
                     element = (
-                      <Field.Root invalid={!used}>
+                      <Field.Root key={key} invalid={!used}>
                         <Field.Label>{key}</Field.Label>
                         <Input value={value as string} onChange={(e) => onChange(key as Key, e.target.value)} />
                         <Field.ErrorText>unused</Field.ErrorText>
