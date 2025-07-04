@@ -1,9 +1,11 @@
 import z from 'zod'
 import { Flex, Heading } from '@chakra-ui/react'
-import { createBalanceSchema, Form, useForm } from '@centrifuge/forms'
+import { Form, useForm } from '@centrifuge/forms'
 import { usePoolProvider } from '@contexts/PoolProvider'
 import { AddHoldingForm } from '@components/holdings/addHoldingForm'
-import { Button, Card } from '@centrifuge/ui'
+import { Button, Card, Loader } from '@centrifuge/ui'
+import { AssetId, ShareClassId } from '@centrifuge/sdk'
+import { useCentrifugeTransaction } from '@hooks/useCentrifugeTransaction'
 
 export const handle = {
   hasSettings: false,
@@ -12,30 +14,44 @@ export const handle = {
 
 const schema = z.object({
   network: z.string(),
-  asset: z.string(),
-  sc: z.string(),
-  value: createBalanceSchema(2),
+  asset: z.instanceof(AssetId),
+  sc: z.instanceof(ShareClassId),
 })
 
 export default function Add() {
-  const { shareClass, networks, isLoading, poolDetails } = usePoolProvider()
+  const { networks, isLoading, poolDetails } = usePoolProvider()
+  const { execute, isPending } = useCentrifugeTransaction()
 
   const form = useForm({
+    schema,
     mode: 'onChange',
     onSubmit: (values) => {
-      console.log('Nav form values: ', values)
+      const { sc, asset } = values
+      const selectedShareClass = poolDetails?.shareClasses.find(
+        (shareClass: any) => shareClass.details.id.raw === sc.raw
+      )
+
+      // TODO: valuation contract should come from sdk
+      execute(selectedShareClass?.shareClass.createHolding(asset, '0x6Bcb240d3e1f1C4321ECAFFDacB45691DC03bE5D', false))
     },
     onSubmitError: (error) => console.error('Nav form submission error:', error),
   })
 
-  //TODO: Add better loading component
-  if (isLoading || !shareClass || !networks) return <div>Loading...</div>
+  const { asset, sc } = form.watch()
+
+  if (isLoading) return <Loader />
 
   return (
     <Form form={form}>
       <Flex justifyContent="space-between" alignItems="center" mt={8} mb={8}>
         <Heading>Add holding</Heading>
-        <Button label="Save changes" size="sm" />
+        <Button
+          label="Save changes"
+          size="sm"
+          onClick={() => form.handleSubmit()}
+          disabled={!asset || !sc}
+          loading={isPending}
+        />
       </Flex>
       <Card>
         <AddHoldingForm networks={networks} poolDetails={poolDetails} />

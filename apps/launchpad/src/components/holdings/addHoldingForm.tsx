@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { CiShare1 } from 'react-icons/ci'
-import { BalanceInput, useFormContext } from '@centrifuge/forms'
+import { useFormContext } from '@centrifuge/forms'
 import { PoolNetwork } from '@centrifuge/sdk'
 import { chainExplorer, networkToName, truncateAddress, useAssets } from '@centrifuge/shared'
 import { NetworkIcon, Select } from '@centrifuge/ui'
@@ -10,7 +10,6 @@ import { Link } from 'react-router'
 export const AddHoldingForm = ({ networks, poolDetails }: { networks: PoolNetwork[]; poolDetails: any }) => {
   const { watch, setValue } = useFormContext()
   const network = watch('network')
-  const asset = watch('asset')
   const { data: assets } = useAssets(network)
 
   const networkOptions = useMemo(() => {
@@ -38,7 +37,7 @@ export const AddHoldingForm = ({ networks, poolDetails }: { networks: PoolNetwor
   const assetOptions = useMemo(() => {
     if (!assets) return []
     return assets.map((asset: any) => ({
-      value: asset.id.raw,
+      value: asset.id,
       label: asset.name,
       children: (
         <Grid gridTemplateColumns="1fr 20px 1fr 20px" gap={2} alignItems="center" px={1}>
@@ -58,10 +57,6 @@ export const AddHoldingForm = ({ networks, poolDetails }: { networks: PoolNetwor
     setValue(label, val)
   }
 
-  const selectedAsset = useMemo(() => {
-    return assets?.find((option) => option.id.raw === asset)
-  }, [asset, assets])
-
   return (
     <Grid gridTemplateColumns="1fr 1fr" gap={4}>
       <Select options={networkOptions} label="Network" onSelect={(value) => onSelection('network', value)} />
@@ -72,13 +67,6 @@ export const AddHoldingForm = ({ networks, poolDetails }: { networks: PoolNetwor
         disabled={!assets?.length}
       />
       <Select options={shareClassPerPool} label="Token" onSelect={(value) => onSelection('sc', value)} />
-      <BalanceInput
-        name="value"
-        label="Value per unit"
-        size="sm"
-        currency={selectedAsset?.symbol}
-        decimals={selectedAsset?.decimals ?? 18}
-      />
     </Grid>
   )
 }
