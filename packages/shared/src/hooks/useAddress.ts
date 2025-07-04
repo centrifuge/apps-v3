@@ -6,7 +6,7 @@ const useAddress = () => {
   const { address } = useAccount()
 
   return {
-    address: debugAddress || address,
+    address: (debugAddress as `0x${string}`) || address,
   }
 }
 
