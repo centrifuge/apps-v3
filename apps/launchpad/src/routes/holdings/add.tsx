@@ -32,7 +32,9 @@ export default function Add() {
       )
 
       // TODO: valuation contract should come from sdk
-      execute(selectedShareClass?.shareClass.createHolding(asset, '0x6Bcb240d3e1f1C4321ECAFFDacB45691DC03bE5D', false))
+      execute(
+        selectedShareClass?.shareClass.createHolding(asset, '0x6Bcb240d3e1f1C4321ECAFFDacB45691DC03bE5D', false, {})
+      )
     },
     onSubmitError: (error) => console.error('Nav form submission error:', error),
   })
