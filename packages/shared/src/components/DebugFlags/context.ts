@@ -18,9 +18,9 @@ interface Context {
 }
 
 export const defaultFlags: Flags = Object.entries(genericFlagsConfig).reduce((obj, [k, v]) => {
-  obj[k] = 'options' in v ? v.options[v.default] : v.default
+  Reflect.set(obj, k, 'options' in v ? v.options[v.default] : v.default)
   return obj
-}, {} as any)
+}, {} as Flags)
 
 let persistedState: Flags | null = null
 try {
