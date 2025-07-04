@@ -9,3 +9,4 @@ export {
 } from './formatting'
 export { networkToName } from './networkToName'
 export { chainExplorer } from './chainExplorer'
+export { mockMetadata } from './mockMetadata'

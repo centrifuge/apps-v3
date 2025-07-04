@@ -34,6 +34,8 @@ export function AccountPage({
     }
   }, [sc])
 
+  console.log(amounts)
+
   const pendingInvestments = useMemo(
     () => investmentsPerVaults.map((investment) => investment.pendingInvestCurrency),
     [investmentsPerVaults]

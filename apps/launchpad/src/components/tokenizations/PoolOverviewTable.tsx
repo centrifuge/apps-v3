@@ -1,14 +1,12 @@
 import { Link } from 'react-router'
 import { Box, Button, Flex, Heading, Image, Stack, Text } from '@chakra-ui/react'
-import { Balance, Pool } from '@centrifuge/sdk'
-import { useAllPoolDetails } from '@centrifuge/shared'
+import { Balance } from '@centrifuge/sdk'
+import { useAllPoolDetails, mockMetadata } from '@centrifuge/shared'
 import { ipfsToHttp } from '@centrifuge/shared/src/utils/formatting'
 import { BalanceDisplay, NetworkIcon } from '@centrifuge/ui'
-import DataTable, { ColumnDefinition } from './DataTable'
-import { mockMetadata } from './mockMetadata'
-import { usePool, usePools, usePoolsByManager } from '@centrifuge/shared/src/hooks/usePools'
 import { useAccount } from 'wagmi'
-import { Spinner } from '@chakra-ui/react'
+import { usePoolsByManager } from '@centrifuge/shared/src/hooks/usePools'
+import DataTable, { ColumnDefinition } from './DataTable'
 
 type Row = {
   id: string

@@ -1,16 +1,19 @@
 import { useMemo } from 'react'
 import { CiShare1 } from 'react-icons/ci'
-import { useFormContext } from '@centrifuge/forms'
+import { useFormContext, Select } from '@centrifuge/forms'
 import { PoolNetwork } from '@centrifuge/sdk'
 import { chainExplorer, networkToName, truncateAddress, useAssets } from '@centrifuge/shared'
-import { NetworkIcon, Select } from '@centrifuge/ui'
+import { NetworkIcon } from '@centrifuge/ui'
 import { Flex, Grid, Text } from '@chakra-ui/react'
 import { Link } from 'react-router'
 
 export const AddHoldingForm = ({ networks, poolDetails }: { networks: PoolNetwork[]; poolDetails: any }) => {
-  const { watch, setValue } = useFormContext()
+  const { watch } = useFormContext()
   const network = watch('network')
-  const { data: assets } = useAssets(network)
+  const shareClassId = watch('sc')
+  const { data: assets } = useAssets(11155111, 11155111)
+
+  console.log(shareClassId, poolDetails)
 
   const networkOptions = useMemo(() => {
     if (!networks) return []
@@ -52,21 +55,11 @@ export const AddHoldingForm = ({ networks, poolDetails }: { networks: PoolNetwor
     }))
   }, [assets, network])
 
-  const onSelection = (label: any, value: any) => {
-    const val = value[0]
-    setValue(label, val)
-  }
-
   return (
     <Grid gridTemplateColumns="1fr 1fr" gap={4}>
-      <Select options={networkOptions} label="Network" onSelect={(value) => onSelection('network', value)} />
-      <Select
-        options={assetOptions}
-        label="Available assets"
-        onSelect={(value) => onSelection('asset', value)}
-        disabled={!assets?.length}
-      />
-      <Select options={shareClassPerPool} label="Token" onSelect={(value) => onSelection('sc', value)} />
+      <Select name="network" items={networkOptions} label="Network" />
+      <Select name="asset" items={assetOptions} label="Available assets" disabled={!assets?.length} />
+      <Select name="sc" items={shareClassPerPool} label="Token" />
     </Grid>
   )
 }
