@@ -2,7 +2,7 @@ import { Box, Button, Flex, Heading, Icon, Text, useToken } from '@chakra-ui/rea
 import { IoIosCloseCircleOutline, IoMdCheckmarkCircleOutline, IoMdTimer } from 'react-icons/io'
 import { useFormContext } from '@centrifuge/forms'
 import { InvestAction, RedeemAction, type InvestActionType, type RedeemActionType } from './defaults'
-import { useEffect, useRef, useState, type Dispatch, type SetStateAction } from 'react'
+import { useEffect, useState, type Dispatch, type SetStateAction } from 'react'
 import { useTransactions } from '@components/Transactions/TransactionProvider'
 
 interface InvestActionProps {
@@ -24,66 +24,48 @@ type SuccessPanelProps = InvestActionProps | RedeemActionProps
 export function SuccessPanel(props: SuccessPanelProps) {
   const { getValues } = useFormContext()
   const { transactions } = useTransactions()
-  const [txDescription, setTxDescription] = useState('Handling transaction')
+  const [txHeader, setTxHeader] = useState('Transaction pending')
   const [isTxSuccessful, setIsTxSuccessful] = useState(false)
   const [isTxFailed, setIsTxFailed] = useState(false)
   const [txHash, setTxHash] = useState<string | null>(null)
   const [successColor, errorColor] = useToken('colors', ['success', 'error'])
 
-  const activeTransactionIds = useRef<Record<string, string>>({})
-
   useEffect(() => {
     transactions.forEach((tx) => {
       if (['creating', 'unconfirmed', 'pending'].includes(tx.status) && !tx.dismissed) {
-        if (!activeTransactionIds.current[tx.id]) {
-          if (tx.status === 'creating') {
-            setTxDescription('Creating transaction')
-          } else if (tx.status === 'unconfirmed') {
-            setTxDescription('Signing transaction')
-          } else if (tx.status === 'pending') {
-            setTxDescription('Transaction pending')
-          } else {
-            setTxDescription('Handling transaction')
-          }
+        if (tx.status === 'unconfirmed') {
+          setTxHeader('Signing transaction')
+          setIsTxFailed(false)
+          setIsTxSuccessful(false)
         }
+      }
 
-        activeTransactionIds.current[tx.id] = tx.id
-      } else if (['succeeded', 'failed'].includes(tx.status) && activeTransactionIds.current[tx.id]) {
-        if (tx.status === 'failed' && !!tx.failedReason?.length) {
-          setTxDescription(tx.failedReason)
+      if (['succeeded', 'failed'].includes(tx.status)) {
+        if (tx.status === 'failed') {
+          setTxHeader(tx.failedReason?.length ? tx.failedReason : 'Transaction failed')
           setIsTxFailed(true)
-        } else if (tx.status === 'failed') {
-          setTxDescription('Transaction failed')
-          setIsTxFailed(true)
-        } else if (tx.status === 'succeeded' && tx.title === 'Invest') {
-          setTxDescription('Invest successful')
-          setIsTxSuccessful(true)
-          setTxHash(tx.result?.transactionHash ?? null)
-        } else if (tx.status === 'succeeded' && tx.title === 'Redeem') {
-          setTxDescription('Redeem successful')
+        } else if (tx.status === 'succeeded' && (tx.title === 'Invest' || tx.title === 'Redeem')) {
+          const header = tx.title === 'Invest' ? 'Invest successful' : 'Redeem successful'
+          setTxHeader(header)
           setIsTxSuccessful(true)
           setTxHash(tx.result?.transactionHash ?? null)
         } else {
-          setTxDescription('Transaction status unknown')
+          setTxHeader('Transaction status unknown')
         }
-
-        delete activeTransactionIds.current[tx.id]
-      } else if (tx.dismissed && activeTransactionIds.current[tx.id]) {
-        delete activeTransactionIds.current[tx.id]
       }
     })
 
-    const currentTxIds = new Set(transactions.map((t) => t.id))
-    for (const txId in activeTransactionIds.current) {
-      if (!currentTxIds.has(txId)) {
-        delete activeTransactionIds.current[txId]
-      }
+    return () => {
+      setTxHeader('Transaction pending')
+      setIsTxSuccessful(false)
+      setIsTxFailed(false)
+      setTxHash(null)
     }
   }, [transactions])
 
   const isInvesting = props.isInvesting
   const buttonText = isInvesting ? 'Invest more' : 'Redeem more'
-  const txHeaderColor = isTxSuccessful ? successColor : isTxFailed ? errorColor : 'inherit'
+  const txHeaderColor = isTxSuccessful ? successColor : 'inherit'
   const isButtonDisabled = !isTxSuccessful && !isTxFailed
 
   return (
@@ -98,12 +80,12 @@ export function SuccessPanel(props: SuccessPanelProps) {
       >
         <Box width="100%" overflow="hidden">
           <Flex alignItems="center" gap={2} justifyContent="space-between">
-            <Heading color={txHeaderColor}>{txDescription}</Heading>
+            <Heading color={txHeaderColor}>{txHeader}</Heading>
             <Icon size="xl">
               {isTxSuccessful ? (
                 <IoMdCheckmarkCircleOutline color={txHeaderColor} />
               ) : isTxFailed ? (
-                <IoIosCloseCircleOutline color={txHeaderColor} />
+                <IoIosCloseCircleOutline color={errorColor} />
               ) : (
                 <IoMdTimer color="gray.400" />
               )}
