@@ -1,12 +1,22 @@
 import { useAccount } from 'wagmi'
+import { useDeferredValue } from 'react'
 import { useDebugFlags } from '../components/DebugFlags'
 
 const useAddress = () => {
   const { address: debugAddress } = useDebugFlags()
-  const { address } = useAccount()
+  const deferredDebugAddress = useDeferredValue(debugAddress)
+  const { address, isConnected, chainId } = useAccount()
+
+  if (deferredDebugAddress) {
+    return {
+      address: deferredDebugAddress as `0x${string}`,
+    }
+  }
 
   return {
-    address: (debugAddress as `0x${string}`) || address,
+    address,
+    isConnected,
+    chainId,
   }
 }
 
