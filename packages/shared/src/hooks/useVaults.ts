@@ -1,8 +1,8 @@
 import type { PoolNetwork, ShareClassId, Vault } from '@centrifuge/sdk'
 import { useMemo } from 'react'
-import { useAccount } from 'wagmi'
 import { combineLatest, of } from 'rxjs'
 import { useObservable } from './useObservable'
+import { useAddress } from './useAddress'
 
 export function useVaults(poolNetwork?: PoolNetwork, scId?: ShareClassId) {
   const vaults$ = useMemo(() => (poolNetwork && scId ? poolNetwork.vaults(scId) : undefined), [poolNetwork, scId])
@@ -26,13 +26,13 @@ export function useVaultsDetails(vaults?: Vault[]) {
 }
 
 export function useInvestment(vault?: Vault) {
-  const { address } = useAccount()
+  const { address } = useAddress()
   const investment$ = useMemo(() => (vault && address ? vault.investment(address) : undefined), [vault, address])
   return useObservable(investment$)
 }
 
 export function useInvestmentsPerVaults(vaults?: Vault[]) {
-  const { address } = useAccount()
+  const { address } = useAddress()
   const investmentsPerVaults$ = useMemo(() => {
     if (!vaults || vaults.length === 0 || !address) return of([])
 

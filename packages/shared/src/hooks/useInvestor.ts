@@ -1,11 +1,11 @@
 import { useMemo } from 'react'
 import { useObservable } from './useObservable'
-import { useAccount } from 'wagmi'
 import { useCentrifuge } from './CentrifugeContext'
+import { useAddress } from './useAddress'
 
 export function useInvestor() {
   const centrifuge = useCentrifuge()
-  const { address } = useAccount()
+  const { address } = useAddress()
   const investor$ = useMemo(() => (address ? centrifuge.investor(address) : undefined), [address, centrifuge])
   return useObservable(investor$)
 }

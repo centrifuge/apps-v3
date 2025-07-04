@@ -4,9 +4,11 @@ import { Root } from './Root'
 import { WalletProvider } from '@centrifuge/wallet'
 import { SelectedPoolProvider } from './contexts/useSelectedPoolContext'
 import { CentrifugeProvider } from '@centrifuge/shared'
-import { centrifuge, networks } from './centrifuge'
+import { centrifuge, networks, wagmiConfig } from './centrifuge'
 import { TransactionProvider } from './components/Transactions/TransactionProvider'
 import { ChakraCentrifugeProvider, ChakraCentrifugeProviderProps } from '@centrifuge/ui'
+import { DebugFlags } from '@centrifuge/shared/src/components/DebugFlags'
+import { WagmiProvider } from 'wagmi'
 
 const config = {
   themeKey: 'light' as ChakraCentrifugeProviderProps['themeKey'],
@@ -19,7 +21,11 @@ createRoot(document.getElementById('root')!).render(
         <ChakraCentrifugeProvider themeKey={config.themeKey}>
           <TransactionProvider>
             <SelectedPoolProvider>
-              <Root />
+              <WagmiProvider config={wagmiConfig}>
+                <DebugFlags>
+                  <Root />
+                </DebugFlags>
+              </WagmiProvider>
             </SelectedPoolProvider>
           </TransactionProvider>
         </ChakraCentrifugeProvider>
