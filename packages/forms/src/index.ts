@@ -4,6 +4,7 @@ export { Checkbox } from './components/Checkbox'
 export { Form } from './components/Form'
 export { Input } from './components/Input'
 export { SubmitButton } from './components/SubmitButton'
+export { Select } from './components/Select'
 
 // hooks
 export { useForm } from './hooks/useForm'
