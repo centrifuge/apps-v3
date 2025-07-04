@@ -36,13 +36,13 @@ export const initialFlagsState: Flags = persistedState
   ? Object.entries(persistedState)
       .filter(([k]) => flagKeys.includes(k))
       .reduce((obj, [k, v]) => {
-        obj[k] = v
+        Reflect.set(obj, k, v)
         return obj
-      }, {} as any)
+      }, {} as Flags)
   : Object.entries(flagsConfig).reduce((obj, [k, v]) => {
-      obj[k] = v.default
+      Reflect.set(obj, k, v.default)
       return obj
-    }, {} as any)
+    }, {} as Flags)
 
 export const DebugFlagsContext = React.createContext<Context>({ flags: defaultFlags, register() {}, unregister() {} })
 

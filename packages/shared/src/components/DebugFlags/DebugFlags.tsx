@@ -1,6 +1,7 @@
-import { useState, useMemo, useEffect, ReactNode } from 'react'
+import { useState, useMemo, useEffect, ReactNode, ChangeEvent } from 'react'
 import { Key, genericFlagsConfig } from './config'
 import { DebugFlagsContext, Flags, initialFlagsState, useDebugFlags } from './context'
+import { Button, CloseButton, Drawer, Portal, Field, Input, Checkbox, NativeSelect, Stack } from '@chakra-ui/react'
 
 function DebugFlagsImpl({
   children,
@@ -18,9 +19,9 @@ function DebugFlagsImpl({
     () => ({
       flags: Object.entries(state).reduce((obj, [key, value]) => {
         const conf = genericFlagsConfig[key as Key]
-        obj[key] = 'options' in conf ? conf.options[value as string] : value
+        Reflect.set(obj, key, 'options' in conf ? conf.options[value as string] : value)
         return obj
-      }, {} as any),
+      }, {} as Flags),
       register(id: number, keys: string[]) {
         setTracked((prev) => ({ ...prev, [id]: keys }))
       },
@@ -67,62 +68,85 @@ function Panel({
   onChange: (key: Key, val: string | boolean) => void
   customFlags?: string[]
 }) {
-  const [open, setOpen] = useState(false)
   const { showUnusedFlags } = useDebugFlags()
   const flags = ['address', 'persistDebugFlags', 'showUnusedFlags', ...customFlags]
 
-  return Object.entries(genericFlagsConfig).map(([key, obj]) => {
-    if (!flags.includes(key)) {
-      return null
-    }
+  return (
+    <Drawer.Root>
+      <Drawer.Trigger asChild>
+        <Button variant="solid" size="sm" style={{ position: 'fixed', bottom: '8px', right: '8px' }}>
+          open debug panel
+        </Button>
+      </Drawer.Trigger>
+      <Portal>
+        <Drawer.Backdrop />
+        <Drawer.Positioner>
+          <Drawer.Content>
+            <Drawer.Header>
+              <Drawer.Title>Debug Panel</Drawer.Title>
+            </Drawer.Header>
+            <Drawer.Body>
+              <Stack gap="4">
+                {Object.entries(genericFlagsConfig).map(([key, obj]) => {
+                  if (!flags.includes(key)) {
+                    return null
+                  }
 
-    const used = usedKeys.has(key) || obj.alwaysShow
-    const value = state[key as Key]
-    const visible = used || !!showUnusedFlags
+                  const used = usedKeys.has(key) || obj.alwaysShow
+                  const value = state[key as Key]
+                  const visible = used || !!showUnusedFlags
 
-    let el
-    if (obj.type === 'checkbox') {
-      el = (
-        <input
-          type="checkbox"
-          name={key}
-          checked={value as boolean}
-          onChange={(e) => onChange(key as Key, e.target.checked)}
-        />
-      )
-    } else if (obj.type === 'select' && obj.options) {
-      el = (
-        <select name={key} value={value as string} onChange={(e) => onChange(key as Key, e.target.value)}>
-          {Object.keys(obj.options).map((option, index) => (
-            <option key={`${option}-${index}`} value={option}>
-              {option}
-            </option>
-          ))}
-        </select>
-      )
-    } else if (obj.type === 'component') {
-      el = <obj.Component value={value} onChange={(val) => onChange(key as Key, val)} />
-    } else {
-      el = (
-        <input
-          value={value as string}
-          onChange={(e) => onChange(key as Key, e.target.value)}
-          type="text"
-          color="#ddd"
-        />
-      )
-    }
+                  let element
+                  if (obj.type === 'checkbox') {
+                    element = (
+                      <Checkbox.Root
+                        checked={value as boolean}
+                        onChange={(e: ChangeEvent<HTMLInputElement>) => onChange(key as Key, e.target.checked)}
+                      >
+                        <Checkbox.HiddenInput />
+                        <Checkbox.Control />
+                        <Checkbox.Label>{key}</Checkbox.Label>
+                      </Checkbox.Root>
+                    )
+                  } else if (obj.type === 'select' && obj.options) {
+                    element = (
+                      <NativeSelect.Root size="xl" variant="outline" width="auto" me="-1">
+                        <NativeSelect.Field
+                          value={value as string}
+                          onChange={(e) => onChange(key as Key, e.target.value)}
+                          fontSize="sm"
+                        >
+                          {Object.keys(obj.options).map((option) => (
+                            <option key={`${option}`} value={option}>
+                              {option}
+                            </option>
+                          ))}
+                        </NativeSelect.Field>
+                        <NativeSelect.Indicator />
+                      </NativeSelect.Root>
+                    )
+                  } else {
+                    element = (
+                      <Field.Root invalid={!used}>
+                        <Field.Label>{key}</Field.Label>
+                        <Input value={value as string} onChange={(e) => onChange(key as Key, e.target.value)} />
+                        <Field.ErrorText>unused</Field.ErrorText>
+                      </Field.Root>
+                    )
+                  }
 
-    return visible ? (
-      <div key={key} style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
-        <label htmlFor={key} style={{ marginRight: '8px' }}>
-          {key}
-        </label>
-        {el}
-        {used ? null : <span style={{ color: 'red', marginLeft: '8px' }}>(unused)</span>}
-      </div>
-    ) : null
-  })
+                  return visible ? element : null
+                })}
+              </Stack>
+            </Drawer.Body>
+            <Drawer.CloseTrigger asChild>
+              <CloseButton size="xl" />
+            </Drawer.CloseTrigger>
+          </Drawer.Content>
+        </Drawer.Positioner>
+      </Portal>
+    </Drawer.Root>
+  )
 }
 
 export default DebugFlagsImpl
