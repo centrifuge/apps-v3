@@ -2,7 +2,7 @@ export { usePools, usePool, usePoolDetails, useAllPoolDetails, usePoolNetworks, 
 export { useVaults, useVaultDetails, useVaultsDetails, useInvestment, useInvestmentsPerVaults } from './useVaults'
 export { useInvestor, usePortfolio } from './useInvestor'
 export { CentrifugeProvider, useCentrifuge } from './CentrifugeContext'
-export { useCentrifugeSigner } from './useCentrifugeSigner'
+export { useSetCentrifugeSigner } from './useSetCentrifugeSigner'
 export { useObservable } from './useObservable'
 export { TransactionProvider } from './TransactionProvider'
 export { useCentrifugeTransaction } from './useCentrifugeTransaction'

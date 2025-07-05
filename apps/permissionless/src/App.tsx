@@ -1,5 +1,5 @@
 import { Box } from '@chakra-ui/react'
-import { useCentrifugeSigner } from '@centrifuge/shared'
+import { useSetCentrifugeSigner } from '@centrifuge/shared'
 import { Header } from './components/Header'
 import { PoolPage } from './components/PoolPage'
 import { LandingPageSkeleton } from './components/Skeletons/LandingPageSkeleton'
@@ -15,7 +15,7 @@ export function App() {
    * If we need to use the signer in other parts of the app, we can access
    * it through the Centrifuge SDK instance obtained from `useCentrifuge()
    */
-  useCentrifugeSigner()
+  useSetCentrifugeSigner()
 
   return (
     <Box bg="bg-secondary" w="100%" minH="100vh">

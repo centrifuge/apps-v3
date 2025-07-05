@@ -6,7 +6,7 @@ import { useWalletClient, useAccount } from 'wagmi'
  * A custom hook to automatically set/clear the signer on the Centrifuge SDK instance
  * based on the current wallet connection status from wagmi.
  */
-export function useCentrifugeSigner() {
+export function useSetCentrifugeSigner() {
   const centrifuge = useCentrifuge()
   const { isConnected } = useAccount()
   const { data: walletClient } = useWalletClient()
