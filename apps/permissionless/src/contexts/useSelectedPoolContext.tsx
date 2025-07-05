@@ -19,13 +19,15 @@ export const SelectedPoolProvider = ({ children }: { children: React.ReactNode }
   const hasSetInitialPoolRef = useRef(false)
 
   useEffect(() => {
-    if (pools?.length && !hasSetInitialPoolRef.current && !isLoading) {
-      setSelectedPoolId(pools[0].id)
-      hasSetInitialPoolRef.current = true
-    }
+    if (!isLoading) {
+      if (pools?.length && !hasSetInitialPoolRef.current) {
+        setSelectedPoolId(pools[0].id)
+        hasSetInitialPoolRef.current = true
+      }
 
-    if (pools && pools.length === 0 && !isLoading && hasSetInitialPoolRef.current) {
-      hasSetInitialPoolRef.current = false
+      if (pools && pools.length === 0 && hasSetInitialPoolRef.current) {
+        hasSetInitialPoolRef.current = false
+      }
     }
   }, [pools])
 
