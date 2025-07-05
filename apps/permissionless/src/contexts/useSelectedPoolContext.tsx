@@ -16,7 +16,7 @@ export const SelectedPoolProvider = ({ children }: { children: React.ReactNode }
   const [selectedPoolId, setSelectedPoolId] = useState<PoolId | undefined>(undefined)
 
   useEffect(() => {
-    if (pools?.length) {
+    if (pools?.length && pools[0].id !== selectedPoolId) {
       setSelectedPoolId(pools[0].id)
     }
   }, [pools])
