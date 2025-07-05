@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useRef, useState } from 'react'
 import { PoolId } from '@centrifuge/sdk'
 import { usePools } from '@centrifuge/shared'
 
@@ -15,9 +15,19 @@ export const SelectedPoolProvider = ({ children }: { children: React.ReactNode }
   const { data: pools, isLoading } = usePools()
   const [selectedPoolId, setSelectedPoolId] = useState<PoolId | undefined>(undefined)
 
+  // Use a ref to track if we've already set the initial pool ID
+  const hasSetInitialPoolRef = useRef(false)
+
   useEffect(() => {
-    if (pools?.length) {
-      setSelectedPoolId(pools[0].id)
+    if (!isLoading) {
+      if (pools?.length && !hasSetInitialPoolRef.current) {
+        setSelectedPoolId(pools[0].id)
+        hasSetInitialPoolRef.current = true
+      }
+
+      if (pools && pools.length === 0 && hasSetInitialPoolRef.current) {
+        hasSetInitialPoolRef.current = false
+      }
     }
   }, [pools])
 

@@ -7,10 +7,14 @@ import { Address } from 'viem'
 
 export function usePools() {
   const centrifuge = useCentrifuge()
-  const pools$ = useMemo(
-    () => centrifuge.pools().pipe(map((pools) => pools.filter((p) => p.chainId === 11155111))),
-    [centrifuge]
-  )
+  const pools$ = useMemo(() => {
+    if (!centrifuge) {
+      return of([])
+    }
+
+    return centrifuge.pools().pipe(map((pools) => pools.filter((p) => p.chainId === 11155111)))
+  }, [centrifuge])
+
   return useObservable(pools$)
 }
 
@@ -30,13 +34,21 @@ export function usePoolsByManager(address: Address | undefined) {
 
 export function usePool(poolId?: PoolId) {
   const centrifuge = useCentrifuge()
-  const pool$ = useMemo(() => (poolId ? centrifuge.pool(poolId) : undefined), [poolId])
+  const pool$ = useMemo(() => {
+    if (!poolId || !centrifuge) return undefined
+    return centrifuge.pool(poolId)
+  }, [poolId, centrifuge])
+
   return useObservable(pool$)
 }
 
 export function usePoolDetails(poolId?: PoolId) {
   const { data: pool } = usePool(poolId)
-  const details$ = useMemo(() => (pool ? pool?.details() : undefined), [pool])
+  const details$ = useMemo(() => {
+    if (!pool) return undefined
+    return pool.details()
+  }, [pool])
+
   return useObservable(details$)
 }
 
@@ -46,16 +58,20 @@ export function useAllPoolDetails(poolIds: PoolId[]) {
   const poolIdsKey = useMemo(() => poolIds?.join(',') || '', [poolIds?.join(',')])
 
   const details$ = useMemo(() => {
-    if (!poolIds?.length) return of([])
+    if (!poolIds?.length || !centrifuge) return of([])
     // TODO: fix the hardcoded one, we need to update the metadata for existing pools or update sdk to return even if missing metadata
     return combineLatest([poolIds[0]].map((id) => centrifuge.pool(id).pipe(switchMap((pool) => pool.details()))))
-  }, [poolIdsKey])
+  }, [poolIdsKey, poolIds, centrifuge])
 
   return useObservable(details$)
 }
 
 export function usePoolNetworks(poolId?: PoolId) {
   const { data: pool } = usePool(poolId)
-  const vaults$ = useMemo(() => (pool ? pool?.activeNetworks() : undefined), [pool])
+  const vaults$ = useMemo(() => {
+    if (!pool) return undefined
+    return pool.activeNetworks()
+  }, [pool])
+
   return useObservable(vaults$)
 }
