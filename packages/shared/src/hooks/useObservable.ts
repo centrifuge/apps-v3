@@ -1,6 +1,8 @@
 import { useMemo, useReducer, useRef, useState, useSyncExternalStore } from 'react'
 import { catchError, of, share, timer, type Observable, type ObservedValueOf } from 'rxjs'
 import { map, tap } from 'rxjs/operators'
+import { ReplaySubject } from 'rxjs'
+import _ from 'lodash'
 
 export type ObservableOptions = never
 
@@ -45,7 +47,6 @@ type CacheRecord<T> = {
     error?: unknown
     status: 'idle' | 'loading' | 'success' | 'error'
   }
-  // Allows observables to emit `undefined` and still be successful
   didEmitData: boolean
 }
 
@@ -55,8 +56,15 @@ function useObservableInner<ObservableType extends Observable<any>>(observable?:
   useWarnIfNotStable(observable, "useObservable: observable is not stable. Don't forget to memoize it!")
 
   const [updateCount, forceUpdate] = useReducer((s) => s + 1, 0)
-  const store = useMemo(() => {
-    if (!observable) return
+
+  const processedObservableRef = useRef<CacheRecord<ObservedValueOf<ObservableType>> | null>(null)
+
+  useMemo(() => {
+    if (!observable) {
+      processedObservableRef.current = null
+      return
+    }
+
     if (!cache.has(observable)) {
       const entry = {
         snapshot: {
@@ -64,36 +72,53 @@ function useObservableInner<ObservableType extends Observable<any>>(observable?:
         },
         didEmitData: false,
       } as CacheRecord<ObservedValueOf<ObservableType>>
+
       entry.observable = observable.pipe(
         map((value) => ({ data: value, error: undefined, hasData: true })),
         catchError((error) => of({ data: entry.snapshot.data, error, hasData: entry.didEmitData })),
         tap((result) => {
-          entry.didEmitData = result.hasData
-          entry.snapshot = {
-            ...result,
-            status: entry.didEmitData ? 'success' : 'error',
-          }
-          if (result.error) {
-            console.error(result.error)
+          const newStatus = result.error ? 'error' : result.hasData ? 'success' : 'loading'
+          const currentSnapshot = entry.snapshot
+
+          // Use lodash.isEqual for robust deep equality check on data
+          if (
+            !_.isEqual(currentSnapshot.data, result.data) ||
+            currentSnapshot.error !== result.error ||
+            currentSnapshot.status !== newStatus
+          ) {
+            entry.didEmitData = result.hasData
+            entry.snapshot = {
+              ...result,
+              status: newStatus,
+            }
+            if (result.error) {
+              console.error(result.error)
+            }
           }
         }),
-        // Share the observable to prevent unsubscribing and resubscribing between the immediate subscription and the useSyncExternalStore subscription.
+        // Changed to `share` with `ReplaySubject` connector and delayed `resetOnRefCountZero`
         share({
-          resetOnRefCountZero: () => timer(0),
+          connector: () => new ReplaySubject(1), // Ensures new subscribers get the last value (like shareReplay(1))
+          resetOnError: true, // Resubscribes to source if it errors
+          resetOnComplete: true, // Resubscribes to source if it completes
+          resetOnRefCountZero: () => timer(100), // Keep source alive for 100ms after last subscriber leaves
         })
       )
-
-      // Eagerly subscribe to sync set `entry.snapshot`.
-      const subscription = entry.observable.subscribe()
-      subscription.unsubscribe()
-
       cache.set(observable, entry)
     }
-    const instance = cache.get(observable)!
+    processedObservableRef.current = cache.get(observable)!
+  }, [observable])
+
+  const store = useMemo(() => {
+    const instance = processedObservableRef.current
+    if (!instance) {
+      return noopStore
+    }
 
     return {
       subscribe: (onStoreChange: () => void) => {
         const subscription = instance.observable.subscribe(() => onStoreChange())
+
         return () => {
           subscription.unsubscribe()
         }
@@ -102,11 +127,9 @@ function useObservableInner<ObservableType extends Observable<any>>(observable?:
         return instance.snapshot
       },
     }
-    // forceUpdate will cause the store to be recreated, and resubscribed to.
-    // Which, in case of an error, will restart the observable.
-  }, [observable, updateCount])
+  }, [processedObservableRef.current, updateCount])
 
-  const res = useSyncExternalStore(store?.subscribe || noopStore.subscribe, store?.getSnapshot || noopStore.getSnapshot)
+  const res = useSyncExternalStore(store.subscribe, store.getSnapshot)
 
   function resetError() {
     if (observable) {
@@ -131,6 +154,8 @@ function useObservableInner<ObservableType extends Observable<any>>(observable?:
 
 const noopSnapshot = {
   status: 'idle' as const,
+  data: undefined,
+  error: undefined,
 }
 const noopStore = {
   subscribe: () => () => {},
@@ -150,10 +175,10 @@ function useWarnIfNotStable(object?: unknown, message = 'object is not stable') 
   //    if (ref.current.lastObject === object) {
   //      ref.current.stableObjectCount++
   //    }
-  //if (ref.current.hasObjectCount === 10 && ref.current.stableObjectCount <= 1) {
+  // if (ref.current.hasObjectCount === 10 && ref.current.stableObjectCount <= 1) {
   //  console.warn(message, object)
-  //}
+  // }
   //  }
   //  ref.current.lastObject = object
-  //}
+  // }
 }
