@@ -19,7 +19,7 @@ export function Root() {
    * Initialize Centrifuge SDK with any necessary config.
    * We need to ensure it is created only once, so we must use useMemo.
    * If we don't use useMemo, it can create a new instance on every render,
-   * which can lead to an infinite loop of new instances querying sdk pools and crashing the app.
+   * which can lead to issues with state management and performance.
    * Be sure to always use the same instance of Centrifuge SDK throughout the app,
    * from `useCentrifuge()` set in `CentrifugeProvider`.
    */
