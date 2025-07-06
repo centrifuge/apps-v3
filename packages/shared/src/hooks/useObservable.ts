@@ -2,7 +2,7 @@ import { useMemo, useReducer, useRef, useState, useSyncExternalStore } from 'rea
 import { catchError, of, share, timer, type Observable, type ObservedValueOf } from 'rxjs'
 import { map, tap } from 'rxjs/operators'
 import { ReplaySubject } from 'rxjs'
-import _ from 'lodash'
+import { isEqual } from 'lodash'
 
 export type ObservableOptions = never
 
@@ -47,6 +47,7 @@ type CacheRecord<T> = {
     error?: unknown
     status: 'idle' | 'loading' | 'success' | 'error'
   }
+  // Allows observables to emit `undefined` and still be successful
   didEmitData: boolean
 }
 
@@ -82,7 +83,7 @@ function useObservableInner<ObservableType extends Observable<any>>(observable?:
 
           // Use lodash.isEqual for robust deep equality check on data
           if (
-            !_.isEqual(currentSnapshot.data, result.data) ||
+            !isEqual(currentSnapshot.data, result.data) ||
             currentSnapshot.error !== result.error ||
             currentSnapshot.status !== newStatus
           ) {
@@ -96,14 +97,21 @@ function useObservableInner<ObservableType extends Observable<any>>(observable?:
             }
           }
         }),
-        // Changed to `share` with `ReplaySubject` connector and delayed `resetOnRefCountZero`
+        // Added `ReplaySubject` connector to `share` and delayed `resetOnRefCountZero` to try and avoid infinite loops
+        // It leaves the observable alive for 100ms after the last subscriber leaves to remain active during rapid unmount/remount andn re-render cycles
         share({
-          connector: () => new ReplaySubject(1), // Ensures new subscribers get the last value (like shareReplay(1))
+          connector: () => new ReplaySubject(1), // Ensures new subscribers get the last value (behaves like shareReplay(1))
           resetOnError: true, // Resubscribes to source if it errors
           resetOnComplete: true, // Resubscribes to source if it completes
           resetOnRefCountZero: () => timer(100), // Keep source alive for 100ms after last subscriber leaves
         })
       )
+      // Eagerly subscribe to sync set `entry.snapshot` in the cache.
+      // Might be problematic if the observable is not stable or contains asynchronous operations.
+      // useSyncExternalStore is designed to handle asynchronous state without needing an eager synchronous subscription
+      // const subscription = entry.observable.subscribe()  --- Was causing an error that resulted in an infinite loop of rendering
+      // subscription.unsubscribe()
+
       cache.set(observable, entry)
     }
     processedObservableRef.current = cache.get(observable)!
