@@ -46,12 +46,12 @@ export function RedeemAmount({ isDisabled, parsedAmount, vault, currencies, setC
       return setValue('amountToReceive', '0')
     }
 
-    const redeemAmountDecimals = portfolioInvestmentCurrency?.decimals ?? 6
+    const redeemAmountDecimals = parsedAmount.decimals
     const redeemAmount = parsedAmount.toBigInt()
     const navPerShareAmount = navPerShare.toBigInt()
 
     const receiveAmount = divideBigInts(redeemAmount, navPerShareAmount, redeemAmountDecimals).formatToString(
-      portfolioInvestmentCurrency?.decimals ?? 6
+      redeemAmountDecimals
     )
 
     setValue('amountToReceive', receiveAmount)
