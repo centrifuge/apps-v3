@@ -3,7 +3,7 @@ export { useVaults, useVaultDetails, useVaultsDetails, useInvestment, useInvestm
 export { useInvestor, usePortfolio } from './useInvestor'
 export { CentrifugeProvider, useCentrifuge } from './CentrifugeContext'
 export { useObservable } from './useObservable'
-export { TransactionProvider } from './TransactionProvider'
+export * from './TransactionProvider'
 export { useCentrifugeTransaction } from './useCentrifugeTransaction'
 export { useNavPerNetwork, useHoldings } from './useShareClass'
 export { useAddress } from './useAddress'

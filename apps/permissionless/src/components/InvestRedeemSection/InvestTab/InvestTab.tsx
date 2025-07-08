@@ -3,8 +3,7 @@ import { z } from 'zod'
 import { Box } from '@chakra-ui/react'
 import { Form, useForm, safeParse, createBalanceSchema } from '@centrifuge/forms'
 import { Balance, Vault } from '@centrifuge/sdk'
-import { useInvestment, useVaultDetails } from '@centrifuge/shared'
-import { useCentrifugeTransaction } from '@hooks/useCentrifugeTransaction'
+import { useCentrifugeTransaction, useInvestment, useVaultDetails } from '@centrifuge/shared'
 import {
   type InvestActionType,
   InvestAction,

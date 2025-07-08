@@ -1,4 +1,5 @@
-import * as React from 'react'
+import { createContext, ReactNode, useCallback, useContext, useMemo, useState } from 'react'
+import { TransactionToasts } from '../components'
 
 export type TransactionStatus = 'creating' | 'unconfirmed' | 'pending' | 'succeeded' | 'failed'
 export type Transaction = {
@@ -19,20 +20,20 @@ type TransactionsContextType = {
   updateTransaction: (id: string, update: Partial<Transaction> | ((prev: Transaction) => Partial<Transaction>)) => void
 }
 
-const TransactionsContext = React.createContext<TransactionsContextType>(null as any)
+const TransactionsContext = createContext<TransactionsContextType>(null as any)
 
 type TransactionProviderProps = {
-  children: React.ReactNode
+  children: ReactNode
 }
 
 export function TransactionProvider({ children }: TransactionProviderProps) {
-  const [transactions, setTransactions] = React.useState<Transaction[]>([])
+  const [transactions, setTransactions] = useState<Transaction[]>([])
 
-  const addTransaction = React.useCallback((tx: Transaction) => {
+  const addTransaction = useCallback((tx: Transaction) => {
     setTransactions((prev) => [...prev, tx])
   }, [])
 
-  const updateTransaction = React.useCallback(
+  const updateTransaction = useCallback(
     (id: string, update: Partial<Transaction> | ((prev: Transaction) => Partial<Transaction>)) => {
       setTransactions((prev) =>
         prev.map((tx) =>
@@ -49,7 +50,7 @@ export function TransactionProvider({ children }: TransactionProviderProps) {
     []
   )
 
-  const addOrUpdateTransaction = React.useCallback((tx: Transaction) => {
+  const addOrUpdateTransaction = useCallback((tx: Transaction) => {
     setTransactions((prev) => {
       if (prev.find((t) => t.id === tx.id)) {
         return prev.map((t) => (t.id === tx.id ? { ...t, dismissed: false, ...tx } : t))
@@ -58,7 +59,7 @@ export function TransactionProvider({ children }: TransactionProviderProps) {
     })
   }, [])
 
-  const ctx: TransactionsContextType = React.useMemo(
+  const ctx: TransactionsContextType = useMemo(
     () => ({
       transactions,
       addTransaction,
@@ -71,14 +72,13 @@ export function TransactionProvider({ children }: TransactionProviderProps) {
   return (
     <TransactionsContext.Provider value={ctx}>
       {children}
-      {/* TODO: implement transaction toasts */}
-      {/* <TransactionToasts /> */}
+      <TransactionToasts />
     </TransactionsContext.Provider>
   )
 }
 
 export function useTransactions() {
-  const ctx = React.useContext(TransactionsContext)
+  const ctx = useContext(TransactionsContext)
   if (!ctx) throw new Error('useTransactions must be used within Provider')
   return ctx
 }
