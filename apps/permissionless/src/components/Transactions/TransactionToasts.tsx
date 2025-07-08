@@ -1,67 +1,58 @@
 import { useEffect, useRef } from 'react'
 import { Toaster, toaster } from '@centrifuge/ui'
 import { useTransactions } from '@components/Transactions/TransactionProvider'
+import { getCompletedTxDescription, getNewOrUpdatedTxDescription } from '@components/Transactions/utils/toastsUtils'
 
 export function TransactionToasts() {
-  const { transactions, updateTransaction } = useTransactions()
+  const { transactions } = useTransactions()
 
   const activeToastIds = useRef<Record<string, string>>({})
 
+  console.log({ currentToasts: activeToastIds.current })
+
   useEffect(() => {
     transactions.forEach((tx) => {
-      // 1. Handle creating/updating toasts for in-progress transactions (creating, unconfirmed, pending)
-      if (['creating', 'unconfirmed', 'pending'].includes(tx.status) && !tx.dismissed) {
-        // If a toast for this transaction doesn't exist yet, create a new 'loading' toast
-        if (!activeToastIds.current[tx.id]) {
-          const description =
-            tx.status === 'creating'
-              ? 'Creating transaction'
-              : tx.status === 'unconfirmed'
-                ? 'Signing transaction'
-                : tx.status === 'pending'
-                  ? 'Transaction pending'
-                  : ''
+      switch (tx.status) {
+        case 'creating':
+        case 'unconfirmed':
+        case 'pending': {
+          if (!activeToastIds.current[tx.id] && !tx.dismissed) {
+            // Create a loading toast and store its ID
+            const toastId = toaster.create({
+              title: tx.title,
+              description: getNewOrUpdatedTxDescription(tx.status),
+              type: 'loading',
+              duration: undefined,
+              closable: true,
+              id: tx.id,
+            })
 
-          // Create a loading toast and store its ID
-          const toastId = toaster.create({
-            title: tx.title,
-            description,
-            type: 'loading',
-            duration: undefined,
-            closable: true,
-            id: tx.id,
-          })
+            activeToastIds.current[tx.id] = toastId
+          }
+          break
+        }
+        case 'succeeded':
+        case 'failed': {
+          if (activeToastIds.current[tx.id]) {
+            const toastIdToDismiss = activeToastIds.current[tx.id]
+            const type: 'success' | 'error' = tx.status === 'succeeded' ? 'success' : 'error'
 
-          activeToastIds.current[tx.id] = toastId
+            toaster.update(toastIdToDismiss, {
+              title: tx.title,
+              description: getCompletedTxDescription(tx),
+              type,
+              duration: type === 'error' ? 60_000 : 5_000,
+              closable: true,
+            })
+
+            delete activeToastIds.current[tx.id] // Remove from our tracking ref
+          }
+          break
         }
       }
-      // 2. Handle transactions that have reached a final state (succeeded or failed)
-      else if (['succeeded', 'failed'].includes(tx.status) && activeToastIds.current[tx.id]) {
-        const toastIdToDismiss = activeToastIds.current[tx.id]
-        const type: 'success' | 'error' = tx.status === 'succeeded' ? 'success' : 'error'
-        const description =
-          tx.status === 'failed' && tx.failedReason
-            ? tx.failedReason
-            : tx.status === 'succeeded'
-              ? 'Transaction successful'
-              : tx.status === 'failed'
-                ? 'Transaction failed'
-                : ''
 
-        toaster.update(toastIdToDismiss, {
-          title: tx.title,
-          description,
-          type,
-          duration: type === 'error' ? 60_000 : 5_000,
-          closable: true,
-        })
-
-        // Dismiss the toast immediately after updating it to its final state
-        toaster.dismiss(toastIdToDismiss)
-        delete activeToastIds.current[tx.id] // Remove from our tracking ref
-      }
-      // 3. Handle transactions that are explicitly marked as dismissed
-      else if (tx.dismissed && activeToastIds.current[tx.id]) {
+      // Handle transactions that are explicitly marked as dismissed
+      if (tx.dismissed && activeToastIds.current[tx.id]) {
         const toastIdToDismiss = activeToastIds.current[tx.id]
         toaster.dismiss(toastIdToDismiss)
         delete activeToastIds.current[tx.id]
@@ -76,7 +67,7 @@ export function TransactionToasts() {
         delete activeToastIds.current[txId]
       }
     }
-  }, [transactions, updateTransaction])
+  }, [transactions])
 
   return <Toaster />
 }
