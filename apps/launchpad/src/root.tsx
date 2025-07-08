@@ -1,13 +1,12 @@
 import { Links, Meta, Outlet, Scripts, ScrollRestoration } from 'react-router'
 import { WalletProvider } from '@centrifuge/wallet'
 import { ChakraCentrifugeProvider, ChakraCentrifugeProviderProps } from '@centrifuge/ui'
-import { centrifuge, networks, wagmiConfig } from './centrifuge'
+import { centrifuge, networks } from './centrifuge'
 import { CentrifugeProvider } from '@centrifuge/shared'
 import { TransactionProvider } from '@components/transactions/TransactionProvider'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { PoolProvider } from '@contexts/PoolProvider'
 import { DebugFlags } from '@centrifuge/shared/src/components/DebugFlags'
-import { WagmiProvider } from 'wagmi'
 
 const queryClient = new QueryClient()
 
@@ -42,11 +41,9 @@ export default function Root() {
           <ChakraCentrifugeProvider themeKey={config.themeKey}>
             <TransactionProvider>
               <PoolProvider>
-                <WagmiProvider config={wagmiConfig}>
-                  <DebugFlags>
-                    <Outlet />
-                  </DebugFlags>
-                </WagmiProvider>
+                <DebugFlags>
+                  <Outlet />
+                </DebugFlags>
               </PoolProvider>
             </TransactionProvider>
           </ChakraCentrifugeProvider>

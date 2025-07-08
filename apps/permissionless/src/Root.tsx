@@ -7,6 +7,7 @@ import { CentrifugeProvider } from '@centrifuge/shared'
 import { TransactionProvider } from './components/Transactions/TransactionProvider'
 import { ChakraCentrifugeProvider, ChakraCentrifugeProviderProps } from '@centrifuge/ui'
 import { useMemo } from 'react'
+import { DebugFlags } from '@centrifuge/shared/src/components/DebugFlags'
 
 const config = {
   themeKey: 'light' as ChakraCentrifugeProviderProps['themeKey'],
@@ -42,7 +43,9 @@ export function Root() {
             <ChakraCentrifugeProvider themeKey={config.themeKey}>
               <TransactionProvider>
                 <SelectedPoolProvider>
-                  <App />
+                  <DebugFlags>
+                    <App />
+                  </DebugFlags>
                 </SelectedPoolProvider>
               </TransactionProvider>
             </ChakraCentrifugeProvider>

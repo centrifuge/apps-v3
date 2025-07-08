@@ -1,6 +1,4 @@
 import Centrifuge from '@centrifuge/sdk'
-import { http, createConfig } from 'wagmi'
-import { mainnet, sepolia } from 'wagmi/chains'
 
 export const centrifuge = new Centrifuge({
   environment: import.meta.env.VITE_CENTRIFUGE_ENV,
@@ -8,11 +6,3 @@ export const centrifuge = new Centrifuge({
 })
 
 export const networks = centrifuge.chains.map((cid) => centrifuge.getChainConfig(cid))
-
-export const wagmiConfig = createConfig({
-  chains: [mainnet, sepolia],
-  transports: {
-    [mainnet.id]: http(),
-    [sepolia.id]: http(),
-  },
-})

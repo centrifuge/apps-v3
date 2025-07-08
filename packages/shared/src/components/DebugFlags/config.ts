@@ -30,7 +30,7 @@ export type DebugFlagConfig =
       alwaysShow?: boolean
     }
 
-export type Key = 'address' | 'persistDebugFlags' | 'showUnusedFlags'
+export type Key = 'address' | 'persistDebugFlags'
 
 export const flagsConfig = {
   address: {
@@ -42,10 +42,6 @@ export const flagsConfig = {
     default: !!localStorage?.getItem('debugFlags'),
     type: 'checkbox',
   },
-  showUnusedFlags: {
-    default: true,
-    type: 'checkbox',
-  },
 } satisfies Record<Key, DebugFlagConfig>
 
-export const genericFlagsConfig = flagsConfig as Record<string, DebugFlagConfig>
+export const genericFlagsConfig: Record<string, DebugFlagConfig> = flagsConfig
