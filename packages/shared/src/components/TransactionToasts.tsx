@@ -29,21 +29,35 @@ export function TransactionToasts() {
           }
           break
         }
-        case 'succeeded':
-        case 'failed': {
+        case 'succeeded': {
           if (activeToastIds.current[tx.id]) {
             const toastIdToDismiss = activeToastIds.current[tx.id]
-            const type: 'success' | 'error' = tx.status === 'succeeded' ? 'success' : 'error'
 
             toaster.update(toastIdToDismiss, {
               title: tx.title,
               description: getCompletedTxDescription(tx),
-              type,
-              duration: type === 'error' ? 60_000 : 5_000,
+              type: 'success',
+              duration: 10_000,
               closable: true,
             })
 
-            delete activeToastIds.current[tx.id] // Remove from our tracking ref
+            delete activeToastIds.current[tx.id]
+          }
+          break
+        }
+        case 'failed': {
+          if (activeToastIds.current[tx.id]) {
+            const toastIdToDismiss = activeToastIds.current[tx.id]
+
+            toaster.update(toastIdToDismiss, {
+              title: tx.title,
+              description: getCompletedTxDescription(tx),
+              type: 'error',
+              duration: 60_000,
+              closable: true,
+            })
+
+            delete activeToastIds.current[tx.id]
           }
           break
         }
