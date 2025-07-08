@@ -3,7 +3,13 @@ import { IoIosCloseCircleOutline, IoMdCheckmarkCircleOutline, IoMdTimer } from '
 import { useFormContext } from '@centrifuge/forms'
 import { InvestAction, RedeemAction, type InvestActionType, type RedeemActionType } from './defaults'
 import { useEffect, useState, type Dispatch, type SetStateAction } from 'react'
-import { useTransactions } from '@components/Transactions/TransactionProvider'
+import { useTransactions } from '@centrifuge/shared'
+
+interface TxState {
+  header: string
+  isSuccessful: boolean
+  isFailed: boolean
+}
 
 interface InvestActionProps {
   currencies: { investCurrency: string; receiveCurrency: string }
@@ -24,49 +30,68 @@ type SuccessPanelProps = InvestActionProps | RedeemActionProps
 export function SuccessPanel(props: SuccessPanelProps) {
   const { getValues } = useFormContext()
   const { transactions } = useTransactions()
-  const [txHeader, setTxHeader] = useState('Transaction pending')
-  const [isTxSuccessful, setIsTxSuccessful] = useState(false)
-  const [isTxFailed, setIsTxFailed] = useState(false)
-  const [txHash, setTxHash] = useState<string | null>(null)
-  const [successColor, errorColor] = useToken('colors', ['success', 'error'])
+  const [txState, setTxState] = useState<TxState>({
+    header: 'Transaction pending',
+    isSuccessful: false,
+    isFailed: false,
+  })
+  const [successColor] = useToken('colors', ['success'])
 
   useEffect(() => {
     transactions.forEach((tx) => {
-      if (['creating', 'unconfirmed', 'pending'].includes(tx.status) && !tx.dismissed) {
-        if (tx.status === 'unconfirmed') {
-          setTxHeader('Signing transaction')
-          setIsTxFailed(false)
-          setIsTxSuccessful(false)
+      switch (tx.status) {
+        case 'unconfirmed': {
+          if (tx.dismissed) return
+          setTxState({
+            header: 'Signing transaction',
+            isSuccessful: false,
+            isFailed: false,
+          })
+          break
         }
-      }
-
-      if (['succeeded', 'failed'].includes(tx.status)) {
-        if (tx.status === 'failed') {
-          setTxHeader(tx.failedReason?.length ? tx.failedReason : 'Transaction failed')
-          setIsTxFailed(true)
-        } else if (tx.status === 'succeeded' && (tx.title === 'Invest' || tx.title === 'Redeem')) {
-          const header = tx.title === 'Invest' ? 'Invest successful' : 'Redeem successful'
-          setTxHeader(header)
-          setIsTxSuccessful(true)
-          setTxHash(tx.result?.transactionHash ?? null)
-        } else {
-          setTxHeader('Transaction status unknown')
+        case 'failed': {
+          if (tx.dismissed) return
+          setTxState({
+            header: 'Transaction failed',
+            isSuccessful: false,
+            isFailed: true,
+          })
+          break
+        }
+        case 'succeeded': {
+          if (tx.dismissed) return
+          if (tx.title === 'Invest' || tx.title === 'Redeem') {
+            const header = tx.title === 'Invest' ? 'Invest successful' : 'Redeem successful'
+            setTxState({
+              header,
+              isSuccessful: true,
+              isFailed: false,
+            })
+          }
+          break
+        }
+        default: {
+          setTxState((prev) => ({
+            ...prev,
+            header: 'Transaction pending',
+          }))
         }
       }
     })
 
     return () => {
-      setTxHeader('Transaction pending')
-      setIsTxSuccessful(false)
-      setIsTxFailed(false)
-      setTxHash(null)
+      setTxState({
+        header: 'Transaction pending',
+        isSuccessful: false,
+        isFailed: false,
+      })
     }
   }, [transactions])
 
   const isInvesting = props.isInvesting
   const buttonText = isInvesting ? 'Invest more' : 'Redeem more'
-  const txHeaderColor = isTxSuccessful ? successColor : 'inherit'
-  const isButtonDisabled = !isTxSuccessful && !isTxFailed
+  const txHeaderColor = txState.isSuccessful ? successColor : 'inherit'
+  const isButtonDisabled = !txState.isSuccessful && !txState.isFailed
 
   return (
     <Box height="100%">
@@ -80,18 +105,18 @@ export function SuccessPanel(props: SuccessPanelProps) {
       >
         <Box width="100%" overflow="hidden">
           <Flex alignItems="center" gap={2} justifyContent="space-between">
-            <Heading color={txHeaderColor}>{txHeader}</Heading>
+            <Heading color={txHeaderColor}>{txState.header}</Heading>
             <Icon size="xl">
-              {isTxSuccessful ? (
-                <IoMdCheckmarkCircleOutline color={txHeaderColor} />
-              ) : isTxFailed ? (
-                <IoIosCloseCircleOutline color={errorColor} />
+              {txState.isSuccessful ? (
+                <IoMdCheckmarkCircleOutline />
+              ) : txState.isFailed ? (
+                <IoIosCloseCircleOutline />
               ) : (
                 <IoMdTimer color="gray.400" />
               )}
             </Icon>
           </Flex>
-          <Box opacity={isTxSuccessful ? 1 : 0.5}>
+          <Box opacity={txState.isSuccessful ? 1 : 0.5}>
             <Flex alignItems="center" gap={2} justifyContent="space-between" mt={6} width="100%">
               <Box>
                 <Text fontWeight={500}>You {isInvesting ? 'invested' : 'redeemed'}</Text>
@@ -107,33 +132,16 @@ export function SuccessPanel(props: SuccessPanelProps) {
               <Text alignSelf="flex-end">{props.currencies.receiveCurrency}</Text>
             </Flex>
           </Box>
-          {txHash && (
-            <Flex alignItems="center" gap={2} justifyContent="space-between" mt={6} opacity={isTxSuccessful ? 1 : 0.5}>
-              <Box>
-                <Text fontWeight={500}>Transaction hash</Text>
-                <Text fontSize="xs" wordBreak="break-word">
-                  {txHash}
-                </Text>
-              </Box>
-              <Button asChild variant="subtle" size="xs">
-                <a target="_blank" href={`https://etherscan.io/tx/${txHash}`}>
-                  View on Etherscan
-                </a>
-              </Button>
-            </Flex>
-          )}
         </Box>
         <Button
           colorPalette="yellow"
           type="button"
           mb={4}
-          onClick={() => {
-            if (isInvesting) {
-              props.setActionType(InvestAction.INVEST_AMOUNT)
-            } else {
-              props.setActionType(RedeemAction.REDEEM_AMOUNT)
-            }
-          }}
+          onClick={() =>
+            isInvesting
+              ? props.setActionType(InvestAction.INVEST_AMOUNT)
+              : props.setActionType(RedeemAction.REDEEM_AMOUNT)
+          }
           width="100%"
           mt={4}
           disabled={isButtonDisabled}
