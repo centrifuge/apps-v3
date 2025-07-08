@@ -9,7 +9,7 @@ const EMPTY_POOLS = { data: [], isLoading: false }
 
 export function usePools() {
   const centrifuge = useCentrifuge()
-  const pools$ = useMemo(() => centrifuge.pools(), [centrifuge])
+  const pools$ = useMemo(() => centrifuge.pools(), [])
   return useObservable(pools$)
 }
 

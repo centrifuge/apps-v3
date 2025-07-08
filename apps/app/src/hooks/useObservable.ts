@@ -138,17 +138,15 @@ const noopStore = {
 }
 
 function useWarnIfNotStable(object?: unknown, message = 'object is not stable') {
-  if (import.meta.env.DEV) {
-    const ref = useRef({ hasObjectCount: 0, stableObjectCount: 0, lastObject: object })
-    if (object && ref.current.lastObject) {
-      ref.current.hasObjectCount++
-      if (ref.current.lastObject === object) {
-        ref.current.stableObjectCount++
-      }
-      if (ref.current.hasObjectCount === 10 && ref.current.stableObjectCount <= 1) {
-        console.warn(message, object)
-      }
+  const ref = useRef({ hasObjectCount: 0, stableObjectCount: 0, lastObject: object })
+  if (object && ref.current.lastObject) {
+    ref.current.hasObjectCount++
+    if (ref.current.lastObject === object) {
+      ref.current.stableObjectCount++
     }
-    ref.current.lastObject = object
+    if (ref.current.hasObjectCount === 10 && ref.current.stableObjectCount <= 1) {
+      console.warn(message, object)
+    }
   }
+  ref.current.lastObject = object
 }

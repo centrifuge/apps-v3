@@ -10,7 +10,7 @@ export function Header() {
       <Box width={40}>
         <LogoCentrifugeText fill="text-primary" />
       </Box>
-      <PoolSelector />
+      {/* <PoolSelector /> */}
       <WalletButton />
     </Box>
   )
