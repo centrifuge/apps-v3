@@ -13,7 +13,7 @@ interface CancelRedeemProps {
 
 export function RedeemCancel({ currencies, setActionType }: CancelRedeemProps) {
   const { getValues } = useFormContext()
-  const redeemText = `${getValues('amount').toString()} ${currencies.investCurrency}`
+  const redeemText = `${getValues('redeemAmount').toString()} ${currencies.investCurrency}`
   const receiveText = `${getValues('amountToReceive').toString()} ${currencies.receiveCurrency}`
 
   return (

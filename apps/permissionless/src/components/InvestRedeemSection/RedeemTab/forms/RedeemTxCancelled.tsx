@@ -34,7 +34,7 @@ export function RedeemTxCancelled({ currencies, setActionType }: RedeemTxCancell
             <Flex alignItems="center" gap={2} justifyContent="space-between" mt={6} width="100%">
               <Box>
                 <Text fontWeight={500}>You cancelled redeeming</Text>
-                <Heading fontSize="lg">{getValues('amount').toString()}</Heading>
+                <Heading fontSize="lg">{getValues('redeemAmount').toString()}</Heading>
               </Box>
               <Text alignSelf="flex-end">{currencies.investCurrency}</Text>
             </Flex>

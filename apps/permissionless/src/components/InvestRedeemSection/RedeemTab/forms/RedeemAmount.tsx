@@ -72,8 +72,8 @@ export function RedeemAmount({ isDisabled, parsedAmount, vault, currencies, setC
         Redeem
       </Text>
       <BalanceInput
-        name="amount"
-        decimals={portfolioShareCurrency?.decimals ?? 18}
+        name="redeemAmount"
+        decimals={shareClass?.details.pricePerShare.decimals}
         placeholder="0.00"
         inputGroupProps={{
           endAddon: currencies.investCurrency,

@@ -23,7 +23,7 @@ export default function RedeemTab({ vault }: { vault: Vault }) {
 
   // TODO: Add necessary refinements for validation checks
   const schema = z.object({
-    amount: createBalanceSchema(vaultDetails?.shareCurrency.decimals ?? 18, z.number().min(0.01)),
+    redeemAmount: createBalanceSchema(vaultDetails?.shareCurrency.decimals ?? 18, z.number().min(0.01)),
     amountToReceive: createBalanceSchema(vaultDetails?.investmentCurrency.decimals ?? 6, z.number().min(0.01)),
   })
 
@@ -32,18 +32,19 @@ export default function RedeemTab({ vault }: { vault: Vault }) {
     defaultValues: RedeemFormDefaultValues,
     mode: 'onChange',
     onSubmit: (values) => {
-      console.log('Redeem values: ', values)
-      // Since amount is now of type Balance, we can directly pass it to the redeem function
-      redeem(values.amount)
+      redeem(values.redeemAmount)
       setActionType(RedeemAction.CANCEL)
     },
     onSubmitError: (error) => console.error('Redeem form submission error:', error),
   })
 
   const { watch } = form
-  const amount = watch('amount')
+  const amount = watch('redeemAmount')
 
-  const parsedAmount = useMemo(() => safeParse(schema.shape.amount, amount) ?? 0, [amount, schema.shape.amount])
+  const parsedAmount = useMemo(
+    () => safeParse(schema.shape.redeemAmount, amount) ?? 0,
+    [amount, schema.shape.redeemAmount]
+  )
   const isDisabled = isPending || !vaultDetails || !investment || parsedAmount === 0
 
   return (
