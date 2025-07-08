@@ -1,7 +1,7 @@
-import { useAccount } from 'wagmi'
 import { useAppKit } from '@reown/appkit/react'
 import type { Address } from 'viem'
 import { Button, ButtonColorPalette, ButtonVariant } from '@centrifuge/ui'
+import { useAddress } from '../../shared/src'
 
 function truncateAddress(string: Address) {
   const first = string.slice(0, 7)
@@ -21,7 +21,7 @@ export const WalletButton = ({
   const [connectedBtnVariant, disconnectedBtnVariant] = variant
 
   const { open } = useAppKit()
-  const { isConnected, address } = useAccount()
+  const { isConnected, address } = useAddress()
 
   const handleConnect = () => {
     open()

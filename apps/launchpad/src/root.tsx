@@ -6,6 +6,7 @@ import { CentrifugeProvider } from '@centrifuge/shared'
 import { TransactionProvider } from '@components/transactions/TransactionProvider'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { PoolProvider } from '@contexts/PoolProvider'
+import { DebugFlags } from '@centrifuge/shared/src/components/DebugFlags'
 
 const queryClient = new QueryClient()
 
@@ -40,7 +41,9 @@ export default function Root() {
           <ChakraCentrifugeProvider themeKey={config.themeKey}>
             <TransactionProvider>
               <PoolProvider>
-                <Outlet />
+                <DebugFlags>
+                  <Outlet />
+                </DebugFlags>
               </PoolProvider>
             </TransactionProvider>
           </ChakraCentrifugeProvider>
