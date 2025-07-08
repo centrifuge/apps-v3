@@ -52,7 +52,7 @@ export function TransactionToasts() {
           title: tx.title,
           description,
           type,
-          duration: type === 'error' ? 60_000 : 10_000,
+          duration: type === 'error' ? 60_000 : 5_000,
           closable: true,
         })
 

@@ -59,7 +59,6 @@ export function InvestAmount({
   // Get the share class info for calculating shares amount to receive
   const shareClass = pool?.shareClasses.find((asset) => asset.shareClass.pool.chainId === investmentCurrencyChainId)
   const navPerShare = shareClass?.details.pricePerShare
-  const shareDecimals = shareClass?.details.pricePerShare.decimals
 
   // Check if the user has the necessary investment currency to invest
   const hasInvestmentCurrency = portfolioCurrency?.chainId === vaultDetails?.investmentCurrency?.chainId
@@ -72,7 +71,7 @@ export function InvestAmount({
       return setValue('amountToReceive', '0')
     }
 
-    const redeemAmount = formatBalanceToString(parsedAmount.mul(navPerShare), shareDecimals)
+    const redeemAmount = formatBalanceToString(parsedAmount.mul(navPerShare), parsedAmount.decimals)
     setValue('amountToReceive', redeemAmount)
   }, [parsedAmount, shareClass, navPerShare])
 
