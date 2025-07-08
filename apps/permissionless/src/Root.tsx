@@ -26,8 +26,8 @@ export function Root() {
   const centrifuge = useMemo(
     () =>
       new Centrifuge({
-        environment: import.meta.env.VITE_CENTRIFUGE_ENV,
-        rpcUrls: { 11155111: `https://eth-sepolia.g.alchemy.com/v2/${import.meta.env.VITE_ALCHEMY_KEY}` },
+        environment: 'demo',
+        rpcUrls: { 11155111: `https://eth-sepolia.g.alchemy.com/v2/KNR-1LZhNqWOxZS2AN8AFeaiESBV10qZ` },
       }),
     []
   )
