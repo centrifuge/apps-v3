@@ -107,7 +107,7 @@ export function InvestTxFeedback({ currencies, setActionType }: InvestTxFeedback
             <Flex alignItems="center" gap={2} justifyContent="space-between" mt={6} width="100%">
               <Box>
                 <Text fontWeight={500}>You invested</Text>
-                <Heading fontSize="lg">{getValues('amount').toString()}</Heading>
+                <Heading fontSize="lg">{getValues('investAmount').toString()}</Heading>
               </Box>
               <Text alignSelf="flex-end">{currencies.investCurrency}</Text>
             </Flex>

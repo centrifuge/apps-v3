@@ -1,7 +1,7 @@
 import { useEffect, useMemo, type Dispatch, type SetStateAction } from 'react'
 import { Badge, Box, Button, Flex, Text } from '@chakra-ui/react'
 import { BalanceInput, useFormContext } from '@centrifuge/forms'
-import { Balance, Vault } from '@centrifuge/sdk'
+import { Balance, PoolId, Vault } from '@centrifuge/sdk'
 import { formatBalanceAbbreviated, usePortfolio, usePoolDetails, useVaultsDetails } from '@centrifuge/shared'
 import { NetworkIcons, type Network } from '@centrifuge/ui'
 import { useSelectedPoolContext } from '@contexts/useSelectedPoolContext'
@@ -35,7 +35,7 @@ export function InvestAmount({
   const { data: vaultsDetails } = useVaultsDetails(vaults)
   const { data: portfolio } = usePortfolio()
   const { selectedPoolId } = useSelectedPoolContext()
-  const { data: pool } = usePoolDetails(selectedPoolId)
+  const { data: pool } = usePoolDetails(selectedPoolId as PoolId)
   const { setValue } = useFormContext()
 
   const investmentCurrencies = vaultsDetails?.map((vault) => ({
@@ -90,7 +90,7 @@ export function InvestAmount({
         <Text fontWeight={500}>You pay</Text>
       </Flex>
       <BalanceInput
-        name="amount"
+        name="investAmount"
         decimals={portfolioCurrency?.decimals}
         placeholder="0.00"
         selectOptions={investmentCurrencies}
@@ -105,7 +105,7 @@ export function InvestAmount({
             borderRadius={10}
             px={3}
             h="24px"
-            onClick={() => setValue('amount', defaultBalance)}
+            onClick={() => setValue('investAmount', defaultBalance)}
             borderColor="gray.500 !important"
             border="1px solid"
             cursor="pointer"

@@ -31,7 +31,7 @@ export default function InvestTab({
 
   // TODO: Add any necessary refinements for validation checks
   const schema = z.object({
-    amount: createBalanceSchema(vaultDetails?.investmentCurrency.decimals ?? 6, z.number().min(0.01)),
+    investAmount: createBalanceSchema(vaultDetails?.investmentCurrency.decimals ?? 6, z.number().min(0.01)),
     amountToReceive: createBalanceSchema(vaultDetails?.shareCurrency.decimals ?? 18, z.number().min(0.01)),
     requirement_nonUsCitizen: z.boolean().refine((val) => val === true, {
       message: 'Non-US citizen requirement must be confirmed',
@@ -50,16 +50,19 @@ export default function InvestTab({
     defaultValues: InvestFormDefaultValues,
     mode: 'onChange',
     onSubmit: (values) => {
-      invest(values.amount)
+      invest(values.investAmount)
       setActionType(InvestAction.SUCCESS)
     },
     onSubmitError: (error) => console.error('Invest form submission error:', error),
   })
 
   const { watch } = form
-  const [amount] = watch(['amount'])
+  const [investAmount] = watch(['investAmount'])
 
-  const parsedAmount = useMemo(() => safeParse(schema.shape.amount, amount) ?? 0, [amount, schema.shape.amount])
+  const parsedAmount = useMemo(
+    () => safeParse(schema.shape.investAmount, investAmount) ?? 0,
+    [investAmount, schema.shape.investAmount]
+  )
 
   const isDisabled = !vaultDetails || !investment || parsedAmount === 0 || isPending
 
