@@ -6,6 +6,7 @@ import Centrifuge from '@centrifuge/sdk'
 import { CentrifugeProvider, TransactionProvider } from '@centrifuge/shared'
 import { ChakraCentrifugeProvider, ChakraCentrifugeProviderProps } from '@centrifuge/ui'
 import { useMemo } from 'react'
+import { DebugFlags } from '@centrifuge/shared/src/components/DebugFlags'
 
 const config = {
   themeKey: 'light' as ChakraCentrifugeProviderProps['themeKey'],
@@ -25,8 +26,8 @@ export function Root() {
   const centrifuge = useMemo(
     () =>
       new Centrifuge({
-        environment: import.meta.env.VITE_CENTRIFUGE_ENV,
-        rpcUrls: { 11155111: `https://eth-sepolia.g.alchemy.com/v2/${import.meta.env.VITE_ALCHEMY_KEY}` },
+        environment: 'demo',
+        rpcUrls: { 11155111: `https://eth-sepolia.g.alchemy.com/v2/KNR-1LZhNqWOxZS2AN8AFeaiESBV10qZ` },
       }),
     []
   )
@@ -41,7 +42,9 @@ export function Root() {
             <ChakraCentrifugeProvider themeKey={config.themeKey}>
               <TransactionProvider>
                 <SelectedPoolProvider>
-                  <App />
+                  <DebugFlags>
+                    <App />
+                  </DebugFlags>
                 </SelectedPoolProvider>
               </TransactionProvider>
             </ChakraCentrifugeProvider>

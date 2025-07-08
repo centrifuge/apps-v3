@@ -2,7 +2,7 @@ import { useMemo, useReducer, useRef, useState, useSyncExternalStore } from 'rea
 import { catchError, of, share, timer, type Observable, type ObservedValueOf } from 'rxjs'
 import { map, tap } from 'rxjs/operators'
 import { ReplaySubject } from 'rxjs'
-import { isEqual } from 'lodash'
+import lodash from 'lodash'
 
 export type ObservableOptions = never
 
@@ -84,7 +84,7 @@ function useObservableInner<ObservableType extends Observable<any>>(observable?:
           // Use lodash.isEqual for robust deep equality check on data to reduce unnecessary snapshot updates.
           // This is important to avoid unnecessary re-renders when the data is the same and prevent `onStoreChange` from being excessively called.
           if (
-            !isEqual(currentSnapshot.data, result.data) ||
+            !lodash.isEqual(currentSnapshot.data, result.data) ||
             currentSnapshot.error !== result.error ||
             currentSnapshot.status !== newStatus
           ) {

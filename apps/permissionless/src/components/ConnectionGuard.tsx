@@ -1,7 +1,8 @@
+import { useAddress } from '@centrifuge/shared'
 import { Button, Menu, Stack, Text } from '@chakra-ui/react'
 import { useAppKit } from '@reown/appkit/react'
 import type { ReactNode } from 'react'
-import { useAccount, useChains, useSwitchChain } from 'wagmi'
+import { useChains, useSwitchChain } from 'wagmi'
 
 type Props = {
   networks?: number[]
@@ -13,7 +14,7 @@ export function ConnectionGuard({ networks, children, message = 'Unsupported net
   const { switchChain } = useSwitchChain()
   const chains = useChains()
   const { open } = useAppKit()
-  const { isConnected, chainId } = useAccount()
+  const { isConnected, chainId } = useAddress()
   function getName(chainId: number) {
     const chain = chains.find((c) => c.id === chainId)
     return chain?.name || chainId.toString()
