@@ -34,7 +34,7 @@ export function useInvestment(vault?: Vault) {
 export function useInvestmentsPerVaults(vaults?: Vault[]) {
   const { address } = useAddress()
   const investmentsPerVaults$ = useMemo(() => {
-    if (!vaults || vaults.length === 0 || !address) return of([])
+    if (!vaults || !vaults.length || !address) return of([])
 
     const investment$ = vaults.map((vault) => vault.investment(address))
     return combineLatest(investment$)
