@@ -1,9 +1,9 @@
+import { useEffect, useState, type Dispatch, type SetStateAction } from 'react'
 import { Box, Button, Flex, Heading, Icon, Text, useToken } from '@chakra-ui/react'
 import { IoIosCloseCircleOutline, IoMdCheckmarkCircleOutline, IoMdTimer } from 'react-icons/io'
 import { useFormContext } from '@centrifuge/forms'
-import { InvestAction, RedeemAction, type InvestActionType, type RedeemActionType } from './defaults'
-import { useEffect, useState, type Dispatch, type SetStateAction } from 'react'
 import { useTransactions } from '@centrifuge/shared'
+import { InvestAction, type InvestActionType } from '@components/InvestRedeemSection/components/defaults'
 
 interface TxState {
   header: string
@@ -11,31 +11,20 @@ interface TxState {
   isFailed: boolean
 }
 
-interface InvestActionProps {
+interface InvestTxFeedbackProps {
   currencies: { investCurrency: string; receiveCurrency: string }
-  isInvesting: true
   setActionType: Dispatch<SetStateAction<InvestActionType>>
 }
 
-interface RedeemActionProps {
-  currencies: { investCurrency: string; receiveCurrency: string }
-  isInvesting?: false
-  setActionType: Dispatch<SetStateAction<RedeemActionType>>
-}
-
-type SuccessPanelProps = InvestActionProps | RedeemActionProps
-
-// We must use props here instead of destructuring in the function parameters
-// to ensure TypeScript can correctly infer the type based on the isInvesting property.
-export function SuccessPanel(props: SuccessPanelProps) {
-  const { getValues } = useFormContext()
+export function InvestTxFeedback({ currencies, setActionType }: InvestTxFeedbackProps) {
+  const { getValues, reset } = useFormContext()
   const { transactions } = useTransactions()
+  const [successColor] = useToken('colors', ['success'])
   const [txState, setTxState] = useState<TxState>({
     header: 'Transaction pending',
     isSuccessful: false,
     isFailed: false,
   })
-  const [successColor] = useToken('colors', ['success'])
 
   useEffect(() => {
     transactions.forEach((tx) => {
@@ -88,8 +77,6 @@ export function SuccessPanel(props: SuccessPanelProps) {
     }
   }, [transactions])
 
-  const isInvesting = props.isInvesting
-  const buttonText = isInvesting ? 'Invest more' : 'Redeem more'
   const txHeaderColor = txState.isSuccessful ? successColor : 'inherit'
   const isButtonDisabled = !txState.isSuccessful && !txState.isFailed
 
@@ -119,17 +106,17 @@ export function SuccessPanel(props: SuccessPanelProps) {
           <Box opacity={txState.isSuccessful ? 1 : 0.5}>
             <Flex alignItems="center" gap={2} justifyContent="space-between" mt={6} width="100%">
               <Box>
-                <Text fontWeight={500}>You {isInvesting ? 'invested' : 'redeemed'}</Text>
+                <Text fontWeight={500}>You invested</Text>
                 <Heading fontSize="lg">{getValues('amount').toString()}</Heading>
               </Box>
-              <Text alignSelf="flex-end">{props.currencies.investCurrency}</Text>
+              <Text alignSelf="flex-end">{currencies.investCurrency}</Text>
             </Flex>
             <Flex alignItems="center" gap={2} justifyContent="space-between" mt={6}>
               <Box>
-                <Text fontWeight={500}>{isInvesting ? 'Token amount' : 'You receive'}</Text>
+                <Text fontWeight={500}>Token amount</Text>
                 <Heading fontSize="lg">{getValues('amountToReceive').toString()}</Heading>
               </Box>
-              <Text alignSelf="flex-end">{props.currencies.receiveCurrency}</Text>
+              <Text alignSelf="flex-end">{currencies.receiveCurrency}</Text>
             </Flex>
           </Box>
         </Box>
@@ -137,16 +124,15 @@ export function SuccessPanel(props: SuccessPanelProps) {
           colorPalette="yellow"
           type="button"
           mb={4}
-          onClick={() =>
-            isInvesting
-              ? props.setActionType(InvestAction.INVEST_AMOUNT)
-              : props.setActionType(RedeemAction.REDEEM_AMOUNT)
-          }
+          onClick={() => {
+            setActionType(InvestAction.INVEST_AMOUNT)
+            reset()
+          }}
           width="100%"
           mt={4}
           disabled={isButtonDisabled}
         >
-          {buttonText}
+          Invest more
         </Button>
       </Flex>
     </Box>
