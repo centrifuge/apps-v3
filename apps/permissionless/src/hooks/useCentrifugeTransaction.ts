@@ -2,15 +2,14 @@ import { lastValueFrom, tap } from 'rxjs'
 import { useConnectorClient } from 'wagmi'
 import { useMutation } from '@tanstack/react-query'
 import { type OperationConfirmedStatus, type Transaction } from '@centrifuge/sdk'
-import { useTransactions } from '@components/Transactions/TransactionProvider'
-import { useCentrifuge } from '@centrifuge/shared'
+import { useCentrifuge, useTransactions } from '@centrifuge/shared'
 
 export function useCentrifugeTransaction() {
   // We need to use the Centrifuge SDK instance initialized in the app Root.
   // If you create a new instance here, i.e. by calling `new Centrifuge()` from an import,
   // it will create a new instance of the SDK.
-  const centrifuge = useCentrifuge()
   const { updateTransaction, addOrUpdateTransaction } = useTransactions()
+  const centrifuge = useCentrifuge()
   const { data: client } = useConnectorClient()
   const { mutateAsync, ...rest } = useMutation({
     mutationFn: execute,

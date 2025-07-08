@@ -3,7 +3,7 @@ import { IoIosCloseCircleOutline, IoMdCheckmarkCircleOutline, IoMdTimer } from '
 import { useFormContext } from '@centrifuge/forms'
 import { InvestAction, RedeemAction, type InvestActionType, type RedeemActionType } from './defaults'
 import { useEffect, useState, type Dispatch, type SetStateAction } from 'react'
-import { useTransactions } from '@components/Transactions/TransactionProvider'
+import { useTransactions } from '@centrifuge/shared'
 
 interface TxState {
   header: string
