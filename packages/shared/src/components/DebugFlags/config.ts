@@ -1,10 +1,12 @@
 import React from 'react'
 
-const params = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : {})
+const url = typeof window !== 'undefined' && window.location.href ? new URL(window.location.href) : null
+const params = new URLSearchParams(url?.search || {})
+
 const localStorage = typeof window !== 'undefined' ? window.localStorage : null
 
 export const debug =
-  import.meta.env.MODE === 'development' || params.get('debug') != null || !!localStorage?.getItem('debugFlags')
+  url?.host.includes('localhost') || params.get('debug') != null || !!localStorage?.getItem('debugFlags')
 
 export type DebugFlagConfig =
   | {
