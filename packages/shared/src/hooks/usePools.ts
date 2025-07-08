@@ -1,38 +1,40 @@
 import { PoolId } from '@centrifuge/sdk'
 import { useMemo } from 'react'
 import { combineLatest, map, of, switchMap } from 'rxjs'
+import { Address } from 'viem'
 import { useObservable } from './useObservable'
 import { useCentrifuge } from './CentrifugeContext'
-import { Address } from 'viem'
 
 export function usePools() {
   const centrifuge = useCentrifuge()
-  const pools$ = useMemo(() => {
-    if (!centrifuge) {
-      return of([])
-    }
 
-    return centrifuge.pools().pipe(map((pools) => pools.filter((p) => p.chainId === 11155111)))
+  const pools$ = useMemo(() => {
+    return centrifuge.pools()
   }, [centrifuge])
 
   return useObservable(pools$)
 }
 
-export function usePoolsByManager(address: Address | undefined) {
-  const { data: pools } = usePools()
-  const stableKey = useMemo(() => pools?.map((p) => p.id).join(',') || '', [pools?.map((p) => p.id).join(',')])
+export function usePoolsByManager(address: Address) {
+  const centrifuge = useCentrifuge()
 
   const pools$ = useMemo(() => {
-    if (!address || !pools) return of([])
-    return combineLatest(
-      pools.map((pool) => pool.isManager(address).pipe(map((isManager) => (isManager ? pool : null))))
-    ).pipe(map((pools) => pools.filter((p) => p !== null)))
-  }, [stableKey, address])
+    if (!address) return of([])
+
+    return centrifuge.pools().pipe(
+      switchMap((pools) => {
+        if (!pools.length) return of([])
+        return combineLatest(
+          pools.map((pool) => pool.isManager(address).pipe(map((isManager) => (isManager ? pool : null))))
+        ).pipe(map((results) => results.filter((p) => p !== null)))
+      })
+    )
+  }, [address, centrifuge])
 
   return useObservable(pools$)
 }
 
-export function usePool(poolId?: PoolId) {
+export function usePool(poolId: PoolId) {
   const centrifuge = useCentrifuge()
   const pool$ = useMemo(() => {
     if (!poolId || !centrifuge) return undefined
@@ -42,12 +44,13 @@ export function usePool(poolId?: PoolId) {
   return useObservable(pool$)
 }
 
-export function usePoolDetails(poolId?: PoolId) {
-  const { data: pool } = usePool(poolId)
+export function usePoolDetails(poolId: PoolId) {
+  const centrifuge = useCentrifuge()
+
   const details$ = useMemo(() => {
-    if (!pool) return undefined
-    return pool.details()
-  }, [pool])
+    if (!poolId) return undefined
+    return centrifuge.pool(poolId).pipe(switchMap((pool) => (pool ? pool.details() : of(undefined))))
+  }, [poolId, centrifuge])
 
   return useObservable(details$)
 }
@@ -55,23 +58,26 @@ export function usePoolDetails(poolId?: PoolId) {
 export function useAllPoolDetails(poolIds: PoolId[]) {
   const centrifuge = useCentrifuge()
 
-  const poolIdsKey = useMemo(() => poolIds?.join(',') || '', [poolIds?.join(',')])
-
   const details$ = useMemo(() => {
-    if (!poolIds?.length || !centrifuge) return of([])
-    // TODO: fix the hardcoded one, we need to update the metadata for existing pools or update sdk to return even if missing metadata
-    return combineLatest([poolIds[0]].map((id) => centrifuge.pool(id).pipe(switchMap((pool) => pool.details()))))
-  }, [poolIdsKey, poolIds, centrifuge])
+    if (!poolIds?.length) {
+      return of([])
+    }
+
+    const poolDetailObservables$ = poolIds.map((id) => centrifuge.pool(id).pipe(switchMap((pool) => pool.details())))
+
+    return combineLatest(poolDetailObservables$)
+  }, [poolIds, centrifuge])
 
   return useObservable(details$)
 }
 
-export function usePoolNetworks(poolId?: PoolId) {
-  const { data: pool } = usePool(poolId)
+export function usePoolNetworks(poolId: PoolId) {
+  const centrifuge = useCentrifuge()
+
   const vaults$ = useMemo(() => {
-    if (!pool) return undefined
-    return pool.activeNetworks()
-  }, [pool])
+    if (!poolId) return undefined
+    return centrifuge.pool(poolId).pipe(switchMap((pool) => (pool ? pool.activeNetworks() : of(undefined))))
+  }, [poolId, centrifuge])
 
   return useObservable(vaults$)
 }

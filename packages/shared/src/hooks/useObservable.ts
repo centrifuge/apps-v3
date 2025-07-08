@@ -1,8 +1,6 @@
 import { useMemo, useReducer, useRef, useState, useSyncExternalStore } from 'react'
 import { catchError, of, share, timer, type Observable, type ObservedValueOf } from 'rxjs'
 import { map, tap } from 'rxjs/operators'
-import { ReplaySubject } from 'rxjs'
-import lodash from 'lodash'
 
 export type ObservableOptions = never
 
@@ -57,15 +55,8 @@ function useObservableInner<ObservableType extends Observable<any>>(observable?:
   useWarnIfNotStable(observable, "useObservable: observable is not stable. Don't forget to memoize it!")
 
   const [updateCount, forceUpdate] = useReducer((s) => s + 1, 0)
-
-  const processedObservableRef = useRef<CacheRecord<ObservedValueOf<ObservableType>> | null>(null)
-
-  useMemo(() => {
-    if (!observable) {
-      processedObservableRef.current = null
-      return
-    }
-
+  const store = useMemo(() => {
+    if (!observable) return
     if (!cache.has(observable)) {
       const entry = {
         snapshot: {
@@ -73,61 +64,36 @@ function useObservableInner<ObservableType extends Observable<any>>(observable?:
         },
         didEmitData: false,
       } as CacheRecord<ObservedValueOf<ObservableType>>
-
       entry.observable = observable.pipe(
         map((value) => ({ data: value, error: undefined, hasData: true })),
         catchError((error) => of({ data: entry.snapshot.data, error, hasData: entry.didEmitData })),
         tap((result) => {
-          const newStatus = result.error ? 'error' : result.hasData ? 'success' : 'loading'
-          const currentSnapshot = entry.snapshot
-
-          // Use lodash.isEqual for robust deep equality check on data to reduce unnecessary snapshot updates.
-          // This is important to avoid unnecessary re-renders when the data is the same and prevent `onStoreChange` from being excessively called.
-          if (
-            !lodash.isEqual(currentSnapshot.data, result.data) ||
-            currentSnapshot.error !== result.error ||
-            currentSnapshot.status !== newStatus
-          ) {
-            entry.didEmitData = result.hasData
-            entry.snapshot = {
-              ...result,
-              status: newStatus,
-            }
-            if (result.error) {
-              console.error(result.error)
-            }
+          entry.didEmitData = result.hasData
+          entry.snapshot = {
+            ...result,
+            status: entry.didEmitData ? 'success' : 'error',
+          }
+          if (result.error) {
+            console.error(result.error)
           }
         }),
-        // Added `ReplaySubject` connector to `share` and delayed `resetOnRefCountZero` to try and avoid infinite loops
-        // It leaves the observable alive for 100ms after the last subscriber leaves to remain active during rapid unmount/remount andn re-render cycles
+        // Share the observable to prevent unsubscribing and resubscribing between the immediate subscription and the useSyncExternalStore subscription.
         share({
-          connector: () => new ReplaySubject(1), // Ensures new subscribers get the last value (behaves like shareReplay(1))
-          resetOnError: true, // Resubscribes to source if it errors
-          resetOnComplete: true, // Resubscribes to source if it completes
-          resetOnRefCountZero: () => timer(100), // Keep source alive for 100ms after last subscriber leaves
+          resetOnRefCountZero: () => timer(0),
         })
       )
-      // Eagerly subscribe to sync set `entry.snapshot` in the cache.
-      // Might be problematic if the observable is not stable or contains asynchronous operations.
-      // useSyncExternalStore is designed to handle asynchronous state without needing an eager synchronous subscription
-      // const subscription = entry.observable.subscribe()  --- Was causing an error that resulted in an infinite loop of rendering
-      // subscription.unsubscribe()
+
+      // Eagerly subscribe to sync set `entry.snapshot`.
+      const subscription = entry.observable.subscribe()
+      subscription.unsubscribe()
 
       cache.set(observable, entry)
     }
-    processedObservableRef.current = cache.get(observable)!
-  }, [observable])
-
-  const store = useMemo(() => {
-    const instance = processedObservableRef.current
-    if (!instance) {
-      return noopStore
-    }
+    const instance = cache.get(observable)!
 
     return {
       subscribe: (onStoreChange: () => void) => {
         const subscription = instance.observable.subscribe(() => onStoreChange())
-
         return () => {
           subscription.unsubscribe()
         }
@@ -136,9 +102,11 @@ function useObservableInner<ObservableType extends Observable<any>>(observable?:
         return instance.snapshot
       },
     }
-  }, [processedObservableRef.current, updateCount])
+    // forceUpdate will cause the store to be recreated, and resubscribed to.
+    // Which, in case of an error, will restart the observable.
+  }, [observable, updateCount])
 
-  const res = useSyncExternalStore(store.subscribe, store.getSnapshot)
+  const res = useSyncExternalStore(store?.subscribe || noopStore.subscribe, store?.getSnapshot || noopStore.getSnapshot)
 
   function resetError() {
     if (observable) {
@@ -163,8 +131,6 @@ function useObservableInner<ObservableType extends Observable<any>>(observable?:
 
 const noopSnapshot = {
   status: 'idle' as const,
-  data: undefined,
-  error: undefined,
 }
 const noopStore = {
   subscribe: () => () => {},
@@ -172,22 +138,15 @@ const noopStore = {
 }
 
 function useWarnIfNotStable(object?: unknown, message = 'object is not stable') {
-  // TODO: not working with launchpad SSR, fix
-  // if (isTestEnv) {
-  //  const ref = useRef({
-  //    hasObjectCount: 0,
-  //    stableObjectCount: 0,
-  //    lastObject: object,
-  //  })
-  //  if (object && ref.current.lastObject) {
-  //    ref.current.hasObjectCount++
-  //    if (ref.current.lastObject === object) {
-  //      ref.current.stableObjectCount++
-  //    }
-  // if (ref.current.hasObjectCount === 10 && ref.current.stableObjectCount <= 1) {
-  //  console.warn(message, object)
-  // }
-  //  }
-  //  ref.current.lastObject = object
-  // }
+  const ref = useRef({ hasObjectCount: 0, stableObjectCount: 0, lastObject: object })
+  if (object && ref.current.lastObject) {
+    ref.current.hasObjectCount++
+    if (ref.current.lastObject === object) {
+      ref.current.stableObjectCount++
+    }
+    if (ref.current.hasObjectCount === 10 && ref.current.stableObjectCount <= 1) {
+      console.warn(message, object)
+    }
+  }
+  ref.current.lastObject = object
 }

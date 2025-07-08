@@ -17,9 +17,6 @@ export default function RedeemTab({ vault }: { vault: Vault }) {
   const { execute, isPending } = useCentrifugeTransaction()
   const [actionType, setActionType] = useState<RedeemActionType>(RedeemAction.REDEEM_AMOUNT)
 
-  // TODO: remove this console log before deploying
-  console.log('investment', vault)
-
   function redeem(amount: Balance) {
     execute(vault.increaseRedeemOrder(amount))
   }
