@@ -8,8 +8,6 @@ export function TransactionToasts() {
 
   const activeToastIds = useRef<Record<string, string>>({})
 
-  console.log({ currentToasts: activeToastIds.current })
-
   useEffect(() => {
     transactions.forEach((tx) => {
       switch (tx.status) {
