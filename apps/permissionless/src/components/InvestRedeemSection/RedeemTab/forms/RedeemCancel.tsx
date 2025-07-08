@@ -11,7 +11,7 @@ interface CancelRedeemProps {
   setActionType: Dispatch<SetStateAction<RedeemActionType>>
 }
 
-export function CancelRedeem({ currencies, setActionType }: CancelRedeemProps) {
+export function RedeemCancel({ currencies, setActionType }: CancelRedeemProps) {
   const { getValues } = useFormContext()
   const redeemText = `${getValues('amount').toString()} ${currencies.investCurrency}`
   const receiveText = `${getValues('amountToReceive').toString()} ${currencies.receiveCurrency}`
