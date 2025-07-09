@@ -6,7 +6,7 @@ import { usePoolProvider } from '@contexts/PoolProvider'
 import { networkToName } from '@centrifuge/shared'
 import { Form, useForm } from '@centrifuge/forms'
 import { SectionWithCheckbox, SectionWithBalanceInput } from './Sections'
-import { Vault } from '@centrifuge/sdk'
+import { usePendingAmounts } from '@centrifuge/shared/src/hooks/useShareClass'
 
 /// TODO: WE NEED TO UPDATE TO USE THE SHARE CLASS VALUES AND NOT THE VAULT
 // wait for sdk
@@ -21,7 +21,9 @@ export const ApproveButton = ({ disabled }: { disabled: boolean }) => {
 }
 
 export default function Approve() {
-  const { isLoading, investmentsPerVaults } = usePoolProvider()
+  const { isLoading, investmentsPerVaults, shareClass } = usePoolProvider()
+  const scPendingAmounts = usePendingAmounts(shareClass?.shareClass)
+  console.log(scPendingAmounts)
 
   const investments = useMemo(() => {
     return investmentsPerVaults?.map((investment: any, index: number) => {
