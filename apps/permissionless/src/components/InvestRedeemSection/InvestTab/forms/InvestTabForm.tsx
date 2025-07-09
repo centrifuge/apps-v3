@@ -9,7 +9,7 @@ import { VaultDetails } from '@utils/types'
 interface InvestTabFormProps {
   actionType: InvestActionType
   isDisabled: boolean
-  parsedAmount: 0 | Balance
+  parsedInvestAmount: 0 | Balance
   vaultDetails?: VaultDetails
   setActionType: Dispatch<SetStateAction<InvestActionType>>
   setVault: Dispatch<Vault>
@@ -19,7 +19,7 @@ interface InvestTabFormProps {
 export function InvestTabForm({
   actionType,
   isDisabled,
-  parsedAmount,
+  parsedInvestAmount,
   vaultDetails,
   setActionType,
   setVault,
@@ -35,7 +35,7 @@ export function InvestTabForm({
       return (
         <InvestAmount
           isDisabled={isDisabled}
-          parsedAmount={parsedAmount}
+          parsedInvestAmount={parsedInvestAmount}
           setActionType={setActionType}
           vaultDetails={vaultDetails}
           currencies={currencies}

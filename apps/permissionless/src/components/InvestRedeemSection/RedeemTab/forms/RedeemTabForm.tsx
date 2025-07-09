@@ -8,15 +8,23 @@ import { RedeemAmount } from '@components/InvestRedeemSection/RedeemTab/forms/Re
 interface RedeemTabFormProps {
   actionType: RedeemActionType
   isDisabled: boolean
-  parsedAmount: 0 | Balance
+  parsedRedeemAmount: 0 | Balance
   vault?: Vault
+  vaults?: Vault[]
   setActionType: Dispatch<SetStateAction<RedeemActionType>>
 }
 
-export function RedeemTabForm({ actionType, isDisabled, parsedAmount, vault, setActionType }: RedeemTabFormProps) {
+export function RedeemTabForm({
+  actionType,
+  isDisabled,
+  parsedRedeemAmount,
+  vault,
+  vaults,
+  setActionType,
+}: RedeemTabFormProps) {
   const [currencies, setCurrencies] = useState({
-    investCurrency: 'deJTRYS',
-    receiveCurrency: 'USDC',
+    investCurrency: '',
+    receiveCurrency: '',
   })
 
   switch (actionType) {
@@ -24,8 +32,9 @@ export function RedeemTabForm({ actionType, isDisabled, parsedAmount, vault, set
       return (
         <RedeemAmount
           isDisabled={isDisabled}
-          parsedAmount={parsedAmount}
+          parsedRedeemAmount={parsedRedeemAmount}
           vault={vault}
+          vaults={vaults}
           currencies={currencies}
           setCurrencies={setCurrencies}
         />

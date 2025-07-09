@@ -2,8 +2,8 @@ import { useEffect, useMemo, type Dispatch, type SetStateAction } from 'react'
 import { Badge, Box, Button, Flex, Text } from '@chakra-ui/react'
 import { BalanceInput, useFormContext } from '@centrifuge/forms'
 import { Balance, PoolId, Vault } from '@centrifuge/sdk'
-import { formatBalanceAbbreviated, usePortfolio, usePoolDetails, useVaultsDetails } from '@centrifuge/shared'
-import { NetworkIcons, type Network } from '@centrifuge/ui'
+import { usePortfolio, usePoolDetails, useVaultsDetails } from '@centrifuge/shared'
+// import { NetworkIcons, type Network } from '@centrifuge/ui'
 import { useSelectedPoolContext } from '@contexts/useSelectedPoolContext'
 import { infoText } from '@utils/infoText'
 import { InvestAction, type InvestActionType } from '@components/InvestRedeemSection/components/defaults'
@@ -13,7 +13,7 @@ import { formatBalance, formatBalanceToString } from '@centrifuge/shared'
 
 interface InvestAmountProps {
   isDisabled: boolean
-  parsedAmount: 0 | Balance
+  parsedInvestAmount: 0 | Balance
   vaultDetails?: VaultDetails
   currencies: { investCurrency: string; receiveCurrency: string }
   setCurrencies: Dispatch<SetStateAction<{ investCurrency: string; receiveCurrency: string }>>
@@ -24,7 +24,7 @@ interface InvestAmountProps {
 
 export function InvestAmount({
   isDisabled,
-  parsedAmount,
+  parsedInvestAmount,
   vaultDetails,
   currencies,
   setCurrencies,
@@ -67,19 +67,19 @@ export function InvestAmount({
 
   // Calculate and update amount to receive based on user input on amount to invest
   useMemo(() => {
-    if (parsedAmount === 0 || !shareClass || navPerShare === undefined) {
-      return setValue('amountToReceive', '0')
+    if (parsedInvestAmount === 0 || !shareClass || navPerShare === undefined) {
+      return setValue('receiveAmount', '0')
     }
 
-    const redeemAmount = formatBalanceToString(parsedAmount.mul(navPerShare), parsedAmount.decimals)
-    setValue('amountToReceive', redeemAmount)
-  }, [parsedAmount, shareClass, navPerShare])
+    const redeemAmount = formatBalanceToString(parsedInvestAmount.mul(navPerShare), parsedInvestAmount.decimals)
+    setValue('receiveAmount', redeemAmount)
+  }, [parsedInvestAmount, shareClass, navPerShare])
 
   useEffect(
     () =>
       setCurrencies({
-        investCurrency: portfolioCurrency?.symbol ?? 'USDC',
-        receiveCurrency: shareClass?.details.symbol ?? 'deJTRYS',
+        investCurrency: portfolioCurrency?.symbol ?? '',
+        receiveCurrency: shareClass?.details.symbol ?? '',
       }),
     [portfolioCurrency, shareClass]
   )
@@ -118,13 +118,13 @@ export function InvestAmount({
         </Flex>
         {/* <NetworkIcons networks={networks} /> */}
       </Flex>
-      {parsedAmount !== 0 && (
+      {parsedInvestAmount !== 0 && (
         <>
           <Text fontWeight={500} mt={6} mb={2}>
             You receive
           </Text>
           <BalanceInput
-            name="amountToReceive"
+            name="receiveAmount"
             decimals={navPerShare?.decimals}
             displayDecimals={navPerShare?.decimals}
             placeholder="0.00"

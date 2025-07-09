@@ -10,13 +10,22 @@ import { divideBigInts } from '@centrifuge/shared/src/utils/formatting'
 
 interface RedeemAmountProps {
   isDisabled: boolean
-  parsedAmount: 0 | Balance
+  parsedRedeemAmount: 0 | Balance
   vault?: Vault
+  vaults?: Vault[]
   currencies: { investCurrency: string; receiveCurrency: string }
   setCurrencies: Dispatch<SetStateAction<{ investCurrency: string; receiveCurrency: string }>>
 }
 
-export function RedeemAmount({ isDisabled, parsedAmount, vault, currencies, setCurrencies }: RedeemAmountProps) {
+export function RedeemAmount({
+  isDisabled,
+  parsedRedeemAmount,
+  vault,
+  vaults,
+  currencies,
+  setCurrencies,
+}: RedeemAmountProps) {
+  // const { data: vaultsDetails } = useVaultsDetails(vaults)
   const { data: portfolio } = usePortfolio()
   const { selectedPoolId } = useSelectedPoolContext()
   const { data: pool } = usePoolDetails(selectedPoolId)
@@ -100,13 +109,13 @@ export function RedeemAmount({ isDisabled, parsedAmount, vault, currencies, setC
           </Text>
         </Flex>
       </Flex>
-      {parsedAmount !== 0 && (
+      {parsedRedeemAmount !== 0 && (
         <>
           <Text fontWeight={500} mt={6} mb={2}>
             You receive
           </Text>
           <BalanceInput
-            name="amountToReceive"
+            name="receiveAmount"
             placeholder="0.00"
             decimals={portfolioInvestmentCurrency?.decimals}
             disabled
@@ -119,7 +128,7 @@ export function RedeemAmount({ isDisabled, parsedAmount, vault, currencies, setC
       <SubmitButton colorPalette="yellow" disabled={isDisabled} width="100%">
         Redeem
       </SubmitButton>
-      {parsedAmount === 0 && <InfoWrapper text={infoText().redeem} />}
+      {parsedRedeemAmount === 0 && <InfoWrapper text={infoText().redeem} />}
     </Box>
   )
 }

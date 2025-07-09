@@ -11,7 +11,7 @@ import {
 } from '@components/InvestRedeemSection/components/defaults'
 import { RedeemTabForm } from '@components/InvestRedeemSection/RedeemTab/forms/RedeemTabForm'
 
-export default function RedeemTab({ vault }: { vault: Vault }) {
+export default function RedeemTab({ vault, vaults }: { vault: Vault; vaults: Vault[] }) {
   const { data: vaultDetails } = useVaultDetails(vault)
   const { data: investment } = useInvestment(vault)
   const { execute, isPending } = useCentrifugeTransaction()
@@ -24,7 +24,7 @@ export default function RedeemTab({ vault }: { vault: Vault }) {
   // TODO: Add necessary refinements for validation checks
   const schema = z.object({
     redeemAmount: createBalanceSchema(vaultDetails?.shareCurrency.decimals ?? 18, z.number().min(0.01)),
-    amountToReceive: createBalanceSchema(vaultDetails?.investmentCurrency.decimals ?? 6, z.number().min(0.01)),
+    receiveAmount: createBalanceSchema(vaultDetails?.investmentCurrency.decimals ?? 6, z.number().min(0.01)),
   })
 
   const form = useForm({
@@ -39,13 +39,15 @@ export default function RedeemTab({ vault }: { vault: Vault }) {
   })
 
   const { watch } = form
-  const amount = watch('redeemAmount')
+  const redeemAmount = watch('redeemAmount')
 
-  const parsedAmount = useMemo(
-    () => safeParse(schema.shape.redeemAmount, amount) ?? 0,
-    [amount, schema.shape.redeemAmount]
+  const parsedRedeemAmount = useMemo(
+    () => safeParse(schema.shape.redeemAmount, redeemAmount) ?? 0,
+    [redeemAmount, schema.shape.redeemAmount]
   )
-  const isDisabled = isPending || !vaultDetails || !investment || parsedAmount === 0
+  const isDisabled = isPending || !vaultDetails || !investment || parsedRedeemAmount === 0
+
+  console.log('1: ', parsedRedeemAmount)
 
   return (
     <Form form={form} style={{ height: '100%' }}>
@@ -53,8 +55,9 @@ export default function RedeemTab({ vault }: { vault: Vault }) {
         <RedeemTabForm
           actionType={actionType}
           isDisabled={isDisabled}
-          parsedAmount={parsedAmount}
+          parsedRedeemAmount={parsedRedeemAmount}
           vault={vault}
+          vaults={vaults}
           setActionType={setActionType}
         />
       </Box>

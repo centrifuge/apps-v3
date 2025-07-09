@@ -7,8 +7,8 @@ export const InvestAction = {
 export type InvestActionType = (typeof InvestAction)[keyof typeof InvestAction]
 
 export const InvestFormDefaultValues = {
-  amount: '',
-  amountToReceive: '1',
+  investAmount: '',
+  receiveAmount: '1',
   investorRequirements: [false, false, false],
 }
 
@@ -21,6 +21,6 @@ export const RedeemAction = {
 export type RedeemActionType = (typeof RedeemAction)[keyof typeof RedeemAction]
 
 export const RedeemFormDefaultValues = {
-  amount: '',
-  amountToReceive: '',
+  redeemAmount: '',
+  receiveAmount: '',
 }
