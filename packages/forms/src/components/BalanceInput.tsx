@@ -17,6 +17,7 @@ import {
 } from '@chakra-ui/react'
 import { useGetFormError } from '../hooks/useGetFormError'
 import { Balance } from '@centrifuge/sdk'
+import Decimal from 'decimal.js-light'
 
 export interface BalanceInputProps<TFieldValues extends FieldValues = FieldValues>
   extends Omit<ChakraInputProps, 'onChange' | 'onBlur' | 'disabled' | 'value'> {
@@ -144,12 +145,11 @@ export function BalanceInput<TFieldValues extends FieldValues = FieldValues>(pro
     // Format the value with fixed decimal places when user leaves the field
     const currentValue = e.target.value
     if (currentValue && currentValue !== '' && currentValue !== '.') {
-      const numericValue = parseFloat(currentValue)
+      const decimalValue = new Decimal(currentValue)
+      const truncatedValue = decimalValue.toDecimalPlaces(currentDisplayDecimals, Decimal.ROUND_DOWN)
+      const formattedValue = truncatedValue.toFixed(currentDisplayDecimals)
 
-      if (!isNaN(numericValue)) {
-        const formattedValue = numericValue.toFixed(currentDisplayDecimals)
-        field.onChange(formattedValue)
-      }
+      field.onChange(formattedValue)
     }
 
     field.onBlur()
