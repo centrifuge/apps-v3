@@ -42,9 +42,9 @@ export function PoolProvider({ children }: PoolProviderProps) {
     return poolId ? new PoolId(poolId) : undefined
   }, [poolId])
 
-  const { data: pool } = usePool(memoizedPoolId)
-  const { data: poolDetails, isLoading: poolLoading, error: poolError } = usePoolDetails(memoizedPoolId)
-  const { data: networks, isLoading: networksLoading } = usePoolNetworks(poolDetails?.id)
+  const { data: pool } = usePool(memoizedPoolId!)
+  const { data: poolDetails, isLoading: poolLoading, error: poolError } = usePoolDetails(memoizedPoolId!)
+  const { data: networks, isLoading: networksLoading } = usePoolNetworks(poolDetails?.id!)
 
   const network = useMemo(() => {
     return networks?.find((n) => n.chainId === connectedChainId)

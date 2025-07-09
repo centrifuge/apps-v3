@@ -7,7 +7,7 @@ export const useAssets = (spokeChainId: number, hubChainId?: number) => {
 
   const asset$ = useMemo(() => {
     if (!spokeChainId) return undefined
-    return centrifuge.assets(spokeChainId, hubChainId)
+    return centrifuge.assets(Number(spokeChainId), Number(hubChainId))
   }, [spokeChainId, hubChainId])
 
   return useObservable(asset$)

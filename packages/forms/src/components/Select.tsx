@@ -44,7 +44,7 @@ export function Select<TFieldValues extends FieldValues = FieldValues>(props: Cu
 
   return (
     <Group>
-      <Field.Root invalid={isError} disabled={formState.isSubmitting} id={name} {...rest}>
+      <Field.Root invalid={isError} disabled={formState.isSubmitting} id={name}>
         <Field.Label>{label}</Field.Label>
         <ChakraSelect.Root
           collection={collection}
@@ -52,11 +52,12 @@ export function Select<TFieldValues extends FieldValues = FieldValues>(props: Cu
           onValueChange={({ value }: { value: string[] }) => onValueChange(value)}
           disabled={disabled}
           value={value}
+          {...rest}
         >
           <ChakraSelect.HiddenSelect />
           <ChakraSelect.Control>
-            <ChakraSelect.Trigger {...({ children: true } as any)}>
-              <ChakraSelect.ValueText {...({ placeholder: 'Please select...' } as any)} />
+            <ChakraSelect.Trigger {...{ children: true }}>
+              <ChakraSelect.ValueText {...{ placeholder: 'Please select...' }} />
               <RiArrowDownSLine />
             </ChakraSelect.Trigger>
           </ChakraSelect.Control>
@@ -64,7 +65,7 @@ export function Select<TFieldValues extends FieldValues = FieldValues>(props: Cu
             <ChakraSelect.Positioner>
               <ChakraSelect.Content>
                 {items.map((item) => (
-                  <ChakraSelect.Item {...({ item, children: item.children ?? item.label } as any)} key={item.value} />
+                  <ChakraSelect.Item {...{ item, children: item.children ?? item.label }} key={item.value} />
                 ))}
               </ChakraSelect.Content>
             </ChakraSelect.Positioner>

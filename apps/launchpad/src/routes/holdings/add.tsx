@@ -5,7 +5,7 @@ import { usePoolProvider } from '@contexts/PoolProvider'
 import { AddHoldingForm } from '@components/holdings/addHoldingForm'
 import { Button, Card, Loader } from '@centrifuge/ui'
 import { AssetId, ShareClassId } from '@centrifuge/sdk'
-import { useCentrifugeTransaction } from '@hooks/useCentrifugeTransaction'
+import { useCentrifugeTransaction } from '@centrifuge/shared'
 
 export const handle = {
   hasSettings: false,
@@ -59,7 +59,7 @@ export default function Add() {
         />
       </Flex>
       <Card>
-        <AddHoldingForm networks={networks} poolDetails={poolDetails} hubChainId={pool?.hubChainId} />
+        <AddHoldingForm networks={networks} poolDetails={poolDetails} hubChainId={pool?.chainId!} />
       </Card>
     </Form>
   )
