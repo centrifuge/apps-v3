@@ -114,7 +114,7 @@ export function RedeemAmount({
     return formatBalanceToString(maxRedeemBalance, maxRedeemBalance.decimals) ?? ''
   }, [maxRedeemBalance])
 
-  const setMaxInvestAmount = useCallback(() => {
+  const setMaxRedeemAmount = useCallback(() => {
     if (!maxRedeemAmount || !pricePerShare || maxRedeemBalance === 0) return
 
     const calculatedReceiveAmount = calculateReceiveAmountValue(maxRedeemBalance, pricePerShare)
@@ -157,7 +157,7 @@ export function RedeemAmount({
             borderColor="gray.500 !important"
             border="1px solid"
             cursor="pointer"
-            onClick={setMaxInvestAmount}
+            onClick={setMaxRedeemAmount}
           >
             MAX
           </Badge>
