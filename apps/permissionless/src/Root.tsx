@@ -25,8 +25,9 @@ export function Root() {
    */
   const centrifuge = useMemo(
     () =>
+      // TODO: SETUP VITE ENV VARIABLES FOR DEPLOYMENT
       new Centrifuge({
-        environment: 'demo',
+        environment: 'testnet',
         rpcUrls: { 11155111: `https://eth-sepolia.g.alchemy.com/v2/KNR-1LZhNqWOxZS2AN8AFeaiESBV10qZ` },
       }),
     []
