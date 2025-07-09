@@ -17,7 +17,7 @@ interface DataTableProps<RowType extends { id?: string | number }> {
 
 const TABLE_HEADER_COLOR = '#F9FAFB'
 
-const DataTable = <RowType extends { id?: string | number }>({
+export const DataTable = <RowType extends { id?: string | number }>({
   columns,
   data,
   size = 'sm',
@@ -66,5 +66,3 @@ const DataTable = <RowType extends { id?: string | number }>({
     </Table.Root>
   )
 }
-
-export default DataTable

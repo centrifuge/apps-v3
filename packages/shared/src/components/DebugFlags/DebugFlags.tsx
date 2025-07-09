@@ -100,7 +100,7 @@ const Panel = ({
                       <Checkbox.Root
                         key={key}
                         checked={value as boolean}
-                        onChange={(e: ChangeEvent<HTMLInputElement>) => onChange(key as Key, e.target.checked)}
+                        onCheckedChange={(checked) => onChange(key as Key, checked.checked)}
                       >
                         <Checkbox.HiddenInput />
                         <Checkbox.Control />

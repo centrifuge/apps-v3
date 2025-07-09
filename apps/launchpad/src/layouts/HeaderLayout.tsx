@@ -44,6 +44,14 @@ const getOrdersTabs = (poolId: string) => [
   },
 ]
 
+// Holdings page tabs
+const getHoldingsTabs = () => [
+  {
+    label: 'Add',
+    path: `/holdings/add`,
+  },
+]
+
 // Account page tabs
 const getAccountTabs = (poolId: string, labels: string[]) => [
   ...labels.map((label) => ({
@@ -71,6 +79,9 @@ function getTabsForRoute(pathname: string, poolId?: string, labels?: string[]) {
   if (pathname.startsWith('/settings')) {
     return getPoolSettingsTabs(poolId)
   }
+  if (pathname.startsWith('/holdings')) {
+    return getHoldingsTabs()
+  }
   return MAIN_TABS
 }
 
@@ -91,7 +102,7 @@ export default function HeaderLayout() {
     return poolId ? new PoolId(poolId) : undefined
   }, [poolId])
 
-  const { data: poolsDetails } = usePoolDetails(memoizedPoolId)
+  const { data: poolsDetails } = usePoolDetails(memoizedPoolId!)
   const shareClasses = poolsDetails?.shareClasses.map((shareClass) => shareClass.details.symbol)
   const poolName = poolsDetails?.metadata?.pool?.name ?? 'Pool'
 

@@ -50,7 +50,7 @@ export function Checkbox<TFieldValues extends FieldValues = FieldValues>(props: 
         }}
       >
         <ChakraCheckbox.HiddenInput />
-        <ChakraCheckbox.Control borderColor="black" borderRadius={4} />
+        <ChakraCheckbox.Control />
         <ChakraCheckbox.Label>{label}</ChakraCheckbox.Label>
       </ChakraCheckbox.Root>
       <Field.ErrorText>{errorMessage}</Field.ErrorText>
