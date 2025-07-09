@@ -73,6 +73,7 @@ export function Input<TFieldValues extends FieldValues = FieldValues>(props: Inp
           disabled={isDisabled}
           onChange={mergedOnChange}
           onBlur={mergedOnBlur}
+          borderRadius="sm"
         />
       </InputGroup>
       <Field.ErrorText>{errorMessage}</Field.ErrorText>

@@ -1,12 +1,6 @@
 import z from 'zod'
 import { Form, useForm } from '@centrifuge/forms'
-import {
-  truncateAddress,
-  useAllPoolDetails,
-  useCentrifugeTransaction,
-  usePool,
-  usePoolsByManager,
-} from '@centrifuge/shared'
+import { truncateAddress, useAllPoolDetails, useCentrifugeTransaction, usePoolsByManager } from '@centrifuge/shared'
 import { Card, Button, Loader } from '@centrifuge/ui'
 import { Box, Flex, Heading, Stack, VStack } from '@chakra-ui/react'
 import { useAccount } from 'wagmi'
@@ -26,22 +20,26 @@ const schema = z.object({
 export default function Investors() {
   const { address } = useAccount()
   const { data: pools, isLoading } = usePoolsByManager(address!)
-  const execute = useCentrifugeTransaction()
+  const { execute, isPending } = useCentrifugeTransaction()
 
   const poolIds = useMemo(() => {
     if (!pools) return []
     return pools.map((pool) => pool.id)
   }, [pools])
 
-  const { data: poolDetails, isLoading: isPoolDetailsLoading } = useAllPoolDetails(poolIds)
+  const { data: poolsDetails } = useAllPoolDetails(poolIds)
 
   const form = useForm({
     schema,
     mode: 'onChange',
     onSubmit: (values) => {
-      const { poolId, chainId } = values
-      const selectedPool = pools?.find((pool) => pool.id.raw.toString() === poolId)
-      console.log(selectedPool?.shareClasses)
+      const { poolId, shareClassId, investorAddress, network } = values
+      const selectedShareClass = poolsDetails
+        ?.find((pool) => pool.id.raw.toString() === poolId)
+        ?.shareClasses.find((sc) => sc.details.id.raw.toString() === shareClassId)
+      if (selectedShareClass) {
+        execute(selectedShareClass.shareClass.updateMember(investorAddress, 1800000000, Number(network)))
+      }
     },
   })
 
@@ -66,11 +64,12 @@ export default function Investors() {
             size="sm"
             onClick={() => form.handleSubmit()}
             disabled={!form.formState.isValid || !shareClassId || !poolId || !network}
+            loading={isPending}
           />
         </Flex>
         <Card mt={8}>
           <Stack gap={4}>
-            <WhitelistInvestor poolIds={poolIds} />
+            <WhitelistInvestor pools={poolsDetails ?? []} />
           </Stack>
         </Card>
       </Box>

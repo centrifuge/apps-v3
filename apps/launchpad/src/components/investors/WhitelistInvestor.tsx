@@ -1,12 +1,12 @@
 import { Input, Select, useFormContext } from '@centrifuge/forms'
-import { PoolId, PoolNetwork } from '@centrifuge/sdk'
+import { Pool, PoolId, PoolNetwork } from '@centrifuge/sdk'
 import { networkToName, usePoolDetails, usePoolNetworks } from '@centrifuge/shared'
 import { NetworkIcon } from '@centrifuge/ui'
 import { Flex, Grid, Heading, Text } from '@chakra-ui/react'
 import { useMemo } from 'react'
-import { isAddress } from 'viem'
 
-export const WhitelistInvestor = ({ poolIds }: { poolIds: PoolId[] }) => {
+// TODO: fix types
+export const WhitelistInvestor = ({ pools }: { pools: any[] }) => {
   const { watch } = useFormContext()
   const poolId = watch('poolId')
   const { data: poolDetails } = usePoolDetails(poolId)
@@ -38,7 +38,12 @@ export const WhitelistInvestor = ({ poolIds }: { poolIds: PoolId[] }) => {
       <Heading size="md">Whitelist investors</Heading>
       <Grid templateColumns="1fr 1fr" gap={4}>
         <Select
-          items={poolIds?.map((pool) => ({ label: pool.raw.toString(), value: pool.raw.toString() })) ?? []}
+          items={
+            pools?.map((pool) => ({
+              label: pool.metadata?.pool?.name ?? pool.id.raw.toString(),
+              value: pool.id.raw.toString(),
+            })) ?? []
+          }
           label="Pool"
           name="poolId"
         />
