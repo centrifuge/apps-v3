@@ -21,7 +21,6 @@ export default function RedeemTab({ vault, vaults }: { vault: Vault; vaults: Vau
     execute(vault.increaseRedeemOrder(amount))
   }
 
-  // TODO: Add necessary refinements for validation checks
   const schema = z.object({
     redeemAmount: createBalanceSchema(vaultDetails?.shareCurrency.decimals ?? 18, z.number().min(0.01)),
     receiveAmount: createBalanceSchema(vaultDetails?.investmentCurrency.decimals ?? 6, z.number().min(0.01)),
@@ -46,8 +45,6 @@ export default function RedeemTab({ vault, vaults }: { vault: Vault; vaults: Vau
     [redeemAmount, schema.shape.redeemAmount]
   )
   const isDisabled = isPending || !vaultDetails || !investment || parsedRedeemAmount === 0
-
-  console.log('1: ', parsedRedeemAmount)
 
   return (
     <Form form={form} style={{ height: '100%' }}>

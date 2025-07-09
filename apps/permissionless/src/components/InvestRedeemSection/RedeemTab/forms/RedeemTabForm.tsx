@@ -1,9 +1,9 @@
 import { useState, type Dispatch, type SetStateAction } from 'react'
 import type { Balance, Vault } from '@centrifuge/sdk'
 import { type RedeemActionType, RedeemAction } from '@components/InvestRedeemSection/components/defaults'
-import { SuccessPanel } from '@components/InvestRedeemSection/components/SuccessPanel'
-import { CancelRedeem } from '@components/InvestRedeemSection/RedeemTab/forms/CancelRedeem'
+import { RedeemCancel } from '@components/InvestRedeemSection/RedeemTab/forms/RedeemCancel'
 import { RedeemAmount } from '@components/InvestRedeemSection/RedeemTab/forms/RedeemAmount'
+import { RedeemTxCancelled } from '@components/InvestRedeemSection/RedeemTab/forms/RedeemTxCancelled'
 
 interface RedeemTabFormProps {
   actionType: RedeemActionType
@@ -40,8 +40,8 @@ export function RedeemTabForm({
         />
       )
     case RedeemAction.CANCEL:
-      return <CancelRedeem setActionType={setActionType} currencies={currencies} />
+      return <RedeemCancel setActionType={setActionType} currencies={currencies} />
     case RedeemAction.SUCCESS:
-      return <SuccessPanel currencies={currencies} setActionType={setActionType} />
+      return <RedeemTxCancelled currencies={currencies} setActionType={setActionType} />
   }
 }
