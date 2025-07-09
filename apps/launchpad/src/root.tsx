@@ -5,8 +5,7 @@ import { CentrifugeProvider, TransactionProvider } from '@centrifuge/shared'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { PoolProvider } from '@contexts/PoolProvider'
 import { DebugFlags } from '@centrifuge/shared/src/components/DebugFlags'
-import { useMemo } from 'react'
-import Centrifuge from '@centrifuge/sdk'
+import { centrifuge, networks } from './centrifuge'
 
 const queryClient = new QueryClient()
 
@@ -34,18 +33,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function Root() {
-  const centrifuge = useMemo(
-    () =>
-      // TODO: SETUP VITE ENV VARIABLES FOR DEPLOYMENT
-      new Centrifuge({
-        environment: 'testnet',
-        rpcUrls: { 11155111: `https://eth-sepolia.g.alchemy.com/v2/KNR-1LZhNqWOxZS2AN8AFeaiESBV10qZ` },
-      }),
-    []
-  )
-
-  const networks = useMemo(() => centrifuge.chains.map((cid) => centrifuge.getChainConfig(cid)), [centrifuge])
-
   return (
     <QueryClientProvider client={queryClient}>
       <CentrifugeProvider client={centrifuge}>
