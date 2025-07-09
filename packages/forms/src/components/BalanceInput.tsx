@@ -21,6 +21,7 @@ import Decimal from 'decimal.js-light'
 
 export interface BalanceInputProps<TFieldValues extends FieldValues = FieldValues>
   extends Omit<ChakraInputProps, 'onChange' | 'onBlur' | 'disabled' | 'value'> {
+  currency?: string
   name: FieldPath<TFieldValues>
   label?: string
   rules?: object
@@ -60,6 +61,7 @@ const CurrencySelect = ({
 
 export function BalanceInput<TFieldValues extends FieldValues = FieldValues>(props: BalanceInputProps<TFieldValues>) {
   const {
+    currency,
     disabled,
     inputGroupProps,
     name,
@@ -231,6 +233,8 @@ export function BalanceInput<TFieldValues extends FieldValues = FieldValues>(pro
                 }
               }}
             />
+          ) : currency ? (
+            currency
           ) : undefined
         }
       >

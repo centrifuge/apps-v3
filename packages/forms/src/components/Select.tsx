@@ -1,19 +1,14 @@
 import type { FieldPath, FieldValues } from 'react-hook-form'
 import { useController, useFormContext } from 'react-hook-form'
-import {
-  type SelectRootProps,
-  type SelectValueChangeDetails,
-  createListCollection,
-  Field,
-  Portal,
-  Select as ChakraSelect,
-} from '@chakra-ui/react'
+import { createListCollection, Select as ChakraSelect, Field, SelectRootProps, Portal, Group } from '@chakra-ui/react'
 import { useGetFormError } from '../hooks/useGetFormError'
 import { useState } from 'react'
+import { RiArrowDownSLine } from 'react-icons/ri'
 
 export interface CustomSelectProps<TFieldValues extends FieldValues = FieldValues>
   extends Omit<SelectRootProps, 'collection'> {
-  items: Array<{ label: string; value: string }>
+  disabled?: boolean
+  items: { value: string; children?: any; label: string }[]
   label: string
   name: FieldPath<TFieldValues>
   rules?: object
@@ -22,7 +17,7 @@ export interface CustomSelectProps<TFieldValues extends FieldValues = FieldValue
 export function Select<TFieldValues extends FieldValues = FieldValues>(props: CustomSelectProps<TFieldValues>) {
   const [value, setValue] = useState<string[]>([])
   const { control, trigger } = useFormContext()
-  const { name, rules, label, items, ...rest } = props
+  const { name, rules, label, items, disabled, ...rest } = props
 
   const {
     field,
@@ -39,42 +34,45 @@ export function Select<TFieldValues extends FieldValues = FieldValues>(props: Cu
     name,
   })
 
-  const handleChange = async (details: SelectValueChangeDetails<{ label: string; value: string }>) => {
-    const value = details?.value?.[0]
-    field.onChange(value === '' ? undefined : value) // Call react-hook-form's onChange with the selected value
-    setValue(value === '' ? [] : [value]) // Update local state for controlled component
-    await trigger(name) // Trigger validation for the field
+  const onValueChange = (value: string[]) => {
+    setValue(value)
+    field.onChange(value[0])
+    trigger(name)
   }
 
-  const frameworks = createListCollection({ items })
+  const collection = createListCollection({ items })
 
   return (
-    <Field.Root invalid={isError} disabled={formState.isSubmitting} id={name}>
-      <Field.Label>{label}</Field.Label>
-      <ChakraSelect.Root collection={frameworks} value={value} onValueChange={handleChange} {...rest}>
-        <ChakraSelect.HiddenSelect />
-        <ChakraSelect.Control>
-          <ChakraSelect.Trigger>
-            <ChakraSelect.ValueText placeholder={label} />
-          </ChakraSelect.Trigger>
-          <ChakraSelect.IndicatorGroup>
-            <ChakraSelect.Indicator />
-          </ChakraSelect.IndicatorGroup>
-        </ChakraSelect.Control>
-        <Portal>
-          <ChakraSelect.Positioner>
-            <ChakraSelect.Content>
-              {frameworks.items.map((framework) => (
-                <ChakraSelect.Item item={framework} key={framework.value}>
-                  {framework.label}
-                  <ChakraSelect.ItemIndicator />
-                </ChakraSelect.Item>
-              ))}
-            </ChakraSelect.Content>
-          </ChakraSelect.Positioner>
-        </Portal>
-      </ChakraSelect.Root>
-      <Field.ErrorText>{errorMessage}</Field.ErrorText>
-    </Field.Root>
+    <Group>
+      <Field.Root invalid={isError} disabled={formState.isSubmitting} id={name}>
+        <Field.Label>{label}</Field.Label>
+        <ChakraSelect.Root
+          collection={collection}
+          size="sm"
+          onValueChange={({ value }: { value: string[] }) => onValueChange(value)}
+          disabled={disabled}
+          value={value}
+          {...rest}
+        >
+          <ChakraSelect.HiddenSelect />
+          <ChakraSelect.Control>
+            <ChakraSelect.Trigger {...{ children: true }}>
+              <ChakraSelect.ValueText {...{ placeholder: 'Please select...' }} />
+              <RiArrowDownSLine />
+            </ChakraSelect.Trigger>
+          </ChakraSelect.Control>
+          <Portal>
+            <ChakraSelect.Positioner>
+              <ChakraSelect.Content>
+                {items.map((item) => (
+                  <ChakraSelect.Item {...{ item, children: item.children ?? item.label }} key={item.value} />
+                ))}
+              </ChakraSelect.Content>
+            </ChakraSelect.Positioner>
+          </Portal>
+        </ChakraSelect.Root>
+        <Field.ErrorText>{errorMessage}</Field.ErrorText>
+      </Field.Root>
+    </Group>
   )
 }

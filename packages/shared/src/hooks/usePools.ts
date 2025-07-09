@@ -25,7 +25,7 @@ export function usePoolsByManager(address: Address) {
       switchMap((pools) => {
         if (!pools.length) return of([])
         return combineLatest(
-          pools.map((pool) => pool.isManager(address).pipe(map((isManager) => (isManager ? pool : null))))
+          pools.map((pool) => pool.isPoolManager(address).pipe(map((isManager) => (isManager ? pool : null))))
         ).pipe(map((results) => results.filter((p) => p !== null)))
       })
     )
@@ -37,9 +37,9 @@ export function usePoolsByManager(address: Address) {
 export function usePool(poolId: PoolId) {
   const centrifuge = useCentrifuge()
   const pool$ = useMemo(() => {
-    if (!poolId || !centrifuge) return undefined
+    if (!poolId) return undefined
     return centrifuge.pool(poolId)
-  }, [poolId, centrifuge])
+  }, [poolId])
 
   return useObservable(pool$)
 }
@@ -63,7 +63,10 @@ export function useAllPoolDetails(poolIds: PoolId[]) {
       return of([])
     }
 
-    const poolDetailObservables$ = poolIds.map((id) => centrifuge.pool(id).pipe(switchMap((pool) => pool.details())))
+    // TODO: sdk needs to be fixed to not return nulls and keep the observable
+    const poolDetailObservables$ = [poolIds[1], poolIds[0]].map((id) =>
+      centrifuge.pool(id).pipe(switchMap((pool) => pool.details()))
+    )
 
     return combineLatest(poolDetailObservables$)
   }, [poolIds, centrifuge])
