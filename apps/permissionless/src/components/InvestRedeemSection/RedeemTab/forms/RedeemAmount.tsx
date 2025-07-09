@@ -6,7 +6,7 @@ import { usePortfolio, formatBalance, usePoolDetails, useVaultDetails } from '@c
 import { InfoWrapper } from '@components/InvestRedeemSection/components/InfoWrapper'
 import { infoText } from '@utils/infoText'
 import { useSelectedPoolContext } from '@contexts/useSelectedPoolContext'
-import { divideBigInts } from '@centrifuge/shared/src/utils/formatting'
+import { divideBigInts, formatBalanceToString } from '@centrifuge/shared/src/utils/formatting'
 import { debounce } from '@utils/debounce'
 
 interface RedeemAmountProps {
@@ -52,7 +52,9 @@ export function RedeemAmount({
 
   const calculateReceiveAmount = useCallback(
     (inputStringValue: string, redeemInputAmount?: Balance) => {
-      if (!inputStringValue || inputStringValue === '0' || !redeemInputAmount || !navPerShare) return
+      if (!inputStringValue || inputStringValue === '0' || !redeemInputAmount || !navPerShare) {
+        return setValue('receiveAmount', '0')
+      }
 
       const redeemAmountDecimals = redeemInputAmount.decimals
       const redeemAmount = redeemInputAmount.toBigInt()
@@ -72,9 +74,14 @@ export function RedeemAmount({
 
   const calculateRedeemAmount = useCallback(
     (inputStringValue: string, receiveInputAmount?: Balance) => {
-      if (!inputStringValue || inputStringValue === '0' || !receiveInputAmount || !navPerShare) return
+      if (!inputStringValue || inputStringValue === '0' || !receiveInputAmount || !navPerShare) {
+        return setValue('redeemAmount', '0')
+      }
 
-      const calculatedRedeemAmount = receiveInputAmount.mul(navPerShare)
+      const calculatedRedeemAmount = formatBalanceToString(
+        receiveInputAmount.mul(navPerShare),
+        receiveInputAmount.decimals
+      )
       return setValue('redeemAmount', calculatedRedeemAmount)
     },
     [navPerShare, setValue]

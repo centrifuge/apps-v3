@@ -1,4 +1,4 @@
-import { useEffect, useMemo, type Dispatch, type SetStateAction } from 'react'
+import { useCallback, useEffect, useMemo, type Dispatch, type SetStateAction } from 'react'
 import { Badge, Box, Button, Flex, Text } from '@chakra-ui/react'
 import { BalanceInput, useFormContext } from '@centrifuge/forms'
 import { Balance, PoolId, Vault } from '@centrifuge/sdk'
@@ -10,6 +10,7 @@ import { InvestAction, type InvestActionType } from '@components/InvestRedeemSec
 import { InfoWrapper } from '@components/InvestRedeemSection/components/InfoWrapper'
 import { VaultDetails } from '@utils/types'
 import { formatBalance, formatBalanceToString } from '@centrifuge/shared'
+import { debounce } from '@utils/debounce'
 
 interface InvestAmountProps {
   isDisabled: boolean
@@ -54,7 +55,10 @@ export function InvestAmount({
   const portfolioInvestmentAsset = portfolio?.find((asset) => asset.currency.chainId === investmentCurrencyChainId)
   const portfolioCurrency = portfolioInvestmentAsset?.currency
   const portfolioBalance = portfolioInvestmentAsset?.balance
-  const defaultBalance = portfolioBalance ?? ({ value: 0n, decimals: 6 } as unknown as Balance)
+  const maxInvestAmount = useMemo(() => {
+    if (!portfolioBalance) return '0'
+    return formatBalanceToString(portfolioBalance, portfolioBalance.decimals) ?? '0'
+  }, [portfolioBalance])
 
   // Get the share class info for calculating shares amount to receive
   const shareClass = pool?.shareClasses.find((asset) => asset.shareClass.pool.chainId === investmentCurrencyChainId)
@@ -66,14 +70,27 @@ export function InvestAmount({
   const infoLabel = hasNoInvestmentCurrency ? infoText().portfolioMissingInvestmentCurrency : infoText().redeem
 
   // Calculate and update amount to receive based on user input on amount to invest
-  useMemo(() => {
-    if (parsedInvestAmount === 0 || !shareClass || navPerShare === undefined) {
-      return setValue('receiveAmount', '0')
-    }
+  const calculateReceiveAmount = useCallback(
+    (inputStringValue: string, investInputAmount?: Balance) => {
+      if (!inputStringValue || inputStringValue === '0' || !investInputAmount || !navPerShare) return
 
-    const redeemAmount = formatBalanceToString(parsedInvestAmount.mul(navPerShare), parsedInvestAmount.decimals)
-    setValue('receiveAmount', redeemAmount)
-  }, [parsedInvestAmount, shareClass, navPerShare])
+      const calculatedReceiveAmount = formatBalanceToString(
+        investInputAmount.mul(navPerShare),
+        investInputAmount.decimals
+      )
+      setValue('receiveAmount', calculatedReceiveAmount)
+    },
+    [navPerShare]
+  )
+
+  const debouncedCalculateReceiveAmount = useMemo(() => debounce(calculateReceiveAmount, 600), [calculateReceiveAmount])
+
+  const setMaxInvestAmount = useCallback(() => {
+    if (!portfolioBalance || !maxInvestAmount || !navPerShare) return
+    setValue('investAmount', maxInvestAmount)
+    const calculatedReceiveAmount = formatBalanceToString(portfolioBalance.mul(navPerShare), portfolioBalance.decimals)
+    setValue('receiveAmount', calculatedReceiveAmount)
+  }, [maxInvestAmount])
 
   useEffect(
     () =>
@@ -95,6 +112,7 @@ export function InvestAmount({
         placeholder="0.00"
         selectOptions={investmentCurrencies}
         onSelectChange={(e: string) => changeVault(e)}
+        onChange={debouncedCalculateReceiveAmount}
       />
       <Flex mt={2} justify="space-between">
         <Flex>
@@ -105,7 +123,7 @@ export function InvestAmount({
             borderRadius={10}
             px={3}
             h="24px"
-            onClick={() => setValue('investAmount', defaultBalance)}
+            onClick={setMaxInvestAmount}
             borderColor="gray.500 !important"
             border="1px solid"
             cursor="pointer"
@@ -113,7 +131,7 @@ export function InvestAmount({
             MAX
           </Badge>
           <Text color="text-primary" opacity={0.5} alignSelf="flex-end" ml={2}>
-            {formatBalance(defaultBalance, portfolioCurrency?.symbol)}
+            {formatBalance(portfolioBalance ?? 0, portfolioCurrency?.symbol)}
           </Text>
         </Flex>
         {/* <NetworkIcons networks={networks} /> */}
