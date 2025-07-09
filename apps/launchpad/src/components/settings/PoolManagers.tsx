@@ -5,6 +5,7 @@ import SpokeManagers from './SpokeManagers'
 type PoolManagersProps = {
   currentHubManagers: string[]
   currentSpokeManagers: { address: string; chainId: number }[]
+  poolId: string
   addHubManager: (address: string) => void
   removeHubManager: (address: string) => void
   addSpokeManager: ({ address, chainId }: { address: string; chainId: number }) => void
@@ -14,6 +15,7 @@ type PoolManagersProps = {
 export default function PoolManagers({
   currentHubManagers,
   currentSpokeManagers,
+  poolId,
   addHubManager,
   removeHubManager,
   addSpokeManager,
@@ -29,6 +31,7 @@ export default function PoolManagers({
       />
       <SpokeManagers
         currentSpokeManagers={currentSpokeManagers}
+        poolId={poolId}
         addSpokeManager={addSpokeManager}
         removeSpokeManager={removeSpokeManager}
       />

@@ -4,7 +4,7 @@ import { isAddress } from 'viem'
 import { IoAddOutline } from 'react-icons/io5'
 import { FaRegTrashAlt } from 'react-icons/fa'
 import { truncateAddress } from '@centrifuge/shared'
-import { NetworkIcon, NETWORK_ID_MAP } from '../elements/NetworkIcon'
+import { NetworkIcon, capitalizeNetworkName } from '../elements/NetworkIcon'
 
 export interface AddressInputProps {
   onAdd: (address: string) => void
@@ -26,7 +26,7 @@ export const AddressInputLabel = ({
 }) => {
   if (!isAddress(address)) return null
   const networkId = chainId || 1 // Default to Ethereum Mainnet if no chainId is provided
-  const networkName = NETWORK_ID_MAP[networkId].charAt(0).toUpperCase() + NETWORK_ID_MAP[networkId].slice(1)
+  const networkName = capitalizeNetworkName(networkId)
 
   return (
     <Flex

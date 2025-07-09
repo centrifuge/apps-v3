@@ -19,6 +19,10 @@ export const NETWORK_ID_MAP: Record<number, Network> = {
   84532: 'base', // Base Sepolia
 }
 
+export const capitalizeNetworkName = (networkId: number): string => {
+  return NETWORK_ID_MAP[networkId].charAt(0).toUpperCase() + NETWORK_ID_MAP[networkId].slice(1)
+}
+
 interface NetworkIconProps extends Omit<ImageProps, 'src'> {
   networkId?: number
   srcOverride?: string

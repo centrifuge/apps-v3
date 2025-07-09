@@ -1,26 +1,37 @@
-import { useState } from 'react'
-import { AddressInput, Card, NetworkIcon } from '@centrifuge/ui'
+import { useMemo, useState } from 'react'
+import { AddressInput, capitalizeNetworkName, Card, NetworkIcon } from '@centrifuge/ui'
 import { Flex, Grid, Heading, Select, Stack, createListCollection } from '@chakra-ui/react'
+import { usePoolNetworks } from '@centrifuge/shared'
+import { PoolId } from '@centrifuge/sdk'
 
 type SpokeManagerProps = {
   currentSpokeManagers: { address: string; chainId: number }[]
+  poolId: string
   addSpokeManager: ({ address, chainId }: { address: string; chainId: number }) => void
   removeSpokeManager: (address: string) => void
 }
 
 export default function SpokeManagers({
   currentSpokeManagers,
+  poolId,
   addSpokeManager,
   removeSpokeManager,
 }: SpokeManagerProps) {
-  // TODO: Get this from SDK
-  const chains = createListCollection({
-    items: [
-      { label: 'Ethereum', value: 1 },
-      { label: 'Base Mainnet', value: 8453 },
-      { label: 'Base Sepolia', value: 84532 },
-    ],
-  })
+  const memoizedPoolId = useMemo(() => {
+    return poolId ? new PoolId(poolId) : undefined
+  }, [poolId])
+
+  const { data, isLoading } = usePoolNetworks(memoizedPoolId)
+  const chains = useMemo(() => {
+    if (isLoading || !data) return createListCollection({ items: [] })
+    return createListCollection({
+      items: data.map((chain) => ({
+        label: capitalizeNetworkName(chain.chainId),
+        value: chain.chainId,
+      })),
+    })
+  }, [data, isLoading])
+
   const [selectedChain, setSelectedChain] = useState<string[]>([])
 
   const handleAdd = (address: string) => {

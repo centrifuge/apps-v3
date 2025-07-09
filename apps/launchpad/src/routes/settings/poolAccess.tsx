@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Button } from '@centrifuge/ui'
 import { Container, Flex, Heading } from '@chakra-ui/react'
 import PoolManagers from '@components/settings/PoolManagers'
+import { useParams } from 'react-router'
 
 export const handle = {
   hasSettings: false,
@@ -48,18 +49,15 @@ export const SaveChangesButton = ({
   const hubPayload = buildHubPayload()
   const spokePayload = buildSpokePayload()
 
-  console.log({ hubPayload, spokePayload })
-
   return <Button label="Save changes" size="sm" width={140} />
 }
 
 export default function PoolAccess() {
+  const { poolId } = useParams()
   const [initialHubManagers, setInitialHubManagers] = useState<string[]>([])
   const [currentHubManagers, setCurrentHubManagers] = useState<string[]>([])
   const [initialSpokeManagers, setInitialSpokeManagers] = useState<{ address: string; chainId: number }[]>([])
   const [currentSpokeManagers, setCurrentSpokeManagers] = useState<{ address: string; chainId: number }[]>([])
-
-  console.log({ currentHubManagers })
 
   useEffect(() => {
     // TODO: call SDK to get initial hub and spoke managers
@@ -111,6 +109,7 @@ export default function PoolAccess() {
         removeHubManager={removeHubManager}
         addSpokeManager={addSpokeManager}
         removeSpokeManager={removeSpokeManager}
+        poolId={poolId}
       />
     </Container>
   )
