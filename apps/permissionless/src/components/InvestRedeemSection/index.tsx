@@ -1,7 +1,7 @@
 import { useEffect, useState, type ComponentType, type Dispatch } from 'react'
 import { useChainId } from 'wagmi'
 import { Flex, Heading, Stack, Text } from '@chakra-ui/react'
-import type { Vault } from '@centrifuge/sdk'
+import type { PoolNetwork, Vault } from '@centrifuge/sdk'
 import { usePoolNetworks, useVaults } from '@centrifuge/shared'
 import { useGeolocation } from '@hooks/useGeolocation'
 import { ConnectionGuard } from '@components/ConnectionGuard'
@@ -90,7 +90,7 @@ function VaultGuard({
   vaults,
 }: {
   pool: PoolDetails
-  tab: ComponentType<{ vault: Vault; setVault: Dispatch<Vault>; vaults: Vault[] }>
+  tab: ComponentType<{ vault: Vault; setVault: Dispatch<Vault>; vaults: Vault[]; networks?: PoolNetwork[] }>
   vault?: Vault
   setVault: Dispatch<Vault | undefined>
   setVaults: Dispatch<Vault[] | undefined>
@@ -121,7 +121,7 @@ function VaultGuard({
         <Text>No vaults found for this pool on this network.</Text>
       ) : (
         <Stack height="100%">
-          <Tab vault={vault} setVault={setVault} vaults={vaults ?? []} />
+          <Tab vault={vault} setVault={setVault} vaults={vaults ?? []} networks={networks} />
         </Stack>
       )}
     </ConnectionGuard>

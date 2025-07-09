@@ -2,7 +2,7 @@ import { Dispatch, useMemo, useState } from 'react'
 import { z } from 'zod'
 import { Box } from '@chakra-ui/react'
 import { Form, useForm, safeParse, createBalanceSchema } from '@centrifuge/forms'
-import { Balance, Vault } from '@centrifuge/sdk'
+import { Balance, PoolNetwork, Vault } from '@centrifuge/sdk'
 import { useCentrifugeTransaction, useInvestment, useVaultDetails } from '@centrifuge/shared'
 import {
   type InvestActionType,
@@ -15,10 +15,12 @@ export default function InvestTab({
   vault,
   setVault,
   vaults,
+  networks,
 }: {
   vault: Vault
   setVault: Dispatch<Vault>
   vaults: Vault[]
+  networks?: PoolNetwork[]
 }) {
   const { data: vaultDetails } = useVaultDetails(vault)
   const { data: investment } = useInvestment(vault)
@@ -72,11 +74,12 @@ export default function InvestTab({
         <InvestTabForm
           actionType={actionType}
           isDisabled={isDisabled}
+          networks={networks}
           parsedInvestAmount={parsedInvestAmount}
+          vaults={vaults}
           vaultDetails={vaultDetails}
           setActionType={setActionType}
           setVault={setVault}
-          vaults={vaults}
         />
       </Box>
     </Form>

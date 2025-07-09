@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useMemo, type Dispatch, type SetStateAction } from 'react'
 import { Badge, Box, Button, Flex, Text } from '@chakra-ui/react'
 import { BalanceInput, useFormContext } from '@centrifuge/forms'
-import { Balance, PoolId, Vault } from '@centrifuge/sdk'
+import { Balance, PoolId, PoolNetwork, Vault } from '@centrifuge/sdk'
 import { usePortfolio, usePoolDetails, useVaultsDetails } from '@centrifuge/shared'
-// import { NetworkIcons, type Network } from '@centrifuge/ui'
+import { NetworkIcons } from '@centrifuge/ui'
 import { useSelectedPoolContext } from '@contexts/useSelectedPoolContext'
 import { infoText } from '@utils/infoText'
 import { InvestAction, type InvestActionType } from '@components/InvestRedeemSection/components/defaults'
@@ -14,6 +14,7 @@ import { debounce } from '@utils/debounce'
 
 interface InvestAmountProps {
   isDisabled: boolean
+  networks?: PoolNetwork[]
   parsedInvestAmount: 0 | Balance
   vaultDetails?: VaultDetails
   currencies: { investCurrency: string; receiveCurrency: string }
@@ -25,6 +26,7 @@ interface InvestAmountProps {
 
 export function InvestAmount({
   isDisabled,
+  networks,
   parsedInvestAmount,
   vaultDetails,
   currencies,
@@ -38,6 +40,7 @@ export function InvestAmount({
   const { selectedPoolId } = useSelectedPoolContext()
   const { data: pool } = usePoolDetails(selectedPoolId as PoolId)
   const { setValue } = useFormContext()
+  const networkIds = networks?.map((network) => network.chainId)
 
   const investmentCurrencies = vaultsDetails?.map((vault) => ({
     label: vault.investmentCurrency.symbol,
@@ -134,7 +137,7 @@ export function InvestAmount({
             {formatBalance(portfolioBalance ?? 0, portfolioCurrency?.symbol)}
           </Text>
         </Flex>
-        {/* <NetworkIcons networks={networks} /> */}
+        <NetworkIcons networkIds={networkIds} />
       </Flex>
       {parsedInvestAmount !== 0 && (
         <>

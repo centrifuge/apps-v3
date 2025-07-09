@@ -1,29 +1,32 @@
 import { Dispatch, SetStateAction, useCallback, useEffect, useMemo } from 'react'
 import { Badge, Box, Flex, Text } from '@chakra-ui/react'
 import { BalanceInput, SubmitButton, useFormContext } from '@centrifuge/forms'
-import { Balance, PoolId, Vault } from '@centrifuge/sdk'
+import { Balance, PoolId, PoolNetwork, Vault } from '@centrifuge/sdk'
 import { usePortfolio, formatBalance, usePoolDetails, useVaultDetails } from '@centrifuge/shared'
 import { InfoWrapper } from '@components/InvestRedeemSection/components/InfoWrapper'
 import { infoText } from '@utils/infoText'
 import { useSelectedPoolContext } from '@contexts/useSelectedPoolContext'
 import { divideBigInts, formatBalanceToString } from '@centrifuge/shared/src/utils/formatting'
 import { debounce } from '@utils/debounce'
+import { NetworkIcons } from '@centrifuge/ui'
 
 interface RedeemAmountProps {
+  currencies: { investCurrency: string; receiveCurrency: string }
   isDisabled: boolean
+  networks: PoolNetwork[]
   parsedRedeemAmount: 0 | Balance
   vault?: Vault
   vaults?: Vault[]
-  currencies: { investCurrency: string; receiveCurrency: string }
   setCurrencies: Dispatch<SetStateAction<{ investCurrency: string; receiveCurrency: string }>>
 }
 
 export function RedeemAmount({
+  currencies,
   isDisabled,
+  networks,
   parsedRedeemAmount,
   vault,
   vaults,
-  currencies,
   setCurrencies,
 }: RedeemAmountProps) {
   // const { data: vaultsDetails } = useVaultsDetails(vaults)
@@ -32,6 +35,7 @@ export function RedeemAmount({
   const { data: pool } = usePoolDetails(selectedPoolId as PoolId)
   const { data: vaultDetails } = useVaultDetails(vault)
   const { setValue } = useFormContext()
+  const networkIds = networks?.map((network) => network.chainId)
 
   const shareClass = pool?.shareClasses.find(
     (sc) => sc.details.id.raw.toString() === vault?.shareClass.id.raw.toString()
@@ -132,6 +136,7 @@ export function RedeemAmount({
             {formatBalance(defaultShareBalance, portfolioShareCurrency?.symbol)}
           </Text>
         </Flex>
+        <NetworkIcons networkIds={networkIds} />
       </Flex>
       {parsedRedeemAmount !== 0 && (
         <>

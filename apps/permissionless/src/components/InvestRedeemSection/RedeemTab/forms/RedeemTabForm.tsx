@@ -1,5 +1,5 @@
 import { useState, type Dispatch, type SetStateAction } from 'react'
-import type { Balance, Vault } from '@centrifuge/sdk'
+import type { Balance, PoolNetwork, Vault } from '@centrifuge/sdk'
 import { type RedeemActionType, RedeemAction } from '@components/InvestRedeemSection/components/defaults'
 import { RedeemCancel } from '@components/InvestRedeemSection/RedeemTab/forms/RedeemCancel'
 import { RedeemAmount } from '@components/InvestRedeemSection/RedeemTab/forms/RedeemAmount'
@@ -8,6 +8,7 @@ import { RedeemTxCancelled } from '@components/InvestRedeemSection/RedeemTab/for
 interface RedeemTabFormProps {
   actionType: RedeemActionType
   isDisabled: boolean
+  networks: PoolNetwork[]
   parsedRedeemAmount: 0 | Balance
   vault?: Vault
   vaults?: Vault[]
@@ -17,6 +18,7 @@ interface RedeemTabFormProps {
 export function RedeemTabForm({
   actionType,
   isDisabled,
+  networks,
   parsedRedeemAmount,
   vault,
   vaults,
@@ -32,6 +34,7 @@ export function RedeemTabForm({
       return (
         <RedeemAmount
           isDisabled={isDisabled}
+          networks={networks}
           parsedRedeemAmount={parsedRedeemAmount}
           vault={vault}
           vaults={vaults}
