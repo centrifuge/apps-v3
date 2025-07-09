@@ -58,10 +58,6 @@ export function InvestAmount({
   const portfolioInvestmentAsset = portfolio?.find((asset) => asset.currency.chainId === investmentCurrencyChainId)
   const portfolioCurrency = portfolioInvestmentAsset?.currency
   const portfolioBalance = portfolioInvestmentAsset?.balance
-  const maxInvestAmount = useMemo(() => {
-    if (!portfolioBalance) return '0'
-    return formatBalanceToString(portfolioBalance, portfolioBalance.decimals) ?? '0'
-  }, [portfolioBalance])
 
   // Get the share class info for calculating shares amount to receive
   const shareClass = pool?.shareClasses.find((asset) => asset.shareClass.pool.chainId === investmentCurrencyChainId)
@@ -87,6 +83,11 @@ export function InvestAmount({
   )
 
   const debouncedCalculateReceiveAmount = useMemo(() => debounce(calculateReceiveAmount, 600), [calculateReceiveAmount])
+
+  const maxInvestAmount = useMemo(() => {
+    if (!portfolioBalance) return '0'
+    return formatBalanceToString(portfolioBalance, portfolioBalance.decimals) ?? '0'
+  }, [portfolioBalance])
 
   const setMaxInvestAmount = useCallback(() => {
     if (!portfolioBalance || !maxInvestAmount || !navPerShare) return
