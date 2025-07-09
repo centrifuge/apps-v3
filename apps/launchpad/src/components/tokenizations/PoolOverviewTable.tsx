@@ -1,9 +1,9 @@
 import { Link } from 'react-router'
-import { Button, Flex, Heading, Image, Loader, Stack, Text } from '@chakra-ui/react'
+import { Button, Flex, Heading, Image, Stack, Text } from '@chakra-ui/react'
 import { Balance, PoolId } from '@centrifuge/sdk'
 import { useAllPoolDetails } from '@centrifuge/shared'
 import { ipfsToHttp } from '@centrifuge/shared/src/utils/formatting'
-import { BalanceDisplay, NetworkIcon } from '@centrifuge/ui'
+import { BalanceDisplay, Loader, NetworkIcon } from '@centrifuge/ui'
 import DataTable, { ColumnDefinition } from './DataTable'
 import { mockMetadata } from './mockMetadata'
 

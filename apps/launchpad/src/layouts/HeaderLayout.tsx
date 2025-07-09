@@ -68,16 +68,14 @@ const getPoolSettingsTabs = (poolId: string) => [
 ]
 
 function getTabsForRoute(pathname: string, poolId?: string, labels?: string[]) {
-  if (!poolId) return []
-
   if (pathname.includes('/orders/')) {
-    return getOrdersTabs(poolId)
+    return getOrdersTabs(poolId!)
   }
   if (pathname.startsWith('/account')) {
-    return getAccountTabs(poolId, labels ?? [])
+    return getAccountTabs(poolId!, labels ?? [])
   }
   if (pathname.startsWith('/settings')) {
-    return getPoolSettingsTabs(poolId)
+    return getPoolSettingsTabs(poolId!)
   }
   if (pathname.startsWith('/holdings')) {
     return getHoldingsTabs()

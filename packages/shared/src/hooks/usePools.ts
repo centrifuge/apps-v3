@@ -1,4 +1,4 @@
-import { PoolId, PoolNetwork } from '@centrifuge/sdk'
+import { PoolId } from '@centrifuge/sdk'
 import { useMemo } from 'react'
 import { combineLatest, map, of, switchMap } from 'rxjs'
 import { Address } from 'viem'
@@ -63,7 +63,10 @@ export function useAllPoolDetails(poolIds: PoolId[]) {
       return of([])
     }
 
-    const poolDetailObservables$ = poolIds.map((id) => centrifuge.pool(id).pipe(switchMap((pool) => pool.details())))
+    // TODO: sdk needs to be fixed to not return nulls and keep the observable
+    const poolDetailObservables$ = [poolIds[1], poolIds[0]].map((id) =>
+      centrifuge.pool(id).pipe(switchMap((pool) => pool.details()))
+    )
 
     return combineLatest(poolDetailObservables$)
   }, [poolIds, centrifuge])
