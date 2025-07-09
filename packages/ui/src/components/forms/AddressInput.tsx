@@ -10,6 +10,7 @@ export interface AddressInputProps {
   onClick: (address: string | string[]) => void
   withSelection?: boolean
   addresses?: string[]
+  label?: string
 }
 
 export const AddressInputLabel = ({ address, onDelete }: { address: string; onDelete: (address: string) => void }) => {
@@ -39,7 +40,7 @@ export const AddressInputLabel = ({ address, onDelete }: { address: string; onDe
   )
 }
 
-export const AddressInput = ({ onClick, addresses }: AddressInputProps) => {
+export const AddressInput = ({ onClick, addresses, label = 'Wallet Address' }: AddressInputProps) => {
   const [existingAddresses, setExistingAddresses] = useState<string[]>(addresses || [])
   const [value, setValue] = useState('')
   const [isValid, setIsValid] = useState(true)
@@ -62,7 +63,7 @@ export const AddressInput = ({ onClick, addresses }: AddressInputProps) => {
 
   return (
     <Field.Root invalid={!isValid && value !== ''}>
-      <Field.Label>Wallet Address</Field.Label>
+      {label && <Field.Label>{label}</Field.Label>}
       <Group attached w="full" maxW="sm" display="flex" flexDirection="column" gap={2} alignItems="flex-start">
         <Flex alignItems="flex-start" w="full">
           <Input

@@ -23,7 +23,7 @@ export interface InputProps<TFieldValues extends FieldValues = FieldValues>
 }
 
 export function Input<TFieldValues extends FieldValues = FieldValues>(props: InputProps<TFieldValues>) {
-  const { disabled, inputGroupProps, name, rules, onChange, onBlur, ...rest } = props
+  const { disabled, inputGroupProps, name, rules, onChange, onBlur, label, ...rest } = props
 
   const { control, trigger } = useFormContext<TFieldValues>()
 
@@ -64,6 +64,7 @@ export function Input<TFieldValues extends FieldValues = FieldValues>(props: Inp
 
   return (
     <Field.Root invalid={isError}>
+      {label && <Field.Label>{label}</Field.Label>}
       <InputGroup {...inputGroupProps}>
         <ChakraInput
           {...field}
