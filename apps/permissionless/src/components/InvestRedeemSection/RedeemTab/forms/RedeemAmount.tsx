@@ -1,7 +1,7 @@
 import { Dispatch, SetStateAction, useCallback, useEffect, useMemo } from 'react'
 import { Badge, Box, Flex, Text } from '@chakra-ui/react'
 import { BalanceInput, SubmitButton, useFormContext } from '@centrifuge/forms'
-import { Balance, PoolId, PoolNetwork, Vault } from '@centrifuge/sdk'
+import { Balance, PoolId, PoolNetwork, Price, Vault } from '@centrifuge/sdk'
 import { usePortfolio, formatBalance, usePoolDetails, useVaultDetails, useVaultsDetails } from '@centrifuge/shared'
 import { InfoWrapper } from '@components/InvestRedeemSection/components/InfoWrapper'
 import { infoText } from '@utils/infoText'
@@ -54,28 +54,34 @@ export function RedeemAmount({
   const shareAsset = vaultDetails?.shareCurrency.address
   const portfolioShareAsset = portfolio?.find((asset) => asset.currency.address === shareAsset)
   const portfolioShareCurrency = portfolioShareAsset?.currency
-  const defaultShareBalance = portfolioShareAsset?.balance ?? 0
+  const maxRedeemBalance = portfolioShareAsset?.balance ?? 0
 
   // Get info on the users investment asset that shares will be converted into
   const investmentCurrencyChainId = vaultDetails?.investmentCurrency?.chainId
   const portfolioInvestmentAsset = portfolio?.find((asset) => asset.currency.chainId === investmentCurrencyChainId)
   const portfolioInvestmentCurrency = portfolioInvestmentAsset?.currency
 
+  const calculateReceiveAmountValue = (redeemBalance: Balance, pricePerShare?: Price) => {
+    if (!redeemBalance || !pricePerShare) {
+      return ''
+    }
+
+    const redeemAmountDecimals = redeemBalance.decimals
+    const redeemAmountBigint = redeemBalance.toBigInt()
+    const pricePerShareBigint = pricePerShare.toBigInt()
+
+    return divideBigInts(redeemAmountBigint, pricePerShareBigint, redeemAmountDecimals).formatToString(
+      redeemAmountDecimals
+    )
+  }
+
   const calculateReceiveAmount = useCallback(
     (inputStringValue: string, redeemInputAmount?: Balance) => {
       if (!inputStringValue || inputStringValue === '0' || !redeemInputAmount || !pricePerShare) {
-        return setValue('receiveAmount', '0')
+        return setValue('receiveAmount', '')
       }
 
-      const redeemAmountDecimals = redeemInputAmount.decimals
-      const redeemAmount = redeemInputAmount.toBigInt()
-      const navPerShareAmount = pricePerShare.toBigInt()
-      const calculatedReceiveAmount = divideBigInts(
-        redeemAmount,
-        navPerShareAmount,
-        redeemAmountDecimals
-      ).formatToString(redeemAmountDecimals)
-
+      const calculatedReceiveAmount = calculateReceiveAmountValue(redeemInputAmount, pricePerShare)
       return setValue('receiveAmount', calculatedReceiveAmount)
     },
     [pricePerShare]
@@ -86,7 +92,7 @@ export function RedeemAmount({
   const calculateRedeemAmount = useCallback(
     (inputStringValue: string, receiveInputAmount?: Balance) => {
       if (!inputStringValue || inputStringValue === '0' || !receiveInputAmount || !pricePerShare) {
-        return setValue('redeemAmount', '0')
+        return setValue('redeemAmount', '')
       }
 
       const calculatedRedeemAmount = formatBalanceToString(
@@ -101,6 +107,20 @@ export function RedeemAmount({
   const debouncedCalculateRedeemAmount = useMemo(() => debounce(calculateRedeemAmount, 500), [calculateRedeemAmount])
 
   const changeVault = (value: number) => switchChain({ chainId: value })
+
+  const maxRedeemAmount = useMemo(() => {
+    if (!portfolioShareAsset || maxRedeemBalance === 0) return ''
+
+    return formatBalanceToString(maxRedeemBalance, maxRedeemBalance.decimals) ?? ''
+  }, [maxRedeemBalance])
+
+  const setMaxInvestAmount = useCallback(() => {
+    if (!maxRedeemAmount || !pricePerShare || maxRedeemBalance === 0) return
+
+    const calculatedReceiveAmount = calculateReceiveAmountValue(maxRedeemBalance, pricePerShare)
+    setValue('redeemAmount', maxRedeemAmount)
+    setValue('receiveAmount', calculatedReceiveAmount)
+  }, [maxRedeemAmount, pricePerShare])
 
   useEffect(
     () =>
@@ -137,12 +157,12 @@ export function RedeemAmount({
             borderColor="gray.500 !important"
             border="1px solid"
             cursor="pointer"
-            onClick={() => setValue('amount', defaultShareBalance.toString())}
+            onClick={setMaxInvestAmount}
           >
             MAX
           </Badge>
           <Text color="text-primary" opacity={0.5} alignSelf="flex-end" ml={2}>
-            {formatBalance(defaultShareBalance, portfolioShareCurrency?.symbol)}
+            {formatBalance(maxRedeemBalance, portfolioShareCurrency?.symbol)}
           </Text>
         </Flex>
         <NetworkIcons networkIds={networkIds} />
