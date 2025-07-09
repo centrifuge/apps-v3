@@ -2,18 +2,19 @@ import { Dispatch, SetStateAction, useCallback, useEffect, useMemo } from 'react
 import { Badge, Box, Flex, Text } from '@chakra-ui/react'
 import { BalanceInput, SubmitButton, useFormContext } from '@centrifuge/forms'
 import { Balance, PoolId, PoolNetwork, Vault } from '@centrifuge/sdk'
-import { usePortfolio, formatBalance, usePoolDetails, useVaultDetails } from '@centrifuge/shared'
+import { usePortfolio, formatBalance, usePoolDetails, useVaultDetails, useVaultsDetails } from '@centrifuge/shared'
 import { InfoWrapper } from '@components/InvestRedeemSection/components/InfoWrapper'
 import { infoText } from '@utils/infoText'
 import { useSelectedPoolContext } from '@contexts/useSelectedPoolContext'
 import { divideBigInts, formatBalanceToString } from '@centrifuge/shared/src/utils/formatting'
 import { debounce } from '@utils/debounce'
 import { NetworkIcons } from '@centrifuge/ui'
+import { useSwitchChain } from 'wagmi'
 
 interface RedeemAmountProps {
   currencies: { investCurrency: string; receiveCurrency: string }
   isDisabled: boolean
-  networks: PoolNetwork[]
+  networks?: PoolNetwork[]
   parsedRedeemAmount: 0 | Balance
   vault?: Vault
   vaults?: Vault[]
@@ -29,40 +30,46 @@ export function RedeemAmount({
   vaults,
   setCurrencies,
 }: RedeemAmountProps) {
-  // const { data: vaultsDetails } = useVaultsDetails(vaults)
+  const { data: vaultsDetails } = useVaultsDetails(vaults)
   const { data: portfolio } = usePortfolio()
   const { selectedPoolId } = useSelectedPoolContext()
   const { data: pool } = usePoolDetails(selectedPoolId as PoolId)
   const { data: vaultDetails } = useVaultDetails(vault)
+  const { switchChain } = useSwitchChain()
   const { setValue } = useFormContext()
-  const networkIds = networks?.map((network) => network.chainId)
 
+  const networkIds = networks?.map((network) => network.chainId)
+  const investmentCurrencies = vaultsDetails?.map((vault) => ({
+    label: vault.investmentCurrency.symbol,
+    value: vault.investmentCurrency.chainId,
+  }))
+
+  // Get the pricePerShare
   const shareClass = pool?.shareClasses.find(
     (sc) => sc.details.id.raw.toString() === vault?.shareClass.id.raw.toString()
   )
-  const navPerShare = shareClass?.details.pricePerShare
-
-  const investmentCurrencyChainId = vaultDetails?.investmentCurrency?.chainId
-  const shareAsset = vaultDetails?.shareCurrency.address
+  const pricePerShare = shareClass?.details.pricePerShare
 
   // Get info on the users shares holdings in their wallet
+  const shareAsset = vaultDetails?.shareCurrency.address
   const portfolioShareAsset = portfolio?.find((asset) => asset.currency.address === shareAsset)
   const portfolioShareCurrency = portfolioShareAsset?.currency
   const defaultShareBalance = portfolioShareAsset?.balance ?? 0
 
   // Get info on the users investment asset that shares will be converted into
+  const investmentCurrencyChainId = vaultDetails?.investmentCurrency?.chainId
   const portfolioInvestmentAsset = portfolio?.find((asset) => asset.currency.chainId === investmentCurrencyChainId)
   const portfolioInvestmentCurrency = portfolioInvestmentAsset?.currency
 
   const calculateReceiveAmount = useCallback(
     (inputStringValue: string, redeemInputAmount?: Balance) => {
-      if (!inputStringValue || inputStringValue === '0' || !redeemInputAmount || !navPerShare) {
+      if (!inputStringValue || inputStringValue === '0' || !redeemInputAmount || !pricePerShare) {
         return setValue('receiveAmount', '0')
       }
 
       const redeemAmountDecimals = redeemInputAmount.decimals
       const redeemAmount = redeemInputAmount.toBigInt()
-      const navPerShareAmount = navPerShare.toBigInt()
+      const navPerShareAmount = pricePerShare.toBigInt()
       const calculatedReceiveAmount = divideBigInts(
         redeemAmount,
         navPerShareAmount,
@@ -71,27 +78,29 @@ export function RedeemAmount({
 
       return setValue('receiveAmount', calculatedReceiveAmount)
     },
-    [navPerShare]
+    [pricePerShare]
   )
 
   const debouncedCalculateReceiveAmount = useMemo(() => debounce(calculateReceiveAmount, 500), [calculateReceiveAmount])
 
   const calculateRedeemAmount = useCallback(
     (inputStringValue: string, receiveInputAmount?: Balance) => {
-      if (!inputStringValue || inputStringValue === '0' || !receiveInputAmount || !navPerShare) {
+      if (!inputStringValue || inputStringValue === '0' || !receiveInputAmount || !pricePerShare) {
         return setValue('redeemAmount', '0')
       }
 
       const calculatedRedeemAmount = formatBalanceToString(
-        receiveInputAmount.mul(navPerShare),
+        receiveInputAmount.mul(pricePerShare),
         receiveInputAmount.decimals
       )
       return setValue('redeemAmount', calculatedRedeemAmount)
     },
-    [navPerShare, setValue]
+    [pricePerShare, setValue]
   )
 
   const debouncedCalculateRedeemAmount = useMemo(() => debounce(calculateRedeemAmount, 500), [calculateRedeemAmount])
+
+  const changeVault = (value: number) => switchChain({ chainId: value })
 
   useEffect(
     () =>
@@ -147,10 +156,9 @@ export function RedeemAmount({
             name="receiveAmount"
             placeholder="0.00"
             decimals={portfolioInvestmentCurrency?.decimals}
-            inputGroupProps={{
-              endAddon: currencies.receiveCurrency,
-            }}
             onChange={debouncedCalculateRedeemAmount}
+            selectOptions={investmentCurrencies}
+            onSelectChange={changeVault}
           />
         </>
       )}

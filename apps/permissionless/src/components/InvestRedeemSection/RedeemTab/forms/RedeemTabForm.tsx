@@ -8,7 +8,7 @@ import { RedeemTxCancelled } from '@components/InvestRedeemSection/RedeemTab/for
 interface RedeemTabFormProps {
   actionType: RedeemActionType
   isDisabled: boolean
-  networks: PoolNetwork[]
+  networks?: PoolNetwork[]
   parsedRedeemAmount: 0 | Balance
   vault?: Vault
   vaults?: Vault[]

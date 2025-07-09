@@ -16,7 +16,7 @@ export default function RedeemTab({
   vault,
   vaults,
 }: {
-  networks: PoolNetwork[]
+  networks?: PoolNetwork[]
   vault: Vault
   vaults: Vault[]
 }) {

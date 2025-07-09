@@ -11,6 +11,7 @@ import { InfoWrapper } from '@components/InvestRedeemSection/components/InfoWrap
 import { VaultDetails } from '@utils/types'
 import { formatBalance, formatBalanceToString } from '@centrifuge/shared'
 import { debounce } from '@utils/debounce'
+import { useSwitchChain } from 'wagmi'
 
 interface InvestAmountProps {
   isDisabled: boolean
@@ -32,7 +33,7 @@ export function InvestAmount({
   currencies,
   setCurrencies,
   setActionType,
-  setVault,
+  // setVault,
   vaults,
 }: InvestAmountProps) {
   const { data: vaultsDetails } = useVaultsDetails(vaults)
@@ -40,17 +41,16 @@ export function InvestAmount({
   const { selectedPoolId } = useSelectedPoolContext()
   const { data: pool } = usePoolDetails(selectedPoolId as PoolId)
   const { setValue } = useFormContext()
+  const { switchChain } = useSwitchChain()
   const networkIds = networks?.map((network) => network.chainId)
 
+  // Investment Currencies for changing asset to invest
   const investmentCurrencies = vaultsDetails?.map((vault) => ({
     label: vault.investmentCurrency.symbol,
-    value: vault.investmentCurrency.symbol,
+    value: vault.investmentCurrency.chainId,
   }))
 
-  // TODO: change vault
-  const changeVault = (value: string) => {
-    console.log('changeVault', value)
-  }
+  const changeVault = (value: number) => switchChain({ chainId: value })
 
   const investmentCurrencyChainId = vaultDetails?.investmentCurrency?.chainId
 
@@ -114,7 +114,7 @@ export function InvestAmount({
         decimals={portfolioCurrency?.decimals}
         placeholder="0.00"
         selectOptions={investmentCurrencies}
-        onSelectChange={(e: string) => changeVault(e)}
+        onSelectChange={changeVault}
         onChange={debouncedCalculateReceiveAmount}
       />
       <Flex mt={2} justify="space-between">
