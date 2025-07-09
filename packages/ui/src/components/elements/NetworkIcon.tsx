@@ -8,7 +8,7 @@ import BaseSvg from '../../assets/logos/base.svg'
 
 export type Network = 'ethereum' | 'arbitrum' | 'celo' | 'base'
 
-const NETWORK_ID_MAP: Record<number, Network> = {
+export const NETWORK_ID_MAP: Record<number, Network> = {
   1: 'ethereum', // Ethereum Mainnet
   11155111: 'ethereum', // Ethereum Sepolia
   42161: 'arbitrum', // Arbitrum One

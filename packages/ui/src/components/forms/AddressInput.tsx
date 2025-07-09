@@ -4,17 +4,29 @@ import { isAddress } from 'viem'
 import { IoAddOutline } from 'react-icons/io5'
 import { FaRegTrashAlt } from 'react-icons/fa'
 import { truncateAddress } from '@centrifuge/shared'
-import { NetworkIcon } from '../elements/NetworkIcon'
+import { NetworkIcon, NETWORK_ID_MAP } from '../elements/NetworkIcon'
 
 export interface AddressInputProps {
-  onClick: (address: string | string[]) => void
+  onAdd: (address: string) => void
   withSelection?: boolean
-  addresses?: string[]
+  addresses?: { address: string; chainId?: number }[]
+  onDelete?: (address: string) => void
+  chainId?: number
   label?: string
 }
 
-export const AddressInputLabel = ({ address, onDelete }: { address: string; onDelete: (address: string) => void }) => {
+export const AddressInputLabel = ({
+  address,
+  chainId,
+  onDelete,
+}: {
+  address: string
+  chainId?: number
+  onDelete: (address: string) => void
+}) => {
   if (!isAddress(address)) return null
+  const networkId = chainId || 1 // Default to Ethereum Mainnet if no chainId is provided
+  const networkName = NETWORK_ID_MAP[networkId].charAt(0).toUpperCase() + NETWORK_ID_MAP[networkId].slice(1)
 
   return (
     <Flex
@@ -30,8 +42,8 @@ export const AddressInputLabel = ({ address, onDelete }: { address: string; onDe
     >
       <Text fontSize="sm">{truncateAddress(address)}</Text>
       <Flex alignItems="center" gap={2}>
-        <NetworkIcon />
-        <Text fontSize="sm">Ethereum</Text>
+        <NetworkIcon networkId={networkId} />
+        <Text fontSize="sm">{networkName}</Text>
       </Flex>
       <IconButton size="sm" backgroundColor="white" color="text-disabled" onClick={() => onDelete(address)}>
         <FaRegTrashAlt />
@@ -40,25 +52,24 @@ export const AddressInputLabel = ({ address, onDelete }: { address: string; onDe
   )
 }
 
-export const AddressInput = ({ onClick, addresses, label = 'Wallet Address' }: AddressInputProps) => {
-  const [existingAddresses, setExistingAddresses] = useState<string[]>(addresses || [])
+export const AddressInput = ({ onAdd, onDelete, addresses, label = 'Wallet Address' }: AddressInputProps) => {
   const [value, setValue] = useState('')
   const [isValid, setIsValid] = useState(true)
 
   const handleClick = () => {
     const valid = isAddress(value)
     setIsValid(valid)
-    if (addresses?.includes(value)) return
-    if (valid) {
-      const newAddresses = [...existingAddresses, value]
+
+    if (valid && typeof onAdd === 'function') {
+      onAdd(value)
       setValue('')
-      setExistingAddresses([...existingAddresses, value])
-      addresses?.length ? onClick(newAddresses) : onClick(value)
     }
   }
 
   const handleDelete = (address: string) => {
-    setExistingAddresses(existingAddresses.filter((a) => a !== address))
+    if (typeof onDelete === 'function') {
+      onDelete(address)
+    }
   }
 
   return (
@@ -98,8 +109,10 @@ export const AddressInput = ({ onClick, addresses, label = 'Wallet Address' }: A
           </IconButton>
         </Flex>
 
-        {existingAddresses.length
-          ? existingAddresses.map((address) => <AddressInputLabel address={address} onDelete={handleDelete} />)
+        {addresses?.length
+          ? addresses.map((address) => (
+              <AddressInputLabel address={address.address} onDelete={handleDelete} chainId={address.chainId} />
+            ))
           : null}
       </Group>
 
