@@ -1,12 +1,13 @@
-import { Dispatch, SetStateAction, useEffect, useMemo } from 'react'
+import { Dispatch, SetStateAction, useCallback, useEffect, useMemo } from 'react'
 import { Badge, Box, Flex, Text } from '@chakra-ui/react'
 import { BalanceInput, SubmitButton, useFormContext } from '@centrifuge/forms'
-import { Balance, Vault } from '@centrifuge/sdk'
+import { Balance, PoolId, Vault } from '@centrifuge/sdk'
 import { usePortfolio, formatBalance, usePoolDetails, useVaultDetails } from '@centrifuge/shared'
 import { InfoWrapper } from '@components/InvestRedeemSection/components/InfoWrapper'
 import { infoText } from '@utils/infoText'
 import { useSelectedPoolContext } from '@contexts/useSelectedPoolContext'
 import { divideBigInts } from '@centrifuge/shared/src/utils/formatting'
+import { debounce } from '@utils/debounce'
 
 interface RedeemAmountProps {
   isDisabled: boolean
@@ -28,7 +29,7 @@ export function RedeemAmount({
   // const { data: vaultsDetails } = useVaultsDetails(vaults)
   const { data: portfolio } = usePortfolio()
   const { selectedPoolId } = useSelectedPoolContext()
-  const { data: pool } = usePoolDetails(selectedPoolId)
+  const { data: pool } = usePoolDetails(selectedPoolId as PoolId)
   const { data: vaultDetails } = useVaultDetails(vault)
   const { setValue } = useFormContext()
 
@@ -49,22 +50,37 @@ export function RedeemAmount({
   const portfolioInvestmentAsset = portfolio?.find((asset) => asset.currency.chainId === investmentCurrencyChainId)
   const portfolioInvestmentCurrency = portfolioInvestmentAsset?.currency
 
-  // Calculate and update the amount the user will receive in the investment asset based on shares sold
-  useMemo(() => {
-    if (parsedAmount === 0 || !shareClass || !navPerShare) {
-      return setValue('amountToReceive', '0')
-    }
+  const calculateReceiveAmount = useCallback(
+    (inputStringValue: string, redeemInputAmount?: Balance) => {
+      if (!inputStringValue || inputStringValue === '0' || !redeemInputAmount || !navPerShare) return
 
-    const redeemAmountDecimals = parsedAmount.decimals
-    const redeemAmount = parsedAmount.toBigInt()
-    const navPerShareAmount = navPerShare.toBigInt()
+      const redeemAmountDecimals = redeemInputAmount.decimals
+      const redeemAmount = redeemInputAmount.toBigInt()
+      const navPerShareAmount = navPerShare.toBigInt()
+      const calculatedReceiveAmount = divideBigInts(
+        redeemAmount,
+        navPerShareAmount,
+        redeemAmountDecimals
+      ).formatToString(redeemAmountDecimals)
 
-    const receiveAmount = divideBigInts(redeemAmount, navPerShareAmount, redeemAmountDecimals).formatToString(
-      redeemAmountDecimals
-    )
+      return setValue('receiveAmount', calculatedReceiveAmount)
+    },
+    [navPerShare]
+  )
 
-    setValue('amountToReceive', receiveAmount)
-  }, [parsedAmount, shareClass, navPerShare])
+  const debouncedCalculateReceiveAmount = useMemo(() => debounce(calculateReceiveAmount, 500), [calculateReceiveAmount])
+
+  const calculateRedeemAmount = useCallback(
+    (inputStringValue: string, receiveInputAmount?: Balance) => {
+      if (!inputStringValue || inputStringValue === '0' || !receiveInputAmount || !navPerShare) return
+
+      const calculatedRedeemAmount = receiveInputAmount.mul(navPerShare)
+      return setValue('redeemAmount', calculatedRedeemAmount)
+    },
+    [navPerShare, setValue]
+  )
+
+  const debouncedCalculateRedeemAmount = useMemo(() => debounce(calculateRedeemAmount, 500), [calculateRedeemAmount])
 
   useEffect(
     () =>
@@ -87,6 +103,7 @@ export function RedeemAmount({
         inputGroupProps={{
           endAddon: currencies.investCurrency,
         }}
+        onChange={debouncedCalculateReceiveAmount}
       />
       <Flex mt={2} justify="space-between">
         <Flex>
@@ -118,10 +135,10 @@ export function RedeemAmount({
             name="receiveAmount"
             placeholder="0.00"
             decimals={portfolioInvestmentCurrency?.decimals}
-            disabled
             inputGroupProps={{
               endAddon: currencies.receiveCurrency,
             }}
+            onChange={debouncedCalculateRedeemAmount}
           />
         </>
       )}
