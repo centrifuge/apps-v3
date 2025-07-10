@@ -1,10 +1,11 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useMemo } from 'react'
 import { Button } from '@centrifuge/ui'
-import { Container, Flex, Heading } from '@chakra-ui/react'
-import PoolManagers from '@components/settings/PoolManagers'
+import { Box, Container, Flex, Heading, Text } from '@chakra-ui/react'
 import { useParams } from 'react-router'
 import { useCentrifugeTransaction, usePool } from '@centrifuge/shared'
-import { PoolId } from '@centrifuge/sdk'
+import { HexString, PoolId } from '@centrifuge/sdk'
+import HubManagers from '@components/settings/HubManagers'
+import SpokeManagers from '@components/settings/SpokeManagers'
 
 export const handle = {
   hasSettings: false,
@@ -26,56 +27,65 @@ export default function PoolAccess() {
 
   const { data: pool } = usePool(memoizedPoolId)
 
-  const [initialHubManagers, setInitialHubManagers] = useState<`0x${string}`[]>([])
-  const [currentHubManagers, setCurrentHubManagers] = useState<`0x${string}`[]>([])
-  const [initialSpokeManagers, setInitialSpokeManagers] = useState<{ address: `0x${string}`; chainId: number }[]>([])
-  const [currentSpokeManagers, setCurrentSpokeManagers] = useState<{ address: `0x${string}`; chainId: number }[]>([])
+  const [initialHubManagers] = useState<HexString[]>(['0x423420ae467df6e90291fd0252c0a8a637c1e03f'])
+  const [currentHubManagers, setCurrentHubManagers] = useState<HexString[]>([
+    '0x423420ae467df6e90291fd0252c0a8a637c1e03f',
+  ])
+  const [initialSpokeManagers] = useState<{ address: HexString; chainId: number }[]>([
+    { address: '0x423420ae467df6e90291fd0252c0a8a637c1e03f', chainId: 1 },
+  ])
+  const [currentSpokeManagers, setCurrentSpokeManagers] = useState<{ address: HexString; chainId: number }[]>([
+    { address: '0x423420ae467df6e90291fd0252c0a8a637c1e03f', chainId: 1 },
+  ])
   const { execute } = useCentrifugeTransaction()
 
-  useEffect(() => {
-    // TODO: call SDK to get initial hub and spoke managers
-    setInitialHubManagers(['0x423420Ae467df6e90291fd0252c0A8a637C1e03f'])
-    setInitialSpokeManagers([{ address: '0x423420Ae467df6e90291fd0252c0A8a637C1e03f', chainId: 1 }])
+  // TODO:
+  // Set initial values from SDK when functions are available
 
-    // TODO: refactor this after initial values are set from SDK
-    setCurrentHubManagers(['0x423420Ae467df6e90291fd0252c0A8a637C1e03f'])
-    setCurrentSpokeManagers([{ address: '0x423420Ae467df6e90291fd0252c0A8a637C1e03f', chainId: 1 }])
-  }, [])
-
-  const addHubManager = (address: `0x${string}`) => {
+  const addHubManager = (address: HexString) => {
     if (!address.trim()) return
-    if (currentHubManagers.includes(address)) return
+    const validAddress = address.toLowerCase() as HexString
+    if (currentHubManagers.includes(validAddress)) return
 
-    setCurrentHubManagers((prev) => [...prev, address])
+    setCurrentHubManagers((prev) => [...prev, validAddress])
   }
 
-  const removeHubManager = (address: `0x${string}`) => {
-    setCurrentHubManagers((prev) => prev.filter((m) => m !== address))
+  const removeHubManager = ({ address }: { address: HexString }) => {
+    const validAddress = address.toLowerCase() as HexString
+    setCurrentHubManagers((prev) => prev.filter((m) => m !== validAddress))
   }
 
-  const addSpokeManager = ({ address, chainId }: { address: `0x${string}`; chainId: number }) => {
+  const addSpokeManager = ({ address, chainId }: { address: HexString; chainId: number }) => {
     if (!address.trim()) return
-    if (currentSpokeManagers.some((currentSpokeManager) => currentSpokeManager.address === address)) return
-    setCurrentSpokeManagers((prev) => [...prev, { address, chainId }])
+    const validAddress = address.toLowerCase() as HexString
+    if (
+      currentSpokeManagers.some(
+        (currentSpokeManager) => currentSpokeManager.address === validAddress && currentSpokeManager.chainId === chainId
+      )
+    ) {
+      return
+    }
+    setCurrentSpokeManagers((prev) => [...prev, { address: validAddress, chainId }])
   }
 
-  const removeSpokeManager = (address: `0x${string}`) => {
-    setCurrentSpokeManagers((prev) => prev.filter((m) => m.address !== address))
+  const removeSpokeManager = ({ address, chainId }: { address: HexString; chainId: number }) => {
+    const validAddress = address.toLowerCase() as HexString
+    setCurrentSpokeManagers((prev) => prev.filter((m) => m.address !== validAddress && m.chainId !== chainId))
   }
 
   const buildHubPayload = () => {
-    const addedOrKept = currentHubManagers.map((address) => ({ address, canManage: true }))
-
     const removed = initialHubManagers
       .filter((address) => !currentHubManagers.includes(address))
       .map((address) => ({ address, canManage: false }))
 
-    return [...addedOrKept, ...removed]
+    const added = currentHubManagers
+      .filter((address) => !initialHubManagers.includes(address))
+      .map((address) => ({ address, canManage: true }))
+
+    return [...added, ...removed]
   }
 
   const buildSpokePayload = () => {
-    const addedOrKept = currentSpokeManagers.map((manager) => ({ ...manager, canManage: true }))
-
     const removed = initialSpokeManagers
       .filter(
         (initialManager) =>
@@ -86,19 +96,34 @@ export default function PoolAccess() {
       )
       .map((manager) => ({ ...manager, canManage: false }))
 
-    return [...addedOrKept, ...removed]
+    const added = currentSpokeManagers
+      .filter(
+        (initialManager) =>
+          !initialSpokeManagers.some(
+            (currentManager) =>
+              currentManager.address === initialManager.address && currentManager.chainId === initialManager.chainId
+          )
+      )
+      .map((manager) => ({ ...manager, canManage: true }))
+
+    return [...added, ...removed]
   }
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const hubPayload = buildHubPayload()
     const spokePayload = buildSpokePayload()
 
-    console.log({ hubPayload, spokePayload })
-
     if (!pool) return
 
-    // execute(pool.updatePoolManagers(hubPayload))
-    // execute(pool.updateBalanceSheetManagers(spokePayload))
+    if (hubPayload.length !== 0) {
+      const hubResult = await execute(pool.updatePoolManagers(hubPayload))
+      console.log({ hubResult })
+    }
+
+    if (spokePayload.length !== 0) {
+      const spokeResult = await execute(pool.updateBalanceSheetManagers(spokePayload))
+      console.log({ spokeResult })
+    }
   }
 
   return (
@@ -107,15 +132,20 @@ export default function PoolAccess() {
         <Heading size="lg">Pool acccess</Heading>
         <SaveChangesButton onSubmit={handleSubmit} />
       </Flex>
-      <PoolManagers
-        currentHubManagers={currentHubManagers}
-        currentSpokeManagers={currentSpokeManagers}
-        addHubManager={addHubManager}
-        removeHubManager={removeHubManager}
-        addSpokeManager={addSpokeManager}
-        removeSpokeManager={removeSpokeManager}
-        poolId={poolId}
-      />
+      <Box mt={8}>
+        <Text fontSize="sm">Pool managers *</Text>
+        <HubManagers
+          currentHubManagers={currentHubManagers}
+          addHubManager={addHubManager}
+          removeHubManager={removeHubManager}
+        />
+        <SpokeManagers
+          currentSpokeManagers={currentSpokeManagers}
+          poolId={poolId}
+          addSpokeManager={addSpokeManager}
+          removeSpokeManager={removeSpokeManager}
+        />
+      </Box>
     </Container>
   )
 }

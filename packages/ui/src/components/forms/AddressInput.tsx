@@ -5,12 +5,13 @@ import { IoAddOutline } from 'react-icons/io5'
 import { FaRegTrashAlt } from 'react-icons/fa'
 import { truncateAddress } from '@centrifuge/shared'
 import { NetworkIcon, capitalizeNetworkName } from '../elements/NetworkIcon'
+import { HexString } from '@centrifuge/sdk'
 
 export interface AddressInputProps {
-  onAdd: (address: `0x${string}`) => void
+  onAdd: (address: HexString) => void
   withSelection?: boolean
-  addresses?: { address: `0x${string}`; chainId?: number }[]
-  onDelete?: (address: `0x${string}`) => void
+  addresses?: { address: HexString; chainId?: number }[]
+  onDelete?: ({ address, chainId }: { address: HexString; chainId?: number }) => void
   chainId?: number
   label?: string
 }
@@ -20,9 +21,9 @@ export const AddressInputLabel = ({
   chainId,
   onDelete,
 }: {
-  address: `0x${string}`
+  address: HexString
   chainId?: number
-  onDelete: (address: `0x${string}`) => void
+  onDelete: ({ address, chainId }: { address: HexString; chainId?: number }) => void
 }) => {
   if (!isAddress(address)) return null
   const networkId = chainId || 1 // Default to Ethereum Mainnet if no chainId is provided
@@ -45,7 +46,12 @@ export const AddressInputLabel = ({
         <NetworkIcon networkId={networkId} />
         <Text fontSize="sm">{networkName}</Text>
       </Flex>
-      <IconButton size="sm" backgroundColor="white" color="text-disabled" onClick={() => onDelete(address)}>
+      <IconButton
+        size="sm"
+        backgroundColor="white"
+        color="text-disabled"
+        onClick={() => onDelete({ address, chainId })}
+      >
         <FaRegTrashAlt />
       </IconButton>
     </Flex>
@@ -66,9 +72,9 @@ export const AddressInput = ({ onAdd, onDelete, addresses, label = 'Wallet Addre
     }
   }
 
-  const handleDelete = (address: `0x${string}`) => {
+  const handleDelete = ({ address, chainId }: { address: HexString; chainId?: number }) => {
     if (typeof onDelete === 'function') {
-      onDelete(address)
+      onDelete({ address, chainId })
     }
   }
 

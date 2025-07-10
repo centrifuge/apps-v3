@@ -1,11 +1,12 @@
+import { HexString } from '@centrifuge/sdk'
 import { AddressInput, Card, NetworkIcon } from '@centrifuge/ui'
 import { Flex, Grid, Heading, Stack, Text } from '@chakra-ui/react'
 import { infoText } from '@utils/infoText'
 
 type HubManagersProps = {
-  currentHubManagers: `0x${string}`[]
-  addHubManager: (address: `0x${string}`) => void
-  removeHubManager: (address: `0x${string}`) => void
+  currentHubManagers: HexString[]
+  addHubManager: (address: HexString) => void
+  removeHubManager: ({ address }: { address: HexString }) => void
 }
 
 export default function HubManagers({ currentHubManagers, addHubManager, removeHubManager }: HubManagersProps) {

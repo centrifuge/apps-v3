@@ -2,13 +2,13 @@ import { useMemo, useState } from 'react'
 import { AddressInput, capitalizeNetworkName, Card, NetworkIcon } from '@centrifuge/ui'
 import { Flex, Grid, Heading, ListCollection, Select, Stack, createListCollection } from '@chakra-ui/react'
 import { usePoolNetworks } from '@centrifuge/shared'
-import { PoolId } from '@centrifuge/sdk'
+import { HexString, PoolId } from '@centrifuge/sdk'
 
 type SpokeManagerProps = {
-  currentSpokeManagers: { address: `0x${string}`; chainId: number }[]
+  currentSpokeManagers: { address: HexString; chainId: number }[]
   poolId: string
-  addSpokeManager: ({ address, chainId }: { address: `0x${string}`; chainId: number }) => void
-  removeSpokeManager: (address: `0x${string}`) => void
+  addSpokeManager: ({ address, chainId }: { address: HexString; chainId: number }) => void
+  removeSpokeManager: ({ address, chainId }: { address: HexString; chainId: number }) => void
 }
 
 export default function SpokeManagers({
@@ -48,11 +48,8 @@ export default function SpokeManagers({
     )
   }
 
-  const handleAdd = (address: `0x${string}`) => {
-    if (!address.trim()) return
-    const networkId = selectedChain[0]
-
-    addSpokeManager({ address, chainId: Number(networkId) })
+  const handleAdd = (address: HexString) => {
+    addSpokeManager({ address, chainId: Number(selectedChain[0]) })
   }
 
   return (
@@ -64,7 +61,7 @@ export default function SpokeManagers({
         <Grid templateColumns="1fr 1fr" gap={4} mt={8}>
           <AddressInput
             onAdd={handleAdd}
-            onDelete={removeSpokeManager}
+            onDelete={({ address, chainId }) => chainId && removeSpokeManager({ address, chainId })}
             addresses={currentSpokeManagers.map((csm) => ({ address: csm.address, chainId: csm.chainId }))}
           />
           <Stack>
