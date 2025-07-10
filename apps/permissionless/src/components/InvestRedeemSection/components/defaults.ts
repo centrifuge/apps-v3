@@ -8,7 +8,7 @@ export type InvestActionType = (typeof InvestAction)[keyof typeof InvestAction]
 
 export const InvestFormDefaultValues = {
   investAmount: '',
-  receiveAmount: '1',
+  receiveAmount: '',
   investorRequirements: [false, false, false],
 }
 

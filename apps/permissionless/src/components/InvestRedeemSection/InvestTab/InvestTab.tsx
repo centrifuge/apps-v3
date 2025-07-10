@@ -52,9 +52,7 @@ export default function InvestTab({
       vaultDetails?.investmentCurrency.decimals ?? 6,
       z.number().min(1).max(Number(maxInvestAmount))
     ),
-    receiveAmount: createBalanceSchema(vaultDetails?.shareCurrency.decimals ?? 18)
-      .optional()
-      .or(z.literal('')),
+    receiveAmount: createBalanceSchema(vaultDetails?.shareCurrency.decimals ?? 18).optional(),
     requirement_nonUsCitizen: z.boolean().refine((val) => val === true, {
       message: 'Non-US citizen requirement must be confirmed',
     }),
