@@ -1,15 +1,18 @@
-import { Box, Button, Flex, Heading, Icon, Text } from '@chakra-ui/react'
+import { type Dispatch, type SetStateAction } from 'react'
 import { IoMdTimer } from 'react-icons/io'
+import { Box, Button, Flex, Heading, Icon, Text } from '@chakra-ui/react'
 import { useFormContext } from '@centrifuge/forms'
 import { RedeemAction, type RedeemActionType } from '@components/InvestRedeemSection/components/defaults'
-import { type Dispatch, type SetStateAction } from 'react'
 
 interface RedeemTxCancelledProps {
-  currencies: { investCurrency: string; receiveCurrency: string }
+  currencies: { redeemCurrency: string; receiveCurrency: string }
   setActionType: Dispatch<SetStateAction<RedeemActionType>>
 }
 
-export function RedeemTxCancelled({ currencies, setActionType }: RedeemTxCancelledProps) {
+export function RedeemTxCancelled({
+  currencies: { redeemCurrency, receiveCurrency },
+  setActionType,
+}: RedeemTxCancelledProps) {
   const { getValues } = useFormContext()
   const { reset } = useFormContext()
 
@@ -36,14 +39,14 @@ export function RedeemTxCancelled({ currencies, setActionType }: RedeemTxCancell
                 <Text fontWeight={500}>You cancelled redeeming</Text>
                 <Heading fontSize="lg">{getValues('redeemAmount').toString()}</Heading>
               </Box>
-              <Text alignSelf="flex-end">{currencies.investCurrency}</Text>
+              <Text alignSelf="flex-end">{redeemCurrency}</Text>
             </Flex>
             <Flex alignItems="center" gap={2} justifyContent="space-between" mt={6}>
               <Box>
                 <Text fontWeight={500}>You would have received</Text>
                 <Heading fontSize="lg">{getValues('receiveAmount').toString()}</Heading>
               </Box>
-              <Text alignSelf="flex-end">{currencies.receiveCurrency}</Text>
+              <Text alignSelf="flex-end">{receiveCurrency}</Text>
             </Flex>
           </Box>
         </Box>

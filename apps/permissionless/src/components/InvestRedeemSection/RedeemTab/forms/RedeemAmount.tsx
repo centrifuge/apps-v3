@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useCallback, useEffect, useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 import { Badge, Box, Flex, Text } from '@chakra-ui/react'
 import { BalanceInput, SubmitButton, useFormContext } from '@centrifuge/forms'
 import { Balance, PoolId, PoolNetwork, Price, Vault } from '@centrifuge/sdk'
@@ -19,25 +19,21 @@ import { NetworkIcons } from '@centrifuge/ui'
 import { useSwitchChain } from 'wagmi'
 
 interface RedeemAmountProps {
-  currencies: { investCurrency: string; receiveCurrency: string }
   isDisabled: boolean
   maxRedeemAmount: string
   networks?: PoolNetwork[]
   parsedRedeemAmount: 0 | Balance
   vault?: Vault
   vaults?: Vault[]
-  setCurrencies: Dispatch<SetStateAction<{ investCurrency: string; receiveCurrency: string }>>
 }
 
 export function RedeemAmount({
-  currencies,
   isDisabled,
   maxRedeemAmount,
   networks,
   parsedRedeemAmount,
   vault,
   vaults,
-  setCurrencies,
 }: RedeemAmountProps) {
   const { data: vaultsDetails } = useVaultsDetails(vaults)
   const { data: portfolio } = usePortfolio()
@@ -48,6 +44,7 @@ export function RedeemAmount({
   const { setValue } = useFormContext()
   const { data: investment } = useInvestment(vault)
 
+  // Get networkIds and currencies for receiveAmount select currency list
   const networkIds = networks?.map((network) => network.chainId)
   const investmentCurrencies = vaultsDetails?.map((vault) => ({
     label: vault.investmentCurrency.symbol,
@@ -61,7 +58,7 @@ export function RedeemAmount({
   const pricePerShare = shareClass?.details.pricePerShare
 
   // Get info on the users shares holdings in their wallet
-  const shareCurrencySymbol = investment?.shareCurrency.symbol
+  const shareCurrencySymbol = investment?.shareCurrency.symbol ?? ''
   const maxRedeemBalance = investment?.shareBalance ?? 0
 
   // Get info on the users investment asset that shares will be converted into
@@ -69,19 +66,23 @@ export function RedeemAmount({
   const portfolioInvestmentAsset = portfolio?.find((asset) => asset.currency.chainId === investmentCurrencyChainId)
   const portfolioInvestmentCurrency = portfolioInvestmentAsset?.currency
 
-  const calculateReceiveAmountValue = (redeemBalance: Balance, pricePerShare?: Price) => {
-    if (!redeemBalance || !pricePerShare) {
-      return ''
-    }
+  const calculateReceiveAmountValue = useCallback(
+    (redeemBalance: Balance, pricePerShare?: Price) => {
+      if (!redeemBalance || !pricePerShare) {
+        return ''
+      }
 
-    const redeemAmountDecimals = redeemBalance.decimals
-    const redeemAmountBigint = redeemBalance.toBigInt()
-    const pricePerShareBigint = pricePerShare.toBigInt()
+      const redeemAmountDecimals = redeemBalance.decimals
+      const redeemAmountBigint = redeemBalance.toBigInt()
+      const pricePerShareBigint = pricePerShare.toBigInt()
 
-    return divideBigInts(redeemAmountBigint, pricePerShareBigint, redeemAmountDecimals).formatToString(
-      redeemAmountDecimals
-    )
-  }
+      return divideBigInts(redeemAmountBigint, pricePerShareBigint, redeemAmountDecimals).formatToString(
+        redeemAmountDecimals,
+        portfolioInvestmentCurrency?.decimals
+      )
+    },
+    [portfolioInvestmentCurrency?.decimals]
+  )
 
   const calculateReceiveAmount = useCallback(
     (inputStringValue: string, redeemInputAmount?: Balance) => {
@@ -124,15 +125,6 @@ export function RedeemAmount({
     setValue('receiveAmount', calculatedReceiveAmount)
   }, [maxRedeemAmount, pricePerShare])
 
-  useEffect(
-    () =>
-      setCurrencies({
-        investCurrency: shareClass?.details.symbol ?? '',
-        receiveCurrency: vaultDetails?.investmentCurrency.symbol ?? '',
-      }),
-    [shareClass, vaultDetails]
-  )
-
   return (
     <Box>
       <Text fontWeight={500} mb={2}>
@@ -143,7 +135,7 @@ export function RedeemAmount({
         decimals={shareClass?.details.pricePerShare.decimals}
         placeholder="0.00"
         inputGroupProps={{
-          endAddon: currencies.investCurrency,
+          endAddon: shareCurrencySymbol,
         }}
         onChange={debouncedCalculateReceiveAmount}
       />

@@ -41,9 +41,7 @@ export default function RedeemTab({
       investment?.shareBalance.decimals ?? 18,
       z.number().min(1).max(Number(maxRedeemAmount))
     ),
-    receiveAmount: createBalanceSchema(vaultDetails?.investmentCurrency.decimals ?? 6)
-      .optional()
-      .or(z.literal('')),
+    receiveAmount: createBalanceSchema(vaultDetails?.investmentCurrency.decimals ?? 6).optional(),
   })
 
   const form = useForm({
@@ -58,11 +56,15 @@ export default function RedeemTab({
   })
 
   const { watch } = form
-  const redeemAmount = watch('redeemAmount')
+  const [redeemAmount, receiveAmount] = watch(['redeemAmount', 'receiveAmount'])
 
   const parsedRedeemAmount = useMemo(
     () => safeParse(schema.shape.redeemAmount, redeemAmount) ?? 0,
     [redeemAmount, schema.shape.redeemAmount]
+  )
+  const parsedReceiveAmount = useMemo(
+    () => safeParse(schema.shape.receiveAmount, receiveAmount) ?? 0,
+    [receiveAmount, schema.shape.receiveAmount]
   )
   const isDisabled = isPending || !vaultDetails || !investment || parsedRedeemAmount === 0
 
@@ -75,6 +77,7 @@ export default function RedeemTab({
           maxRedeemAmount={maxRedeemAmount}
           networks={networks}
           parsedRedeemAmount={parsedRedeemAmount}
+          parsedReceiveAmount={parsedReceiveAmount}
           vault={vault}
           vaults={vaults}
           setActionType={setActionType}
