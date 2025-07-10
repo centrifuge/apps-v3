@@ -58,7 +58,7 @@ export default function Investors() {
     <Form form={form}>
       <Box mt={10}>
         <Flex justifyContent="space-between" alignItems="center">
-          <Heading size="lg">Investors</Heading>
+          <Heading size="md">Investors</Heading>
           <Button
             label="Save changes"
             size="sm"
