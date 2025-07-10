@@ -3,9 +3,9 @@ import { Flex, Grid, Heading, Stack, Text } from '@chakra-ui/react'
 import { infoText } from '@utils/infoText'
 
 type HubManagersProps = {
-  currentHubManagers: string[]
-  addHubManager: (address: string) => void
-  removeHubManager: (address: string) => void
+  currentHubManagers: `0x${string}`[]
+  addHubManager: (address: `0x${string}`) => void
+  removeHubManager: (address: `0x${string}`) => void
 }
 
 export default function HubManagers({ currentHubManagers, addHubManager, removeHubManager }: HubManagersProps) {

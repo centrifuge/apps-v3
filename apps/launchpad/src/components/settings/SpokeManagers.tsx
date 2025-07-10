@@ -1,14 +1,14 @@
 import { useMemo, useState } from 'react'
 import { AddressInput, capitalizeNetworkName, Card, NetworkIcon } from '@centrifuge/ui'
-import { Flex, Grid, Heading, Select, Stack, createListCollection } from '@chakra-ui/react'
+import { Flex, Grid, Heading, ListCollection, Select, Stack, createListCollection } from '@chakra-ui/react'
 import { usePoolNetworks } from '@centrifuge/shared'
 import { PoolId } from '@centrifuge/sdk'
 
 type SpokeManagerProps = {
-  currentSpokeManagers: { address: string; chainId: number }[]
+  currentSpokeManagers: { address: `0x${string}`; chainId: number }[]
   poolId: string
-  addSpokeManager: ({ address, chainId }: { address: string; chainId: number }) => void
-  removeSpokeManager: (address: string) => void
+  addSpokeManager: ({ address, chainId }: { address: `0x${string}`; chainId: number }) => void
+  removeSpokeManager: (address: `0x${string}`) => void
 }
 
 export default function SpokeManagers({
@@ -22,6 +22,7 @@ export default function SpokeManagers({
   }, [poolId])
 
   const { data, isLoading } = usePoolNetworks(memoizedPoolId)
+
   const chains = useMemo(() => {
     if (isLoading || !data) return createListCollection({ items: [] })
     return createListCollection({
@@ -34,7 +35,20 @@ export default function SpokeManagers({
 
   const [selectedChain, setSelectedChain] = useState<string[]>([])
 
-  const handleAdd = (address: string) => {
+  if (isLoading || !isValidChains(chains)) {
+    return (
+      <Card mt={8}>
+        <Stack>
+          <Heading size="md">Spoke manager</Heading>
+          <Heading size="sm" color="text-secondary">
+            Loading networks...
+          </Heading>
+        </Stack>
+      </Card>
+    )
+  }
+
+  const handleAdd = (address: `0x${string}`) => {
     if (!address.trim()) return
     const networkId = selectedChain[0]
 
@@ -93,4 +107,10 @@ export default function SpokeManagers({
       </Card>
     </>
   )
+}
+
+const isValidChains = (
+  chains: ListCollection<never> | ListCollection<{ label: string; value: number }>
+): chains is ListCollection<{ label: string; value: number }> => {
+  return chains.items.length > 0
 }

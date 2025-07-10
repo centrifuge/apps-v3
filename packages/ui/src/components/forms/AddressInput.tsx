@@ -7,10 +7,10 @@ import { truncateAddress } from '@centrifuge/shared'
 import { NetworkIcon, capitalizeNetworkName } from '../elements/NetworkIcon'
 
 export interface AddressInputProps {
-  onAdd: (address: string) => void
+  onAdd: (address: `0x${string}`) => void
   withSelection?: boolean
-  addresses?: { address: string; chainId?: number }[]
-  onDelete?: (address: string) => void
+  addresses?: { address: `0x${string}`; chainId?: number }[]
+  onDelete?: (address: `0x${string}`) => void
   chainId?: number
   label?: string
 }
@@ -20,9 +20,9 @@ export const AddressInputLabel = ({
   chainId,
   onDelete,
 }: {
-  address: string
+  address: `0x${string}`
   chainId?: number
-  onDelete: (address: string) => void
+  onDelete: (address: `0x${string}`) => void
 }) => {
   if (!isAddress(address)) return null
   const networkId = chainId || 1 // Default to Ethereum Mainnet if no chainId is provided
@@ -66,7 +66,7 @@ export const AddressInput = ({ onAdd, onDelete, addresses, label = 'Wallet Addre
     }
   }
 
-  const handleDelete = (address: string) => {
+  const handleDelete = (address: `0x${string}`) => {
     if (typeof onDelete === 'function') {
       onDelete(address)
     }

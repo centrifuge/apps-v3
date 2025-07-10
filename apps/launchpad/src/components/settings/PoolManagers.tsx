@@ -3,13 +3,13 @@ import HubManagers from './HubManagers'
 import SpokeManagers from './SpokeManagers'
 
 type PoolManagersProps = {
-  currentHubManagers: string[]
-  currentSpokeManagers: { address: string; chainId: number }[]
+  currentHubManagers: `0x${string}`[]
+  currentSpokeManagers: { address: `0x${string}`; chainId: number }[]
   poolId: string
-  addHubManager: (address: string) => void
-  removeHubManager: (address: string) => void
-  addSpokeManager: ({ address, chainId }: { address: string; chainId: number }) => void
-  removeSpokeManager: (address: string) => void
+  addHubManager: (address: `0x${string}`) => void
+  removeHubManager: (address: `0x${string}`) => void
+  addSpokeManager: ({ address, chainId }: { address: `0x${string}`; chainId: number }) => void
+  removeSpokeManager: (address: `0x${string}`) => void
 }
 
 export default function PoolManagers({
