@@ -25,6 +25,8 @@ export default function PoolAccess() {
     return poolId ? new PoolId(poolId) : undefined
   }, [poolId])
 
+  if (!memoizedPoolId) return null
+
   const { data: pool } = usePool(memoizedPoolId)
 
   const [initialHubManagers] = useState<HexString[]>(['0x423420ae467df6e90291fd0252c0a8a637c1e03f'])

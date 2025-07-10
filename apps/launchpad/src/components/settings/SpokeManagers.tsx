@@ -18,7 +18,7 @@ export default function SpokeManagers({
   removeSpokeManager,
 }: SpokeManagerProps) {
   const memoizedPoolId = useMemo(() => {
-    return poolId ? new PoolId(poolId) : undefined
+    return new PoolId(poolId)
   }, [poolId])
 
   const { data, isLoading } = usePoolNetworks(memoizedPoolId)
