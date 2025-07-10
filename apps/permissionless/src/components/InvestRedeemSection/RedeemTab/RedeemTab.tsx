@@ -30,7 +30,7 @@ export default function RedeemTab({
   }
 
   const schema = z.object({
-    redeemAmount: createBalanceSchema(vaultDetails?.shareCurrency.decimals ?? 6, z.number().min(1)),
+    redeemAmount: createBalanceSchema(investment?.shareBalance.decimals ?? 18, z.number().min(1)),
     receiveAmount: createBalanceSchema(vaultDetails?.investmentCurrency.decimals ?? 6)
       .optional()
       .or(z.literal('')),

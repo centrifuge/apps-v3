@@ -2,7 +2,14 @@ import { Dispatch, SetStateAction, useCallback, useEffect, useMemo } from 'react
 import { Badge, Box, Flex, Text } from '@chakra-ui/react'
 import { BalanceInput, SubmitButton, useFormContext } from '@centrifuge/forms'
 import { Balance, PoolId, PoolNetwork, Price, Vault } from '@centrifuge/sdk'
-import { usePortfolio, formatBalance, usePoolDetails, useVaultDetails, useVaultsDetails } from '@centrifuge/shared'
+import {
+  usePortfolio,
+  formatBalance,
+  usePoolDetails,
+  useVaultDetails,
+  useVaultsDetails,
+  useInvestment,
+} from '@centrifuge/shared'
 import { InfoWrapper } from '@components/InvestRedeemSection/components/InfoWrapper'
 import { infoText } from '@utils/infoText'
 import { useSelectedPoolContext } from '@contexts/useSelectedPoolContext'
@@ -37,6 +44,7 @@ export function RedeemAmount({
   const { data: vaultDetails } = useVaultDetails(vault)
   const { switchChain } = useSwitchChain()
   const { setValue } = useFormContext()
+  const { data: investment } = useInvestment(vault)
 
   const networkIds = networks?.map((network) => network.chainId)
   const investmentCurrencies = vaultsDetails?.map((vault) => ({
@@ -51,10 +59,9 @@ export function RedeemAmount({
   const pricePerShare = shareClass?.details.pricePerShare
 
   // Get info on the users shares holdings in their wallet
-  const shareAsset = vaultDetails?.shareCurrency.address
-  const portfolioShareAsset = portfolio?.find((asset) => asset.currency.address === shareAsset)
-  const portfolioShareCurrency = portfolioShareAsset?.currency
-  const maxRedeemBalance = portfolioShareAsset?.balance ?? 0
+  const shareCurrencyBalance = investment?.shareBalance ?? 0
+  const shareCurrencySymbol = investment?.shareCurrency.symbol
+  const maxRedeemBalance = shareCurrencyBalance
 
   // Get info on the users investment asset that shares will be converted into
   const investmentCurrencyChainId = vaultDetails?.investmentCurrency?.chainId
@@ -109,7 +116,7 @@ export function RedeemAmount({
   const changeVault = (value: number) => switchChain({ chainId: value })
 
   const maxRedeemAmount = useMemo(() => {
-    if (!portfolioShareAsset || maxRedeemBalance === 0) return ''
+    if (maxRedeemBalance === 0) return ''
 
     return formatBalanceToString(maxRedeemBalance, maxRedeemBalance.decimals) ?? ''
   }, [maxRedeemBalance])
@@ -162,7 +169,7 @@ export function RedeemAmount({
             MAX
           </Badge>
           <Text color="text-primary" opacity={0.5} alignSelf="flex-end" ml={2}>
-            {formatBalance(maxRedeemBalance, portfolioShareCurrency?.symbol)}
+            {formatBalance(maxRedeemBalance, shareCurrencySymbol)}
           </Text>
         </Flex>
         <NetworkIcons networkIds={networkIds} />
