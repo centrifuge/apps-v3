@@ -8,6 +8,7 @@ import { RedeemTxCancelled } from '@components/InvestRedeemSection/RedeemTab/for
 interface RedeemTabFormProps {
   actionType: RedeemActionType
   isDisabled: boolean
+  maxRedeemAmount: string
   networks?: PoolNetwork[]
   parsedRedeemAmount: 0 | Balance
   vault?: Vault
@@ -18,6 +19,7 @@ interface RedeemTabFormProps {
 export function RedeemTabForm({
   actionType,
   isDisabled,
+  maxRedeemAmount,
   networks,
   parsedRedeemAmount,
   vault,
@@ -34,6 +36,7 @@ export function RedeemTabForm({
       return (
         <RedeemAmount
           isDisabled={isDisabled}
+          maxRedeemAmount={maxRedeemAmount}
           networks={networks}
           parsedRedeemAmount={parsedRedeemAmount}
           vault={vault}

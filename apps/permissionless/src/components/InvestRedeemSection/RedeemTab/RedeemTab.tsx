@@ -3,7 +3,7 @@ import { z } from 'zod'
 import { Box } from '@chakra-ui/react'
 import { createBalanceSchema, Form, safeParse, useForm } from '@centrifuge/forms'
 import { Balance, PoolNetwork, type Vault } from '@centrifuge/sdk'
-import { useInvestment, useCentrifugeTransaction, useVaultDetails } from '@centrifuge/shared'
+import { formatBalanceToString, useInvestment, useCentrifugeTransaction, useVaultDetails } from '@centrifuge/shared'
 import {
   RedeemAction,
   RedeemFormDefaultValues,
@@ -24,13 +24,23 @@ export default function RedeemTab({
   const { data: investment } = useInvestment(vault)
   const { execute, isPending } = useCentrifugeTransaction()
   const [actionType, setActionType] = useState<RedeemActionType>(RedeemAction.REDEEM_AMOUNT)
+  const maxRedeemBalance = investment?.shareBalance ?? 0
+
+  const maxRedeemAmount = useMemo(() => {
+    if (maxRedeemBalance === 0) return ''
+
+    return formatBalanceToString(maxRedeemBalance, maxRedeemBalance.decimals) ?? ''
+  }, [maxRedeemBalance])
 
   function redeem(amount: Balance) {
     execute(vault.increaseRedeemOrder(amount))
   }
 
   const schema = z.object({
-    redeemAmount: createBalanceSchema(investment?.shareBalance.decimals ?? 18, z.number().min(1)),
+    redeemAmount: createBalanceSchema(
+      investment?.shareBalance.decimals ?? 18,
+      z.number().min(1).max(Number(maxRedeemAmount))
+    ),
     receiveAmount: createBalanceSchema(vaultDetails?.investmentCurrency.decimals ?? 6)
       .optional()
       .or(z.literal('')),
@@ -62,6 +72,7 @@ export default function RedeemTab({
         <RedeemTabForm
           actionType={actionType}
           isDisabled={isDisabled}
+          maxRedeemAmount={maxRedeemAmount}
           networks={networks}
           parsedRedeemAmount={parsedRedeemAmount}
           vault={vault}

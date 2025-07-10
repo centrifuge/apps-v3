@@ -21,6 +21,7 @@ import { useSwitchChain } from 'wagmi'
 interface RedeemAmountProps {
   currencies: { investCurrency: string; receiveCurrency: string }
   isDisabled: boolean
+  maxRedeemAmount: string
   networks?: PoolNetwork[]
   parsedRedeemAmount: 0 | Balance
   vault?: Vault
@@ -31,6 +32,7 @@ interface RedeemAmountProps {
 export function RedeemAmount({
   currencies,
   isDisabled,
+  maxRedeemAmount,
   networks,
   parsedRedeemAmount,
   vault,
@@ -59,9 +61,8 @@ export function RedeemAmount({
   const pricePerShare = shareClass?.details.pricePerShare
 
   // Get info on the users shares holdings in their wallet
-  const shareCurrencyBalance = investment?.shareBalance ?? 0
   const shareCurrencySymbol = investment?.shareCurrency.symbol
-  const maxRedeemBalance = shareCurrencyBalance
+  const maxRedeemBalance = investment?.shareBalance ?? 0
 
   // Get info on the users investment asset that shares will be converted into
   const investmentCurrencyChainId = vaultDetails?.investmentCurrency?.chainId
@@ -114,12 +115,6 @@ export function RedeemAmount({
   const debouncedCalculateRedeemAmount = useMemo(() => debounce(calculateRedeemAmount, 500), [calculateRedeemAmount])
 
   const changeVault = (value: number) => switchChain({ chainId: value })
-
-  const maxRedeemAmount = useMemo(() => {
-    if (maxRedeemBalance === 0) return ''
-
-    return formatBalanceToString(maxRedeemBalance, maxRedeemBalance.decimals) ?? ''
-  }, [maxRedeemBalance])
 
   const setMaxRedeemAmount = useCallback(() => {
     if (!maxRedeemAmount || !pricePerShare || maxRedeemBalance === 0) return

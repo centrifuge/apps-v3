@@ -9,6 +9,7 @@ import { VaultDetails } from '@utils/types'
 interface InvestTabFormProps {
   actionType: InvestActionType
   isDisabled: boolean
+  maxInvestAmount: string
   networks?: PoolNetwork[]
   parsedInvestAmount: 0 | Balance
   vaults: Vault[]
@@ -20,6 +21,7 @@ interface InvestTabFormProps {
 export function InvestTabForm({
   actionType,
   isDisabled,
+  maxInvestAmount,
   networks,
   parsedInvestAmount,
   vaults,
@@ -38,6 +40,7 @@ export function InvestTabForm({
         <InvestAmount
           currencies={currencies}
           isDisabled={isDisabled}
+          maxInvestAmount={maxInvestAmount}
           networks={networks}
           parsedInvestAmount={parsedInvestAmount}
           vaults={vaults}

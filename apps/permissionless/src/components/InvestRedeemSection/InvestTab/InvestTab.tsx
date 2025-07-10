@@ -3,7 +3,13 @@ import { z } from 'zod'
 import { Box } from '@chakra-ui/react'
 import { Form, useForm, safeParse, createBalanceSchema } from '@centrifuge/forms'
 import { Balance, PoolNetwork, Vault } from '@centrifuge/sdk'
-import { useCentrifugeTransaction, useInvestment, useVaultDetails } from '@centrifuge/shared'
+import {
+  formatBalanceToString,
+  useCentrifugeTransaction,
+  useInvestment,
+  usePortfolio,
+  useVaultDetails,
+} from '@centrifuge/shared'
 import {
   type InvestActionType,
   InvestAction,
@@ -24,8 +30,17 @@ export default function InvestTab({
 }) {
   const { data: vaultDetails } = useVaultDetails(vault)
   const { data: investment } = useInvestment(vault)
+  const { data: portfolio } = usePortfolio()
   const { execute, isPending } = useCentrifugeTransaction()
   const [actionType, setActionType] = useState<InvestActionType>(InvestAction.INVEST_AMOUNT)
+  const investmentCurrencyChainId = vaultDetails?.investmentCurrency?.chainId
+  const portfolioInvestmentAsset = portfolio?.find((asset) => asset.currency.chainId === investmentCurrencyChainId)
+  const portfolioBalance = portfolioInvestmentAsset?.balance
+
+  const maxInvestAmount = useMemo(() => {
+    if (!portfolioBalance) return '0'
+    return formatBalanceToString(portfolioBalance, portfolioBalance.decimals) ?? '0'
+  }, [portfolioBalance])
 
   function invest(amount: Balance) {
     execute(vault.increaseInvestOrder(amount))
@@ -33,8 +48,13 @@ export default function InvestTab({
 
   // TODO: Add any necessary refinements for validation checks
   const schema = z.object({
-    investAmount: createBalanceSchema(vaultDetails?.investmentCurrency.decimals ?? 6, z.number().min(0.01)),
-    receiveAmount: createBalanceSchema(vaultDetails?.shareCurrency.decimals ?? 18, z.number().min(0.01)),
+    investAmount: createBalanceSchema(
+      vaultDetails?.investmentCurrency.decimals ?? 6,
+      z.number().min(1).max(Number(maxInvestAmount))
+    ),
+    receiveAmount: createBalanceSchema(vaultDetails?.shareCurrency.decimals ?? 18)
+      .optional()
+      .or(z.literal('')),
     requirement_nonUsCitizen: z.boolean().refine((val) => val === true, {
       message: 'Non-US citizen requirement must be confirmed',
     }),
@@ -74,6 +94,7 @@ export default function InvestTab({
         <InvestTabForm
           actionType={actionType}
           isDisabled={isDisabled}
+          maxInvestAmount={maxInvestAmount}
           networks={networks}
           parsedInvestAmount={parsedInvestAmount}
           vaults={vaults}

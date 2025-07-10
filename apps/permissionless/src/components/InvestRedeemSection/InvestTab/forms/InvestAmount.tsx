@@ -15,6 +15,7 @@ import { useSwitchChain } from 'wagmi'
 
 interface InvestAmountProps {
   isDisabled: boolean
+  maxInvestAmount: string
   networks?: PoolNetwork[]
   parsedInvestAmount: 0 | Balance
   vaultDetails?: VaultDetails
@@ -27,6 +28,7 @@ interface InvestAmountProps {
 
 export function InvestAmount({
   isDisabled,
+  maxInvestAmount,
   networks,
   parsedInvestAmount,
   vaultDetails,
@@ -83,11 +85,6 @@ export function InvestAmount({
   )
 
   const debouncedCalculateReceiveAmount = useMemo(() => debounce(calculateReceiveAmount, 600), [calculateReceiveAmount])
-
-  const maxInvestAmount = useMemo(() => {
-    if (!portfolioBalance) return '0'
-    return formatBalanceToString(portfolioBalance, portfolioBalance.decimals) ?? '0'
-  }, [portfolioBalance])
 
   const setMaxInvestAmount = useCallback(() => {
     if (!portfolioBalance || !maxInvestAmount || !pricePerShare) return
