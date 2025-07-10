@@ -52,7 +52,7 @@ export function formatBalanceAbbreviated(
 export function formatBalance(
   amount: number | Decimal | string | Balance,
   currency?: string,
-  precision = 0,
+  precision?: number,
   minPrecision = precision
 ): string {
   let val: Decimal
@@ -67,8 +67,8 @@ export function formatBalance(
     val = new Decimal(0)
   }
 
-  const fixedString = val.toFixed(precision)
-  const numToFormat = parseFloat(fixedString)
+  const fixedDecimal = val.toDecimalPlaces(precision ?? undefined, Decimal.ROUND_DOWN)
+  const numToFormat = parseFloat(fixedDecimal.toString())
 
   const formattedAmount = numToFormat.toLocaleString('en', {
     minimumFractionDigits: minPrecision,
