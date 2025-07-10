@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from 'react-router'
 import { Box, Flex, Heading, Stack } from '@chakra-ui/react'
-import { Button } from '@centrifuge/ui'
+import { Button, Loader } from '@centrifuge/ui'
 import { AccountPage } from '@components/account/AccountPage'
 import { useMemo } from 'react'
 import { usePoolProvider } from '@contexts/PoolProvider'
@@ -10,12 +10,14 @@ import { usePoolProvider } from '@contexts/PoolProvider'
 export default function Account() {
   const navigate = useNavigate()
   const { poolId } = useParams()
-  const { shareClass } = usePoolProvider()
+  const { shareClass, isLoading, poolDetails } = usePoolProvider()
   const shareClassId = shareClass?.shareClass?.id.raw ?? ''
 
   const totalNav = useMemo(() => {
     return shareClass?.details.pricePerShare.mul(shareClass?.details.totalIssuance)
   }, [shareClass])
+
+  if (isLoading) return <Loader />
 
   return (
     <Box mt={10}>
@@ -29,7 +31,7 @@ export default function Account() {
 
         <Button label="Update NAV" onClick={() => navigate(`/nav/${shareClassId}/${poolId}`)} size="sm" width="150px" />
       </Flex>
-      {shareClass && <AccountPage sc={shareClass} />}
+      {shareClass && <AccountPage sc={shareClass} poolDetails={poolDetails} />}
     </Box>
   )
 }

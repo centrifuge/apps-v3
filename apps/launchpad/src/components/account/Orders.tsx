@@ -1,5 +1,4 @@
-import { Balance } from '@centrifuge/sdk'
-import { formatBalanceToString, ShareClassWithDetails } from '@centrifuge/shared'
+import { formatBalance, ShareClassWithDetails } from '@centrifuge/shared'
 import { usePendingAmounts } from '@centrifuge/shared/src/hooks/useShareClass'
 import { Button, Card } from '@centrifuge/ui'
 import { Flex, Heading, Separator, Stack } from '@chakra-ui/react'
@@ -36,17 +35,16 @@ export function Orders({
     navigate(route)
   }
 
-  // TODO: fix decimals, should come from sdk
   const pendingAmount = useMemo(() => {
     return pendingAmounts
       ?.map((p) => (isInvestment ? p.pendingDeposit : p.pendingRedeem))
-      .reduce((acc, curr) => acc.add(curr), new Balance(0, 18))
+      .reduce((acc, curr) => acc + curr.toFloat(), 0)
   }, [pendingAmounts, isInvestment])
 
   const approvedAmount = useMemo(() => {
     return pendingAmounts
       ?.map((p) => (isInvestment ? p.approvedDeposit : p.approvedRedeem))
-      .reduce((acc, curr) => acc.add(curr), new Balance(0, 18))
+      .reduce((acc, curr) => acc + curr.toFloat(), 0)
   }, [pendingAmounts, isInvestment])
 
   return (
@@ -57,7 +55,7 @@ export function Orders({
         <Stack gap={0}>
           <Heading size="xs">{isInvestment ? 'Pending investments' : 'Pending redemptions'}</Heading>
           <Heading size="2xl">
-            {formatBalanceToString(pendingAmount ?? 0, 2)} {shareClass?.details?.symbol}
+            {formatBalance(pendingAmount ?? 0, { precision: 2 })} {shareClass?.details?.symbol}
           </Heading>
         </Stack>
         <Button label="Approve" onClick={() => findRoute(true)} colorPalette="gray" size="sm" width="120px" />
@@ -67,7 +65,7 @@ export function Orders({
         <Stack gap={0}>
           <Heading size="xs">{isInvestment ? 'Approved investments' : 'Approved redemptions'}</Heading>
           <Heading size="2xl">
-            {formatBalanceToString(approvedAmount ?? 0, 2)} {shareClass?.details?.symbol}
+            {formatBalance(approvedAmount ?? 0, { precision: 2 })} {shareClass?.details?.symbol}
           </Heading>
         </Stack>
         <Button
