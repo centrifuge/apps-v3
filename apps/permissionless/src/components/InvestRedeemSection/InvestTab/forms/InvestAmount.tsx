@@ -61,7 +61,7 @@ export function InvestAmount({
 
   // Get the share class info for calculating shares amount to receive
   const shareClass = pool?.shareClasses.find((asset) => asset.shareClass.pool.chainId === investmentCurrencyChainId)
-  const navPerShare = shareClass?.details.pricePerShare
+  const pricePerShare = shareClass?.details.pricePerShare
 
   // Check if the user has the necessary investment currency to invest
   const hasInvestmentCurrency = portfolioCurrency?.chainId === vaultDetails?.investmentCurrency?.chainId
@@ -71,15 +71,15 @@ export function InvestAmount({
   // Calculate and update amount to receive based on user input on amount to invest
   const calculateReceiveAmount = useCallback(
     (inputStringValue: string, investInputAmount?: Balance) => {
-      if (!inputStringValue || inputStringValue === '0' || !investInputAmount || !navPerShare) return
+      if (!inputStringValue || inputStringValue === '0' || !investInputAmount || !pricePerShare) return
 
       const calculatedReceiveAmount = formatBalanceToString(
-        investInputAmount.mul(navPerShare),
+        investInputAmount.mul(pricePerShare),
         investInputAmount.decimals
       )
       setValue('receiveAmount', calculatedReceiveAmount)
     },
-    [navPerShare]
+    [pricePerShare]
   )
 
   const debouncedCalculateReceiveAmount = useMemo(() => debounce(calculateReceiveAmount, 600), [calculateReceiveAmount])
@@ -90,9 +90,12 @@ export function InvestAmount({
   }, [portfolioBalance])
 
   const setMaxInvestAmount = useCallback(() => {
-    if (!portfolioBalance || !maxInvestAmount || !navPerShare) return
+    if (!portfolioBalance || !maxInvestAmount || !pricePerShare) return
     setValue('investAmount', maxInvestAmount)
-    const calculatedReceiveAmount = formatBalanceToString(portfolioBalance.mul(navPerShare), portfolioBalance.decimals)
+    const calculatedReceiveAmount = formatBalanceToString(
+      portfolioBalance.mul(pricePerShare),
+      portfolioBalance.decimals
+    )
     setValue('receiveAmount', calculatedReceiveAmount)
   }, [maxInvestAmount])
 
@@ -147,8 +150,8 @@ export function InvestAmount({
           </Text>
           <BalanceInput
             name="receiveAmount"
-            decimals={navPerShare?.decimals}
-            displayDecimals={navPerShare?.decimals}
+            decimals={pricePerShare?.decimals}
+            displayDecimals={pricePerShare?.decimals}
             placeholder="0.00"
             disabled
             inputGroupProps={{
