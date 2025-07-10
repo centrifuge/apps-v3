@@ -1,27 +1,24 @@
 import { Balance } from '@centrifuge/sdk'
-import { formatBalanceToString } from '@centrifuge/shared'
+import { formatBalanceToString, ShareClassWithDetails } from '@centrifuge/shared'
+import { usePendingAmounts } from '@centrifuge/shared/src/hooks/useShareClass'
 import { Button, Card } from '@centrifuge/ui'
 import { Flex, Heading, Separator, Stack } from '@chakra-ui/react'
+import { useMemo } from 'react'
 import { useNavigate, useParams } from 'react-router'
 
 export function Orders({
   title,
-  pendingBalances,
+  shareClass,
   isInvestment,
 }: {
   title: string
-  pendingBalances: Balance[]
+  shareClass: ShareClassWithDetails
   isInvestment?: boolean
 }) {
+  const { data: pendingAmounts } = usePendingAmounts(shareClass.shareClass)
   const navigate = useNavigate()
   const params = useParams()
   const poolId = params.poolId
-
-  // TODO: might not be right because of the decimals, where decimals should come from?
-  const totalPending =
-    pendingBalances.length > 0
-      ? pendingBalances.reduce((acc, balance) => acc.add(balance), new Balance(0, pendingBalances[0].decimals))
-      : new Balance(0, 18)
 
   const findRoute = (isApprove: boolean) => {
     const defaultRoute = `/orders/${poolId}/approve`
@@ -39,6 +36,19 @@ export function Orders({
     navigate(route)
   }
 
+  // TODO: fix decimals, should come from sdk
+  const pendingAmount = useMemo(() => {
+    return pendingAmounts
+      ?.map((p) => (isInvestment ? p.pendingDeposit : p.pendingRedeem))
+      .reduce((acc, curr) => acc.add(curr), new Balance(0, 18))
+  }, [pendingAmounts, isInvestment])
+
+  const approvedAmount = useMemo(() => {
+    return pendingAmounts
+      ?.map((p) => (isInvestment ? p.approvedDeposit : p.approvedRedeem))
+      .reduce((acc, curr) => acc.add(curr), new Balance(0, 18))
+  }, [pendingAmounts, isInvestment])
+
   return (
     <Card>
       <Heading size="sm">{title}</Heading>
@@ -46,16 +56,19 @@ export function Orders({
       <Flex mt={2} justify="space-between" alignItems="center">
         <Stack gap={0}>
           <Heading size="xs">{isInvestment ? 'Pending investments' : 'Pending redemptions'}</Heading>
-          <Heading size="2xl">{formatBalanceToString(totalPending, 2)} USDC</Heading>
+          <Heading size="2xl">
+            {formatBalanceToString(pendingAmount ?? 0, 2)} {shareClass?.details?.symbol}
+          </Heading>
         </Stack>
         <Button label="Approve" onClick={() => findRoute(true)} colorPalette="gray" size="sm" width="120px" />
       </Flex>
       <Separator mt={4} mb={4} />
-      {/* TODO: NEED INDEXER ONCE SDK HAS BEEN UPDATED TO RETRIEVE PREVIOUSLY APPROVED AMOUNTS */}
       <Flex mt={2} justify="space-between" alignItems="center">
         <Stack gap={0}>
           <Heading size="xs">{isInvestment ? 'Approved investments' : 'Approved redemptions'}</Heading>
-          <Heading size="2xl">{0} USDC</Heading>
+          <Heading size="2xl">
+            {formatBalanceToString(approvedAmount ?? 0, 2)} {shareClass?.details?.symbol}
+          </Heading>
         </Stack>
         <Button
           label={isInvestment ? 'Issue' : 'Revoke'}

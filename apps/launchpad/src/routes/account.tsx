@@ -10,7 +10,7 @@ import { usePoolProvider } from '@contexts/PoolProvider'
 export default function Account() {
   const navigate = useNavigate()
   const { poolId } = useParams()
-  const { shareClass, vaultsDetails, investmentsPerVaults } = usePoolProvider()
+  const { shareClass } = usePoolProvider()
   const shareClassId = shareClass?.shareClass?.id.raw ?? ''
 
   const totalNav = useMemo(() => {
@@ -29,13 +29,7 @@ export default function Account() {
 
         <Button label="Update NAV" onClick={() => navigate(`/nav/${shareClassId}/${poolId}`)} size="sm" width="150px" />
       </Flex>
-      {shareClass && (
-        <AccountPage
-          vaultsDetails={vaultsDetails ?? []}
-          investmentsPerVaults={investmentsPerVaults ?? []}
-          sc={shareClass}
-        />
-      )}
+      {shareClass && <AccountPage sc={shareClass} />}
     </Box>
   )
 }

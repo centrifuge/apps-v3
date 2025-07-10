@@ -12,7 +12,7 @@ export function useHoldings(shareClass: ShareClass) {
   return useObservable(holdings$)
 }
 
-export function usePendingAmounts(shareClass: ShareClass) {
+export const usePendingAmounts = (shareClass: ShareClass) => {
   const pendingAmounts$ = useMemo(() => shareClass?.pendingAmounts(), [shareClass])
   return useObservable(pendingAmounts$)
 }

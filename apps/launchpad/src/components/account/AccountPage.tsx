@@ -1,51 +1,27 @@
 import { Balance } from '@centrifuge/sdk'
-import { Button, Card, NetworkIcon } from '@centrifuge/ui'
+import { Button, Card, Loader, NetworkIcon } from '@centrifuge/ui'
 import { Box, Flex, Grid, Heading, Separator, Stack, Text } from '@chakra-ui/react'
 import { useMemo } from 'react'
-import { formatBalanceToString, useNavPerNetwork, useObservable } from '@centrifuge/shared'
+import { formatBalanceToString, ShareClassWithDetails, useNavPerNetwork } from '@centrifuge/shared'
 import { FaRegChartBar } from 'react-icons/fa'
 import { Orders } from './Orders'
 import { PoolHoldings } from './PoolHoldings'
 import { useNavigate, useParams } from 'react-router'
 
-const calculateNav = (pricePerShare: Balance, numberOfShares: Balance) => {
-  return pricePerShare.mul(numberOfShares)
-}
-
-export function AccountPage({
-  vaultsDetails,
-  investmentsPerVaults,
-  sc,
-}: {
-  // TODO: types
-  vaultsDetails: any[]
-  investmentsPerVaults: any[]
-  sc: any
-}) {
+export function AccountPage({ sc }: { sc: ShareClassWithDetails }) {
   const navigate = useNavigate()
   const { poolId } = useParams()
   const { data: navPerNetwork, isLoading } = useNavPerNetwork(sc.shareClass)
 
   const amounts = useMemo(() => {
     return {
-      totalNav: calculateNav(sc?.details.pricePerShare, sc.details.totalIssuance) ?? 0,
+      totalNav: sc?.details.pricePerShare.mul(sc.details.totalIssuance) ?? 0,
       totalNavPerShare: sc?.details.pricePerShare ?? 0,
       totalIssuance: sc?.details.totalIssuance ?? 0,
     }
   }, [sc])
 
-  console.log(amounts)
-
-  const pendingInvestments = useMemo(
-    () => investmentsPerVaults.map((investment) => investment.pendingInvestCurrency),
-    [investmentsPerVaults]
-  )
-  const pendingRedemptions = useMemo(
-    () => investmentsPerVaults.map((investment) => investment.pendingRedeemShares),
-    [investmentsPerVaults]
-  )
-
-  if (isLoading) return <p>Loading....</p>
+  if (isLoading) return <Loader />
 
   return (
     <Box mb={8}>
@@ -90,7 +66,6 @@ export function AccountPage({
             </Box>
           </Stack>
         </Card>
-        {/* TODO: Add chart */}
         <Card>
           <Flex align="center" gap={2} margin="auto">
             <Text>Coming soon</Text>
@@ -101,8 +76,8 @@ export function AccountPage({
       <Stack mt={8} gap={2}>
         <Heading size="sm">Orders</Heading>
         <Grid templateColumns="repeat(2, 1fr)" gap={4}>
-          <Orders title="Investments" pendingBalances={pendingInvestments} isInvestment />
-          <Orders title="Redemptions" pendingBalances={pendingRedemptions} />
+          <Orders title="Investments" shareClass={sc} isInvestment />
+          <Orders title="Redemptions" shareClass={sc} />
         </Grid>
       </Stack>
       {/* TODO: ADD POOL HOLDINGS ONCE SDK HAS BEEN UPDATED TO RETRIEVE POOL HOLDINGS */}
