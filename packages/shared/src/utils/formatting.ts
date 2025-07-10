@@ -94,9 +94,11 @@ export function formatBigintToString(bigInt: bigint, bigintDecimals: number, for
 }
 
 export function formatBalanceToString(amount: Balance, precision = 0) {
-  if (!(typeof amount === 'object' && 'decimals' in amount)) return null
+  if (!(typeof amount === 'object' && 'decimals' in amount)) return ''
+  const decimalValue = new Decimal(amount.toFloat())
+  const truncatedValue = decimalValue.toDecimalPlaces(precision, Decimal.ROUND_DOWN)
 
-  return amount.toFloat().toFixed(precision)
+  return truncatedValue.toString()
 }
 
 export function ipfsToHttp(uri: string, gateway: string | string[] = 'https://ipfs.io'): string {
