@@ -139,8 +139,6 @@ importers:
         specifier: ^5.1.4
         version: 5.1.4(typescript@5.8.3)(vite@6.3.5(@types/node@22.14.1)(jiti@2.4.2)(terser@5.39.0))
 
-  apps/app: {}
-
   apps/functions:
     dependencies:
       h3:
