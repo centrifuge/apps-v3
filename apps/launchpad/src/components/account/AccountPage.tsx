@@ -46,8 +46,6 @@ export function AccountPage({ sc, poolDetails }: { sc: ShareClassWithDetails; po
     }
   }, [totalNav, totalIssuance, totalNavPerShare])
 
-  console.log(navPerNetwork)
-
   return (
     <Box mb={8}>
       <Grid templateColumns="repeat(2, 1fr)" gap={4} mt={4}>

@@ -1,15 +1,12 @@
-import { useEffect, useMemo } from 'react'
 import z from 'zod'
-import { Button, NetworkIcon, Checkbox, Card } from '@centrifuge/ui'
+import { useEffect, useMemo } from 'react'
+import { Button, NetworkIcon, Checkbox, Card, Loader } from '@centrifuge/ui'
 import { Container, Grid, Heading, Box, Stack, Flex } from '@chakra-ui/react'
 import { usePoolProvider } from '@contexts/PoolProvider'
 import { networkToName } from '@centrifuge/shared'
 import { Form, useForm } from '@centrifuge/forms'
 import { SectionWithCheckbox, SectionWithBalanceInput } from './Sections'
 import { usePendingAmounts } from '@centrifuge/shared/src/hooks/useShareClass'
-
-/// TODO: WE NEED TO UPDATE TO USE THE SHARE CLASS VALUES AND NOT THE VAULT
-// wait for sdk
 
 const schema = z.object({
   selectedVaults: z.array(z.number()),
@@ -21,22 +18,19 @@ export const ApproveButton = ({ disabled }: { disabled: boolean }) => {
 }
 
 export default function Approve() {
-  const { isLoading, investmentsPerVaults, shareClass } = usePoolProvider()
-  const scPendingAmounts = usePendingAmounts(shareClass?.shareClass)
-  console.log(scPendingAmounts)
+  const { isLoading, shareClass } = usePoolProvider()
+  const { data: pendingAmounts } = usePendingAmounts(shareClass?.shareClass)
 
   const investments = useMemo(() => {
-    return investmentsPerVaults?.map((investment: any, index: number) => {
+    return pendingAmounts?.map((investment, index) => {
       return {
         ...investment,
-        chainId: investment.investmentCurrency.chainId,
-        id: `${investment.investmentCurrency.chainId}-${index}`,
-        pendingInvestCurrency: investment.pendingInvestCurrency,
-        currency: investment.investmentCurrency.symbol,
-        decimals: investment.investmentCurrency.decimals,
+        chainId: investment.chainId,
+        id: `${investment.chainId}-${index}`,
+        balance: investment.pendingDeposit,
       }
     })
-  }, [investmentsPerVaults])
+  }, [pendingAmounts])
 
   useEffect(() => setValue('selectedVaults', []), [])
   useEffect(() => {
@@ -48,13 +42,15 @@ export default function Approve() {
     }
   }, [investments])
 
-  // TODO: add correct values when available on sdk
-  // should be the sum of all investments for all the vaults
+  const approvedInvestments = useMemo(() => {
+    return pendingAmounts?.map((p) => p.approvedDeposit).reduce((acc, curr) => acc + curr.toFloat(), 0)
+  }, [pendingAmounts])
+
   const sections = [
     {
       title: 'Approved investments',
-      value: 0,
-      currency: 'USDC',
+      value: approvedInvestments ?? 0,
+      currency: shareClass?.details.symbol ?? 'USDC',
       decimals: 2,
     },
     {
@@ -95,17 +91,15 @@ export default function Approve() {
   const onMulticallCheckedChange = (vault: any) => {}
 
   if (isLoading) {
-    return <div>Loading...</div>
+    return <Loader />
   }
 
-  if (investments.length === 0) {
-    return <div>No investments found</div>
-  }
+  if (!pendingAmounts?.length) return null
 
   return (
     <Container mt={8}>
       <Form form={form}>
-        <Grid templateColumns="1fr 160px" gap={4}>
+        <Grid templateColumns="1fr 160px" gap={4} alignItems="center">
           <Heading>Approve investments</Heading>
           <ApproveButton disabled={selectedVaults.length === 0} />
           <Box gridColumn="1 / -1" mt={4}>
@@ -127,8 +121,6 @@ export default function Approve() {
               </Flex>
               <SectionWithCheckbox
                 title={`investments.${index}`}
-                decimals={investment.decimals}
-                currency={investment.currency}
                 checkboxLabel="Approve and issue"
                 label="Approve investments"
                 onCheckedChange={() => onMulticallCheckedChange(investment)}

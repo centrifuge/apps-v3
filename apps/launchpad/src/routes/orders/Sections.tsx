@@ -1,4 +1,5 @@
 import { BalanceInput } from '@centrifuge/forms'
+import { Balance } from '@centrifuge/sdk'
 import { Card, Checkbox } from '@centrifuge/ui'
 import { Box, Grid } from '@chakra-ui/react'
 
@@ -15,7 +16,7 @@ export const SectionWithBalanceInput = ({
           decimals={section.decimals}
           placeholder="0.00"
           inputGroupProps={{
-            endAddon: 'USD',
+            endAddon: section.currency,
           }}
           label={section.title}
           disabled
