@@ -1,11 +1,11 @@
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from '@centrifuge/ui'
 import { Box, Container, Flex, Heading, Text } from '@chakra-ui/react'
-import { useParams } from 'react-router'
-import { useCentrifugeTransaction, usePool } from '@centrifuge/shared'
-import { HexString, PoolId } from '@centrifuge/sdk'
+import { useAddress, useCentrifugeTransaction, useIsPoolManager } from '@centrifuge/shared'
+import { HexString } from '@centrifuge/sdk'
 import HubManagers from '@components/settings/HubManagers'
 import SpokeManagers from '@components/settings/SpokeManagers'
+import { usePoolProvider } from '@contexts/PoolProvider'
 
 export const handle = {
   hasSettings: false,
@@ -17,17 +17,7 @@ export const SaveChangesButton = ({ onSubmit, isDisabled }: { onSubmit: () => vo
 }
 
 export default function PoolAccess() {
-  const { poolId } = useParams()
-
-  if (!poolId) return null
-
-  const memoizedPoolId = useMemo(() => {
-    return poolId ? new PoolId(poolId) : undefined
-  }, [poolId])
-
-  if (!memoizedPoolId) return null
-
-  const { data: pool } = usePool(memoizedPoolId)
+  const { pool } = usePoolProvider()
 
   // TODO:
   // Set initial values from SDK when functions are available
@@ -37,6 +27,8 @@ export default function PoolAccess() {
   const [currentSpokeManagers, setCurrentSpokeManagers] = useState<{ address: HexString; chainId: number }[]>([])
   const { execute } = useCentrifugeTransaction()
   const [isDisabled, setIsDisabled] = useState(true)
+  const { address } = useAddress()
+  const isPoolManager = useIsPoolManager(pool?.id, address)
 
   useEffect(() => {
     const hubManagers = buildHubPayload()
@@ -49,6 +41,9 @@ export default function PoolAccess() {
     }
   }, [currentHubManagers, currentSpokeManagers])
 
+  if (!pool) return null
+
+  // TODO: Check if address is not already a hub manager (wait for SDK part first)
   const addHubManager = (address: HexString) => {
     if (!address.trim()) return
     const validAddress = address.toLowerCase() as HexString
@@ -62,6 +57,7 @@ export default function PoolAccess() {
     setCurrentHubManagers((prev) => prev.filter((m) => m !== validAddress))
   }
 
+  // TODO: Check if address is not already a spoke manager (wait for SDK part first)
   const addSpokeManager = ({ address, chainId }: { address: HexString; chainId: number }) => {
     if (!address.trim()) return
     const validAddress = address.toLowerCase() as HexString
@@ -80,7 +76,7 @@ export default function PoolAccess() {
     setCurrentSpokeManagers((prev) => prev.filter((m) => m.address !== validAddress && m.chainId !== chainId))
   }
 
-  const buildHubPayload = () => {
+  function buildHubPayload() {
     const removed = initialHubManagers
       .filter((address) => !currentHubManagers.includes(address))
       .map((address) => ({ address, canManage: false }))
@@ -92,7 +88,7 @@ export default function PoolAccess() {
     return [...added, ...removed]
   }
 
-  const buildSpokePayload = () => {
+  function buildSpokePayload() {
     const removed = initialSpokeManagers
       .filter(
         (initialManager) =>
@@ -135,7 +131,7 @@ export default function PoolAccess() {
     <Container mt={8}>
       <Flex justifyContent="space-between" alignItems="center">
         <Heading size="lg">Pool acccess</Heading>
-        <SaveChangesButton isDisabled={isDisabled} onSubmit={handleSubmit} />
+        <SaveChangesButton isDisabled={isDisabled || !isPoolManager} onSubmit={handleSubmit} />
       </Flex>
       <Box mt={8}>
         <Text fontSize="sm">Pool managers *</Text>
@@ -146,7 +142,6 @@ export default function PoolAccess() {
         />
         <SpokeManagers
           currentSpokeManagers={currentSpokeManagers}
-          poolId={poolId}
           addSpokeManager={addSpokeManager}
           removeSpokeManager={removeSpokeManager}
         />

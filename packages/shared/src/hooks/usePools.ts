@@ -85,7 +85,7 @@ export function usePoolNetworks(poolId: PoolId) {
   return useObservable(vaults$)
 }
 
-export function useIsPoolManager(poolId: PoolId, address: HexString) {
+export function useIsPoolManager(poolId?: PoolId, address?: HexString) {
   const centrifuge = useCentrifuge()
 
   const isManager$ = useMemo(() => {
@@ -93,13 +93,10 @@ export function useIsPoolManager(poolId: PoolId, address: HexString) {
     return centrifuge.pool(poolId).pipe(switchMap((pool) => pool.isPoolManager(address)))
   }, [centrifuge, poolId, address])
 
-  return useObservable(isManager$)
+  return useObservable(isManager$).data
 }
 
-export function useIsBalanceSheetManager(
-  poolId: PoolId,
-  { address, chainId }: { address: HexString; chainId: number }
-) {
+export function useIsBalanceSheetManager(poolId?: PoolId, address?: HexString, chainId?: number) {
   const centrifuge = useCentrifuge()
 
   const isBalanceSheetManager$ = useMemo(() => {
@@ -107,5 +104,5 @@ export function useIsBalanceSheetManager(
     return centrifuge.pool(poolId).pipe(switchMap((pool) => pool.isBalanceSheetManager(chainId, address)))
   }, [centrifuge, poolId, address])
 
-  return useObservable(isBalanceSheetManager$)
+  return useObservable(isBalanceSheetManager$).data
 }

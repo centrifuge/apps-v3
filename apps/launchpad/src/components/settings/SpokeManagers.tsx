@@ -1,42 +1,36 @@
 import { useMemo, useState } from 'react'
 import { AddressInput, capitalizeNetworkName, Card, NetworkIcon } from '@centrifuge/ui'
 import { Field, Flex, Grid, Heading, ListCollection, Select, Stack, createListCollection } from '@chakra-ui/react'
-import { usePoolNetworks } from '@centrifuge/shared'
-import { HexString, PoolId } from '@centrifuge/sdk'
+import { HexString, PoolNetwork } from '@centrifuge/sdk'
+import { usePoolProvider } from '@contexts/PoolProvider'
 
 type SpokeManagerProps = {
   currentSpokeManagers: { address: HexString; chainId: number }[]
-  poolId: string
   addSpokeManager: ({ address, chainId }: { address: HexString; chainId: number }) => void
   removeSpokeManager: ({ address, chainId }: { address: HexString; chainId: number }) => void
 }
 
 export default function SpokeManagers({
   currentSpokeManagers,
-  poolId,
   addSpokeManager,
   removeSpokeManager,
 }: SpokeManagerProps) {
-  const memoizedPoolId = useMemo(() => {
-    return new PoolId(poolId)
-  }, [poolId])
-
-  const { data, isLoading } = usePoolNetworks(memoizedPoolId)
+  const { networks } = usePoolProvider()
 
   const chains = useMemo(() => {
-    if (isLoading || !data) return createListCollection({ items: [] })
+    if (!networks) return createListCollection({ items: [] })
     return createListCollection({
-      items: data.map((chain) => ({
+      items: networks.map((chain: PoolNetwork) => ({
         label: capitalizeNetworkName(chain.chainId),
         value: chain.chainId,
       })),
     })
-  }, [data, isLoading])
+  }, [networks])
 
   const [selectedChain, setSelectedChain] = useState<string[]>([])
   const [isValid, setIsValid] = useState(true)
 
-  if (isLoading || !isValidChains(chains)) {
+  if (!isValidChains(chains)) {
     return (
       <Card mt={8}>
         <Stack>
@@ -84,6 +78,7 @@ export default function SpokeManagers({
                   borderTopRightRadius={0}
                   borderBottomRightRadius={0}
                 >
+                  {/* TODO: Use Select component from our shared package, needs a bit of refactoring first */}
                   <Select.HiddenSelect />
                   <Select.Control>
                     <Select.Trigger>
@@ -116,7 +111,7 @@ export default function SpokeManagers({
 }
 
 const isValidChains = (
-  chains: ListCollection<never> | ListCollection<{ label: string; value: number }>
+  chains: ListCollection<never> | ListCollection<{ label: string; value: number }> | ListCollection<unknown>
 ): chains is ListCollection<{ label: string; value: number }> => {
   return chains.items.length > 0
 }

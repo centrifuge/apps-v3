@@ -20,9 +20,11 @@ export const AddressInputLabel = ({
   address,
   chainId,
   onDelete,
+  disabled = false,
 }: {
   address: HexString
   chainId?: number
+  disabled?: boolean
   onDelete: ({ address, chainId }: { address: HexString; chainId?: number }) => void
 }) => {
   if (!isAddress(address)) return null
@@ -47,6 +49,7 @@ export const AddressInputLabel = ({
         <Text fontSize="sm">{networkName}</Text>
       </Flex>
       <IconButton
+        disabled={disabled}
         size="sm"
         backgroundColor="white"
         color="text-disabled"
@@ -117,7 +120,12 @@ export const AddressInput = ({ onAdd, onDelete, addresses, label = 'Wallet Addre
 
         {addresses?.length
           ? addresses.map((address) => (
-              <AddressInputLabel address={address.address} onDelete={handleDelete} chainId={address.chainId} />
+              <AddressInputLabel
+                disabled={addresses.length <= 1}
+                address={address.address}
+                onDelete={handleDelete}
+                chainId={address.chainId}
+              />
             ))
           : null}
       </Group>
