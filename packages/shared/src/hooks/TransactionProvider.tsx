@@ -7,9 +7,9 @@ export type Transaction = {
   title: string
   status: TransactionStatus
   hash?: string
-  result?: any
+  result?: { [key: string]: unknown }
   failedReason?: string
-  error?: any
+  error?: { [key: string]: unknown }
   dismissed?: boolean
 }
 
@@ -20,7 +20,14 @@ type TransactionsContextType = {
   updateTransaction: (id: string, update: Partial<Transaction> | ((prev: Transaction) => Partial<Transaction>)) => void
 }
 
-const TransactionsContext = createContext<TransactionsContextType>(null as any)
+const defaultContextValues = {
+  transactions: [],
+  addTransaction: () => {},
+  addOrUpdateTransaction: () => {},
+  updateTransaction: () => {},
+}
+
+const TransactionsContext = createContext<TransactionsContextType>(defaultContextValues)
 
 type TransactionProviderProps = {
   children: ReactNode
@@ -79,7 +86,7 @@ export function TransactionProvider({ children }: TransactionProviderProps) {
 
 export function useTransactions() {
   const ctx = useContext(TransactionsContext)
-  if (!ctx) throw new Error('useTransactions must be used within Provider')
+  if (!ctx || ctx === defaultContextValues) throw new Error('useTransactions must be used within TransactionProvider')
   return ctx
 }
 
