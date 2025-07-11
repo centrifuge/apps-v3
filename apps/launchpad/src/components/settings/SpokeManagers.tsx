@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { AddressInput, capitalizeNetworkName, Card, NetworkIcon } from '@centrifuge/ui'
-import { Flex, Grid, Heading, ListCollection, Select, Stack, createListCollection } from '@chakra-ui/react'
+import { Field, Flex, Grid, Heading, ListCollection, Select, Stack, createListCollection } from '@chakra-ui/react'
 import { usePoolNetworks } from '@centrifuge/shared'
 import { HexString, PoolId } from '@centrifuge/sdk'
 
@@ -34,6 +34,7 @@ export default function SpokeManagers({
   }, [data, isLoading])
 
   const [selectedChain, setSelectedChain] = useState<string[]>([])
+  const [isValid, setIsValid] = useState(true)
 
   if (isLoading || !isValidChains(chains)) {
     return (
@@ -49,6 +50,11 @@ export default function SpokeManagers({
   }
 
   const handleAdd = (address: HexString) => {
+    if (!selectedChain[0]) {
+      setIsValid(false)
+      return
+    }
+    setIsValid(true)
     addSpokeManager({ address, chainId: Number(selectedChain[0]) })
   }
 
@@ -67,37 +73,40 @@ export default function SpokeManagers({
           <Stack>
             <Heading size="sm">Spoke chain*</Heading>
             <Flex alignItems="center" gap={2} p={1}>
-              <Select.Root
-                value={selectedChain}
-                onValueChange={(e) => setSelectedChain(e.value)}
-                collection={chains}
-                size="sm"
-                background="border-secondary"
-                borderRadius={10}
-                borderTopRightRadius={0}
-                borderBottomRightRadius={0}
-              >
-                <Select.HiddenSelect />
-                <Select.Control>
-                  <Select.Trigger>
-                    <Select.ValueText placeholder="Please select..." />
-                  </Select.Trigger>
-                  <Select.IndicatorGroup>
-                    <Select.Indicator />
-                  </Select.IndicatorGroup>
-                </Select.Control>
-                <Select.Positioner>
-                  <Select.Content>
-                    {chains.items.map((chain) => (
-                      <Select.Item item={chain} key={chain.value} justifyContent="flex-start">
-                        <NetworkIcon networkId={chain.value} />
-                        {chain.label}
-                        <Select.ItemIndicator />
-                      </Select.Item>
-                    ))}
-                  </Select.Content>
-                </Select.Positioner>
-              </Select.Root>
+              <Field.Root invalid={!isValid}>
+                <Select.Root
+                  value={selectedChain}
+                  onValueChange={(e) => setSelectedChain(e.value)}
+                  collection={chains}
+                  size="sm"
+                  background="border-secondary"
+                  borderRadius={10}
+                  borderTopRightRadius={0}
+                  borderBottomRightRadius={0}
+                >
+                  <Select.HiddenSelect />
+                  <Select.Control>
+                    <Select.Trigger>
+                      <Select.ValueText placeholder="Please select..." />
+                    </Select.Trigger>
+                    <Select.IndicatorGroup>
+                      <Select.Indicator />
+                    </Select.IndicatorGroup>
+                  </Select.Control>
+                  <Select.Positioner>
+                    <Select.Content>
+                      {chains.items.map((chain) => (
+                        <Select.Item item={chain} key={chain.value} justifyContent="flex-start">
+                          <NetworkIcon networkId={chain.value} />
+                          {chain.label}
+                          <Select.ItemIndicator />
+                        </Select.Item>
+                      ))}
+                    </Select.Content>
+                  </Select.Positioner>
+                </Select.Root>
+                {!isValid && <Field.ErrorText>Please select chain</Field.ErrorText>}
+              </Field.Root>
             </Flex>
           </Stack>
         </Grid>

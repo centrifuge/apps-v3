@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { Button } from '@centrifuge/ui'
 import { Box, Container, Flex, Heading, Text } from '@chakra-ui/react'
 import { useParams } from 'react-router'
@@ -12,8 +12,8 @@ export const handle = {
   hasTabs: true,
 }
 
-export const SaveChangesButton = ({ onSubmit }: { onSubmit: () => void }) => {
-  return <Button onClick={onSubmit} label="Save changes" size="sm" width={140} />
+export const SaveChangesButton = ({ onSubmit, isDisabled }: { onSubmit: () => void; isDisabled: boolean }) => {
+  return <Button disabled={isDisabled} onClick={onSubmit} label="Save changes" size="sm" width={140} />
 }
 
 export default function PoolAccess() {
@@ -29,20 +29,25 @@ export default function PoolAccess() {
 
   const { data: pool } = usePool(memoizedPoolId)
 
-  const [initialHubManagers] = useState<HexString[]>(['0x423420ae467df6e90291fd0252c0a8a637c1e03f'])
-  const [currentHubManagers, setCurrentHubManagers] = useState<HexString[]>([
-    '0x423420ae467df6e90291fd0252c0a8a637c1e03f',
-  ])
-  const [initialSpokeManagers] = useState<{ address: HexString; chainId: number }[]>([
-    { address: '0x423420ae467df6e90291fd0252c0a8a637c1e03f', chainId: 1 },
-  ])
-  const [currentSpokeManagers, setCurrentSpokeManagers] = useState<{ address: HexString; chainId: number }[]>([
-    { address: '0x423420ae467df6e90291fd0252c0a8a637c1e03f', chainId: 1 },
-  ])
-  const { execute } = useCentrifugeTransaction()
-
   // TODO:
   // Set initial values from SDK when functions are available
+  const [initialHubManagers] = useState<HexString[]>([])
+  const [currentHubManagers, setCurrentHubManagers] = useState<HexString[]>([])
+  const [initialSpokeManagers] = useState<{ address: HexString; chainId: number }[]>([])
+  const [currentSpokeManagers, setCurrentSpokeManagers] = useState<{ address: HexString; chainId: number }[]>([])
+  const { execute } = useCentrifugeTransaction()
+  const [isDisabled, setIsDisabled] = useState(true)
+
+  useEffect(() => {
+    const hubManagers = buildHubPayload()
+    const spokeManagers = buildSpokePayload()
+
+    if (hubManagers.length !== 0 || spokeManagers.length !== 0) {
+      setIsDisabled(false)
+    } else {
+      setIsDisabled(true)
+    }
+  }, [currentHubManagers, currentSpokeManagers])
 
   const addHubManager = (address: HexString) => {
     if (!address.trim()) return
@@ -118,13 +123,11 @@ export default function PoolAccess() {
     if (!pool) return
 
     if (hubPayload.length !== 0) {
-      const hubResult = await execute(pool.updatePoolManagers(hubPayload))
-      console.log({ hubResult })
+      await execute(pool.updatePoolManagers(hubPayload))
     }
 
     if (spokePayload.length !== 0) {
-      const spokeResult = await execute(pool.updateBalanceSheetManagers(spokePayload))
-      console.log({ spokeResult })
+      await execute(pool.updateBalanceSheetManagers(spokePayload))
     }
   }
 
@@ -132,7 +135,7 @@ export default function PoolAccess() {
     <Container mt={8}>
       <Flex justifyContent="space-between" alignItems="center">
         <Heading size="lg">Pool acccess</Heading>
-        <SaveChangesButton onSubmit={handleSubmit} />
+        <SaveChangesButton isDisabled={isDisabled} onSubmit={handleSubmit} />
       </Flex>
       <Box mt={8}>
         <Text fontSize="sm">Pool managers *</Text>

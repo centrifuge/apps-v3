@@ -1,4 +1,4 @@
-import { PoolId } from '@centrifuge/sdk'
+import { HexString, PoolId } from '@centrifuge/sdk'
 import { useMemo } from 'react'
 import { combineLatest, map, of, switchMap } from 'rxjs'
 import { Address } from 'viem'
@@ -83,4 +83,29 @@ export function usePoolNetworks(poolId: PoolId) {
   }, [poolId, centrifuge])
 
   return useObservable(vaults$)
+}
+
+export function useIsPoolManager(poolId: PoolId, address: HexString) {
+  const centrifuge = useCentrifuge()
+
+  const isManager$ = useMemo(() => {
+    if (!poolId || !address) return of(false)
+    return centrifuge.pool(poolId).pipe(switchMap((pool) => pool.isPoolManager(address)))
+  }, [centrifuge, poolId, address])
+
+  return useObservable(isManager$)
+}
+
+export function useIsBalanceSheetManager(
+  poolId: PoolId,
+  { address, chainId }: { address: HexString; chainId: number }
+) {
+  const centrifuge = useCentrifuge()
+
+  const isBalanceSheetManager$ = useMemo(() => {
+    if (!poolId || !address || !chainId) return of(false)
+    return centrifuge.pool(poolId).pipe(switchMap((pool) => pool.isBalanceSheetManager(chainId, address)))
+  }, [centrifuge, poolId, address])
+
+  return useObservable(isBalanceSheetManager$)
 }

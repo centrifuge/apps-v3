@@ -1,4 +1,13 @@
-export { usePools, usePool, usePoolDetails, useAllPoolDetails, usePoolNetworks, usePoolsByManager } from './usePools'
+export {
+  usePools,
+  usePool,
+  usePoolDetails,
+  useAllPoolDetails,
+  usePoolNetworks,
+  usePoolsByManager,
+  useIsBalanceSheetManager,
+  useIsPoolManager,
+} from './usePools'
 export { useVaults, useVaultDetails, useVaultsDetails, useInvestment, useInvestmentsPerVaults } from './useVaults'
 export { useInvestor, usePortfolio } from './useInvestor'
 export { CentrifugeProvider, useCentrifuge } from './CentrifugeContext'
