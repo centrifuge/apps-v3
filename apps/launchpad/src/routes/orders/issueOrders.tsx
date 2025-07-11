@@ -5,7 +5,7 @@ import { Form, useForm } from '@centrifuge/forms'
 import { networkToName, useCentrifugeTransaction } from '@centrifuge/shared'
 import { usePendingAmounts } from '@centrifuge/shared/src/hooks/useShareClass'
 import { usePoolProvider } from '@contexts/PoolProvider'
-import { AssetId, Balance } from '@centrifuge/sdk'
+import { AssetId, Balance, Price } from '@centrifuge/sdk'
 import { FormSection } from './FormSection'
 import { z } from 'zod'
 
@@ -42,7 +42,7 @@ export const ApproveButton = ({
 export default function IssueOrders() {
   const { execute, isPending } = useCentrifugeTransaction()
   const { isLoading, shareClass, poolDetails } = usePoolProvider()
-  const { data: pendingAmounts } = usePendingAmounts(shareClass?.shareClass)
+  const { data: pendingAmounts } = usePendingAmounts(shareClass?.shareClass!)
   const pricePerShare = shareClass?.details.pricePerShare.toFloat()
   const poolSymbol = poolDetails?.currency.symbol
   const poolDecimals = poolDetails?.currency.decimals
@@ -65,7 +65,7 @@ export default function IssueOrders() {
         assetId: p.assetId,
         approvedDeposit: p.approvedDeposit,
         // TODO: should the nav per share come from the sdk as the time the investment was approved, right now is showing the current nav per share
-        navPerShare: pricePerShare.toString(),
+        navPerShare: pricePerShare?.toString() ?? '0',
       })) ?? []
     )
   }, [pendingAmounts])
@@ -80,20 +80,22 @@ export default function IssueOrders() {
     onSubmit: (values) => {
       const { selectedAssets, approvedDeposits } = values
 
-      const payload = selectedAssets.map((selectedAssetId) => {
-        const pendingInfo = approvedDeposits.find((p) => p.assetId.equals(selectedAssetId))
+      const payload = selectedAssets
+        .map((selectedAssetId) => {
+          const pendingInfo = approvedDeposits.find((p) => p.assetId.equals(selectedAssetId))
 
-        if (pendingInfo) {
-          return {
-            assetId: selectedAssetId,
-            issuePricePerShare: new Balance(pendingInfo.navPerShare, poolDecimals),
+          if (pendingInfo && poolDecimals) {
+            return {
+              assetId: selectedAssetId,
+              issuePricePerShare: new Price(pendingInfo.navPerShare),
+            }
           }
-        }
-        return null
-      })
+          return null
+        })
+        .filter((item): item is NonNullable<typeof item> => item !== null)
 
-      if (payload.length > 0) {
-        execute(shareClass?.shareClass.approveDepositsAndIssueShares(payload))
+      if (payload.length > 0 && shareClass?.shareClass) {
+        execute(shareClass.shareClass.approveDepositsAndIssueShares(payload))
       }
     },
   })
@@ -155,14 +157,14 @@ export default function IssueOrders() {
                       label: 'Issue with nav per share',
                       subLabel: '(latest)',
                       // Todo each pending amount should return the asset currency details
-                      currency: poolSymbol,
+                      currency: poolSymbol ?? 'USD',
                       decimals: 2,
                     },
                     {
                       fieldType: 'balance' as const,
                       name: `approvedDeposits.${index}.approvedDeposit`,
                       label: 'Issue new shares',
-                      currency: shareClass?.details.symbol,
+                      currency: shareClass?.details.symbol ?? '',
                       decimals: 2,
                       disabled: true,
                     },

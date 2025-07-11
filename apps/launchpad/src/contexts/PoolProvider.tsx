@@ -1,29 +1,30 @@
 import React, { createContext, useContext, useMemo } from 'react'
 import { useChainId } from 'wagmi'
-import { Pool, PoolId } from '@centrifuge/sdk'
+import { Pool, PoolId, PoolNetwork, ShareClass, ShareClassId, Vault } from '@centrifuge/sdk'
 import {
+  PoolDetails,
+  ShareClassWithDetails,
   useInvestmentsPerVaults,
   usePool,
   usePoolDetails,
   usePoolNetworks,
   useVaults,
   useVaultsDetails,
+  VaultDetails,
 } from '@centrifuge/shared'
 import { useParams } from 'react-router'
 
-// TODO: fix types
 interface PoolContextValue {
   pool: Pool | undefined
-  poolDetails: any
-  networks: any
-  network: any
-  shareClass: any
-  scId: any
-  vaults: any
-  vaultsDetails: any
+  poolDetails: PoolDetails | undefined
+  networks: PoolNetwork[] | undefined
+  network: PoolNetwork | undefined
+  shareClass: ShareClassWithDetails | undefined
+  scId: ShareClassId | undefined
+  vaults: Vault[] | undefined
+  vaultsDetails: VaultDetails[] | undefined
   investmentsPerVaults: any
   isLoading: boolean
-  error?: any
 }
 
 const PoolContext = createContext<PoolContextValue | undefined>(undefined)
@@ -43,7 +44,7 @@ export function PoolProvider({ children }: PoolProviderProps) {
   }, [poolId])
 
   const { data: pool } = usePool(memoizedPoolId!)
-  const { data: poolDetails, isLoading: poolLoading, error: poolError } = usePoolDetails(memoizedPoolId!)
+  const { data: poolDetails, isLoading: poolLoading } = usePoolDetails(memoizedPoolId!)
   const { data: networks, isLoading: networksLoading } = usePoolNetworks(poolDetails?.id!)
 
   const network = useMemo(() => {
@@ -72,7 +73,6 @@ export function PoolProvider({ children }: PoolProviderProps) {
     vaultsDetails,
     investmentsPerVaults,
     isLoading,
-    error: poolError,
   }
 
   return <PoolContext.Provider value={contextValue}>{children}</PoolContext.Provider>
