@@ -33,7 +33,7 @@ export interface FormSectionProps {
 
 export const FormSection = ({ fields, templateColumns = '1fr 1fr' }: FormSectionProps) => {
   return (
-    <Grid gridTemplateColumns={templateColumns} gap={6} alignItems="center" mb={4}>
+    <Grid gridTemplateColumns={['1fr', '1fr', templateColumns]} gap={6} alignItems="center" mb={4}>
       {fields.map((field) => {
         if (field.fieldType === 'balance') {
           return (

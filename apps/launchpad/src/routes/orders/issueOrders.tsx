@@ -126,7 +126,7 @@ export default function IssueOrders() {
   if (totalApprovedInvestments === 0 || !pendingAmounts?.length) {
     return (
       <VStack mt={10}>
-        <Text>No investments to approve</Text>
+        <Text>No pending shares to issue</Text>
       </VStack>
     )
   }

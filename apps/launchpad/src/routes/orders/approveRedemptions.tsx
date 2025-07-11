@@ -122,7 +122,7 @@ export default function ApproveRedemptions() {
   if (totalPendingRedeems === 0 || !pendingAmounts?.length) {
     return (
       <VStack mt={10}>
-        <Text>No investments to approve</Text>
+        <Text>No pending redemptions to approve</Text>
       </VStack>
     )
   }
