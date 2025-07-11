@@ -97,7 +97,6 @@ export default function ApproveOrders() {
   const { watch, setValue, getValues } = form
 
   const selectedAssets = watch('selectedAssets')
-  const pendingDeposits = watch('pendingDeposits')
 
   const handleAssetSelection = (assetId: AssetId, isChecked: boolean) => {
     const currentAssets = getValues('selectedAssets')
