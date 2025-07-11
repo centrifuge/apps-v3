@@ -15,6 +15,9 @@ export const inputRecipe = defineRecipe({
     variant: {
       outline: {
         bg: white,
+        _disabled: {
+          bg: 'gray.50',
+        },
       },
     },
     size: {

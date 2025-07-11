@@ -31,13 +31,17 @@ export default function Add() {
         (shareClass: any) => shareClass.details.id.raw === sc.raw
       )
 
+      if (!selectedShareClass) {
+        throw new Error('Share class not found')
+      }
+
       // TODO: valuation contract should come from sdk
       execute(
-        selectedShareClass?.shareClass.createHolding(asset, '0x6Bcb240d3e1f1C4321ECAFFDacB45691DC03bE5D', false, {
-          equity: 123,
-          gain: 123,
-          loss: 123,
-        })
+        selectedShareClass?.shareClass.createHolding(asset, '0x6Bcb240d3e1f1C4321ECAFFDacB45691DC03bE5D', false, [
+          123, // equity
+          123, // gain
+          123, // loss
+        ])
       )
     },
   })
@@ -59,7 +63,7 @@ export default function Add() {
         />
       </Flex>
       <Card>
-        <AddHoldingForm networks={networks} poolDetails={poolDetails} hubChainId={pool?.chainId!} />
+        <AddHoldingForm networks={networks ?? []} poolDetails={poolDetails} hubChainId={pool?.chainId!} />
       </Card>
     </Form>
   )

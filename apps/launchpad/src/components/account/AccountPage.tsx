@@ -2,50 +2,50 @@ import { Balance } from '@centrifuge/sdk'
 import { Button, Card, NetworkIcon } from '@centrifuge/ui'
 import { Box, Flex, Grid, Heading, Separator, Stack, Text } from '@chakra-ui/react'
 import { useMemo } from 'react'
-import { formatBalanceToString, useNavPerNetwork, useObservable } from '@centrifuge/shared'
+import {
+  formatUIBalance,
+  formatBalanceToString,
+  PoolDetails,
+  ShareClassWithDetails,
+  useNavPerNetwork,
+} from '@centrifuge/shared'
 import { FaRegChartBar } from 'react-icons/fa'
 import { Orders } from './Orders'
 import { PoolHoldings } from './PoolHoldings'
 import { useNavigate, useParams } from 'react-router'
 
-const calculateNav = (pricePerShare: Balance, numberOfShares: Balance) => {
-  return pricePerShare.mul(numberOfShares)
-}
-
-export function AccountPage({
-  vaultsDetails,
-  investmentsPerVaults,
-  sc,
-}: {
-  // TODO: types
-  vaultsDetails: any[]
-  investmentsPerVaults: any[]
-  sc: any
-}) {
+export function AccountPage({ sc, poolDetails }: { sc: ShareClassWithDetails; poolDetails: PoolDetails }) {
   const navigate = useNavigate()
   const { poolId } = useParams()
-  const { data: navPerNetwork, isLoading } = useNavPerNetwork(sc.shareClass)
+  const { data: navPerNetwork } = useNavPerNetwork(sc.shareClass)
+  const decimals = poolDetails?.currency.decimals
+  const poolCurrencySymbol = poolDetails?.currency.symbol
+
+  const totalNav = useMemo(() => {
+    return navPerNetwork?.map((network) => network.nav).reduce((acc, curr) => acc.add(curr), new Balance(0, decimals))
+  }, [navPerNetwork])
+
+  const totalIssuance = useMemo(() => {
+    return (
+      navPerNetwork
+        ?.map((network) => network.totalIssuance)
+        .reduce((acc, curr) => acc.add(curr), new Balance(0, decimals)) ?? new Balance(0, decimals)
+    )
+  }, [navPerNetwork])
+
+  const totalNavPerShare = useMemo(() => {
+    return navPerNetwork
+      ?.map((network) => network.pricePerShare)
+      .reduce((acc, curr) => acc.add(curr), new Balance(0, decimals))
+  }, [navPerNetwork])
 
   const amounts = useMemo(() => {
     return {
-      totalNav: calculateNav(sc?.details.pricePerShare, sc.details.totalIssuance) ?? 0,
-      totalNavPerShare: sc?.details.pricePerShare ?? 0,
-      totalIssuance: sc?.details.totalIssuance ?? 0,
+      totalNav: totalNav?.mul(totalIssuance) ?? 0,
+      totalNavPerShare: totalNavPerShare ?? 0,
+      totalIssuance: totalIssuance ?? 0,
     }
-  }, [sc])
-
-  console.log(amounts)
-
-  const pendingInvestments = useMemo(
-    () => investmentsPerVaults.map((investment) => investment.pendingInvestCurrency),
-    [investmentsPerVaults]
-  )
-  const pendingRedemptions = useMemo(
-    () => investmentsPerVaults.map((investment) => investment.pendingRedeemShares),
-    [investmentsPerVaults]
-  )
-
-  if (isLoading) return <p>Loading....</p>
+  }, [totalNav, totalIssuance, totalNavPerShare])
 
   return (
     <Box mb={8}>
@@ -56,7 +56,7 @@ export function AccountPage({
               <Stack gap={0}>
                 <Heading fontSize="xs">NAV</Heading>
                 <Heading size="2xl">
-                  {formatBalanceToString(amounts.totalNav, 2) ?? '0'} {sc?.details.symbol}
+                  {formatUIBalance(amounts.totalNav, { precision: 2 }) ?? '0'} {poolCurrencySymbol}
                 </Heading>
               </Stack>
               <Separator mt={2} mb={2} />
@@ -64,7 +64,7 @@ export function AccountPage({
                 <Flex key={`${network.chainId}-${index}`} align="center" gap={2}>
                   <NetworkIcon networkId={network.chainId} boxSize="20px" />
                   <Text fontSize="sm">
-                    {formatBalanceToString(network.nav, 2) ?? '0'} {sc?.details.symbol}
+                    {formatUIBalance(network.nav, { precision: 2 }) ?? '0'} {poolCurrencySymbol}
                   </Text>
                 </Flex>
               ))}
@@ -74,7 +74,7 @@ export function AccountPage({
                 <Heading fontSize="xs">NAV per share</Heading>
                 <Flex justify="space-between" align="center" width="100%">
                   <Heading size="2xl">
-                    {formatBalanceToString(amounts.totalNavPerShare, 4) ?? '0'} {sc?.details.symbol}
+                    {formatUIBalance(amounts.totalNavPerShare, { precision: 4 }) ?? '0'} {poolCurrencySymbol}
                   </Heading>
                 </Flex>
               </Stack>
@@ -83,14 +83,13 @@ export function AccountPage({
                 <Flex key={`${network.chainId}-${index}`} align="center" gap={2}>
                   <NetworkIcon networkId={network.chainId} boxSize="20px" />
                   <Text fontSize="sm">
-                    {formatBalanceToString(network.pricePerShare, 2) ?? '0'} {sc?.details.symbol}
+                    {formatBalanceToString(network.pricePerShare, 2) ?? '0'} {poolCurrencySymbol}
                   </Text>
                 </Flex>
               ))}
             </Box>
           </Stack>
         </Card>
-        {/* TODO: Add chart */}
         <Card>
           <Flex align="center" gap={2} margin="auto">
             <Text>Coming soon</Text>
@@ -101,8 +100,8 @@ export function AccountPage({
       <Stack mt={8} gap={2}>
         <Heading size="sm">Orders</Heading>
         <Grid templateColumns="repeat(2, 1fr)" gap={4}>
-          <Orders title="Investments" pendingBalances={pendingInvestments} isInvestment />
-          <Orders title="Redemptions" pendingBalances={pendingRedemptions} />
+          <Orders title="Investments" shareClass={sc} isInvestment poolCurrencySymbol={poolCurrencySymbol} />
+          <Orders title="Redemptions" shareClass={sc} poolCurrencySymbol={poolCurrencySymbol} />
         </Grid>
       </Stack>
       {/* TODO: ADD POOL HOLDINGS ONCE SDK HAS BEEN UPDATED TO RETRIEVE POOL HOLDINGS */}

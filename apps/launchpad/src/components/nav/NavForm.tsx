@@ -2,21 +2,9 @@ import { Box, Flex, Grid, GridItem, Text } from '@chakra-ui/react'
 import { BalanceInput, useFormContext } from '@centrifuge/forms'
 import { BalanceDisplay, NetworkIcon } from '@centrifuge/ui'
 import { usePoolProvider } from '@contexts/PoolProvider'
-import { Balance } from '@centrifuge/sdk'
+import { Balance, Price } from '@centrifuge/sdk'
 import { useEffect, useMemo } from 'react'
-
-type Network = 'ethereum' | 'arbitrum' | 'celo' | 'base'
-
-const NETWORK_ID_MAP: Record<number, Network> = {
-  1: 'ethereum', // Ethereum Mainnet
-  11155111: 'ethereum', // Ethereum Sepolia
-  42161: 'arbitrum', // Arbitrum One
-  421614: 'arbitrum', // Arbitrum Sepolia
-  42220: 'celo', // Celo Mainnet
-  44787: 'celo', // Celo Alfajores
-  8453: 'base', // Base Mainnet
-  84532: 'base', // Base Sepolia
-}
+import { networkToName } from '@centrifuge/shared'
 
 interface NavFormProps {
   parsedNewTokenPrice: Balance | 0
@@ -25,10 +13,10 @@ interface NavFormProps {
 export function NavForm({ parsedNewTokenPrice }: NavFormProps) {
   const { network, shareClass } = usePoolProvider()
   const { setValue } = useFormContext()
-  const networkName = useMemo(() => NETWORK_ID_MAP[network?.chainId]?.toUpperCase(), [network])
+  const networkName = useMemo(() => networkToName(network?.chainId ?? 0), [network])
 
-  const navPerShare: Balance = shareClass?.details?.navPerShare ?? 0
-  const totalIssuance: Balance = shareClass?.details?.totalIssuance ?? 0
+  const navPerShare = shareClass?.details?.pricePerShare ?? 0
+  const totalIssuance = shareClass?.details?.totalIssuance ?? 0
   const hasBalances = typeof navPerShare !== 'number' && typeof totalIssuance !== 'number'
 
   const currentNav = useMemo(
@@ -110,7 +98,7 @@ export function NavForm({ parsedNewTokenPrice }: NavFormProps) {
         <Box border="1px solid" borderColor="gray.200" borderRadius="md" p={4}>
           <Flex alignItems="center" justifyContent="space-between">
             <Flex alignItems="center" justifyContent="flex-start">
-              <NetworkIcon networkId={network} />
+              <NetworkIcon networkId={network?.chainId} />
               <Text fontSize="xs" ml={2}>
                 {networkName}
               </Text>
@@ -123,7 +111,7 @@ export function NavForm({ parsedNewTokenPrice }: NavFormProps) {
         <Box border="1px solid" borderColor="gray.200" borderRadius="md" p={4}>
           <Flex alignItems="center" justifyContent="space-between">
             <Flex alignItems="center" justifyContent="flex-start">
-              <NetworkIcon networkId={network} />
+              <NetworkIcon networkId={network?.chainId} />
               <Text fontSize="xs" ml={2}>
                 {networkName}
               </Text>
