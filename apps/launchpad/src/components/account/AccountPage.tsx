@@ -19,6 +19,7 @@ export function AccountPage({ sc, poolDetails }: { sc: ShareClassWithDetails; po
   const { poolId } = useParams()
   const { data: navPerNetwork } = useNavPerNetwork(sc.shareClass)
   const decimals = poolDetails?.currency.decimals
+  const poolCurrencySymbol = poolDetails?.currency.symbol
 
   const totalNav = useMemo(() => {
     return navPerNetwork?.map((network) => network.nav).reduce((acc, curr) => acc.add(curr), new Balance(0, decimals))
@@ -55,7 +56,7 @@ export function AccountPage({ sc, poolDetails }: { sc: ShareClassWithDetails; po
               <Stack gap={0}>
                 <Heading fontSize="xs">NAV</Heading>
                 <Heading size="2xl">
-                  {formatBalance(amounts.totalNav, { precision: 2 }) ?? '0'} {sc?.details.symbol}
+                  {formatBalance(amounts.totalNav, { precision: 2 }) ?? '0'} {poolCurrencySymbol}
                 </Heading>
               </Stack>
               <Separator mt={2} mb={2} />
@@ -63,7 +64,7 @@ export function AccountPage({ sc, poolDetails }: { sc: ShareClassWithDetails; po
                 <Flex key={`${network.chainId}-${index}`} align="center" gap={2}>
                   <NetworkIcon networkId={network.chainId} boxSize="20px" />
                   <Text fontSize="sm">
-                    {formatBalance(network.nav, { precision: 2 }) ?? '0'} {sc?.details.symbol}
+                    {formatBalance(network.nav, { precision: 2 }) ?? '0'} {poolCurrencySymbol}
                   </Text>
                 </Flex>
               ))}
@@ -73,7 +74,7 @@ export function AccountPage({ sc, poolDetails }: { sc: ShareClassWithDetails; po
                 <Heading fontSize="xs">NAV per share</Heading>
                 <Flex justify="space-between" align="center" width="100%">
                   <Heading size="2xl">
-                    {formatBalance(amounts.totalNavPerShare, { precision: 4 }) ?? '0'} {sc?.details.symbol}
+                    {formatBalance(amounts.totalNavPerShare, { precision: 4 }) ?? '0'} {poolCurrencySymbol}
                   </Heading>
                 </Flex>
               </Stack>
@@ -82,7 +83,7 @@ export function AccountPage({ sc, poolDetails }: { sc: ShareClassWithDetails; po
                 <Flex key={`${network.chainId}-${index}`} align="center" gap={2}>
                   <NetworkIcon networkId={network.chainId} boxSize="20px" />
                   <Text fontSize="sm">
-                    {formatBalanceToString(network.pricePerShare, 2) ?? '0'} {sc?.details.symbol}
+                    {formatBalanceToString(network.pricePerShare, 2) ?? '0'} {poolCurrencySymbol}
                   </Text>
                 </Flex>
               ))}
@@ -99,8 +100,8 @@ export function AccountPage({ sc, poolDetails }: { sc: ShareClassWithDetails; po
       <Stack mt={8} gap={2}>
         <Heading size="sm">Orders</Heading>
         <Grid templateColumns="repeat(2, 1fr)" gap={4}>
-          <Orders title="Investments" shareClass={sc} isInvestment />
-          <Orders title="Redemptions" shareClass={sc} />
+          <Orders title="Investments" shareClass={sc} isInvestment poolCurrencySymbol={poolCurrencySymbol} />
+          <Orders title="Redemptions" shareClass={sc} poolCurrencySymbol={poolCurrencySymbol} />
         </Grid>
       </Stack>
       {/* TODO: ADD POOL HOLDINGS ONCE SDK HAS BEEN UPDATED TO RETRIEVE POOL HOLDINGS */}

@@ -25,7 +25,7 @@ export default function Account() {
         <Stack gap={0}>
           <Heading size="sm">Total NAV</Heading>
           <Heading size="4xl">
-            {totalNav?.toString() ?? '0'} {shareClass?.details.symbol}
+            {totalNav?.toString() ?? '0'} {poolDetails?.currency.symbol}
           </Heading>
         </Stack>
 

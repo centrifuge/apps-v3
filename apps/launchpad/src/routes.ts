@@ -14,7 +14,7 @@ export default [
     route('/nav/:shareClassId/:poolId', './routes/nav.tsx'),
 
     // Orders
-    route('/orders/:poolId/approve', './routes/orders/approve.tsx'),
+    route('/orders/:poolId/approve', './routes/orders/approveOrders.tsx'),
     route('/orders/:poolId/issue', './routes/orders/issue.tsx'),
     route('/orders/:poolId/approveRedeem', './routes/orders/approveRedeem.tsx'),
     route('/orders/:poolId/revokeRedeem', './routes/orders/revoke.tsx'),

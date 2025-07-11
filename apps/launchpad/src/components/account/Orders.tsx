@@ -9,10 +9,12 @@ export function Orders({
   title,
   shareClass,
   isInvestment,
+  poolCurrencySymbol,
 }: {
   title: string
   shareClass: ShareClassWithDetails
   isInvestment?: boolean
+  poolCurrencySymbol: string
 }) {
   const { data: pendingAmounts } = usePendingAmounts(shareClass.shareClass)
   const navigate = useNavigate()
@@ -55,7 +57,7 @@ export function Orders({
         <Stack gap={0}>
           <Heading size="xs">{isInvestment ? 'Pending investments' : 'Pending redemptions'}</Heading>
           <Heading size="2xl">
-            {formatBalance(pendingAmount ?? 0, { precision: 2 })} {shareClass?.details?.symbol}
+            {formatBalance(pendingAmount ?? 0, { precision: 2 })} {poolCurrencySymbol}
           </Heading>
         </Stack>
         <Button label="Approve" onClick={() => findRoute(true)} colorPalette="gray" size="sm" width="120px" />
@@ -65,7 +67,7 @@ export function Orders({
         <Stack gap={0}>
           <Heading size="xs">{isInvestment ? 'Approved investments' : 'Approved redemptions'}</Heading>
           <Heading size="2xl">
-            {formatBalance(approvedAmount ?? 0, { precision: 2 })} {shareClass?.details?.symbol}
+            {formatBalance(approvedAmount ?? 0, { precision: 2 })} {poolCurrencySymbol}
           </Heading>
         </Stack>
         <Button
