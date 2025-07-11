@@ -5,24 +5,23 @@ import { Form, useForm } from '@centrifuge/forms'
 import { networkToName, useCentrifugeTransaction } from '@centrifuge/shared'
 import { usePendingAmounts } from '@centrifuge/shared/src/hooks/useShareClass'
 import { usePoolProvider } from '@contexts/PoolProvider'
-import { AssetId, Balance, Price } from '@centrifuge/sdk'
+import { AssetId, Balance } from '@centrifuge/sdk'
 import { FormSection } from './FormSection'
 import { z } from 'zod'
 
 type PendingAmount = {
   chainId: number
   assetId: AssetId
-  approvedDeposit: Balance
+  pendingRedeem: Balance
 }
 
 const schema = z.object({
   selectedAssets: z.array(z.instanceof(AssetId)),
-  approvedDeposits: z.array(
+  pendingRedeems: z.array(
     z.object({
       chainId: z.number(),
       assetId: z.instanceof(AssetId),
-      approvedDeposit: z.instanceof(Balance),
-      navPerShare: z.string(),
+      pendingRedeem: z.instanceof(Balance),
     })
   ),
 })
@@ -39,13 +38,12 @@ export const ApproveButton = ({
   return <Button label="Approve" onClick={onClick} size="sm" width={163} disabled={disabled} loading={isLoading} />
 }
 
-export default function IssueOrders() {
+export default function ApproveRedemptions() {
   const { execute, isPending } = useCentrifugeTransaction()
-  const { isLoading, shareClass, poolDetails } = usePoolProvider()
+  const { isLoading, shareClass } = usePoolProvider()
   const { data: pendingAmounts } = usePendingAmounts(shareClass?.shareClass!)
-  const pricePerShare = shareClass?.details.pricePerShare.toFloat()
-  const poolSymbol = poolDetails?.currency.symbol
-  const poolDecimals = poolDetails?.currency.decimals
+
+  console.log(pendingAmounts)
 
   const groupedByChain = useMemo(() => {
     return pendingAmounts?.reduce(
@@ -59,13 +57,11 @@ export default function IssueOrders() {
 
   useEffect(() => {
     setValue(
-      'approvedDeposits',
+      'pendingRedeems',
       pendingAmounts?.map((p) => ({
         chainId: p.chainId,
         assetId: p.assetId,
-        approvedDeposit: p.approvedDeposit,
-        // TODO: should the nav per share come from the sdk as the time the investment was approved, right now is showing the current nav per share
-        navPerShare: pricePerShare?.toString() ?? '0',
+        pendingRedeem: p.pendingRedeem,
       })) ?? []
     )
   }, [pendingAmounts])
@@ -74,20 +70,20 @@ export default function IssueOrders() {
     schema,
     defaultValues: {
       selectedAssets: [],
-      approvedDeposits: [],
+      pendingRedeems: [],
     },
     mode: 'onChange',
     onSubmit: (values) => {
-      const { selectedAssets, approvedDeposits } = values
+      const { selectedAssets, pendingRedeems } = values
 
       const payload = selectedAssets
         .map((selectedAssetId) => {
-          const pendingInfo = approvedDeposits.find((p) => p.assetId.equals(selectedAssetId))
+          const pendingInfo = pendingRedeems.find((p) => p.assetId.equals(selectedAssetId))
 
-          if (pendingInfo && poolDecimals) {
+          if (pendingInfo) {
             return {
               assetId: selectedAssetId,
-              issuePricePerShare: new Price(pendingInfo.navPerShare),
+              approveShareAmount: pendingInfo.pendingRedeem,
             }
           }
           return null
@@ -95,7 +91,7 @@ export default function IssueOrders() {
         .filter((item): item is NonNullable<typeof item> => item !== null)
 
       if (payload.length > 0 && shareClass?.shareClass) {
-        execute(shareClass.shareClass.approveDepositsAndIssueShares(payload))
+        execute(shareClass.shareClass.approveRedeemsAndRevokeShares(payload))
       }
     },
   })
@@ -113,8 +109,8 @@ export default function IssueOrders() {
     setValue('selectedAssets', newAssets, { shouldDirty: true })
   }
 
-  const totalApprovedInvestments = useMemo(() => {
-    return pendingAmounts?.map((p) => p.approvedDeposit).reduce((acc, curr) => acc + curr.toFloat(), 0)
+  const totalPendingRedeems = useMemo(() => {
+    return pendingAmounts?.map((p) => p.pendingRedeem).reduce((acc, curr) => acc + curr.toFloat(), 0)
   }, [pendingAmounts])
 
   const isApproveDisabled = !selectedAssets.length
@@ -123,10 +119,10 @@ export default function IssueOrders() {
     return <Loader />
   }
 
-  if (totalApprovedInvestments === 0 || !pendingAmounts?.length) {
+  if (totalPendingRedeems === 0 || !pendingAmounts?.length) {
     return (
       <VStack mt={10}>
-        <Text>No pending shares to issue</Text>
+        <Text>No pending redemptions to approve</Text>
       </VStack>
     )
   }
@@ -140,49 +136,35 @@ export default function IssueOrders() {
         </Grid>
 
         {Object.keys(groupedByChain ?? {}).map((chainId, index) => {
-          const pendingDeposits = groupedByChain?.[parseInt(chainId)]
-          if (!pendingDeposits) return null
+          const pendingRedeems = groupedByChain?.[parseInt(chainId)]
+          if (!pendingRedeems) return null
           return (
             <Box key={chainId} mt={12} mb={12}>
               <Flex alignItems="center" gap={2} mb={4}>
                 <NetworkIcon networkId={parseInt(chainId, 10)} />
-                <Heading size="md">{networkToName(parseInt(chainId, 10))} Investments</Heading>
+                <Heading size="md">{networkToName(parseInt(chainId, 10))} Redemptions</Heading>
               </Flex>
               <Card>
-                {groupedByChain?.[parseInt(chainId)]?.map((approvedDeposit) => {
+                {groupedByChain?.[parseInt(chainId)]?.map((pendingRedeem) => {
                   const innerSections = [
                     {
                       fieldType: 'balance' as const,
-                      name: `approvedDeposits.${index}.navPerShare`,
-                      label: 'Issue with nav per share',
-                      subLabel: '(latest)',
+                      name: `pendingRedeems.${index}.pendingRedeem`,
+                      label: 'Approve redemption',
                       // Todo each pending amount should return the asset currency details
-                      currency: poolSymbol ?? 'USD',
-                      decimals: 2,
-                    },
-                    {
-                      fieldType: 'balance' as const,
-                      name: `approvedDeposits.${index}.approvedDeposit`,
-                      label: 'Issue new shares',
                       currency: shareClass?.details.symbol ?? '',
                       decimals: 2,
                       disabled: true,
                     },
                     {
                       fieldType: 'checkbox' as const,
-                      name: `chain-checkbox-${approvedDeposit.chainId}`,
-                      label: 'Issue',
-                      onChange: (checked: boolean) => handleAssetSelection(approvedDeposit.assetId, checked),
+                      name: `chain-checkbox-${pendingRedeem.chainId}`,
+                      label: 'Approve',
+                      onChange: (checked: boolean) => handleAssetSelection(pendingRedeem.assetId, checked),
                     },
                   ]
 
-                  return (
-                    <FormSection
-                      fields={innerSections}
-                      templateColumns="1fr 1fr 1fr"
-                      key={approvedDeposit.assetId.toString()}
-                    />
-                  )
+                  return <FormSection fields={innerSections} />
                 })}
               </Card>
             </Box>

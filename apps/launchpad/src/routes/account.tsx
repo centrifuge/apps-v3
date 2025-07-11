@@ -31,7 +31,7 @@ export default function Account() {
 
         <Button label="Update NAV" onClick={() => navigate(`/nav/${shareClassId}/${poolId}`)} size="sm" width="150px" />
       </Flex>
-      {shareClass && <AccountPage sc={shareClass} poolDetails={poolDetails} />}
+      {shareClass && poolDetails && <AccountPage sc={shareClass} poolDetails={poolDetails} />}
     </Box>
   )
 }

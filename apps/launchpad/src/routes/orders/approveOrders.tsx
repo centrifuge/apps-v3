@@ -41,7 +41,7 @@ export const ApproveButton = ({
 export default function ApproveOrders() {
   const { execute, isPending } = useCentrifugeTransaction()
   const { isLoading, shareClass } = usePoolProvider()
-  const { data: pendingAmounts } = usePendingAmounts(shareClass?.shareClass)
+  const { data: pendingAmounts } = usePendingAmounts(shareClass?.shareClass!)
 
   const groupedByChain = useMemo(() => {
     return pendingAmounts?.reduce(
@@ -86,10 +86,10 @@ export default function ApproveOrders() {
           }
           return null
         })
-        .filter(Boolean)
+        .filter((item): item is NonNullable<typeof item> => item !== null)
 
-      if (payload.length > 0) {
-        execute(shareClass?.shareClass.approveDepositsAndIssueShares(payload))
+      if (payload.length > 0 && shareClass?.shareClass) {
+        execute(shareClass.shareClass.approveDepositsAndIssueShares(payload))
       }
     },
   })
@@ -97,7 +97,6 @@ export default function ApproveOrders() {
   const { watch, setValue, getValues } = form
 
   const selectedAssets = watch('selectedAssets')
-  const pendingDeposits = watch('pendingDeposits')
 
   const handleAssetSelection = (assetId: AssetId, isChecked: boolean) => {
     const currentAssets = getValues('selectedAssets')

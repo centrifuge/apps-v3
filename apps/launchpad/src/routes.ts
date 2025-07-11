@@ -16,8 +16,8 @@ export default [
     // Orders
     route('/orders/:poolId/approve', './routes/orders/approveOrders.tsx'),
     route('/orders/:poolId/issue', './routes/orders/issueOrders.tsx'),
-    route('/orders/:poolId/approveRedeem', './routes/orders/approveRedeem.tsx'),
-    route('/orders/:poolId/revokeRedeem', './routes/orders/revoke.tsx'),
+    route('/orders/:poolId/approveRedeem', './routes/orders/approveRedemptions.tsx'),
+    route('/orders/:poolId/revokeRedeem', './routes/orders/revokeShares.tsx'),
 
     // Pool settings
     route('/settings/:poolId/poolAccess', './routes/settings/poolAccess.tsx'),

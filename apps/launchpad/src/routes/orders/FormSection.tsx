@@ -15,6 +15,7 @@ type FieldConfig =
       currency: string
       decimals: number
       disabled?: boolean
+      subLabel?: string
     }
   | {
       fieldType: 'checkbox'
@@ -27,11 +28,12 @@ type FieldConfig =
 
 export interface FormSectionProps {
   fields: FieldConfig[]
+  templateColumns?: string
 }
 
-export const FormSection = ({ fields }: FormSectionProps) => {
+export const FormSection = ({ fields, templateColumns = '1fr 1fr' }: FormSectionProps) => {
   return (
-    <Grid gridTemplateColumns="1fr 1fr" gap={6} alignItems="center" mb={4}>
+    <Grid gridTemplateColumns={['1fr', '1fr', templateColumns]} gap={6} alignItems="center" mb={4}>
       {fields.map((field) => {
         if (field.fieldType === 'balance') {
           return (
@@ -39,6 +41,7 @@ export const FormSection = ({ fields }: FormSectionProps) => {
               key={field.name}
               name={field.name}
               label={field.label}
+              subLabel={field.subLabel}
               decimals={field.decimals}
               placeholder="0.00"
               inputGroupProps={{

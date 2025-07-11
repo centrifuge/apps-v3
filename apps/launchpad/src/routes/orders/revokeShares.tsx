@@ -12,16 +12,16 @@ import { z } from 'zod'
 type PendingAmount = {
   chainId: number
   assetId: AssetId
-  approvedDeposit: Balance
+  approvedRedeem: Balance
 }
 
 const schema = z.object({
   selectedAssets: z.array(z.instanceof(AssetId)),
-  approvedDeposits: z.array(
+  approvedRedeems: z.array(
     z.object({
       chainId: z.number(),
       assetId: z.instanceof(AssetId),
-      approvedDeposit: z.instanceof(Balance),
+      approvedRedeem: z.instanceof(Balance),
       navPerShare: z.string(),
     })
   ),
@@ -39,7 +39,7 @@ export const ApproveButton = ({
   return <Button label="Approve" onClick={onClick} size="sm" width={163} disabled={disabled} loading={isLoading} />
 }
 
-export default function IssueOrders() {
+export default function RevokeShares() {
   const { execute, isPending } = useCentrifugeTransaction()
   const { isLoading, shareClass, poolDetails } = usePoolProvider()
   const { data: pendingAmounts } = usePendingAmounts(shareClass?.shareClass!)
@@ -59,11 +59,11 @@ export default function IssueOrders() {
 
   useEffect(() => {
     setValue(
-      'approvedDeposits',
+      'approvedRedeems',
       pendingAmounts?.map((p) => ({
         chainId: p.chainId,
         assetId: p.assetId,
-        approvedDeposit: p.approvedDeposit,
+        approvedRedeem: p.approvedRedeem,
         // TODO: should the nav per share come from the sdk as the time the investment was approved, right now is showing the current nav per share
         navPerShare: pricePerShare?.toString() ?? '0',
       })) ?? []
@@ -74,20 +74,20 @@ export default function IssueOrders() {
     schema,
     defaultValues: {
       selectedAssets: [],
-      approvedDeposits: [],
+      approvedRedeems: [],
     },
     mode: 'onChange',
     onSubmit: (values) => {
-      const { selectedAssets, approvedDeposits } = values
+      const { selectedAssets, approvedRedeems } = values
 
       const payload = selectedAssets
         .map((selectedAssetId) => {
-          const pendingInfo = approvedDeposits.find((p) => p.assetId.equals(selectedAssetId))
+          const pendingInfo = approvedRedeems.find((p) => p.assetId.equals(selectedAssetId))
 
           if (pendingInfo && poolDecimals) {
             return {
               assetId: selectedAssetId,
-              issuePricePerShare: new Price(pendingInfo.navPerShare),
+              revokePricePerShare: new Price(pendingInfo.navPerShare),
             }
           }
           return null
@@ -113,8 +113,8 @@ export default function IssueOrders() {
     setValue('selectedAssets', newAssets, { shouldDirty: true })
   }
 
-  const totalApprovedInvestments = useMemo(() => {
-    return pendingAmounts?.map((p) => p.approvedDeposit).reduce((acc, curr) => acc + curr.toFloat(), 0)
+  const totalApprovedRedeems = useMemo(() => {
+    return pendingAmounts?.map((p) => p.approvedRedeem).reduce((acc, curr) => acc + curr.toFloat(), 0)
   }, [pendingAmounts])
 
   const isApproveDisabled = !selectedAssets.length
@@ -123,10 +123,10 @@ export default function IssueOrders() {
     return <Loader />
   }
 
-  if (totalApprovedInvestments === 0 || !pendingAmounts?.length) {
+  if (totalApprovedRedeems === 0 || !pendingAmounts?.length) {
     return (
       <VStack mt={10}>
-        <Text>No pending shares to issue</Text>
+        <Text>No pending shares to revoke</Text>
       </VStack>
     )
   }
@@ -140,8 +140,8 @@ export default function IssueOrders() {
         </Grid>
 
         {Object.keys(groupedByChain ?? {}).map((chainId, index) => {
-          const pendingDeposits = groupedByChain?.[parseInt(chainId)]
-          if (!pendingDeposits) return null
+          const approvedRedeems = groupedByChain?.[parseInt(chainId)]
+          if (!approvedRedeems) return null
           return (
             <Box key={chainId} mt={12} mb={12}>
               <Flex alignItems="center" gap={2} mb={4}>
@@ -149,12 +149,12 @@ export default function IssueOrders() {
                 <Heading size="md">{networkToName(parseInt(chainId, 10))} Investments</Heading>
               </Flex>
               <Card>
-                {groupedByChain?.[parseInt(chainId)]?.map((approvedDeposit) => {
+                {groupedByChain?.[parseInt(chainId)]?.map((approvedRedeem) => {
                   const innerSections = [
                     {
                       fieldType: 'balance' as const,
-                      name: `approvedDeposits.${index}.navPerShare`,
-                      label: 'Issue with nav per share',
+                      name: `approvedRedeems.${index}.navPerShare`,
+                      label: 'Revoke with nav per share',
                       subLabel: '(latest)',
                       // Todo each pending amount should return the asset currency details
                       currency: poolSymbol ?? 'USD',
@@ -162,17 +162,17 @@ export default function IssueOrders() {
                     },
                     {
                       fieldType: 'balance' as const,
-                      name: `approvedDeposits.${index}.approvedDeposit`,
-                      label: 'Issue new shares',
+                      name: `approvedRedeems.${index}.approvedRedeem`,
+                      label: 'Revoke shares',
                       currency: shareClass?.details.symbol ?? '',
                       decimals: 2,
                       disabled: true,
                     },
                     {
                       fieldType: 'checkbox' as const,
-                      name: `chain-checkbox-${approvedDeposit.chainId}`,
+                      name: `chain-checkbox-${approvedRedeem.chainId}`,
                       label: 'Issue',
-                      onChange: (checked: boolean) => handleAssetSelection(approvedDeposit.assetId, checked),
+                      onChange: (checked: boolean) => handleAssetSelection(approvedRedeem.assetId, checked),
                     },
                   ]
 
@@ -180,7 +180,7 @@ export default function IssueOrders() {
                     <FormSection
                       fields={innerSections}
                       templateColumns="1fr 1fr 1fr"
-                      key={approvedDeposit.assetId.toString()}
+                      key={approvedRedeem.assetId.toString()}
                     />
                   )
                 })}
