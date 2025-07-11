@@ -139,7 +139,7 @@ export default function HeaderLayout() {
                 {hasSettings ? (
                   <Button colorPalette="gray" variant="subtle">
                     <IoSettingsSharp />
-                    <Text>Settings</Text>
+                    <Text onClick={() => navigate(`settings/${poolId}/poolAccess`)}>Settings</Text>
                   </Button>
                 ) : null}
               </Flex>
