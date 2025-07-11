@@ -1,21 +1,25 @@
 import type { Dispatch, SetStateAction } from 'react'
 import { FaRegClock } from 'react-icons/fa6'
 import { Box, Button, Flex, Heading, Text } from '@chakra-ui/react'
-import { useFormContext } from '@centrifuge/forms'
 import { infoText } from '@utils/infoText'
 import { RedeemAction, type RedeemActionType } from '@components/InvestRedeemSection/components/defaults'
 import { InfoWrapper } from '@components/InvestRedeemSection/components/InfoWrapper'
+import { Balance } from '@centrifuge/sdk'
+import { BalanceDisplay } from '@centrifuge/ui'
 
 interface CancelRedeemProps {
-  currencies: { investCurrency: string; receiveCurrency: string }
+  currencies: { redeemCurrency: string; receiveCurrency: string }
+  parsedRedeemAmount: 0 | Balance
+  parsedReceiveAmount: 0 | Balance
   setActionType: Dispatch<SetStateAction<RedeemActionType>>
 }
 
-export function CancelRedeem({ currencies, setActionType }: CancelRedeemProps) {
-  const { getValues } = useFormContext()
-  const redeemText = `${getValues('amount').toString()} ${currencies.investCurrency}`
-  const receiveText = `${getValues('amountToReceive').toString()} ${currencies.receiveCurrency}`
-
+export function RedeemCancel({
+  currencies: { redeemCurrency, receiveCurrency },
+  parsedRedeemAmount,
+  parsedReceiveAmount,
+  setActionType,
+}: CancelRedeemProps) {
   return (
     <Box>
       <Heading>Rdemption in progress</Heading>
@@ -25,7 +29,7 @@ export function CancelRedeem({ currencies, setActionType }: CancelRedeemProps) {
           Redeeming
         </Text>
         <Text color="info" whiteSpace="normal" wordWrap="break-word" textAlign="right">
-          {redeemText}
+          <BalanceDisplay balance={parsedRedeemAmount} currency={redeemCurrency} />
         </Text>
       </Flex>
       <Flex mt={4} justify="space-between">
@@ -33,7 +37,7 @@ export function CancelRedeem({ currencies, setActionType }: CancelRedeemProps) {
           You receive
         </Text>
         <Text color="info" whiteSpace="normal" wordWrap="break-word" textAlign="right">
-          {receiveText}
+          <BalanceDisplay balance={parsedReceiveAmount} currency={receiveCurrency} />
         </Text>
       </Flex>
       <Button

@@ -2,8 +2,14 @@ import { Dispatch, useMemo, useState } from 'react'
 import { z } from 'zod'
 import { Box } from '@chakra-ui/react'
 import { Form, useForm, safeParse, createBalanceSchema } from '@centrifuge/forms'
-import { Balance, Vault } from '@centrifuge/sdk'
-import { useCentrifugeTransaction, useInvestment, useVaultDetails } from '@centrifuge/shared'
+import { Balance, PoolNetwork, Vault } from '@centrifuge/sdk'
+import {
+  formatBalanceToString,
+  useCentrifugeTransaction,
+  useInvestment,
+  usePortfolio,
+  useVaultDetails,
+} from '@centrifuge/shared'
 import {
   type InvestActionType,
   InvestAction,
@@ -15,15 +21,26 @@ export default function InvestTab({
   vault,
   setVault,
   vaults,
+  networks,
 }: {
   vault: Vault
   setVault: Dispatch<Vault>
   vaults: Vault[]
+  networks?: PoolNetwork[]
 }) {
   const { data: vaultDetails } = useVaultDetails(vault)
   const { data: investment } = useInvestment(vault)
+  const { data: portfolio } = usePortfolio()
   const { execute, isPending } = useCentrifugeTransaction()
   const [actionType, setActionType] = useState<InvestActionType>(InvestAction.INVEST_AMOUNT)
+  const investmentCurrencyChainId = vaultDetails?.investmentCurrency?.chainId
+  const portfolioInvestmentAsset = portfolio?.find((asset) => asset.currency.chainId === investmentCurrencyChainId)
+  const portfolioBalance = portfolioInvestmentAsset?.balance
+
+  const maxInvestAmount = useMemo(() => {
+    if (!portfolioBalance) return '0'
+    return formatBalanceToString(portfolioBalance, portfolioBalance.decimals) ?? '0'
+  }, [portfolioBalance])
 
   function invest(amount: Balance) {
     execute(vault.increaseInvestOrder(amount))
@@ -31,8 +48,11 @@ export default function InvestTab({
 
   // TODO: Add any necessary refinements for validation checks
   const schema = z.object({
-    amount: createBalanceSchema(vaultDetails?.investmentCurrency.decimals ?? 6, z.number().min(0.01)),
-    amountToReceive: createBalanceSchema(vaultDetails?.shareCurrency.decimals ?? 18, z.number().min(0.01)),
+    investAmount: createBalanceSchema(
+      vaultDetails?.investmentCurrency.decimals ?? 6,
+      z.number().min(1).max(Number(maxInvestAmount))
+    ),
+    receiveAmount: createBalanceSchema(vaultDetails?.shareCurrency.decimals ?? 18).optional(),
     requirement_nonUsCitizen: z.boolean().refine((val) => val === true, {
       message: 'Non-US citizen requirement must be confirmed',
     }),
@@ -50,18 +70,21 @@ export default function InvestTab({
     defaultValues: InvestFormDefaultValues,
     mode: 'onChange',
     onSubmit: (values) => {
-      invest(values.amount)
+      invest(values.investAmount)
       setActionType(InvestAction.SUCCESS)
     },
     onSubmitError: (error) => console.error('Invest form submission error:', error),
   })
 
   const { watch } = form
-  const [amount] = watch(['amount'])
+  const [investAmount] = watch(['investAmount'])
 
-  const parsedAmount = useMemo(() => safeParse(schema.shape.amount, amount) ?? 0, [amount, schema.shape.amount])
+  const parsedInvestAmount = useMemo(
+    () => safeParse(schema.shape.investAmount, investAmount) ?? 0,
+    [investAmount, schema.shape.investAmount]
+  )
 
-  const isDisabled = !vaultDetails || !investment || parsedAmount === 0 || isPending
+  const isDisabled = !vaultDetails || !investment || parsedInvestAmount === 0 || isPending
 
   return (
     <Form form={form} style={{ height: '100%' }}>
@@ -69,11 +92,13 @@ export default function InvestTab({
         <InvestTabForm
           actionType={actionType}
           isDisabled={isDisabled}
-          parsedAmount={parsedAmount}
+          maxInvestAmount={maxInvestAmount}
+          networks={networks}
+          parsedInvestAmount={parsedInvestAmount}
+          vaults={vaults}
           vaultDetails={vaultDetails}
           setActionType={setActionType}
           setVault={setVault}
-          vaults={vaults}
         />
       </Box>
     </Form>

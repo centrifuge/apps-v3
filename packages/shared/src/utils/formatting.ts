@@ -52,7 +52,7 @@ export function formatBalanceAbbreviated(
 export function formatBalance(
   amount: number | Decimal | string | Balance,
   currency?: string,
-  precision = 0,
+  precision?: number,
   minPrecision = precision
 ): string {
   let val: Decimal
@@ -67,8 +67,8 @@ export function formatBalance(
     val = new Decimal(0)
   }
 
-  const fixedString = val.toFixed(precision)
-  const numToFormat = parseFloat(fixedString)
+  const fixedDecimal = val.toDecimalPlaces(precision ?? undefined, Decimal.ROUND_DOWN)
+  const numToFormat = parseFloat(fixedDecimal.toString())
 
   const formattedAmount = numToFormat.toLocaleString('en', {
     minimumFractionDigits: minPrecision,
@@ -94,9 +94,11 @@ export function formatBigintToString(bigInt: bigint, bigintDecimals: number, for
 }
 
 export function formatBalanceToString(amount: Balance, precision = 0) {
-  if (!(typeof amount === 'object' && 'decimals' in amount)) return null
+  if (!(typeof amount === 'object' && 'decimals' in amount)) return ''
+  const decimalValue = new Decimal(amount.toFloat())
+  const truncatedValue = decimalValue.toDecimalPlaces(precision, Decimal.ROUND_DOWN)
 
-  return amount.toFloat().toFixed(precision)
+  return truncatedValue.toString()
 }
 
 export function ipfsToHttp(uri: string, gateway: string | string[] = 'https://ipfs.io'): string {

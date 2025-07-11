@@ -2,8 +2,8 @@ import { useMemo, useState } from 'react'
 import { z } from 'zod'
 import { Box } from '@chakra-ui/react'
 import { createBalanceSchema, Form, safeParse, useForm } from '@centrifuge/forms'
-import { Balance, type Vault } from '@centrifuge/sdk'
-import { useInvestment, useCentrifugeTransaction, useVaultDetails } from '@centrifuge/shared'
+import { Balance, PoolNetwork, type Vault } from '@centrifuge/sdk'
+import { formatBalanceToString, useInvestment, useCentrifugeTransaction, useVaultDetails } from '@centrifuge/shared'
 import {
   RedeemAction,
   RedeemFormDefaultValues,
@@ -11,20 +11,37 @@ import {
 } from '@components/InvestRedeemSection/components/defaults'
 import { RedeemTabForm } from '@components/InvestRedeemSection/RedeemTab/forms/RedeemTabForm'
 
-export default function RedeemTab({ vault }: { vault: Vault }) {
+export default function RedeemTab({
+  networks,
+  vault,
+  vaults,
+}: {
+  networks?: PoolNetwork[]
+  vault: Vault
+  vaults: Vault[]
+}) {
   const { data: vaultDetails } = useVaultDetails(vault)
   const { data: investment } = useInvestment(vault)
   const { execute, isPending } = useCentrifugeTransaction()
   const [actionType, setActionType] = useState<RedeemActionType>(RedeemAction.REDEEM_AMOUNT)
+  const maxRedeemBalance = investment?.shareBalance ?? 0
+
+  const maxRedeemAmount = useMemo(() => {
+    if (maxRedeemBalance === 0) return ''
+
+    return formatBalanceToString(maxRedeemBalance, maxRedeemBalance.decimals) ?? ''
+  }, [maxRedeemBalance])
 
   function redeem(amount: Balance) {
     execute(vault.increaseRedeemOrder(amount))
   }
 
-  // TODO: Add necessary refinements for validation checks
   const schema = z.object({
-    amount: createBalanceSchema(vaultDetails?.shareCurrency.decimals ?? 18, z.number().min(0.01)),
-    amountToReceive: createBalanceSchema(vaultDetails?.investmentCurrency.decimals ?? 6, z.number().min(0.01)),
+    redeemAmount: createBalanceSchema(
+      investment?.shareBalance.decimals ?? 18,
+      z.number().min(1).max(Number(maxRedeemAmount))
+    ),
+    receiveAmount: createBalanceSchema(vaultDetails?.investmentCurrency.decimals ?? 6).optional(),
   })
 
   const form = useForm({
@@ -32,19 +49,24 @@ export default function RedeemTab({ vault }: { vault: Vault }) {
     defaultValues: RedeemFormDefaultValues,
     mode: 'onChange',
     onSubmit: (values) => {
-      console.log('Redeem values: ', values)
-      // Since amount is now of type Balance, we can directly pass it to the redeem function
-      redeem(values.amount)
+      redeem(values.redeemAmount)
       setActionType(RedeemAction.CANCEL)
     },
     onSubmitError: (error) => console.error('Redeem form submission error:', error),
   })
 
   const { watch } = form
-  const amount = watch('amount')
+  const [redeemAmount, receiveAmount] = watch(['redeemAmount', 'receiveAmount'])
 
-  const parsedAmount = useMemo(() => safeParse(schema.shape.amount, amount) ?? 0, [amount, schema.shape.amount])
-  const isDisabled = isPending || !vaultDetails || !investment || parsedAmount === 0
+  const parsedRedeemAmount = useMemo(
+    () => safeParse(schema.shape.redeemAmount, redeemAmount) ?? 0,
+    [redeemAmount, schema.shape.redeemAmount]
+  )
+  const parsedReceiveAmount = useMemo(
+    () => safeParse(schema.shape.receiveAmount, receiveAmount) ?? 0,
+    [receiveAmount, schema.shape.receiveAmount]
+  )
+  const isDisabled = isPending || !vaultDetails || !investment || parsedRedeemAmount === 0
 
   return (
     <Form form={form} style={{ height: '100%' }}>
@@ -52,8 +74,12 @@ export default function RedeemTab({ vault }: { vault: Vault }) {
         <RedeemTabForm
           actionType={actionType}
           isDisabled={isDisabled}
-          parsedAmount={parsedAmount}
+          maxRedeemAmount={maxRedeemAmount}
+          networks={networks}
+          parsedRedeemAmount={parsedRedeemAmount}
+          parsedReceiveAmount={parsedReceiveAmount}
           vault={vault}
+          vaults={vaults}
           setActionType={setActionType}
         />
       </Box>

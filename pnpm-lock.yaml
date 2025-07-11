@@ -44,9 +44,6 @@ importers:
       install:
         specifier: ^0.13.0
         version: 0.13.0
-      lodash:
-        specifier: ^4.17.21
-        version: 4.17.21
       npm:
         specifier: ^11.4.1
         version: 11.4.2
@@ -141,8 +138,6 @@ importers:
       vite-tsconfig-paths:
         specifier: ^5.1.4
         version: 5.1.4(typescript@5.8.3)(vite@6.3.5(@types/node@22.14.1)(jiti@2.4.2)(terser@5.39.0))
-
-  apps/app: {}
 
   apps/functions:
     dependencies:
@@ -10257,7 +10252,7 @@ snapshots:
     dependencies:
       '@ioredis/commands': 1.2.0
       cluster-key-slot: 1.1.2
-      debug: 4.4.0
+      debug: 4.4.1
       denque: 2.1.0
       lodash.defaults: 4.2.0
       lodash.isarguments: 3.1.0
