@@ -47,8 +47,6 @@ export function InvestAmount({
     value: vault.investmentCurrency.chainId,
   }))
 
-  console.log({ vaultDetails })
-
   const changeVault = (value: number) => switchChain({ chainId: value })
 
   const investmentCurrencyChainId = vaultDetails?.investmentCurrency?.chainId
