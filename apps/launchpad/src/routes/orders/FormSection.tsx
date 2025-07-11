@@ -31,52 +31,50 @@ export interface FormSectionProps {
 
 export const FormSection = ({ fields }: FormSectionProps) => {
   return (
-    <Card>
-      <Grid gridTemplateColumns="1fr 1fr" gap={6} alignItems="center">
-        {fields.map((field) => {
-          if (field.fieldType === 'balance') {
-            return (
-              <BalanceInput
-                key={field.name}
-                name={field.name}
-                label={field.label}
-                decimals={field.decimals}
-                placeholder="0.00"
-                inputGroupProps={{
-                  endAddon: field.currency,
-                }}
-                disabled={field.disabled}
-              />
-            )
-          }
+    <Grid gridTemplateColumns="1fr 1fr" gap={6} alignItems="center" mb={4}>
+      {fields.map((field) => {
+        if (field.fieldType === 'balance') {
+          return (
+            <BalanceInput
+              key={field.name}
+              name={field.name}
+              label={field.label}
+              decimals={field.decimals}
+              placeholder="0.00"
+              inputGroupProps={{
+                endAddon: field.currency,
+              }}
+              disabled={field.disabled}
+            />
+          )
+        }
 
-          if (field.fieldType === 'checkbox') {
-            const label = field.tooltipKey ? (
-              <Tooltip content={tooltipContent[field.tooltipKey]}>
-                <Text textDecoration="underline">{field.label}</Text>
-              </Tooltip>
-            ) : (
-              field.label
-            )
-            const checkbox = (
-              <Checkbox
-                name={field.name}
-                label={label}
-                disabled={field.disabled}
-                onChange={(checked) => field.onChange?.(checked)}
-              />
-            )
+        if (field.fieldType === 'checkbox') {
+          const label = field.tooltipKey ? (
+            <Tooltip content={tooltipContent[field.tooltipKey]}>
+              <Text textDecoration="underline">{field.label}</Text>
+            </Tooltip>
+          ) : (
+            field.label
+          )
+          const checkbox = (
+            <Checkbox
+              name={field.name}
+              label={label}
+              disabled={field.disabled}
+              onChange={(checked) => field.onChange?.(checked)}
+            />
+          )
 
-            return (
-              <Box key={field.name} mt={6}>
-                {checkbox}
-              </Box>
-            )
-          }
+          return (
+            <Box key={field.name} mt={6}>
+              {checkbox}
+            </Box>
+          )
+        }
 
-          return null
-        })}
-      </Grid>
-    </Card>
+        return null
+      })}
+    </Grid>
   )
 }

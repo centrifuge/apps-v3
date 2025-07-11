@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from 'react'
-import { Button, Loader, NetworkIcon } from '@centrifuge/ui'
+import { Button, Loader, NetworkIcon, Card } from '@centrifuge/ui'
 import { Box, Container, Flex, Grid, Heading, Stack, Text, VStack } from '@chakra-ui/react'
 import { Form, useForm } from '@centrifuge/forms'
 import { networkToName, useCentrifugeTransaction } from '@centrifuge/shared'
@@ -8,6 +8,12 @@ import { usePoolProvider } from '@contexts/PoolProvider'
 import { AssetId, Balance } from '@centrifuge/sdk'
 import { FormSection } from './FormSection'
 import { z } from 'zod'
+
+type PendingAmount = {
+  chainId: number
+  assetId: AssetId
+  pendingDeposit: Balance
+}
 
 const schema = z.object({
   selectedAssets: z.array(z.instanceof(AssetId)),
@@ -36,6 +42,16 @@ export default function ApproveOrders() {
   const { execute, isPending } = useCentrifugeTransaction()
   const { isLoading, shareClass } = usePoolProvider()
   const { data: pendingAmounts } = usePendingAmounts(shareClass?.shareClass)
+
+  const groupedByChain = useMemo(() => {
+    return pendingAmounts?.reduce(
+      (acc, curr) => {
+        acc[curr.chainId] = [...(acc[curr.chainId] || []), curr]
+        return acc
+      },
+      {} as Record<number, PendingAmount[]>
+    )
+  }, [pendingAmounts])
 
   useEffect(() => {
     setValue(
@@ -118,36 +134,38 @@ export default function ApproveOrders() {
           <ApproveButton disabled={isApproveDisabled} onClick={() => form.handleSubmit()} isLoading={isPending} />
         </Grid>
 
-        {pendingDeposits?.map((pendingDeposit, index) => {
-          const innerSections = [
-            {
-              fieldType: 'balance' as const,
-              name: `pendingDeposits.${index}.pendingDeposit`,
-              label: 'Approve investments',
-              // Todo each pending amount should return the asset currency details
-              currency: 'USDC',
-              decimals: 2,
-              disabled: true,
-            },
-            {
-              fieldType: 'checkbox' as const,
-              name: `chain-checkbox-${pendingDeposit.chainId}`,
-              label: 'Approve',
-              onChange: (checked: boolean) => handleAssetSelection(pendingDeposit.assetId, checked),
-            },
-          ]
-
+        {Object.keys(groupedByChain ?? {}).map((chainId, index) => {
+          const pendingDeposits = groupedByChain?.[parseInt(chainId)]
+          if (!pendingDeposits) return null
           return (
-            <Box key={pendingDeposit.chainId} mt={12} mb={12}>
-              <Stack>
-                <Flex justifyContent="space-between">
-                  <Flex alignItems="center" gap={2}>
-                    <NetworkIcon networkId={pendingDeposit.chainId} />
-                    <Heading size="md">{networkToName(pendingDeposit.chainId)} Investments</Heading>
-                  </Flex>
-                </Flex>
-                <FormSection fields={innerSections} />
-              </Stack>
+            <Box key={chainId} mt={12} mb={12}>
+              <Flex alignItems="center" gap={2} mb={4}>
+                <NetworkIcon networkId={parseInt(chainId, 10)} />
+                <Heading size="md">{networkToName(parseInt(chainId, 10))} Investments</Heading>
+              </Flex>
+              <Card>
+                {groupedByChain?.[parseInt(chainId)]?.map((pendingDeposit) => {
+                  const innerSections = [
+                    {
+                      fieldType: 'balance' as const,
+                      name: `pendingDeposits.${index}.pendingDeposit`,
+                      label: 'Approve investments',
+                      // Todo each pending amount should return the asset currency details
+                      currency: 'USDC',
+                      decimals: 2,
+                      disabled: true,
+                    },
+                    {
+                      fieldType: 'checkbox' as const,
+                      name: `chain-checkbox-${pendingDeposit.chainId}`,
+                      label: 'Approve',
+                      onChange: (checked: boolean) => handleAssetSelection(pendingDeposit.assetId, checked),
+                    },
+                  ]
+
+                  return <FormSection fields={innerSections} />
+                })}
+              </Card>
             </Box>
           )
         })}
