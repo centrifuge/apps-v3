@@ -1,9 +1,7 @@
-import { Button, NetworkIcon, Checkbox, Card } from '@centrifuge/ui'
+import { Button, NetworkIcon, Card } from '@centrifuge/ui'
 import { Container, Grid, Heading, Box, Stack, Flex } from '@chakra-ui/react'
-import { SectionWithCheckbox, SectionWithBalanceInput } from './Sections'
-import { usePoolProvider } from '@contexts/PoolProvider'
 import { networkToName } from '@centrifuge/shared'
-import { createBalanceSchema, Form, safeParse, useForm } from '@centrifuge/forms'
+import { Form, useForm } from '@centrifuge/forms'
 import z from 'zod'
 import { useEffect } from 'react'
 
@@ -91,11 +89,7 @@ export default function ApproveRedeem() {
         <Grid templateColumns="1fr 160px" gap={4}>
           <Heading>Approve investments</Heading>
           <ApproveButton disabled={selectedVaults.length === 0} />
-          <Box gridColumn="1 / -1" mt={4}>
-            <Card>
-              <SectionWithBalanceInput sections={sections} />
-            </Card>
-          </Box>
+          <Box gridColumn="1 / -1" mt={4}></Box>
         </Grid>
         {/* TODO: add correct types */}
         {vaults?.map((vault: any) => (
@@ -106,7 +100,6 @@ export default function ApproveRedeem() {
                   <NetworkIcon networkId={vault.chainId} />
                   <Heading size="md">{networkToName(vault.chainId)} Investments</Heading>
                 </Flex>
-                <Checkbox onCheckedChange={() => onCheckedChange(vault.id)} />
               </Flex>
             </Stack>
           </Box>
