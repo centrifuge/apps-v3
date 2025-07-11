@@ -6,8 +6,8 @@ import { networkToName, useCentrifugeTransaction } from '@centrifuge/shared'
 import { usePendingAmounts } from '@centrifuge/shared/src/hooks/useShareClass'
 import { usePoolProvider } from '@contexts/PoolProvider'
 import { AssetId, Balance } from '@centrifuge/sdk'
-import { z } from 'zod'
 import { FormSection } from './FormSection'
+import { z } from 'zod'
 
 const schema = z.object({
   selectedAssets: z.array(z.instanceof(AssetId)),
