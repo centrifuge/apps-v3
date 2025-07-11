@@ -4,6 +4,7 @@ import { IoIosCloseCircleOutline, IoMdCheckmarkCircleOutline, IoMdTimer } from '
 import { useFormContext } from '@centrifuge/forms'
 import { useTransactions } from '@centrifuge/shared'
 import { InvestAction, type InvestActionType } from '@components/InvestRedeemSection/components/defaults'
+import { VaultDetails } from '@utils/types'
 
 interface TxState {
   header: string
@@ -12,11 +13,11 @@ interface TxState {
 }
 
 interface InvestTxFeedbackProps {
-  currencies: { investCurrency: string; receiveCurrency: string }
+  vaultDetails?: VaultDetails
   setActionType: Dispatch<SetStateAction<InvestActionType>>
 }
 
-export function InvestTxFeedback({ currencies, setActionType }: InvestTxFeedbackProps) {
+export function InvestTxFeedback({ vaultDetails, setActionType }: InvestTxFeedbackProps) {
   const { getValues, reset } = useFormContext()
   const { transactions } = useTransactions()
   const [successColor] = useToken('colors', ['success'])
@@ -109,14 +110,14 @@ export function InvestTxFeedback({ currencies, setActionType }: InvestTxFeedback
                 <Text fontWeight={500}>You invested</Text>
                 <Heading fontSize="lg">{getValues('investAmount').toString()}</Heading>
               </Box>
-              <Text alignSelf="flex-end">{currencies.investCurrency}</Text>
+              <Text alignSelf="flex-end">{vaultDetails?.investmentCurrency.symbol}</Text>
             </Flex>
             <Flex alignItems="center" gap={2} justifyContent="space-between" mt={6}>
               <Box>
                 <Text fontWeight={500}>Token amount</Text>
                 <Heading fontSize="lg">{getValues('receiveAmount').toString()}</Heading>
               </Box>
-              <Text alignSelf="flex-end">{currencies.receiveCurrency}</Text>
+              <Text alignSelf="flex-end">{vaultDetails?.shareCurrency.symbol}</Text>
             </Flex>
           </Box>
         </Box>

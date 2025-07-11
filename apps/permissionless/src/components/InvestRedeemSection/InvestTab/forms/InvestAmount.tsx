@@ -19,8 +19,6 @@ interface InvestAmountProps {
   networks?: PoolNetwork[]
   parsedInvestAmount: 0 | Balance
   vaultDetails?: VaultDetails
-  currencies: { investCurrency: string; receiveCurrency: string }
-  setCurrencies: Dispatch<SetStateAction<{ investCurrency: string; receiveCurrency: string }>>
   setActionType: Dispatch<SetStateAction<InvestActionType>>
   setVault: Dispatch<Vault>
   vaults: Vault[]
@@ -32,10 +30,7 @@ export function InvestAmount({
   networks,
   parsedInvestAmount,
   vaultDetails,
-  currencies,
-  setCurrencies,
   setActionType,
-  // setVault,
   vaults,
 }: InvestAmountProps) {
   const { data: vaultsDetails } = useVaultsDetails(vaults)
@@ -51,6 +46,8 @@ export function InvestAmount({
     label: vault.investmentCurrency.symbol,
     value: vault.investmentCurrency.chainId,
   }))
+
+  console.log({ vaultDetails })
 
   const changeVault = (value: number) => switchChain({ chainId: value })
 
@@ -95,15 +92,6 @@ export function InvestAmount({
     )
     setValue('receiveAmount', calculatedReceiveAmount)
   }, [maxInvestAmount])
-
-  useEffect(
-    () =>
-      setCurrencies({
-        investCurrency: portfolioCurrency?.symbol ?? '',
-        receiveCurrency: shareClass?.details.symbol ?? '',
-      }),
-    [portfolioCurrency, shareClass]
-  )
 
   return (
     <Box>
@@ -152,7 +140,7 @@ export function InvestAmount({
             placeholder="0.00"
             disabled
             inputGroupProps={{
-              endAddon: currencies.receiveCurrency,
+              endAddon: vaultDetails?.shareCurrency.symbol,
             }}
           />
         </>
