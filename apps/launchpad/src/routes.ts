@@ -23,7 +23,14 @@ export default [
     route('/settings/:poolId/poolAccess', './routes/settings/poolAccess.tsx'),
 
     // Pool Holdings
-    route('/holdings/:poolId/add', './routes/holdings/add.tsx'),
+    route('/holdings/:poolId/add', './routes/holdings/addHolding.tsx'),
+    route('/holdings/:poolId/deposit', './routes/holdings/depositHolding.tsx'),
+    route('/holdings/:poolId/withdraw', './routes/holdings/depositHolding.tsx'),
+    route('/holdings/:poolId/update', './routes/holdings/updateHolding.tsx'),
+
+    // Pool Metadata
+    // TEMPORAL ONLY TO UPDATE METADATA UNTIL WE HAVE A PROPER UI
+    route('/metadata/:poolId', './routes/updateMetadata.tsx'),
   ]),
   route('*', './routes/catchall.tsx'),
 ] satisfies RouteConfig

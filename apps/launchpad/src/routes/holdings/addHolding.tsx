@@ -2,10 +2,10 @@ import z from 'zod'
 import { Flex, Heading } from '@chakra-ui/react'
 import { Form, useForm } from '@centrifuge/forms'
 import { usePoolProvider } from '@contexts/PoolProvider'
-import { AddHoldingForm } from '@components/holdings/addHoldingForm'
 import { Button, Card, Loader } from '@centrifuge/ui'
 import { AssetId, ShareClassId } from '@centrifuge/sdk'
 import { useCentrifugeTransaction } from '@centrifuge/shared'
+import { AddHoldingForm } from '@components/holdings/addHoldingForm'
 
 export const handle = {
   hasSettings: false,
@@ -52,7 +52,7 @@ export default function Add() {
 
   return (
     <Form form={form}>
-      <Flex justifyContent="space-between" alignItems="center" mt={8} mb={8}>
+      <Flex justifyContent="space-between" alignItems="center" mb={4}>
         <Heading>Add holding</Heading>
         <Button
           label="Save changes"

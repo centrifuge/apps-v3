@@ -56,7 +56,7 @@ export default function Investors() {
 
   return (
     <Form form={form}>
-      <Box mt={10}>
+      <Box>
         <Flex justifyContent="space-between" alignItems="center">
           <Heading size="md">Investors</Heading>
           <Button
@@ -67,7 +67,7 @@ export default function Investors() {
             loading={isPending}
           />
         </Flex>
-        <Card mt={8}>
+        <Card mt={4}>
           <Stack gap={4}>
             <WhitelistInvestor pools={poolsDetails ?? []} />
           </Stack>

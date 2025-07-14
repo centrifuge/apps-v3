@@ -114,10 +114,8 @@ export const PoolOverviewTable = ({ poolIds }: { poolIds: PoolId[] }) => {
   if (isLoadingPools) return <Loader />
 
   return (
-    <Stack mt={10} mb={8}>
-      <Heading size="md" my="4">
-        Pool overview
-      </Heading>
+    <Stack>
+      <Heading size="md">Pool overview</Heading>
       {<DataTable columns={columns} data={flattenedData ?? []} />}
     </Stack>
   )

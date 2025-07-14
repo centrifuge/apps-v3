@@ -109,7 +109,7 @@ export default function IssueOrders() {
   }
 
   return (
-    <Container mt={8}>
+    <Container>
       <Form form={form}>
         <Grid templateColumns="1fr 160px" gap={4} alignItems="center">
           <Heading>Approve investments</Heading>
