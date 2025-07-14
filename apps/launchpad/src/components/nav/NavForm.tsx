@@ -4,6 +4,7 @@ import { BalanceInput, useFormContext } from '@centrifuge/forms'
 import { Balance, ShareClass } from '@centrifuge/sdk'
 import { useCallback } from 'react'
 import { usePoolProvider } from '@contexts/PoolProvider'
+import { formatBalanceToString } from '@centrifuge/shared'
 
 interface NavFormProps {
   shareClassDetails?: Awaited<ReturnType<typeof ShareClass.prototype.details>>
@@ -18,7 +19,7 @@ export function NavForm({ shareClassDetails }: NavFormProps) {
   const handleCalculateNewNav = useCallback((_stringValue: string, newPricePerShare?: Balance) => {
     if (!shareClassDetails?.totalIssuance || !newPricePerShare) return
 
-    const newNav = shareClassDetails?.totalIssuance.mul(newPricePerShare)
+    const newNav = formatBalanceToString(shareClassDetails?.totalIssuance.mul(newPricePerShare))
     setValue('newNav', newNav)
   }, [])
 

@@ -43,9 +43,9 @@ export default function Nav() {
   const form = useForm({
     schema,
     defaultValues: {
-      currentNav: '0',
-      currentTokenPrice: '0',
-      newNav: '0',
+      currentNav: '',
+      currentTokenPrice: '',
+      newNav: '',
       newTokenPrice: '',
     },
     mode: 'onChange',
