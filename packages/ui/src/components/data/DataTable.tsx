@@ -17,8 +17,6 @@ interface DataTableProps<RowType extends { id?: string | number }> {
   columns: ColumnDefinition<RowType>[]
   data: RowType[]
   size?: 'sm' | 'md' | 'lg'
-  defaultSortKey?: string
-  defaultSortOrder?: OrderBy
   pageSize?: number
   page?: number
 }
