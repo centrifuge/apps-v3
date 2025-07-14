@@ -21,31 +21,31 @@ export function AccountPage({ sc, poolDetails }: { sc: ShareClassWithDetails; po
   const decimals = poolDetails?.currency.decimals
   const poolCurrencySymbol = poolDetails?.currency.symbol
 
-  const totalNav = useMemo(() => {
-    return navPerNetwork?.map((network) => network.nav).reduce((acc, curr) => acc.add(curr), new Balance(0, decimals))
-  }, [navPerNetwork])
-
-  const totalIssuance = useMemo(() => {
-    return (
-      navPerNetwork
-        ?.map((network) => network.totalIssuance)
-        .reduce((acc, curr) => acc.add(curr), new Balance(0, decimals)) ?? new Balance(0, decimals)
-    )
-  }, [navPerNetwork])
-
-  const totalNavPerShare = useMemo(() => {
-    return navPerNetwork
-      ?.map((network) => network.pricePerShare)
-      .reduce((acc, curr) => acc.add(curr), new Balance(0, decimals))
-  }, [navPerNetwork])
-
-  const amounts = useMemo(() => {
-    return {
-      totalNav: totalNav?.mul(totalIssuance) ?? 0,
-      totalNavPerShare: totalNavPerShare ?? 0,
-      totalIssuance: totalIssuance ?? 0,
+  const { amounts } = useMemo(() => {
+    const initialTotals = {
+      totalNav: new Balance(0, decimals),
+      totalIssuance: new Balance(0, decimals),
+      totalNavPerShare: new Balance(0, decimals),
     }
-  }, [totalNav, totalIssuance, totalNavPerShare])
+
+    const totals =
+      navPerNetwork?.reduce(
+        (acc, network) => ({
+          totalNav: acc.totalNav.add(network.nav),
+          totalIssuance: acc.totalIssuance.add(network.totalIssuance),
+          totalNavPerShare: acc.totalNavPerShare.add(network.pricePerShare),
+        }),
+        initialTotals
+      ) || initialTotals
+
+    const amounts = {
+      totalNav: totals.totalNav.mul(totals.totalIssuance),
+      totalIssuance: totals.totalIssuance,
+      totalNavPerShare: totals.totalNavPerShare,
+    }
+
+    return { totals, amounts }
+  }, [navPerNetwork, decimals])
 
   return (
     <Box mb={8}>

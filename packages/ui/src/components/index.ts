@@ -1,6 +1,7 @@
 export * from './data/DataTable'
 export * from './data/ChartTooltip'
 export * from './elements/BalanceDisplay'
+export * from './elements/BalanceInputDisplay'
 export * from './elements/Button'
 export * from './elements/Card'
 export * from './elements/LogoCentrifuge'

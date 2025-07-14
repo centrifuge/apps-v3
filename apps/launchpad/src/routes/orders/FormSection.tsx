@@ -1,5 +1,6 @@
 import { BalanceInput, Checkbox } from '@centrifuge/forms'
-import { Card, Tooltip } from '@centrifuge/ui'
+import { Balance } from '@centrifuge/sdk'
+import { BalanceInputDisplay, Tooltip } from '@centrifuge/ui'
 import { Box, Grid, Text } from '@chakra-ui/react'
 
 const tooltipContent = {
@@ -25,6 +26,13 @@ type FieldConfig =
       tooltipKey?: keyof typeof tooltipContent
       onChange?: (checked: boolean) => void
     }
+  | {
+      fieldType: 'displayBalance'
+      balance: Balance
+      currency: string
+      decimals: number
+      label: string
+    }
 
 export interface FormSectionProps {
   fields: FieldConfig[]
@@ -48,6 +56,17 @@ export const FormSection = ({ fields, templateColumns = '1fr 1fr' }: FormSection
                 endAddon: field.currency,
               }}
               disabled={field.disabled}
+            />
+          )
+        }
+
+        if (field.fieldType === 'displayBalance') {
+          return (
+            <BalanceInputDisplay
+              balance={field.balance}
+              currency={field.currency}
+              decimals={field.decimals}
+              label={field.label}
             />
           )
         }

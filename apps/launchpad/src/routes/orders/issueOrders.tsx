@@ -1,22 +1,21 @@
-import { useEffect, useMemo } from 'react'
-import { Button, Loader, NetworkIcon, Card } from '@centrifuge/ui'
-import { Box, Container, Flex, Grid, Heading, Stack, Text, VStack } from '@chakra-ui/react'
-import { Form, useForm } from '@centrifuge/forms'
-import { networkToName, useCentrifugeTransaction } from '@centrifuge/shared'
-import { usePendingAmounts } from '@centrifuge/shared/src/hooks/useShareClass'
+import { useMemo } from 'react'
+import { Loader, NetworkIcon, Card } from '@centrifuge/ui'
+import { Box, Container, Flex, Grid, Heading, Text, VStack } from '@chakra-ui/react'
+import { Form, SubmitButton, useForm } from '@centrifuge/forms'
+import {
+  networkToName,
+  useCentrifugeTransaction,
+  useGroupPendingAmountsByChain,
+  usePendingAmounts,
+} from '@centrifuge/shared'
 import { usePoolProvider } from '@contexts/PoolProvider'
 import { AssetId, Balance, Price } from '@centrifuge/sdk'
 import { FormSection } from './FormSection'
 import { z } from 'zod'
-
-type PendingAmount = {
-  chainId: number
-  assetId: AssetId
-  approvedDeposit: Balance
-}
+import { SelectAssetsSchema } from './utils'
 
 const schema = z.object({
-  selectedAssets: z.array(z.instanceof(AssetId)),
+  ...SelectAssetsSchema.shape,
   approvedDeposits: z.array(
     z.object({
       chainId: z.number(),
@@ -27,48 +26,14 @@ const schema = z.object({
   ),
 })
 
-export const ApproveButton = ({
-  disabled,
-  onClick,
-  isLoading,
-}: {
-  disabled: boolean
-  onClick: () => Promise<void>
-  isLoading: boolean
-}) => {
-  return <Button label="Approve" onClick={onClick} size="sm" width={163} disabled={disabled} loading={isLoading} />
-}
-
 export default function IssueOrders() {
   const { execute, isPending } = useCentrifugeTransaction()
   const { isLoading, shareClass, poolDetails } = usePoolProvider()
   const { data: pendingAmounts } = usePendingAmounts(shareClass?.shareClass!)
+  const groupedByChain = useGroupPendingAmountsByChain(pendingAmounts ?? [])
   const pricePerShare = shareClass?.details.pricePerShare.toFloat()
   const poolSymbol = poolDetails?.currency.symbol
   const poolDecimals = poolDetails?.currency.decimals
-
-  const groupedByChain = useMemo(() => {
-    return pendingAmounts?.reduce(
-      (acc, curr) => {
-        acc[curr.chainId] = [...(acc[curr.chainId] || []), curr]
-        return acc
-      },
-      {} as Record<number, PendingAmount[]>
-    )
-  }, [pendingAmounts])
-
-  useEffect(() => {
-    setValue(
-      'approvedDeposits',
-      pendingAmounts?.map((p) => ({
-        chainId: p.chainId,
-        assetId: p.assetId,
-        approvedDeposit: p.approvedDeposit,
-        // TODO: should the nav per share come from the sdk as the time the investment was approved, right now is showing the current nav per share
-        navPerShare: pricePerShare?.toString() ?? '0',
-      })) ?? []
-    )
-  }, [pendingAmounts])
 
   const form = useForm({
     schema,
@@ -101,8 +66,20 @@ export default function IssueOrders() {
   })
 
   const { watch, setValue, getValues } = form
-
   const selectedAssets = watch('selectedAssets')
+
+  useMemo(() => {
+    setValue(
+      'approvedDeposits',
+      pendingAmounts?.map((p) => ({
+        chainId: p.chainId,
+        assetId: p.assetId,
+        approvedDeposit: p.approvedDeposit,
+        // TODO: should the nav per share come from the sdk as the time the investment was approved, right now is showing the current nav per share
+        navPerShare: pricePerShare?.toString() ?? '0',
+      })) ?? []
+    )
+  }, [pendingAmounts])
 
   const handleAssetSelection = (assetId: AssetId, isChecked: boolean) => {
     const currentAssets = getValues('selectedAssets')
@@ -136,7 +113,9 @@ export default function IssueOrders() {
       <Form form={form}>
         <Grid templateColumns="1fr 160px" gap={4} alignItems="center">
           <Heading>Approve investments</Heading>
-          <ApproveButton disabled={isApproveDisabled} onClick={() => form.handleSubmit()} isLoading={isPending} />
+          <SubmitButton colorPalette="yellow" size="sm" disabled={isApproveDisabled} loading={isPending}>
+            Save changes
+          </SubmitButton>
         </Grid>
 
         {Object.keys(groupedByChain ?? {}).map((chainId, index) => {
@@ -189,7 +168,9 @@ export default function IssueOrders() {
           )
         })}
         <Flex justifyContent="center">
-          <ApproveButton disabled={isApproveDisabled} onClick={() => form.handleSubmit()} isLoading={isPending} />
+          <SubmitButton colorPalette="yellow" size="sm" disabled={isApproveDisabled} loading={isPending}>
+            Save changes
+          </SubmitButton>
         </Flex>
       </Form>
     </Container>
