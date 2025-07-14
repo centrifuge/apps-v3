@@ -1,4 +1,5 @@
 import { useCallback, useMemo } from 'react'
+import { debounce } from 'perfect-debounce'
 import { Badge, Box, Flex, Text } from '@chakra-ui/react'
 import { BalanceInput, SubmitButton, useFormContext } from '@centrifuge/forms'
 import { Balance, PoolId, PoolNetwork, Price, Vault } from '@centrifuge/sdk'
@@ -14,7 +15,6 @@ import { InfoWrapper } from '@components/InvestRedeemSection/components/InfoWrap
 import { infoText } from '@utils/infoText'
 import { useSelectedPoolContext } from '@contexts/useSelectedPoolContext'
 import { divideBigInts, formatBalanceToString } from '@centrifuge/shared/src/utils/formatting'
-import { debounce } from '@utils/debounce'
 import { NetworkIcons } from '@centrifuge/ui'
 import { useSwitchChain } from 'wagmi'
 
