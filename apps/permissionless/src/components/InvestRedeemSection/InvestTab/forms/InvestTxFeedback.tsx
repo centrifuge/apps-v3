@@ -1,6 +1,6 @@
 import { useEffect, useState, type Dispatch, type SetStateAction } from 'react'
-import { Box, Button, Flex, Heading, Icon, Text, useToken } from '@chakra-ui/react'
 import { IoIosCloseCircleOutline, IoMdCheckmarkCircleOutline, IoMdTimer } from 'react-icons/io'
+import { Box, Button, Flex, Heading, Icon, Text, useToken } from '@chakra-ui/react'
 import { useFormContext } from '@centrifuge/forms'
 import { useTransactions } from '@centrifuge/shared'
 import { InvestAction, type InvestActionType } from '@components/InvestRedeemSection/components/defaults'

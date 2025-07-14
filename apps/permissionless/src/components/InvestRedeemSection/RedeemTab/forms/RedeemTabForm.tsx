@@ -1,10 +1,10 @@
 import { useMemo, type Dispatch, type SetStateAction } from 'react'
+import { useInvestment } from '@centrifuge/shared'
 import type { Balance, PoolNetwork, Vault } from '@centrifuge/sdk'
 import { type RedeemActionType, RedeemAction } from '@components/InvestRedeemSection/components/defaults'
-import { RedeemCancel } from '@components/InvestRedeemSection/RedeemTab/forms/RedeemCancel'
 import { RedeemAmount } from '@components/InvestRedeemSection/RedeemTab/forms/RedeemAmount'
+import { RedeemCancel } from '@components/InvestRedeemSection/RedeemTab/forms/RedeemCancel'
 import { RedeemTxCancelled } from '@components/InvestRedeemSection/RedeemTab/forms/RedeemTxCancelled'
-import { useInvestment } from '@centrifuge/shared'
 
 interface RedeemTabFormProps {
   actionType: RedeemActionType
