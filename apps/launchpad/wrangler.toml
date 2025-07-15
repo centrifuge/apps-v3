@@ -11,6 +11,7 @@ enabled = true
 
 [assets]
 directory = "./dist"
+binding = "ASSETS"
 
 # --- PRODUCTION environment settings ---
 [env.production]
