@@ -5,6 +5,7 @@ export interface SubmitButtonProps extends Omit<ButtonProps, 'type' | 'disabled'
   loadingText?: string
   disabled?: boolean
   disableOnInvalid?: boolean
+  loading?: boolean
 }
 
 export function SubmitButton<T extends FieldValues = FieldValues>({
@@ -12,6 +13,7 @@ export function SubmitButton<T extends FieldValues = FieldValues>({
   loadingText,
   disabled = false,
   disableOnInvalid = true,
+  loading = false,
   ...props
 }: SubmitButtonProps) {
   const { formState } = useFormContext<T>()
@@ -23,7 +25,7 @@ export function SubmitButton<T extends FieldValues = FieldValues>({
       {...props}
       type="submit"
       disabled={isDisabled}
-      loading={formState.isSubmitting}
+      loading={formState.isSubmitting || loading}
       loadingText={loadingText}
       mt={4}
     >
