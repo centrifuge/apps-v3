@@ -41,9 +41,6 @@ importers:
       decimal.js:
         specifier: ^10.6.0
         version: 10.6.0
-      decimal.js-light:
-        specifier: ^2.5.1
-        version: 2.5.1
       install:
         specifier: ^0.13.0
         version: 0.13.0
