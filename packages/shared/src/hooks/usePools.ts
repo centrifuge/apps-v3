@@ -63,7 +63,9 @@ export function useAllPoolDetails(poolIds: PoolId[]) {
       return of([])
     }
 
-    const poolDetailObservables$ = poolIds.map((id) => centrifuge.pool(id).pipe(switchMap((pool) => pool.details())))
+    const poolDetailObservables$ = [poolIds[0]].map((id) =>
+      centrifuge.pool(id).pipe(switchMap((pool) => pool.details()))
+    )
 
     return combineLatest(poolDetailObservables$)
   }, [poolIds, centrifuge])
