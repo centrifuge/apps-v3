@@ -1,9 +1,9 @@
 import { useCallback, useMemo } from 'react'
-import { debounce } from 'perfect-debounce'
 import { Badge, Box, Flex, Text } from '@chakra-ui/react'
 import { BalanceInput, SubmitButton, useFormContext } from '@centrifuge/forms'
 import { Balance, PoolId, PoolNetwork, Price, Vault } from '@centrifuge/sdk'
 import {
+  debounce,
   usePortfolio,
   formatBalance,
   usePoolDetails,

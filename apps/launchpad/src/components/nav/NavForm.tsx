@@ -1,10 +1,9 @@
-import { debounce } from 'perfect-debounce'
 import { Box, Grid, GridItem } from '@chakra-ui/react'
 import { BalanceInput, useFormContext } from '@centrifuge/forms'
 import { Balance, ShareClass } from '@centrifuge/sdk'
 import { useCallback } from 'react'
 import { usePoolProvider } from '@contexts/PoolProvider'
-import { formatBalanceToString } from '@centrifuge/shared'
+import { debounce, formatBalanceToString } from '@centrifuge/shared'
 
 interface NavFormProps {
   shareClassDetails?: Awaited<ReturnType<typeof ShareClass.prototype.details>>

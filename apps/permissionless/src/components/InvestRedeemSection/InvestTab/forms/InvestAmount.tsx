@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, type Dispatch, type SetStateAction } from 'react'
-import { debounce } from 'perfect-debounce'
 import { Badge, Box, Button, Flex, Text } from '@chakra-ui/react'
 import { BalanceInput, useFormContext } from '@centrifuge/forms'
 import { Balance, PoolId, PoolNetwork, Vault } from '@centrifuge/sdk'
@@ -10,7 +9,7 @@ import { infoText } from '@utils/infoText'
 import { InvestAction, type InvestActionType } from '@components/InvestRedeemSection/components/defaults'
 import { InfoWrapper } from '@components/InvestRedeemSection/components/InfoWrapper'
 import { VaultDetails } from '@utils/types'
-import { formatBalance, formatBalanceToString } from '@centrifuge/shared'
+import { debounce, formatBalance, formatBalanceToString } from '@centrifuge/shared'
 import { useSwitchChain } from 'wagmi'
 
 interface InvestAmountProps {
