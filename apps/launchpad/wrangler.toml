@@ -7,7 +7,7 @@ routes = [
 ]
 
 [assets]
-directory = "./dist/assets/"
+directory = "./dist"
 
 [observability]
 enabled = true
