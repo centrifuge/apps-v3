@@ -20,7 +20,9 @@
     "deploy:launchpad:testnet": "pnpm run build:launchpad:testnet && wrangler deploy --cwd=apps/launchpad",
     "deploy:launchpad:mainnet": "pnpm run build:launchpad:mainnet && wrangler deploy --cwd=apps/launchpad",
     "lint": "concurrently \"pnpm --filter launchpad lint\" \"pnpm --filter permissionless lint\"",
-    "lint:fix": "npm run lint -- --fix"
+    "lint:fix": "npm run lint -- --fix",
+    "build:pages:launchpad": "pnpm --filter=launchpad build",
+    "build:pages:permissionless": "pnpm --filter=permissionless build"
   },
   "dependencies": {
     "@ark-ui/react": "^5.15.1",
