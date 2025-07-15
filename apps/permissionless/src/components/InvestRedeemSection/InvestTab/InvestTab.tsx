@@ -1,12 +1,14 @@
-import { Dispatch, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
+import { useChainId } from 'wagmi'
 import { z } from 'zod'
-import { Box } from '@chakra-ui/react'
+import { Box, Spinner } from '@chakra-ui/react'
 import { Form, useForm, safeParse, createBalanceSchema } from '@centrifuge/forms'
-import { Balance, PoolNetwork, Vault } from '@centrifuge/sdk'
+import { Balance } from '@centrifuge/sdk'
 import {
   formatBalanceToString,
   useCentrifugeTransaction,
   useInvestment,
+  useIsMember,
   usePortfolio,
   useVaultDetails,
 } from '@centrifuge/shared'
@@ -16,26 +18,23 @@ import {
   InvestFormDefaultValues,
 } from '@components/InvestRedeemSection/components/defaults'
 import { InvestTabForm } from '@components/InvestRedeemSection/InvestTab/forms/InvestTabForm'
+import { infoText } from '@utils/infoText'
+import { TabProps } from '@components/InvestRedeemSection'
+import { InfoWrapper } from '@components/InvestRedeemSection/components/InfoWrapper'
 
-export default function InvestTab({
-  vault,
-  setVault,
-  vaults,
-  networks,
-}: {
-  vault: Vault
-  setVault: Dispatch<Vault>
-  vaults: Vault[]
-  networks?: PoolNetwork[]
-}) {
-  const { data: vaultDetails } = useVaultDetails(vault)
-  const { data: investment } = useInvestment(vault)
-  const { data: portfolio } = usePortfolio()
+export default function InvestTab({ networks, shareClassId, vault, vaults, setVault }: TabProps) {
+  const connectedChainId = useChainId()
+  const { data: vaultDetails, isLoading: isVaultDetailsLoading } = useVaultDetails(vault)
+  const { data: investment, isLoading: isInvestmentLoading } = useInvestment(vault)
+  const { data: portfolio, isLoading: isPortfolioLoading } = usePortfolio()
+  const { data: isMember, isLoading: isMemberLoading } = useIsMember(shareClassId, connectedChainId)
   const { execute, isPending } = useCentrifugeTransaction()
   const [actionType, setActionType] = useState<InvestActionType>(InvestAction.INVEST_AMOUNT)
+
   const investmentCurrencyChainId = vaultDetails?.investmentCurrency?.chainId
   const portfolioInvestmentAsset = portfolio?.find((asset) => asset.currency.chainId === investmentCurrencyChainId)
   const portfolioBalance = portfolioInvestmentAsset?.balance
+  const isInvestorWhiteListed = !!isMember
 
   const maxInvestAmount = useMemo(() => {
     if (!portfolioBalance) return '0'
@@ -84,7 +83,20 @@ export default function InvestTab({
     [investAmount, schema.shape.investAmount]
   )
 
+  const isLoading = isVaultDetailsLoading || isInvestmentLoading || isPortfolioLoading || isMemberLoading
   const isDisabled = !vaultDetails || !investment || parsedInvestAmount === 0 || isPending
+
+  if (isLoading) {
+    return (
+      <Box minH="298px" display="flex" alignItems="center" justifyContent="center">
+        <Spinner size="lg" color="black.solid" />
+      </Box>
+    )
+  }
+
+  if (!isInvestorWhiteListed) {
+    return <InfoWrapper text={infoText().investorNotWhitelisted} type="info" />
+  }
 
   return (
     <Form form={form} style={{ height: '100%' }}>

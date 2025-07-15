@@ -1,7 +1,7 @@
 import { useEffect, useState, type ComponentType, type Dispatch } from 'react'
 import { useChainId } from 'wagmi'
 import { Flex, Heading, Stack, Text } from '@chakra-ui/react'
-import type { PoolNetwork, Vault } from '@centrifuge/sdk'
+import type { PoolNetwork, ShareClassId, Vault } from '@centrifuge/sdk'
 import { usePoolNetworks, useVaults } from '@centrifuge/shared'
 import { useGeolocation } from '@hooks/useGeolocation'
 import { ConnectionGuard } from '@components/ConnectionGuard'
@@ -10,6 +10,22 @@ import { InfoWrapper } from '@components/InvestRedeemSection/components/InfoWrap
 import InvestTab from '@components/InvestRedeemSection/InvestTab/InvestTab'
 import RedeemTab from '@components/InvestRedeemSection/RedeemTab/RedeemTab'
 import type { PoolDetails } from '@utils/types'
+
+export interface TabProps {
+  networks?: PoolNetwork[]
+  shareClassId: ShareClassId
+  vault: Vault
+  vaults: Vault[]
+  setVault: Dispatch<Vault>
+}
+interface VaultGuardProps {
+  pool: PoolDetails
+  tab: ComponentType<TabProps>
+  vault?: Vault
+  setVault: Dispatch<Vault | undefined>
+  setVaults: Dispatch<Vault[] | undefined>
+  vaults?: Vault[]
+}
 
 const RestrictedCountry = () => {
   return (
@@ -81,21 +97,7 @@ export function InvestRedeemSection({ pool: poolDetails }: { pool: PoolDetails }
   )
 }
 
-function VaultGuard({
-  pool: poolDetails,
-  tab: Tab,
-  vault,
-  setVault,
-  setVaults,
-  vaults,
-}: {
-  pool: PoolDetails
-  tab: ComponentType<{ vault: Vault; setVault: Dispatch<Vault>; vaults: Vault[]; networks?: PoolNetwork[] }>
-  vault?: Vault
-  setVault: Dispatch<Vault | undefined>
-  setVaults: Dispatch<Vault[] | undefined>
-  vaults?: Vault[]
-}) {
+function VaultGuard({ pool: poolDetails, tab: Tab, vault, vaults, setVault, setVaults }: VaultGuardProps) {
   const connectedChainId = useChainId()
   // Assuming one share class per pool
   const scId = poolDetails?.shareClasses?.[0]?.details.id
@@ -121,7 +123,7 @@ function VaultGuard({
         <Text>No vaults found for this pool on this network.</Text>
       ) : (
         <Stack height="100%">
-          <Tab vault={vault} setVault={setVault} vaults={vaults ?? []} networks={networks} />
+          <Tab vault={vault} setVault={setVault} vaults={vaults ?? []} networks={networks} shareClassId={scId} />
         </Stack>
       )}
     </ConnectionGuard>
