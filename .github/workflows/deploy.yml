@@ -1,0 +1,98 @@
+name: Deploy to Cloudflare Workers
+
+# This workflow runs automatically on any push to the 'main' branch
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      # This matrix will run the build steps for both 'permissionless' and 'launchpad'
+      matrix:
+        app: [permissionless, launchpad]
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 8
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build for Staging (using testnet mode)
+        run: pnpm --filter=${{ matrix.app }} build --mode testnet
+
+      - name: Upload Staging Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.app }}-staging-build
+          path: ./apps/${{ matrix.app }}/dist
+
+      - name: Build for Production (using mainnet mode)
+        run: pnpm --filter=${{ matrix.app }} build --mode mainnet
+
+      - name: Upload Production Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.app }}-production-build
+          path: ./apps/${{ matrix.app }}/dist
+
+  deploy-staging:
+    # This job will only run after the 'build' job is complete
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: staging
+    strategy:
+      matrix:
+        app: [permissionless, launchpad]
+    steps:
+      - name: Download Staging Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ matrix.app }}-staging-build
+          path: ./apps/${{ matrix.app }}/dist
+
+      - name: Deploy to Cloudflare Staging
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CF_API_TOKEN }}
+          accountId: ${{ secrets.CF_ACCOUNT_ID }}
+          workingDirectory: 'apps/${{ matrix.app }}'
+          command: deploy
+
+  deploy-production:
+    needs: deploy-staging
+    runs-on: ubuntu-latest
+    # This job targets the 'production' environment, which requires manual approval
+    environment:
+      name: production
+    strategy:
+      matrix:
+        app: [permissionless, launchpad]
+    steps:
+      - name: Download Production Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ matrix.app }}-production-build
+          path: ./apps/${{ matrix.app }}/dist
+
+      - name: Deploy to Cloudflare Production
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CF_API_TOKEN }}
+          accountId: ${{ secrets.CF_ACCOUNT_ID }}
+          workingDirectory: 'apps/${{ matrix.app }}'
+          command: deploy --env production
