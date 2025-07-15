@@ -6,10 +6,10 @@ import { useGetFormError } from '../hooks/useGetFormError'
 export interface InputProps<TFieldValues extends FieldValues = FieldValues>
   extends Omit<CheckboxRootProps, 'disabled' | 'onChange'> {
   name: FieldPath<TFieldValues>
-  label: string
+  label?: string | React.ReactNode
   rules?: object
   disabled?: boolean
-  onChange?: (checked: boolean) => void // Optional callback for additional onChange logic
+  onChange?: (checked: boolean) => void
 }
 
 export function Checkbox<TFieldValues extends FieldValues = FieldValues>(props: InputProps<TFieldValues>) {
@@ -41,11 +41,11 @@ export function Checkbox<TFieldValues extends FieldValues = FieldValues>(props: 
         {...rest}
         id={name}
         disabled={isDisabled}
-        onBlur={() => trigger(name)} // Trigger validation on blur
+        onBlur={() => trigger(name)}
         onCheckedChange={({ checked }: { checked: any }) => {
           field.onChange(checked)
           if (checked !== 'indeterminate') {
-            onChange?.(checked) // Call any additional onChange from props
+            onChange?.(checked)
           }
         }}
       >

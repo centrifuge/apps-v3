@@ -14,6 +14,8 @@ import {
   Input as ChakraInput,
   InputGroup,
   NativeSelect,
+  Flex,
+  Text,
 } from '@chakra-ui/react'
 import { useGetFormError } from '../hooks/useGetFormError'
 import { Balance } from '@centrifuge/sdk'
@@ -34,6 +36,7 @@ export interface BalanceInputProps<TFieldValues extends FieldValues = FieldValue
   inputGroupProps?: Omit<InputGroupProps, 'children'>
   selectOptions?: { label: string; value: number }[]
   onSelectChange?: (value: number) => void
+  subLabel?: string
 }
 
 const CurrencySelect = ({
@@ -73,6 +76,7 @@ export function BalanceInput<TFieldValues extends FieldValues = FieldValues>(pro
     selectOptions,
     onSelectChange,
     label,
+    subLabel,
     ...rest
   } = props
   const currentDisplayDecimals = displayDecimals || decimals
@@ -220,7 +224,14 @@ export function BalanceInput<TFieldValues extends FieldValues = FieldValues>(pro
 
   return (
     <Field.Root invalid={isError}>
-      {label && <Field.Label>{label}</Field.Label>}
+      <Flex alignItems="center" gap={2}>
+        {label && <Field.Label>{label}</Field.Label>}
+        {subLabel && (
+          <Text fontSize="sm" color="gray.500">
+            {subLabel}
+          </Text>
+        )}
+      </Flex>
       <InputGroup
         {...inputGroupProps}
         endElement={
