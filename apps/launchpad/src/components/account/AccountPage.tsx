@@ -1,7 +1,7 @@
 import { Balance } from '@centrifuge/sdk'
 import { Button, Card, NetworkIcon } from '@centrifuge/ui'
 import { Box, Flex, Grid, Heading, Separator, Stack, Text } from '@chakra-ui/react'
-import { useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { formatBalanceToString, useNavPerNetwork, useObservable } from '@centrifuge/shared'
 import { FaRegChartBar } from 'react-icons/fa'
 import { Orders } from './Orders'
@@ -25,6 +25,11 @@ export function AccountPage({
   const navigate = useNavigate()
   const { poolId } = useParams()
   const { data: navPerNetwork, isLoading } = useNavPerNetwork(sc.shareClass)
+  const [totalValue, setTotalValue] = useState<number>(0)
+
+  useEffect(() => {
+    setTotalValue(totalValue)
+  }, [totalValue])
 
   const amounts = useMemo(() => {
     return {
@@ -108,7 +113,7 @@ export function AccountPage({
         <Stack gap={0} mb={4}>
           <Heading size="sm">Holdings</Heading>
           <Flex justify="space-between">
-            <Heading size="3xl">39,139,062 USDC</Heading>
+            <Heading size="3xl">{totalValue} USDC</Heading>
             <Button
               label="Add holding"
               onClick={() => navigate(`/holdings/${poolId}/add`)}
@@ -118,7 +123,7 @@ export function AccountPage({
             />
           </Flex>
         </Stack>
-        <PoolHoldings shareClass={sc.shareClass} />
+        <PoolHoldings setTotalValue={setTotalValue} shareClass={sc.shareClass} />
       </Stack>
     </Box>
   )
