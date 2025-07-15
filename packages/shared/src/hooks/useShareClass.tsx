@@ -3,8 +3,8 @@ import { useObservable } from './useObservable'
 import { useMemo } from 'react'
 import { PendingAmount } from '../types'
 
-export function useNavPerNetwork(shareClass?: ShareClass) {
-  const navPerNetwork$ = useMemo(() => (shareClass ? shareClass.navPerNetwork() : undefined), [shareClass])
+export function useNavPerNetwork(shareClass: ShareClass) {
+  const navPerNetwork$ = useMemo(() => shareClass.navPerNetwork(), [shareClass])
   return useObservable(navPerNetwork$)
 }
 
