@@ -1,0 +1,112 @@
+name: Deploy to Cloudflare Workers
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        app: [permissionless, launchpad]
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build for Staging (using testnet mode)
+        run: pnpm --filter=${{ matrix.app }} build --mode testnet
+
+      - name: Upload Staging Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.app }}-staging-build
+          path: ./apps/${{ matrix.app }}/dist
+
+      - name: Build for Production (using mainnet mode)
+        run: pnpm --filter=${{ matrix.app }} build --mode mainnet
+
+      - name: Upload Production Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.app }}-production-build
+          path: ./apps/${{ matrix.app }}/dist
+
+  deploy-staging:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: staging
+    strategy:
+      matrix:
+        app: [permissionless, launchpad]
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Wrangler
+        run: npm install --global wrangler
+
+      - name: Download Staging Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ matrix.app }}-staging-build
+          path: ./apps/${{ matrix.app }}/dist
+
+      - name: Deploy to Cloudflare Staging
+        run: |
+          cd apps/${{ matrix.app }}
+          rm -rf .wrangler
+          CLOUDFLARE_API_TOKEN=${{ secrets.CLOUDFLARE_API_TOKEN }} CLOUDFLARE_ACCOUNT_ID=${{ secrets.CLOUDFLARE_ACCOUNT_ID }} wrangler deploy
+
+  deploy-production:
+    needs: deploy-staging
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+    strategy:
+      matrix:
+        app: [permissionless, launchpad]
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Wrangler
+        run: npm install --global wrangler
+
+      - name: Download Production Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ matrix.app }}-production-build
+          path: ./apps/${{ matrix.app }}/dist
+
+      - name: Deploy to Cloudflare Production
+        run: |
+          cd apps/${{ matrix.app }}
+          rm -rf .wrangler
+          CLOUDFLARE_API_TOKEN=${{ secrets.CLOUDFLARE_API_TOKEN }} CLOUDFLARE_ACCOUNT_ID=${{ secrets.CLOUDFLARE_ACCOUNT_ID }} wrangler deploy --env production

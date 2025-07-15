@@ -1,7 +1,6 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "forceConsistentCasingInFileNames": true,
     "baseUrl": ".",
     "outDir": "dist",
     "jsx": "react-jsx",
