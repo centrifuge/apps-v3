@@ -5,7 +5,7 @@ import { usePoolProvider } from '@contexts/PoolProvider'
 import { Button, Card, Loader } from '@centrifuge/ui'
 import { AssetId, ShareClassId } from '@centrifuge/sdk'
 import { useCentrifugeTransaction } from '@centrifuge/shared'
-import { AddHoldingForm } from '@components/holdings/addHoldingForm'
+import { AddHoldingForm } from '@components/holdings/AddHoldingForm'
 
 export const handle = {
   hasSettings: false,
