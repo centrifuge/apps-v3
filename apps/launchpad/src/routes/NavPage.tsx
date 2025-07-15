@@ -14,7 +14,7 @@ export const handle = {
   hasTabs: false,
 }
 
-export default function Nav() {
+export default function NavPage() {
   const { shareClassId } = useParams()
   const { poolDetails, shareClass, vaultsDetails } = usePoolProvider()
   const { execute, isPending } = useCentrifugeTransaction()

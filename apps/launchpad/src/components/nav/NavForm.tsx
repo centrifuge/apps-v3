@@ -16,10 +16,13 @@ export function NavForm({ shareClassDetails }: NavFormProps) {
   const decimals = poolDetails?.currency.decimals ?? 18
 
   const handleCalculateNewNav = useCallback((_stringValue: string, newPricePerShare?: Balance) => {
-    if (!shareClassDetails?.totalIssuance || !newPricePerShare) return
+    if (!shareClassDetails?.totalIssuance || !newPricePerShare) {
+      // Set to 0 so we can still update new token price without nav calc value
+      return setValue('newNav', '0')
+    }
 
     const newNav = formatBalanceToString(shareClassDetails.totalIssuance.mul(newPricePerShare))
-    setValue('newNav', newNav)
+    return setValue('newNav', newNav)
   }, [])
 
   const debouncedCalculateNewNav = debounce(handleCalculateNewNav, 500)
