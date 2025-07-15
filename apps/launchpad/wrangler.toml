@@ -1,19 +1,17 @@
-# Default environment is STAGING
 name = "launchpad-staging"
-directory = "./dist"
 main = "index.js"
 compatibility_date = "2025-06-30"
 
 routes = [
-	{ pattern = "launchpad.staging.k-f.dev/*", zone_name = "k-f.dev" }
+    { pattern = "launchpad.staging.k-f.dev/*", zone_name = "k-f.dev" }
 ]
 
 [assets]
-directory = "./dist/client"
+directory = "./dist"
 
-# PRODUCTION environment settings
+# --- PRODUCTION environment settings ---
 [env.production]
 name = "launchpad-production"
 routes = [
-	{ pattern = "launchpad.k-f.dev/*", zone_name = "k-f.dev" }
+    { pattern = "launchpad.k-f.dev/*", zone_name = "k-f.dev" }
 ]
