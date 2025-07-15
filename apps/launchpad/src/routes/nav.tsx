@@ -23,10 +23,11 @@ export default function Nav() {
     () => vaultsDetails?.find((vault) => vault.shareClass.id.raw === shareClassId),
     [vaultsDetails, shareClassId]
   )
-  const { data: networksNavs } = useNavPerNetwork(vaultDetails?.shareClass)
-  const currencySymbol = poolDetails?.currency.symbol ?? ''
-  const tokenDecimals = shareClassDetails?.pricePerShare.decimals
-  const navDecimals = shareClassDetails?.nav.decimals
+  const { data: networksNavs } = vaultDetails?.shareClass
+    ? useNavPerNetwork(vaultDetails.shareClass)
+    : { data: undefined }
+  const poolCurrencySymbol = poolDetails?.currency.symbol ?? ''
+  const poolCurrencyDecimals = poolDetails?.currency.decimals ?? 18
 
   function updateSharePrice(pricePerShare: Price) {
     if (!shareClass?.shareClass || !pricePerShare) return
@@ -34,10 +35,10 @@ export default function Nav() {
   }
 
   const schema = z.object({
-    currentNav: createBalanceSchema(navDecimals ?? 18).optional(),
-    currentTokenPrice: createBalanceSchema(tokenDecimals ?? 18).optional(),
-    newNav: createBalanceSchema(navDecimals ?? 18).optional(),
-    newTokenPrice: createBalanceSchema(tokenDecimals ?? 18),
+    currentNav: createBalanceSchema(poolCurrencyDecimals).optional(),
+    currentTokenPrice: createBalanceSchema(poolCurrencyDecimals).optional(),
+    newNav: createBalanceSchema(poolCurrencyDecimals).optional(),
+    newTokenPrice: createBalanceSchema(poolCurrencyDecimals),
   })
 
   const form = useForm({
@@ -92,7 +93,7 @@ export default function Nav() {
             </Grid>
             <Box border="1px solid" borderColor="gray.200" backgroundColor="gray.200" borderRadius="sm" p={2} mt={6}>
               <Text fontSize="xs" textAlign="center">
-                {`This action will change the token price from ${formatBalance(parsedCurrentTokenPrice, currencySymbol, 2)} to ${formatBalance(parsedNewTokenPrice, currencySymbol, 2)}. Token prices will be propagated to all networks JTRSY is deployed to.`}
+                {`This action will change the token price from ${formatBalance(parsedCurrentTokenPrice, poolCurrencySymbol, 2)} to ${formatBalance(parsedNewTokenPrice, poolCurrencySymbol, 2)}. Token prices will be propagated to all networks JTRSY is deployed to.`}
               </Text>
             </Box>
           </Card.Body>

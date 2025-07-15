@@ -12,14 +12,13 @@ interface NavFormProps {
 
 export function NavForm({ shareClassDetails }: NavFormProps) {
   const { setValue } = useFormContext()
-  const { shareClass } = usePoolProvider()
-  const navDecimals = shareClass?.details.nav.decimals ?? 18
-  const tokenDecimals = shareClassDetails?.pricePerShare.decimals ?? 18
+  const { poolDetails } = usePoolProvider()
+  const decimals = poolDetails?.currency.decimals ?? 18
 
   const handleCalculateNewNav = useCallback((_stringValue: string, newPricePerShare?: Balance) => {
     if (!shareClassDetails?.totalIssuance || !newPricePerShare) return
 
-    const newNav = formatBalanceToString(shareClassDetails?.totalIssuance.mul(newPricePerShare))
+    const newNav = formatBalanceToString(shareClassDetails.totalIssuance.mul(newPricePerShare))
     setValue('newNav', newNav)
   }, [])
 
@@ -33,7 +32,7 @@ export function NavForm({ shareClassDetails }: NavFormProps) {
         <Box mb={gapValue}>
           <BalanceInput
             name="currentNav"
-            decimals={navDecimals}
+            decimals={decimals}
             displayDecimals={2}
             placeholder="0.00"
             inputGroupProps={{
@@ -46,7 +45,7 @@ export function NavForm({ shareClassDetails }: NavFormProps) {
         <Box mb={gapValue}>
           <BalanceInput
             name="currentTokenPrice"
-            decimals={tokenDecimals}
+            decimals={decimals}
             displayDecimals={2}
             placeholder="0.00"
             inputGroupProps={{
@@ -61,7 +60,7 @@ export function NavForm({ shareClassDetails }: NavFormProps) {
         <Box mb={gapValue}>
           <BalanceInput
             name="newNav"
-            decimals={navDecimals}
+            decimals={decimals}
             displayDecimals={2}
             placeholder="0.00"
             inputGroupProps={{
@@ -75,7 +74,7 @@ export function NavForm({ shareClassDetails }: NavFormProps) {
         <Box mb={gapValue}>
           <BalanceInput
             name="newTokenPrice"
-            decimals={tokenDecimals}
+            decimals={decimals}
             placeholder="0.00"
             inputGroupProps={{
               endAddon: 'USD per share',
