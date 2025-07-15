@@ -62,9 +62,9 @@ export default function Add() {
           loading={isPending}
         />
       </Flex>
-      {/* <Card>
+      <Card>
         <AddHoldingForm networks={networks ?? []} poolDetails={poolDetails} hubChainId={pool?.chainId!} />
-      </Card> */}
+      </Card>
     </Form>
   )
 }
