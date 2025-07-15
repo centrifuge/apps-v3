@@ -9,10 +9,6 @@ routes = [
 [observability]
 enabled = true
 
-[assets]
-directory = "./dist"
-binding = "ASSETS"
-
 # --- PRODUCTION environment settings ---
 [env.production]
 name = "launchpad-production"
