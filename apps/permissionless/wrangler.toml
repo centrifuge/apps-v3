@@ -1,6 +1,7 @@
 # Default environment is STAGING
 name = "permissionless-staging"
-main = "dist/assets"
+directory = "./dist"
+main = "index.js"
 compatibility_date = "2025-06-25"
 
 routes = [
