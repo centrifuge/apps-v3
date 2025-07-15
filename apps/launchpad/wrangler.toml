@@ -1,16 +1,16 @@
 name = "launchpad-staging"
 main = "index.js"
-compatibility_date = "2025-06-15"
+compatibility_date = "2025-06-30"
 
 routes = [
     { pattern = "launchpad-staging.k-f.dev/*", zone_name = "k-f.dev" }
 ]
 
-[assets]
-directory = "./dist/client"
-
 [observability]
 enabled = true
+
+[assets]
+directory = "./dist"
 
 # --- PRODUCTION environment settings ---
 [env.production]

@@ -19,7 +19,7 @@ const schema = z.object({
   newTokenPrice: createBalanceSchema(2),
 })
 
-export default function Nav() {
+export default function NavPage() {
   const params = useParams()
   const { vaultsDetails } = usePoolProvider()
   console.log({ shareClassId: params.shareClassId, vaultsDetails })
