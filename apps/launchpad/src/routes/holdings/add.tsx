@@ -2,17 +2,9 @@ import z from 'zod'
 import { Flex, Heading } from '@chakra-ui/react'
 import { Form, useForm } from '@centrifuge/forms'
 import { usePoolProvider } from '@contexts/PoolProvider'
-import { Button, Card, Loader } from '@centrifuge/ui'
+import { Button, Loader } from '@centrifuge/ui'
 import { AssetId, ShareClassId } from '@centrifuge/sdk'
 import { useCentrifugeTransaction } from '@centrifuge/shared'
-<<<<<<< Updated upstream
-import { AddHoldingForm } from '../../components/holdings/AddHoldingForm'
-=======
-<<<<<<< Updated upstream
-import { AddHoldingForm } from '@components/holdings/AddHoldingForm'
-=======
->>>>>>> Stashed changes
->>>>>>> Stashed changes
 
 export const handle = {
   hasSettings: false,
