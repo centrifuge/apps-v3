@@ -1,0 +1,18 @@
+# Default environment is STAGING
+name = "permissionless-staging"
+main = "dist/index.js"
+compatibility_date = "2025-06-25"
+
+routes = [
+	{ pattern = "derwa.staging.k-f.dev/*", zone_name = "k-f.dev" }
+]
+
+[assets]
+directory = "./dist"
+
+# PRODUCTION environment settings
+[env.production]
+name = "permissionless-production"
+routes = [
+	{ pattern = "derwa.k-f.dev/*", zone_name = "k-f.dev" }
+]
