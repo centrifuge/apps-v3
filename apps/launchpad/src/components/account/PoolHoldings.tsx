@@ -3,6 +3,8 @@ import { networkToName, useHoldings, formatBalance } from '@centrifuge/shared'
 import { NetworkIcon } from '@centrifuge/ui'
 import { DataTable, ColumnDefinition, ActionsDropdown } from '@centrifuge/ui'
 import { Flex, Heading, Text } from '@chakra-ui/react'
+import { usePoolProvider } from '@contexts/PoolProvider'
+import { useEffect } from 'react'
 
 type Row = {
   id: number
@@ -71,20 +73,24 @@ export function PoolHoldings({
   setTotalValue: (value: number) => void
 }) {
   const holdings = useHoldings(shareClass)
-
-  if (!holdings || !holdings.data || holdings.data.length === 0) {
-    return null
-  }
-
-  console.log(holdings.data)
+  const { poolDetails } = usePoolProvider()
+  const currencySymbol = poolDetails?.currency.symbol ?? 'USD'
 
   // TODO: Right now we are assuming that 1USD = 1USDC, this needs to be updated in the future
-  const totalValue = holdings.data.reduce((acc, holding) => {
+  const totalValue = holdings?.data?.reduce((acc, holding) => {
     const value = formatBalance(holding.value)
     return acc + (value ? parseFloat(value) : 0)
   }, 0)
 
-  setTotalValue(totalValue)
+  useEffect(() => {
+    if (totalValue) {
+      setTotalValue(totalValue)
+    }
+  }, [totalValue])
+
+  if (!holdings || !holdings.data || holdings.data.length === 0) {
+    return null
+  }
 
   const data: Row[] = holdings?.data?.map((holding, idx) => ({
     id: idx,
@@ -92,8 +98,7 @@ export function PoolHoldings({
     network: holding.asset.chainId,
     quantity: formatBalance(holding.amount),
     price: formatBalance(holding.value.mul(holding.amount)),
-    // TODO: pass currency as a second argument to formatBalance
-    value: formatBalance(holding.value),
+    value: formatBalance(holding.value, currencySymbol),
     vaults: [],
     actions: (row: Row) => {
       return (
