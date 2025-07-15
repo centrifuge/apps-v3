@@ -1,5 +1,4 @@
 import { useMemo, useState } from 'react'
-import { useChainId } from 'wagmi'
 import { z } from 'zod'
 import { Box, Spinner } from '@chakra-ui/react'
 import { Form, useForm, safeParse, createBalanceSchema } from '@centrifuge/forms'
@@ -8,7 +7,6 @@ import {
   formatBalanceToString,
   useCentrifugeTransaction,
   useInvestment,
-  useIsMember,
   usePortfolio,
   useVaultDetails,
 } from '@centrifuge/shared'
@@ -22,19 +20,23 @@ import { infoText } from '@utils/infoText'
 import { TabProps } from '@components/InvestRedeemSection'
 import { InfoWrapper } from '@components/InvestRedeemSection/components/InfoWrapper'
 
-export default function InvestTab({ networks, shareClassId, vault, vaults, setVault }: TabProps) {
-  const connectedChainId = useChainId()
+export default function InvestTab({
+  isInvestorWhiteListed,
+  isLoading: isTabLoading,
+  networks,
+  vault,
+  vaults,
+  setVault,
+}: TabProps) {
   const { data: vaultDetails, isLoading: isVaultDetailsLoading } = useVaultDetails(vault)
   const { data: investment, isLoading: isInvestmentLoading } = useInvestment(vault)
   const { data: portfolio, isLoading: isPortfolioLoading } = usePortfolio()
-  const { data: isMember, isLoading: isMemberLoading } = useIsMember(shareClassId, connectedChainId)
   const { execute, isPending } = useCentrifugeTransaction()
   const [actionType, setActionType] = useState<InvestActionType>(InvestAction.INVEST_AMOUNT)
 
   const investmentCurrencyChainId = vaultDetails?.investmentCurrency?.chainId
   const portfolioInvestmentAsset = portfolio?.find((asset) => asset.currency.chainId === investmentCurrencyChainId)
   const portfolioBalance = portfolioInvestmentAsset?.balance
-  const isInvestorWhiteListed = !!isMember
 
   const maxInvestAmount = useMemo(() => {
     if (!portfolioBalance) return '0'
@@ -83,7 +85,7 @@ export default function InvestTab({ networks, shareClassId, vault, vaults, setVa
     [investAmount, schema.shape.investAmount]
   )
 
-  const isLoading = isVaultDetailsLoading || isInvestmentLoading || isPortfolioLoading || isMemberLoading
+  const isLoading = isTabLoading || isVaultDetailsLoading || isInvestmentLoading || isPortfolioLoading
   const isDisabled = !vaultDetails || !investment || parsedInvestAmount === 0 || isPending
 
   if (isLoading) {

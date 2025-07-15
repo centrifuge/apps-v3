@@ -2,7 +2,7 @@ import { useEffect, useState, type ComponentType, type Dispatch } from 'react'
 import { useChainId } from 'wagmi'
 import { Flex, Heading, Stack, Text } from '@chakra-ui/react'
 import type { PoolNetwork, ShareClassId, Vault } from '@centrifuge/sdk'
-import { usePoolNetworks, useVaults } from '@centrifuge/shared'
+import { useIsMember, usePoolNetworks, useVaults } from '@centrifuge/shared'
 import { useGeolocation } from '@hooks/useGeolocation'
 import { ConnectionGuard } from '@components/ConnectionGuard'
 import { Tabs } from '@components/Tabs'
@@ -12,14 +12,19 @@ import RedeemTab from '@components/InvestRedeemSection/RedeemTab/RedeemTab'
 import type { PoolDetails } from '@utils/types'
 
 export interface TabProps {
+  isInvestorWhiteListed: boolean
+  isLoading: boolean
   networks?: PoolNetwork[]
-  shareClassId: ShareClassId
   vault: Vault
   vaults: Vault[]
   setVault: Dispatch<Vault>
 }
 interface VaultGuardProps {
+  connectedChainId: number
+  isInvestorWhiteListed: boolean
+  isLoading: boolean
   pool: PoolDetails
+  shareClassId: ShareClassId
   tab: ComponentType<TabProps>
   vault?: Vault
   setVault: Dispatch<Vault | undefined>
@@ -37,9 +42,16 @@ const RestrictedCountry = () => {
 }
 
 export function InvestRedeemSection({ pool: poolDetails }: { pool: PoolDetails }) {
-  const { data: location } = useGeolocation()
+  const connectedChainId = useChainId()
+  const { data: location, isLoading: isGeoloationLoading } = useGeolocation()
   const [vault, setVault] = useState<Vault>()
   const [vaults, setVaults] = useState<Vault[]>()
+
+  // Assuming one share class per pool
+  const shareClassId = poolDetails?.shareClasses?.[0]?.details.id
+  const { data: isMember, isLoading: isMemberLoading } = useIsMember(shareClassId, connectedChainId)
+  const isInvestorWhiteListed = !!isMember
+  const isTabLoading = isGeoloationLoading || isMemberLoading
 
   const kycCountries = poolDetails?.metadata?.onboarding?.kycRestrictedCountries ?? []
   const kybCountries = poolDetails?.metadata?.onboarding?.kybRestrictedCountries ?? []
@@ -66,11 +78,15 @@ export function InvestRedeemSection({ pool: poolDetails }: { pool: PoolDetails }
               <RestrictedCountry />
             ) : (
               <VaultGuard
+                connectedChainId={connectedChainId}
+                isInvestorWhiteListed={isInvestorWhiteListed}
+                isLoading={isTabLoading}
                 pool={poolDetails}
+                shareClassId={shareClassId}
                 tab={InvestTab}
                 vault={vault}
-                setVault={setVault}
                 vaults={vaults}
+                setVault={setVault}
                 setVaults={setVaults}
               />
             ),
@@ -78,15 +94,20 @@ export function InvestRedeemSection({ pool: poolDetails }: { pool: PoolDetails }
           {
             label: 'Redeem',
             value: 'tab-redeem',
+            disabled: !isInvestorWhiteListed,
             body: isRestrictedCountry ? (
               <RestrictedCountry />
             ) : (
               <VaultGuard
+                connectedChainId={connectedChainId}
+                isInvestorWhiteListed={isInvestorWhiteListed}
+                isLoading={isTabLoading}
                 pool={poolDetails}
+                shareClassId={shareClassId}
                 tab={RedeemTab}
                 vault={vault}
-                setVault={setVault}
                 vaults={vaults}
+                setVault={setVault}
                 setVaults={setVaults}
               />
             ),
@@ -97,14 +118,22 @@ export function InvestRedeemSection({ pool: poolDetails }: { pool: PoolDetails }
   )
 }
 
-function VaultGuard({ pool: poolDetails, tab: Tab, vault, vaults, setVault, setVaults }: VaultGuardProps) {
-  const connectedChainId = useChainId()
-  // Assuming one share class per pool
-  const scId = poolDetails?.shareClasses?.[0]?.details.id
+function VaultGuard({
+  connectedChainId,
+  isInvestorWhiteListed,
+  isLoading,
+  pool: poolDetails,
+  tab: Tab,
+  shareClassId,
+  vault,
+  vaults,
+  setVault,
+  setVaults,
+}: VaultGuardProps) {
   const { data: networks } = usePoolNetworks(poolDetails.id)
   const chainIds = networks?.map((network) => network.chainId) ?? []
   const network = networks?.find((n) => n.chainId === connectedChainId)
-  const { data } = useVaults(network, scId)
+  const { data } = useVaults(network, shareClassId)
 
   useEffect(() => {
     if (data?.length && (!vault || !data.includes(vault))) {
@@ -123,7 +152,14 @@ function VaultGuard({ pool: poolDetails, tab: Tab, vault, vaults, setVault, setV
         <Text>No vaults found for this pool on this network.</Text>
       ) : (
         <Stack height="100%">
-          <Tab vault={vault} setVault={setVault} vaults={vaults ?? []} networks={networks} shareClassId={scId} />
+          <Tab
+            isInvestorWhiteListed={isInvestorWhiteListed}
+            isLoading={isLoading}
+            networks={networks}
+            vault={vault}
+            vaults={vaults ?? []}
+            setVault={setVault}
+          />
         </Stack>
       )}
     </ConnectionGuard>
