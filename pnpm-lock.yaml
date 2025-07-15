@@ -12,8 +12,8 @@ importers:
         specifier: ^5.15.1
         version: 5.15.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@centrifuge/sdk':
-        specifier: 0.0.0-alpha.27
-        version: 0.0.0-alpha.27(viem@2.28.2(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.67))(ws@8.18.1(bufferutil@4.0.9)(utf-8-validate@5.0.10))
+        specifier: 0.0.0-alpha.28
+        version: 0.0.0-alpha.28(viem@2.28.2(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.67))(ws@8.18.1(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       '@chakra-ui/react':
         specifier: ^3.19.1
         version: 3.21.0(@emotion/react@11.14.0(@types/react@19.1.8)(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -433,8 +433,8 @@ packages:
     resolution: {integrity: sha512-ETyHEk2VHHvl9b9jZP5IHPavHYk57EhanlRRuae9XCpb/j5bDCbPPMOBfCWhnl/7EDJz0jEMCi/RhccCE8r1+Q==}
     engines: {node: '>=6.9.0'}
 
-  '@centrifuge/sdk@0.0.0-alpha.27':
-    resolution: {integrity: sha512-QdJfnZ4lbSDDoHMB/vjXrmooZYmbBWMb8taxY5otZLoRPGoi/aVoEiVTu97Jffcf9SQrkaFRzRis3Ecw1CZ2uQ==}
+  '@centrifuge/sdk@0.0.0-alpha.28':
+    resolution: {integrity: sha512-eOr9ImCEZZWeelMWwnTMCb8rl9Bfk+uO5io72BtO94jwnR4IDP4b+4xDRenn+aMKjgvTjzQFLGtZGQAfA98oXQ==}
     engines: {node: '>=18.18'}
     peerDependencies:
       viem: ^2
@@ -5812,7 +5812,7 @@ snapshots:
       '@babel/helper-string-parser': 7.27.1
       '@babel/helper-validator-identifier': 7.27.1
 
-  '@centrifuge/sdk@0.0.0-alpha.27(viem@2.28.2(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.67))(ws@8.18.1(bufferutil@4.0.9)(utf-8-validate@5.0.10))':
+  '@centrifuge/sdk@0.0.0-alpha.28(viem@2.28.2(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.67))(ws@8.18.1(bufferutil@4.0.9)(utf-8-validate@5.0.10))':
     dependencies:
       decimal.js-light: 2.5.1
       eth-permit: 0.2.3
