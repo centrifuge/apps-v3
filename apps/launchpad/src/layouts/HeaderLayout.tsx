@@ -3,7 +3,7 @@ import { usePoolDetails } from '@centrifuge/shared'
 import { LogoCentrifugeText } from '@centrifuge/ui'
 import { WalletButton } from '@centrifuge/wallet'
 import { Box, Container, Stack, Tabs, Button, Heading, IconButton, Text, Flex } from '@chakra-ui/react'
-import { Outlet, useLocation, useMatches, useParams, useNavigate } from 'react-router'
+import { Outlet, useLocation, useMatches, useParams, useNavigate } from 'react-router-dom'
 import { useMemo } from 'react'
 import { IoArrowBackSharp, IoSettingsSharp } from 'react-icons/io5'
 

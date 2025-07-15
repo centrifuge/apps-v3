@@ -1,36 +1,14 @@
-import { Links, Meta, Outlet, Scripts, ScrollRestoration } from 'react-router'
+import { Outlet } from 'react-router-dom'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { WalletProvider } from '@centrifuge/wallet'
 import { ChakraCentrifugeProvider, ChakraCentrifugeProviderProps } from '@centrifuge/ui'
 import { CentrifugeProvider, TransactionProvider } from '@centrifuge/shared'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { PoolProvider } from '@contexts/PoolProvider'
 import { DebugFlags } from '@centrifuge/shared/src/components/DebugFlags'
 import { centrifuge, networks } from './centrifuge'
 
 const queryClient = new QueryClient()
-
-const config = {
-  themeKey: 'light' as ChakraCentrifugeProviderProps['themeKey'],
-}
-
-export function Layout({ children }: { children: React.ReactNode }) {
-  return (
-    <html lang="en">
-      <head>
-        <meta charSet="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Centrifuge Launchpad</title>
-        <Meta />
-        <Links />
-      </head>
-      <body>
-        {children}
-        <ScrollRestoration />
-        <Scripts />
-      </body>
-    </html>
-  )
-}
+const config = { themeKey: 'light' as ChakraCentrifugeProviderProps['themeKey'] }
 
 export default function Root() {
   return (
