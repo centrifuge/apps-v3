@@ -5,7 +5,14 @@ import { usePoolProvider } from '@contexts/PoolProvider'
 import { Button, Card, Loader } from '@centrifuge/ui'
 import { AssetId, ShareClassId } from '@centrifuge/sdk'
 import { useCentrifugeTransaction } from '@centrifuge/shared'
+<<<<<<< Updated upstream
 import { AddHoldingForm } from '../../components/holdings/AddHoldingForm'
+=======
+<<<<<<< Updated upstream
+import { AddHoldingForm } from '@components/holdings/AddHoldingForm'
+=======
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
 
 export const handle = {
   hasSettings: false,
@@ -62,9 +69,6 @@ export default function Add() {
           loading={isPending}
         />
       </Flex>
-      <Card>
-        <AddHoldingForm networks={networks ?? []} poolDetails={poolDetails} hubChainId={pool?.chainId!} />
-      </Card>
     </Form>
   )
 }
