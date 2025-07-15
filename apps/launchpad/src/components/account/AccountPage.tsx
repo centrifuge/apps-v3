@@ -1,6 +1,7 @@
 import { Balance } from '@centrifuge/sdk'
 import { Button, Card, NetworkIcon } from '@centrifuge/ui'
 import { Box, Flex, Grid, Heading, Separator, Stack, Text } from '@chakra-ui/react'
+import { formatBalance } from '@centrifuge/shared'
 import { useEffect, useMemo, useState } from 'react'
 import {
   formatUIBalance,
@@ -20,7 +21,7 @@ export function AccountPage({ sc, poolDetails }: { sc: ShareClassWithDetails; po
   const { data: navPerNetwork } = useNavPerNetwork(sc.shareClass)
   const decimals = poolDetails?.currency.decimals
   const poolCurrencySymbol = poolDetails?.currency.symbol
-  const [totalValue, setTotalValue] = useState<number>(0)
+  const [totalValue, setTotalValue] = useState<Balance>(new Balance(0, decimals))
 
   useEffect(() => {
     setTotalValue(totalValue)
@@ -114,7 +115,7 @@ export function AccountPage({ sc, poolDetails }: { sc: ShareClassWithDetails; po
         <Stack gap={0} mb={4}>
           <Heading size="sm">Holdings</Heading>
           <Flex justify="space-between">
-            <Heading size="3xl">{totalValue} USDC</Heading>
+            <Heading size="3xl">{formatBalance(totalValue)} USDC</Heading>
             <Button
               label="Add holding"
               onClick={() => navigate(`/holdings/${poolId}/add`)}
@@ -124,7 +125,7 @@ export function AccountPage({ sc, poolDetails }: { sc: ShareClassWithDetails; po
             />
           </Flex>
         </Stack>
-        <PoolHoldings setTotalValue={setTotalValue} shareClass={sc.shareClass} />
+        <PoolHoldings poolDecimals={decimals} setTotalValue={setTotalValue} shareClass={sc.shareClass} />
       </Stack>
     </Box>
   )

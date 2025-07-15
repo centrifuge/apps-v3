@@ -1,4 +1,4 @@
-import { ShareClass } from '@centrifuge/sdk'
+import { Balance, ShareClass } from '@centrifuge/sdk'
 import { networkToName, useHoldings, formatBalance } from '@centrifuge/shared'
 import { NetworkIcon } from '@centrifuge/ui'
 import { DataTable, ColumnDefinition, ActionsDropdown } from '@centrifuge/ui'
@@ -67,20 +67,24 @@ const columns: ColumnDefinition<Row>[] = [
 
 export function PoolHoldings({
   shareClass,
+  poolDecimals,
   setTotalValue,
 }: {
   shareClass: ShareClass
-  setTotalValue: (value: number) => void
+  poolDecimals: number
+  setTotalValue: (value: Balance) => void
 }) {
   const holdings = useHoldings(shareClass)
   const { poolDetails } = usePoolProvider()
   const currencySymbol = poolDetails?.currency.symbol ?? 'USD'
 
   // TODO: Right now we are assuming that 1USD = 1USDC, this needs to be updated in the future
-  const totalValue = holdings?.data?.reduce((acc, holding) => {
-    const value = formatBalance(holding.value)
-    return acc + (value ? parseFloat(value) : 0)
-  }, 0)
+  const totalValue = holdings?.data?.reduce(
+    (acc, holding) => {
+      return acc.add(holding.value)
+    },
+    new Balance(0, poolDecimals)
+  )
 
   useEffect(() => {
     if (totalValue) {
