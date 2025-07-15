@@ -1,12 +1,15 @@
-import { Hono } from 'hono'
-import { serveStatic } from 'hono/cloudflare-workers'
+export default {
+  async fetch(request, env) {
+    const url = new URL(request.url)
+    const pathname = url.pathname
 
-const app = new Hono()
+    const isAsset = pathname.includes('.') || pathname.startsWith('/assets/')
 
-app.use('/assets/*', serveStatic({ root: './dist' }))
+    if (!isAsset) {
+      const indexRequest = new Request(new URL('/index.html', request.url), request)
+      return env.ASSETS.fetch(indexRequest)
+    }
 
-// This rule is the catch-all. For any other path, it serves the main index.html file.
-// This allows client-side React Router to work.
-app.get('*', serveStatic({ path: './dist/index.html' }))
-
-export default app
+    return env.ASSETS.fetch(request)
+  },
+}

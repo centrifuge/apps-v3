@@ -26,7 +26,6 @@
     "@reown/appkit-adapter-wagmi": "^1.7.3",
     "@tanstack/react-query": "^5.74.11",
     "decimal.js": "^10.6.0",
-    "hono": "^4.8.5",
     "install": "^0.13.0",
     "npm": "^11.4.1",
     "react": "^19.1.0",
