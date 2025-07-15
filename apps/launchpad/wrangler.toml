@@ -1,6 +1,6 @@
 # Default environment is STAGING
 name = "launchpad-staging"
-main = "dist/server/index.js"
+main = "dist/"
 compatibility_date = "2025-06-30"
 
 routes = [
