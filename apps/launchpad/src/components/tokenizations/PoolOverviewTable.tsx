@@ -114,7 +114,7 @@ export const PoolOverviewTable = ({ poolIds }: { poolIds: PoolId[] }) => {
   if (isLoadingPools) return <Loader />
 
   return (
-    <Stack mt={10} mb={8}>
+    <Stack>
       <Heading size="md" my="4">
         Pool overview
       </Heading>

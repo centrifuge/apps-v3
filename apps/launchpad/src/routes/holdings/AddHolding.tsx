@@ -2,9 +2,10 @@ import z from 'zod'
 import { Flex, Heading } from '@chakra-ui/react'
 import { Form, useForm } from '@centrifuge/forms'
 import { usePoolProvider } from '@contexts/PoolProvider'
-import { Button, Loader } from '@centrifuge/ui'
+import { Button, Card, Loader } from '@centrifuge/ui'
 import { AssetId, ShareClassId } from '@centrifuge/sdk'
 import { useCentrifugeTransaction } from '@centrifuge/shared'
+import { AddHoldingForm } from '@components/holdings/AddHoldingForm'
 
 export const handle = {
   hasSettings: false,
@@ -17,7 +18,7 @@ const schema = z.object({
   sc: z.instanceof(ShareClassId),
 })
 
-export default function Add() {
+export default function AddHolding() {
   const { networks, isLoading, poolDetails, pool } = usePoolProvider()
   const { execute, isPending } = useCentrifugeTransaction()
 
@@ -51,7 +52,7 @@ export default function Add() {
 
   return (
     <Form form={form}>
-      <Flex justifyContent="space-between" alignItems="center" mt={8} mb={8}>
+      <Flex justifyContent="space-between" alignItems="center" mb={4}>
         <Heading>Add holding</Heading>
         <Button
           label="Save changes"
@@ -61,6 +62,9 @@ export default function Add() {
           loading={isPending}
         />
       </Flex>
+      <Card>
+        <AddHoldingForm networks={networks ?? []} poolDetails={poolDetails} hubChainId={pool?.chainId!} />
+      </Card>
     </Form>
   )
 }

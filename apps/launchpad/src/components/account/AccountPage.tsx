@@ -54,7 +54,7 @@ export function AccountPage({ sc, poolDetails }: { sc: ShareClassWithDetails; po
   }, [navPerNetwork, decimals])
 
   return (
-    <Box mb={8}>
+    <Box>
       <Grid templateColumns="repeat(2, 1fr)" gap={4} mt={4}>
         <Card>
           <Stack gap={8}>

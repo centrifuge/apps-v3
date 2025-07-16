@@ -20,7 +20,7 @@ export default function Account() {
   if (isLoading) return <Loader />
 
   return (
-    <Box mt={10}>
+    <Box>
       <Flex alignItems="flex-end" justifyContent="space-between">
         <Stack gap={0}>
           <Heading size="sm">Total NAV</Heading>

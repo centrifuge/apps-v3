@@ -52,6 +52,8 @@ export function Select<TFieldValues extends FieldValues = FieldValues>(props: Cu
           onValueChange={({ value }: { value: string[] }) => onValueChange(value)}
           disabled={disabled}
           value={value}
+          background="white"
+          borderRadius="md"
           {...rest}
         >
           <ChakraSelect.HiddenSelect />

@@ -3,7 +3,7 @@ import { usePoolDetails } from '@centrifuge/shared'
 import { LogoCentrifugeText } from '@centrifuge/ui'
 import { WalletButton } from '@centrifuge/wallet'
 import { Box, Container, Stack, Tabs, Button, Heading, IconButton, Text, Flex } from '@chakra-ui/react'
-import { Outlet, useLocation, useMatches, useParams, useNavigate } from 'react-router-dom'
+import { Outlet, useLocation, useMatches, useParams, useNavigate } from 'react-router'
 import { useMemo } from 'react'
 import { IoArrowBackSharp, IoSettingsSharp } from 'react-icons/io5'
 
@@ -45,10 +45,22 @@ const getOrdersTabs = (poolId: string) => [
 ]
 
 // Holdings page tabs
-const getHoldingsTabs = () => [
+const getHoldingsTabs = (poolId: string) => [
+  {
+    label: 'Deposit',
+    path: `/holdings/${poolId}/deposit`,
+  },
+  {
+    label: 'Withdraw',
+    path: `/holdings/${poolId}/withdraw`,
+  },
+  {
+    label: 'Update',
+    path: `/holdings/${poolId}/update`,
+  },
   {
     label: 'Add',
-    path: `/holdings/add`,
+    path: `/holdings/${poolId}/add`,
   },
 ]
 
@@ -78,7 +90,7 @@ function getTabsForRoute(pathname: string, poolId?: string, labels?: string[]) {
     return getPoolSettingsTabs(poolId!)
   }
   if (pathname.startsWith('/holdings')) {
-    return getHoldingsTabs()
+    return getHoldingsTabs(poolId!)
   }
   return MAIN_TABS
 }
@@ -115,7 +127,7 @@ export default function HeaderLayout() {
   return (
     <Stack>
       <Box backgroundColor="text-primary" w="100%">
-        <Container maxW="container.xl">
+        <Container maxW="6xl">
           <Stack gap={4}>
             <Flex justifyContent="space-between" alignItems="center">
               <LogoCentrifugeText size={24} fill="white" />
@@ -165,7 +177,7 @@ export default function HeaderLayout() {
         </Container>
       </Box>
 
-      <Container maxW="container.xl">
+      <Container maxW="6xl" mt={8} mb={8}>
         <Outlet />
       </Container>
     </Stack>

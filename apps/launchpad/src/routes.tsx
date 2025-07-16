@@ -9,9 +9,9 @@ import IssueOrders from '@routes/orders/IssueOrders'
 import ApproveRedemptions from '@routes/orders/ApproveRedemptions'
 import RevokeShares from '@routes/orders/RevokeShares'
 import PoolAccess from '@routes/settings/PoolAccess'
-import AddHolding from '@routes/holdings/Add'
 import NotFound from '@routes/NotFound'
 import HeaderLayout from '@layouts/HeaderLayout'
+import AddHolding from '@routes/holdings/addHolding'
 
 export const routes = createBrowserRouter([
   {

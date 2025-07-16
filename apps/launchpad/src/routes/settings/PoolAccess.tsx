@@ -128,7 +128,7 @@ export default function PoolAccess() {
   }
 
   return (
-    <Container mt={8}>
+    <Container>
       <Flex justifyContent="space-between" alignItems="center">
         <Heading size="lg">Pool acccess</Heading>
         <SaveChangesButton isDisabled={isDisabled || !isPoolManager} onSubmit={handleSubmit} />
