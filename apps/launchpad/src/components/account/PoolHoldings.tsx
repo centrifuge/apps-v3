@@ -1,40 +1,10 @@
-import { ShareClass } from '@centrifuge/sdk'
-import { networkToName, useHoldings } from '@centrifuge/shared'
+import { Balance, ShareClass } from '@centrifuge/sdk'
+import { networkToName, useHoldings, formatBalance } from '@centrifuge/shared'
 import { NetworkIcon } from '@centrifuge/ui'
-import { DataTable, ColumnDefinition } from '@centrifuge/ui'
-import { Box, Flex, Heading, Text } from '@chakra-ui/react'
-
-// TODO: add pool holdings from sdk once we have it
-const HOLDINGS = [
-  {
-    asset: 'USDC',
-    network: 1,
-    quantity: '10222',
-    price: '1.294',
-    value: '13111.48',
-    vaults: [
-      {
-        id: 1,
-        name: 'Vault 1',
-        network: 1,
-      },
-    ],
-  },
-  {
-    asset: 'USDC',
-    network: '42220',
-    quantity: '10222',
-    price: '1.294',
-    value: '13111.48',
-    vaults: [
-      {
-        id: 2,
-        name: 'Vault 1',
-        network: 42220,
-      },
-    ],
-  },
-]
+import { DataTable, ColumnDefinition, ActionsDropdown } from '@centrifuge/ui'
+import { Flex, Heading, Text } from '@chakra-ui/react'
+import { usePoolProvider } from '@contexts/PoolProvider'
+import { useEffect } from 'react'
 
 type Row = {
   id: number
@@ -43,6 +13,7 @@ type Row = {
   quantity: string
   price: string
   value: string
+  actions?: (row: Row) => React.ReactNode
 }
 
 const columns: ColumnDefinition<Row>[] = [
@@ -52,11 +23,13 @@ const columns: ColumnDefinition<Row>[] = [
     render: (row: Row) => {
       return <Heading fontSize="xs">{row.asset}</Heading>
     },
+    sortKey: 'asset',
     width: '100px',
   },
   {
     header: 'Network',
     accessor: 'network',
+    sortKey: 'network',
     render: (row: Row) => {
       return (
         <Flex align="center" gap={2}>
@@ -72,6 +45,7 @@ const columns: ColumnDefinition<Row>[] = [
     render: (row: Row) => {
       return <Text fontSize="xs">{row.quantity}</Text>
     },
+    sortKey: 'quantity',
   },
   {
     header: 'Price',
@@ -79,6 +53,7 @@ const columns: ColumnDefinition<Row>[] = [
     render: (row: Row) => {
       return <Text fontSize="xs">{row.price}</Text>
     },
+    sortKey: 'price',
   },
   {
     header: 'Value',
@@ -86,20 +61,62 @@ const columns: ColumnDefinition<Row>[] = [
     render: (row: Row) => {
       return <Text fontSize="xs">{row.value}</Text>
     },
+    sortKey: 'value',
   },
 ]
 
-export function PoolHoldings({ shareClass }: { shareClass: ShareClass }) {
-  // TODO: still broken on sdk side
+export function PoolHoldings({
+  shareClass,
+  poolDecimals,
+  setTotalValue,
+}: {
+  shareClass: ShareClass
+  poolDecimals: number
+  setTotalValue: (value: Balance) => void
+}) {
   const holdings = useHoldings(shareClass)
-  const data: Row[] = HOLDINGS.map((holding, idx) => ({
+  const { poolDetails } = usePoolProvider()
+  const currencySymbol = poolDetails?.currency.symbol ?? 'USD'
+
+  // TODO: Right now we are assuming that 1USD = 1USDC, this needs to be updated in the future
+  const totalValue = holdings?.data?.reduce(
+    (acc, holding) => {
+      return acc.add(holding.value)
+    },
+    new Balance(0, poolDecimals)
+  )
+
+  useEffect(() => {
+    if (totalValue) {
+      setTotalValue(totalValue)
+    }
+  }, [totalValue])
+
+  if (!holdings || !holdings.data || holdings.data.length === 0) {
+    return null
+  }
+
+  const data: Row[] = holdings?.data?.map((holding, idx) => ({
     id: idx,
-    asset: holding.asset,
-    network: holding.network,
-    quantity: holding.quantity,
-    price: holding.price,
-    value: holding.value,
-    vaults: holding.vaults,
+    asset: holding.asset.symbol,
+    network: holding.asset.chainId,
+    quantity: formatBalance(holding.amount),
+    price: formatBalance(holding.value.mul(holding.amount)),
+    value: formatBalance(holding.value, currencySymbol),
+    vaults: [],
+    actions: (row: Row) => {
+      return (
+        <ActionsDropdown
+          items={[
+            { label: 'deposit', element: <Text>Deposit</Text> },
+            { label: 'withdraw', element: <Text>Withdraw</Text> },
+            { label: 'buy', element: <Text>Buy</Text> },
+            { label: 'sell', element: <Text>Sell</Text> },
+            { label: 'update', element: <Text>Update</Text> },
+          ]}
+        />
+      )
+    },
   }))
   return <DataTable data={data} columns={columns} />
 }
