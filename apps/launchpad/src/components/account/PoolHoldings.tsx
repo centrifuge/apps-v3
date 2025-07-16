@@ -95,7 +95,7 @@ export function PoolHoldings({ shareClass, poolDecimals }: { shareClass: ShareCl
     price: formatBalance(holding.value.mul(holding.amount)),
     value: formatBalance(holding.value, currencySymbol),
     vaults: [],
-    actions: (row: Row) => {
+    actions: () => {
       return (
         <ActionsDropdown
           items={[

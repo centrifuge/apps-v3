@@ -40,6 +40,14 @@ export const buttonRecipe = defineRecipe({
         fontSize: 'sm',
         fontWeight: 600,
       },
+      plain: {
+        background: 'transparent',
+        color: 'text-primary',
+        fontSize: 'sm',
+        fontWeight: 600,
+        border: 'none',
+        boxShadow: 'none',
+      },
     },
   },
   defaultVariants: {
