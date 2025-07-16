@@ -54,7 +54,7 @@ jobs:
           script: |
             const version = '${{ steps.deploy.outputs.version_id }}';
             const url = `https://${version}-launchpad-demo.centrifuge-kf.workers.dev`;
-            const body = `🚀 **launchpad** Preview: [Live Link](${url})`;
+            const body = `🚀 **launchpad** PR Preview: ${url} ⭐⭐⭐⭐⭐`;
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,

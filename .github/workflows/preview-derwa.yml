@@ -46,3 +46,18 @@ jobs:
           VERSION_ID=$(echo "$DEPLOY_OUTPUT" \
             | awk '/Current Version ID:/ {print $4}' \
             | cut -d'-' -f1)
+          echo "version_id=$VERSION_ID" >> $GITHUB_OUTPUT
+
+      - name: Comment on PR with Preview Link
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const version = '${{ steps.deploy.outputs.version_id }}';
+            const url = `https://${version}-derwa-demo.centrifuge-kf.workers.dev`;
+            const body = `🚀 **derwa** PR Preview: ${url} ⭐⭐⭐⭐⭐`;
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body
+            });
