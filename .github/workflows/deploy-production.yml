@@ -46,6 +46,9 @@ jobs:
       matrix:
         app: [derwa, launchpad]
     steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
       - name: Download Production Artifact
         uses: actions/download-artifact@v4
         with:
