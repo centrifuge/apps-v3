@@ -60,10 +60,21 @@ jobs:
         env:
           ALL_RESULTS: ${{ toJSON(needs.build-and-deploy-preview.outputs) }}
         run: |
-          # 5 stars because it was hard to get this working
-          comment_body="🚀 PR Preview links are ready! ✨✨✨✨✨\n\n"
+          echo "--- 1. RAW DATA RECEIVED FROM PREVIOUS JOB ---"
+          echo "$ALL_RESULTS"
+          echo "----------------------------------------------"
 
+          echo "--- 2. PRETTY-PRINTED JSON (to check if valid) ---"
+          echo "$ALL_RESULTS" | jq .
+          echo "----------------------------------------------------"
+
+          comment_body="🚀 PR Preview links are ready! ✨\n\n"
+
+          echo "--- 3. ATTEMPTING TO GENERATE LINKS ---"
           links=$(echo "$ALL_RESULTS" | jq -r '.[] | "- **\(.app)**: [Live Link](\(.url))"')
+          echo "Generated links variable contains:"
+          echo "$links"
+          echo "---------------------------------------"
 
           full_comment="${comment_body}$(echo -e "$links")"
 
