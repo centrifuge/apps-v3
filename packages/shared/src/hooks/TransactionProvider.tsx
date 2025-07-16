@@ -1,17 +1,19 @@
 import { createContext, ReactNode, useCallback, useContext, useMemo, useState } from 'react'
 import { TransactionToasts } from '../components'
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export type TransactionStatus = 'creating' | 'unconfirmed' | 'pending' | 'succeeded' | 'failed'
 export type Transaction = {
   id: string
   title: string
   status: TransactionStatus
   hash?: string
-  result?: { [key: string]: unknown }
+  result?: any
   failedReason?: string
-  error?: { [key: string]: unknown }
+  error?: any
   dismissed?: boolean
 }
+/* eslint-enable @typescript-eslint/no-explicit-any */
 
 type TransactionsContextType = {
   transactions: Transaction[]
