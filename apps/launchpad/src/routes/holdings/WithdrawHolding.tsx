@@ -4,11 +4,11 @@ import { HoldingsForm } from '@components/holdings/HoldingsForm'
 import { usePoolProvider } from '@contexts/PoolProvider'
 
 export default function WithdrawHolding() {
-  const { data: portfolio } = usePortfolio()
+  const { data: portfolio, isLoading: isPortfolioLoading } = usePortfolio()
   const { shareClass, isLoading: isPoolLoading } = usePoolProvider()
   const { data: holdings, isLoading } = useHoldings(shareClass?.shareClass!)
 
-  if (isPoolLoading || isLoading) return <Loader />
+  if (isPoolLoading || isLoading || isPortfolioLoading) return <Loader />
 
   if (!holdings) return <Text>No holdings found. Add a new holding in order to withdraw.</Text>
 

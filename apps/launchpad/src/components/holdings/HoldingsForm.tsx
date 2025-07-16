@@ -1,10 +1,11 @@
 import { BalanceInput, Form, Select, SubmitButton, useForm } from '@centrifuge/forms'
-import { truncateAddress, useAddress } from '@centrifuge/shared'
+import { Holdings, Portfolio, truncateAddress, useAddress } from '@centrifuge/shared'
 import { Card, DisplayInput, NetworkIcon } from '@centrifuge/ui'
 import { Box, Flex, Grid, Heading, Stack, Text } from '@chakra-ui/react'
 import { SummaryBox } from './SummaryBox'
 import { useEffect, useMemo } from 'react'
 import { Balance } from '@centrifuge/sdk'
+import z from 'zod'
 
 export const HoldingsForm = ({
   isWithdraw = false,
@@ -12,8 +13,8 @@ export const HoldingsForm = ({
   holdings,
 }: {
   isWithdraw?: boolean
-  portfolio: any
-  holdings: any[]
+  portfolio: Portfolio | undefined
+  holdings: Holdings
 }) => {
   const { address } = useAddress()
   const truncate = truncateAddress(address)
@@ -30,10 +31,15 @@ export const HoldingsForm = ({
   }))
 
   const form = useForm({
+    schema: z.object({
+      holding: z.custom<Holdings[number]>(),
+      availableBalance: z.instanceof(Balance),
+      amount: z.instanceof(Balance),
+    }),
     defaultValues: {
-      holding: '',
-      availableBalance: new Balance(0, 6),
-      amount: new Balance(0, 6),
+      holding: holdings[0],
+      availableBalance: '',
+      amount: '',
     },
     mode: 'onChange',
     onSubmit: (values) => {
