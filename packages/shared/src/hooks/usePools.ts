@@ -71,7 +71,7 @@ export function useAllPoolDetails(poolIds: PoolId[]) {
   return useObservable(details$)
 }
 
-export function usePoolNetworks(poolId: PoolId) {
+export function usePoolNetworks(poolId?: PoolId) {
   const centrifuge = useCentrifuge()
 
   const vaults$ = useMemo(() => {

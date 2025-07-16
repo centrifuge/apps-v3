@@ -18,7 +18,7 @@ export const InfoWrapper = ({ text, title, icon, type = 'info' }: InfoWrapperPro
         <Heading fontSize="md" fontWeight="bold" color={type}>
           {title}
         </Heading>
-        <Heading fontSize="sm" color={type} lineHeight={1.5}>
+        <Heading fontSize="sm" color={type} lineHeight={1.5} whiteSpace="pre-wrap">
           {text}
         </Heading>
       </Flex>

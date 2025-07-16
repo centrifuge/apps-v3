@@ -1,11 +1,11 @@
 import type { Dispatch, SetStateAction } from 'react'
 import { FaRegClock } from 'react-icons/fa6'
 import { Box, Button, Flex, Heading, Text } from '@chakra-ui/react'
-import { infoText } from '@utils/infoText'
-import { RedeemAction, type RedeemActionType } from '@components/InvestRedeemSection/components/defaults'
-import { InfoWrapper } from '@components/InvestRedeemSection/components/InfoWrapper'
 import { Balance } from '@centrifuge/sdk'
 import { BalanceDisplay } from '@centrifuge/ui'
+import { RedeemAction, type RedeemActionType } from '@components/InvestRedeemSection/components/defaults'
+import { InfoWrapper } from '@components/InvestRedeemSection/components/InfoWrapper'
+import { infoText } from '@utils/infoText'
 
 interface CancelRedeemProps {
   currencies: { redeemCurrency: string; receiveCurrency: string }

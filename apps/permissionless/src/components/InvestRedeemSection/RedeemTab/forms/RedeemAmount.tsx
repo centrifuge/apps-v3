@@ -1,8 +1,12 @@
 import { useCallback, useMemo } from 'react'
+import { useSwitchChain } from 'wagmi'
 import { Badge, Box, Flex, Text } from '@chakra-ui/react'
 import { BalanceInput, SubmitButton, useFormContext } from '@centrifuge/forms'
 import { Balance, PoolId, PoolNetwork, Price, Vault } from '@centrifuge/sdk'
 import {
+  debounce,
+  divideBigInts,
+  formatBalanceToString,
   usePortfolio,
   formatBalance,
   usePoolDetails,
@@ -10,13 +14,10 @@ import {
   useVaultsDetails,
   useInvestment,
 } from '@centrifuge/shared'
-import { InfoWrapper } from '@components/InvestRedeemSection/components/InfoWrapper'
-import { infoText } from '@utils/infoText'
-import { useSelectedPoolContext } from '@contexts/useSelectedPoolContext'
-import { divideBigInts, formatBalanceToString } from '@centrifuge/shared/src/utils/formatting'
-import { debounce } from '@utils/debounce'
 import { NetworkIcons } from '@centrifuge/ui'
-import { useSwitchChain } from 'wagmi'
+import { InfoWrapper } from '@components/InvestRedeemSection/components/InfoWrapper'
+import { useSelectedPoolContext } from '@contexts/useSelectedPoolContext'
+import { infoText } from '@utils/infoText'
 
 interface RedeemAmountProps {
   isDisabled: boolean

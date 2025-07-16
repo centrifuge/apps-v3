@@ -1,52 +1,41 @@
-import { Box, Flex, Grid, GridItem, Text } from '@chakra-ui/react'
+import { Box, Grid, GridItem } from '@chakra-ui/react'
 import { BalanceInput, useFormContext } from '@centrifuge/forms'
-import { BalanceDisplay, NetworkIcon } from '@centrifuge/ui'
+import { Balance, ShareClass } from '@centrifuge/sdk'
+import { useCallback } from 'react'
 import { usePoolProvider } from '@contexts/PoolProvider'
-import { Balance, Price } from '@centrifuge/sdk'
-import { useEffect, useMemo } from 'react'
-import { networkToName } from '@centrifuge/shared'
+import { debounce, formatBalanceToString } from '@centrifuge/shared'
 
 interface NavFormProps {
-  parsedNewTokenPrice: Balance | 0
+  shareClassDetails?: Awaited<ReturnType<typeof ShareClass.prototype.details>>
 }
 
-export function NavForm({ parsedNewTokenPrice }: NavFormProps) {
-  const { network, shareClass } = usePoolProvider()
+export function NavForm({ shareClassDetails }: NavFormProps) {
   const { setValue } = useFormContext()
-  const networkName = useMemo(() => networkToName(network?.chainId ?? 0), [network])
+  const { poolDetails } = usePoolProvider()
+  const decimals = poolDetails?.currency.decimals ?? 18
 
-  const navPerShare = shareClass?.details?.pricePerShare ?? 0
-  const totalIssuance = shareClass?.details?.totalIssuance ?? 0
-  const hasBalances = typeof navPerShare !== 'number' && typeof totalIssuance !== 'number'
+  const handleCalculateNewNav = useCallback((_stringValue: string, newPricePerShare?: Balance) => {
+    if (!shareClassDetails?.totalIssuance || !newPricePerShare) {
+      // Set to 0 so we can still update new token price without nav calc value
+      return setValue('newNav', '0')
+    }
 
-  const currentNav = useMemo(
-    () => (hasBalances ? navPerShare.mul(totalIssuance) : 0),
-    [hasBalances, navPerShare, totalIssuance]
-  )
-  const currentTokenPrice = useMemo(
-    () => (hasBalances ? totalIssuance.div(navPerShare) : 0),
-    [hasBalances, totalIssuance, navPerShare]
-  )
+    const newNav = formatBalanceToString(shareClassDetails.totalIssuance.mul(newPricePerShare))
+    return setValue('newNav', newNav)
+  }, [])
 
-  const newNav = useMemo(() => {
-    if (parsedNewTokenPrice === 0 || typeof totalIssuance === 'number') return 0
-
-    return parsedNewTokenPrice.mul(totalIssuance)
-  }, [parsedNewTokenPrice, totalIssuance])
-
-  useEffect(() => setValue('newNav', newNav), [newNav])
-  useEffect(() => setValue('currentNav', currentNav), [currentNav])
-  useEffect(() => setValue('currentTokenPrice', currentTokenPrice), [currentTokenPrice])
+  const debouncedCalculateNewNav = debounce(handleCalculateNewNav, 500)
 
   const gapValue = 6
 
   return (
-    <Grid templateColumns="repeat(2, 1fr)" templateRows="repeat(3, 1fr)" columnGap={gapValue}>
+    <Grid templateColumns="repeat(2, 1fr)" templateRows="repeat(2, 1fr)" columnGap={gapValue}>
       <GridItem colSpan={1} rowSpan={2}>
         <Box mb={gapValue}>
           <BalanceInput
             name="currentNav"
-            decimals={2}
+            decimals={decimals}
+            displayDecimals={2}
             placeholder="0.00"
             inputGroupProps={{
               endAddon: 'USD',
@@ -58,7 +47,8 @@ export function NavForm({ parsedNewTokenPrice }: NavFormProps) {
         <Box mb={gapValue}>
           <BalanceInput
             name="currentTokenPrice"
-            decimals={6}
+            decimals={decimals}
+            displayDecimals={2}
             placeholder="0.00"
             inputGroupProps={{
               endAddon: 'USD per share',
@@ -72,7 +62,8 @@ export function NavForm({ parsedNewTokenPrice }: NavFormProps) {
         <Box mb={gapValue}>
           <BalanceInput
             name="newNav"
-            decimals={2}
+            decimals={decimals}
+            displayDecimals={2}
             placeholder="0.00"
             inputGroupProps={{
               endAddon: 'USD',
@@ -85,39 +76,14 @@ export function NavForm({ parsedNewTokenPrice }: NavFormProps) {
         <Box mb={gapValue}>
           <BalanceInput
             name="newTokenPrice"
-            decimals={6}
+            decimals={decimals}
             placeholder="0.00"
             inputGroupProps={{
               endAddon: 'USD per share',
             }}
             label="New Token Price"
+            onChange={debouncedCalculateNewNav}
           />
-        </Box>
-      </GridItem>
-      <GridItem colSpan={1} rowSpan={1}>
-        <Box border="1px solid" borderColor="gray.200" borderRadius="md" p={4}>
-          <Flex alignItems="center" justifyContent="space-between">
-            <Flex alignItems="center" justifyContent="flex-start">
-              <NetworkIcon networkId={network?.chainId} />
-              <Text fontSize="xs" ml={2}>
-                {networkName}
-              </Text>
-            </Flex>
-            <BalanceDisplay balance={currentNav} currency="USD" fontSize="sm" />
-          </Flex>
-        </Box>
-      </GridItem>
-      <GridItem colSpan={1} rowSpan={1}>
-        <Box border="1px solid" borderColor="gray.200" borderRadius="md" p={4}>
-          <Flex alignItems="center" justifyContent="space-between">
-            <Flex alignItems="center" justifyContent="flex-start">
-              <NetworkIcon networkId={network?.chainId} />
-              <Text fontSize="xs" ml={2}>
-                {networkName}
-              </Text>
-            </Flex>
-            <BalanceDisplay balance={newNav} currency="USD" fontSize="sm" />
-          </Flex>
         </Box>
       </GridItem>
     </Grid>

@@ -1,4 +1,5 @@
 // export { isTestEnv } from './config'
+export { debounce } from './debounce'
 export * from './formatting'
 export { networkToName } from './networkToName'
 export { chainExplorer } from './chainExplorer'

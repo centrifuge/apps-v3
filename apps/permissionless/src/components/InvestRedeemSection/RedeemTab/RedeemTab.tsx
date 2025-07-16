@@ -2,24 +2,17 @@ import { useMemo, useState } from 'react'
 import { z } from 'zod'
 import { Box } from '@chakra-ui/react'
 import { createBalanceSchema, Form, safeParse, useForm } from '@centrifuge/forms'
-import { Balance, PoolNetwork, type Vault } from '@centrifuge/sdk'
+import { Balance } from '@centrifuge/sdk'
 import { formatBalanceToString, useInvestment, useCentrifugeTransaction, useVaultDetails } from '@centrifuge/shared'
 import {
   RedeemAction,
   RedeemFormDefaultValues,
   type RedeemActionType,
 } from '@components/InvestRedeemSection/components/defaults'
+import { TabProps } from '@components/InvestRedeemSection'
 import { RedeemTabForm } from '@components/InvestRedeemSection/RedeemTab/forms/RedeemTabForm'
 
-export default function RedeemTab({
-  networks,
-  vault,
-  vaults,
-}: {
-  networks?: PoolNetwork[]
-  vault: Vault
-  vaults: Vault[]
-}) {
+export default function RedeemTab({ networks, vault, vaults }: TabProps) {
   const { data: vaultDetails } = useVaultDetails(vault)
   const { data: investment } = useInvestment(vault)
   const { execute, isPending } = useCentrifugeTransaction()
