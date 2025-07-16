@@ -1,0 +1,63 @@
+name: Launchpad PR Preview
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - 'apps/launchpad/**'
+      - '.github/workflows/preview-launchpad.yml'
+
+jobs:
+  build-and-comment:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build launchpad for Preview
+        run: pnpm --filter=launchpad build --mode testnet
+
+      - name: Install Wrangler
+        run: npm install --global wrangler
+
+      - name: Deploy New Worker Version
+        id: deploy
+        run: |
+          cd apps/launchpad
+          DEPLOY_OUTPUT=$(
+            CLOUDFLARE_API_TOKEN=${{ secrets.CLOUDFLARE_API_TOKEN }} \
+            CLOUDFLARE_ACCOUNT_ID=${{ secrets.CLOUDFLARE_ACCOUNT_ID }} \
+            wrangler deploy --env demo --name launchpad-demo
+          )
+          VERSION_ID=$(echo "$DEPLOY_OUTPUT" \
+            | awk '/Current Version ID:/ {print $4}' \
+            | cut -d'-' -f1)
+          echo "version_id=$VERSION_ID" >> $GITHUB_OUTPUT
+
+      - name: Comment on PR with Preview Link
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const version = '${{ steps.deploy.outputs.version_id }}';
+            const url = `https://${version}-launchpad-demo.centrifuge-kf.workers.dev`;
+            const body = `🚀 **launchpad** PR Preview: ${url} ⭐⭐⭐⭐⭐`;
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body
+            });

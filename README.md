@@ -3,7 +3,7 @@
 A modern monorepo workspace using pnpm with multiple packages:
 
 - `app`: A React application using React Router v7 in framework mode and Vite
-- `permissionless`: A react application using vite
+- `derwa`: A react application using vite
 - `launchpad`: A React application using React Router v7 in framework mode and Vite
 - `functions`: A Nitro-powered API server
 - `forms`: A package to reuse forms within our apps
@@ -23,13 +23,13 @@ pnpm dev
 # Or start individually:
 pnpm dev:app      # Start app V3 only
 pnpm dev:functions  # Start Nitro API server only
-pnpm dev:permissionless # Start permissionless app only
+pnpm dev:derwa # Start derwa app only
 pnpm dev:launchpad  # Start launchpad only
 ```
 
 The React app will be available at: http://localhost:3001/ (or another available port)
-The Permissionless app will be available at: http://localhost:3003/ (or another available port)
-The Permissionless app will be available at: http://localhost:3004/ (or another available port)
+The derwa app will be available at: http://localhost:3003/ (or another available port)
+The launchpad app will be available at: http://localhost:3004/ (or another available port)
 The API server will be available at: http://localhost:3002/ (as configured in functions/.env)
 
 Sample API endpoint: http://localhost:3002/api/hello
@@ -86,7 +86,7 @@ Key architectural decisions:
 
 2. **TypeScript Support**: Full TypeScript support for type-safe API development
 
-#### Centrifuge permissionless
+#### Centrifuge derwa
 
 React app using vite
 

@@ -1,0 +1,26 @@
+main = "index.js"
+compatibility_date = "2025-06-30"
+
+[observability]
+enabled = true
+
+[assets]
+directory = "./dist"
+
+[env.demo]
+name = "derwa-demo"
+routes = [
+    { pattern = "derwa-demo.k-f.dev/*", zone_name = "k-f.dev" }
+]
+
+[env.staging]
+name = "derwa-staging"
+routes = [
+    { pattern = "derwa-staging.k-f.dev/*", zone_name = "k-f.dev" }
+]
+
+[env.production]
+name = "derwa-production"
+routes = [
+    { pattern = "derwa.k-f.dev/*", zone_name = "k-f.dev" }
+]
