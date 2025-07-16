@@ -16,7 +16,7 @@ export default defineConfig(() => {
         inject: {
           data: {
             // TODO: should come from config, currently is not working because the way our tsconfig is configured
-            APP_TITLE: 'Centrifuge Permissionless',
+            APP_TITLE: 'Centrifuge Derwa',
             FAVICON: '/',
           },
         },

@@ -1,0 +1,103 @@
+name: PR Preview Link
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  build-and-deploy-preview:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        app: [derwa, launchpad]
+    outputs:
+      app: ${{ steps.set_outputs.outputs.app }}
+      url: ${{ steps.set_outputs.outputs.url }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build App for Preview
+        run: pnpm --filter=${{ matrix.app }} build --mode testnet
+
+      - name: Install Wrangler
+        run: npm install --global wrangler
+
+      - name: Deploy New Worker Version
+        id: deploy
+        run: |
+          cd apps/${{ matrix.app }}
+          DEPLOY_OUTPUT=$(CLOUDFLARE_API_TOKEN=${{ secrets.CLOUDFLARE_API_TOKEN }} CLOUDFLARE_ACCOUNT_ID=${{ secrets.CLOUDFLARE_ACCOUNT_ID }} wrangler deploy --env demo --name ${{ matrix.app }}-demo)
+          VERSION_ID=$(echo "$DEPLOY_OUTPUT" | awk '/Current Version ID:/ {print $4}' | cut -d'-' -f1)
+          echo "version_id=$VERSION_ID" >> $GITHUB_OUTPUT
+
+      - name: Set deployment URL output
+        id: set_outputs
+        run: |
+          PREVIEW_URL="https://${{ steps.deploy.outputs.version_id }}-${{ matrix.app }}-demo.${{ secrets.CLOUDFLARE_WORKERS_SUBDOMAIN }}.workers.dev"
+          echo "app=${{ matrix.app }}" >> $GITHUB_OUTPUT
+          echo "url=$PREVIEW_URL" >> $GITHUB_OUTPUT
+
+  comment-on-pr:
+    needs: build-and-deploy-preview
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build Comment Body
+        id: build_comment
+        env:
+          ALL_RESULTS: ${{ toJSON(needs.build-and-deploy-preview.outputs) }}
+        run: |
+          # 5 stars because it was hard to get this working
+          comment_body="🚀 PR Preview links are ready! ✨✨✨✨✨\n\n"
+
+          links=$(echo "$ALL_RESULTS" | jq -r 'map("- **\(.app)**: [Live Link](\(.url))") | .[]')
+
+          full_comment="${comment_body}$(echo -e "$links")"
+
+          echo "body<<EOF" >> $GITHUB_OUTPUT
+          echo "$full_comment" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Comment on PR with Preview Links
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const body = `${{ steps.build_comment.outputs.body }}`;
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+
+            const botComment = comments.find(comment => 
+              comment.user.login === 'github-actions[bot]' && comment.body.includes('PR Preview links are ready!')
+            );
+
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: body
+              });
+            } else {
+              await github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: body
+              });
+            }

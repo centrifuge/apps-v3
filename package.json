@@ -5,14 +5,12 @@
   "description": "Centrifuge Apps V3 Workspace",
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "dev": "concurrently \"pnpm dev:functions\" \"pnpm dev:permissionless\" \"pnpm dev:launchpad\"",
-    "dev:permissionless": "pnpm --filter permissionless dev",
+    "dev": "concurrently \"pnpm dev:functions\" \"pnpm dev:derwa\" \"pnpm dev:launchpad\"",
+    "dev:derwa": "pnpm --filter derwa dev",
     "dev:launchpad": "pnpm --filter launchpad dev",
     "dev:functions": "pnpm --filter functions dev",
-    "lint": "concurrently \"pnpm --filter launchpad lint\" \"pnpm --filter permissionless lint\"",
-    "lint:fix": "npm run lint -- --fix",
-    "build:pages:launchpad": "pnpm --filter=launchpad build",
-    "build:pages:permissionless": "pnpm --filter=permissionless build"
+    "lint": "concurrently \"pnpm --filter launchpad lint\" \"pnpm --filter derwa lint\"",
+    "lint:fix": "npm run lint -- --fix"
   },
   "dependencies": {
     "@ark-ui/react": "^5.15.1",
