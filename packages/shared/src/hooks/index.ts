@@ -9,7 +9,7 @@ export {
   useIsPoolManager,
 } from './usePools'
 export { useVaults, useVaultDetails, useVaultsDetails, useInvestment, useInvestmentsPerVaults } from './useVaults'
-export { useInvestor, usePortfolio } from './useInvestor'
+export { useInvestor, useIsMember, usePortfolio } from './useInvestor'
 export { CentrifugeProvider, useCentrifuge } from './CentrifugeContext'
 export { useObservable } from './useObservable'
 export * from './TransactionProvider'
