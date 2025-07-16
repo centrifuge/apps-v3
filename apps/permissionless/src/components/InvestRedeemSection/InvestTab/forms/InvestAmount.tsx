@@ -9,8 +9,7 @@ import { infoText } from '@utils/infoText'
 import { InvestAction, type InvestActionType } from '@components/InvestRedeemSection/components/defaults'
 import { InfoWrapper } from '@components/InvestRedeemSection/components/InfoWrapper'
 import { VaultDetails } from '@utils/types'
-import { formatBalance, formatBalanceToString } from '@centrifuge/shared'
-import { debounce } from '@utils/debounce'
+import { debounce, formatBalance, formatBalanceToString } from '@centrifuge/shared'
 import { useSwitchChain } from 'wagmi'
 
 interface InvestAmountProps {

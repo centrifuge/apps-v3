@@ -4,6 +4,7 @@ import { Badge, Box, Flex, Text } from '@chakra-ui/react'
 import { BalanceInput, SubmitButton, useFormContext } from '@centrifuge/forms'
 import { Balance, PoolId, PoolNetwork, Price, Vault } from '@centrifuge/sdk'
 import {
+  debounce,
   divideBigInts,
   formatBalanceToString,
   usePortfolio,
@@ -17,7 +18,6 @@ import { NetworkIcons } from '@centrifuge/ui'
 import { InfoWrapper } from '@components/InvestRedeemSection/components/InfoWrapper'
 import { useSelectedPoolContext } from '@contexts/useSelectedPoolContext'
 import { infoText } from '@utils/infoText'
-import { debounce } from '@utils/debounce'
 
 interface RedeemAmountProps {
   isDisabled: boolean

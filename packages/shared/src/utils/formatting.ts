@@ -3,6 +3,7 @@ import Decimal from 'decimal.js-light'
 import { formatUnits, type Address } from 'viem'
 
 export function truncateAddress(string: Address) {
+  if (!string) return ''
   const first = string.slice(0, 7)
   const last = string.slice(-7)
 
