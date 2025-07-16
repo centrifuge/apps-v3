@@ -3,6 +3,7 @@ import { Tabs as ChakraTabs } from '@chakra-ui/react'
 
 interface TabsProps {
   elements: {
+    disabled?: boolean
     label: string
     value: string
     body: React.ReactNode
@@ -23,7 +24,13 @@ export const Tabs = ({ elements }: TabsProps) => {
     >
       <ChakraTabs.List>
         {elements.map((element) => (
-          <ChakraTabs.Trigger value={element.value} key={element.value} height="55px" alignItems="flex-end">
+          <ChakraTabs.Trigger
+            value={element.value}
+            key={element.value}
+            height="55px"
+            alignItems="flex-end"
+            disabled={element.disabled ?? false}
+          >
             {element.label}
           </ChakraTabs.Trigger>
         ))}

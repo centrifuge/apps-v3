@@ -1,9 +1,9 @@
-import { useState, type Dispatch, type SetStateAction } from 'react'
+import { type Dispatch, type SetStateAction } from 'react'
 import type { Balance, PoolNetwork, Vault } from '@centrifuge/sdk'
 import { type InvestActionType, InvestAction } from '@components/InvestRedeemSection/components/defaults'
-import { InvestTxFeedback } from '@components/InvestRedeemSection/InvestTab/forms/InvestTxFeedback'
 import { InvestAmount } from '@components/InvestRedeemSection/InvestTab/forms/InvestAmount'
 import { InvestRequirements } from '@components/InvestRedeemSection/InvestTab/forms/InvestRequirements'
+import { InvestTxFeedback } from '@components/InvestRedeemSection/InvestTab/forms/InvestTxFeedback'
 import { VaultDetails } from '@utils/types'
 
 interface InvestTabFormProps {
@@ -29,16 +29,10 @@ export function InvestTabForm({
   setActionType,
   setVault,
 }: InvestTabFormProps) {
-  const [currencies, setCurrencies] = useState({
-    investCurrency: '',
-    receiveCurrency: '',
-  })
-
   switch (actionType) {
     case InvestAction.INVEST_AMOUNT:
       return (
         <InvestAmount
-          currencies={currencies}
           isDisabled={isDisabled}
           maxInvestAmount={maxInvestAmount}
           networks={networks}
@@ -46,13 +40,12 @@ export function InvestTabForm({
           vaults={vaults}
           vaultDetails={vaultDetails}
           setActionType={setActionType}
-          setCurrencies={setCurrencies}
           setVault={setVault}
         />
       )
     case InvestAction.INVESTOR_REQUIREMENTS:
       return <InvestRequirements />
     case InvestAction.SUCCESS:
-      return <InvestTxFeedback setActionType={setActionType} currencies={currencies} />
+      return <InvestTxFeedback vaultDetails={vaultDetails} setActionType={setActionType} />
   }
 }

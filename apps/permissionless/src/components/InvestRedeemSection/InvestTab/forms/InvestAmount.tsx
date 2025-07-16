@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, type Dispatch, type SetStateAction } from 'react'
+import { useCallback, useMemo, type Dispatch, type SetStateAction } from 'react'
 import { Badge, Box, Button, Flex, Text } from '@chakra-ui/react'
 import { BalanceInput, useFormContext } from '@centrifuge/forms'
 import { Balance, PoolId, PoolNetwork, Vault } from '@centrifuge/sdk'
@@ -19,8 +19,6 @@ interface InvestAmountProps {
   networks?: PoolNetwork[]
   parsedInvestAmount: 0 | Balance
   vaultDetails?: VaultDetails
-  currencies: { investCurrency: string; receiveCurrency: string }
-  setCurrencies: Dispatch<SetStateAction<{ investCurrency: string; receiveCurrency: string }>>
   setActionType: Dispatch<SetStateAction<InvestActionType>>
   setVault: Dispatch<Vault>
   vaults: Vault[]
@@ -32,10 +30,7 @@ export function InvestAmount({
   networks,
   parsedInvestAmount,
   vaultDetails,
-  currencies,
-  setCurrencies,
   setActionType,
-  // setVault,
   vaults,
 }: InvestAmountProps) {
   const { data: vaultsDetails } = useVaultsDetails(vaults)
@@ -96,15 +91,6 @@ export function InvestAmount({
     setValue('receiveAmount', calculatedReceiveAmount)
   }, [maxInvestAmount])
 
-  useEffect(
-    () =>
-      setCurrencies({
-        investCurrency: portfolioCurrency?.symbol ?? '',
-        receiveCurrency: shareClass?.details.symbol ?? '',
-      }),
-    [portfolioCurrency, shareClass]
-  )
-
   return (
     <Box>
       <Flex justify="space-between" mb={2}>
@@ -152,7 +138,7 @@ export function InvestAmount({
             placeholder="0.00"
             disabled
             inputGroupProps={{
-              endAddon: currencies.receiveCurrency,
+              endAddon: vaultDetails?.shareCurrency.symbol,
             }}
           />
         </>
