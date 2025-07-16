@@ -7,11 +7,6 @@ import { AssetId, ShareClassId } from '@centrifuge/sdk'
 import { useCentrifugeTransaction } from '@centrifuge/shared'
 import { AddHoldingForm } from '@components/holdings/AddHoldingForm'
 
-export const handle = {
-  hasSettings: false,
-  hasTabs: true,
-}
-
 const schema = z.object({
   network: z.string(),
   asset: z.instanceof(AssetId),

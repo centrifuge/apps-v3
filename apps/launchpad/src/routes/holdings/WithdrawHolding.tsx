@@ -3,11 +3,6 @@ import { Loader, Text } from '@chakra-ui/react'
 import { HoldingsForm } from '@components/holdings/HoldingsForm'
 import { usePoolProvider } from '@contexts/PoolProvider'
 
-export const handle = {
-  hasSettings: false,
-  hasTabs: true,
-}
-
 export default function WithdrawHolding() {
   const { data: portfolio } = usePortfolio()
   const { shareClass, isLoading: isPoolLoading } = usePoolProvider()

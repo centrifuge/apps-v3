@@ -99,11 +99,42 @@ export function PoolHoldings({ shareClass, poolDecimals }: { shareClass: ShareCl
       return (
         <ActionsDropdown
           items={[
-            { label: 'deposit', element: <Text>Deposit</Text> },
-            { label: 'withdraw', element: <Text>Withdraw</Text> },
-            { label: 'buy', element: <Text>Buy</Text> },
-            { label: 'sell', element: <Text>Sell</Text> },
-            { label: 'update', element: <Text>Update</Text> },
+            {
+              label: 'deposit',
+              element: (
+                <Button
+                  label="Deposit"
+                  onClick={() => navigate(`/holdings/${poolId}/deposit`)}
+                  variant="plain"
+                  size="sm"
+                  height="14px"
+                />
+              ),
+            },
+            {
+              label: 'withdraw',
+              element: (
+                <Button
+                  label="Withdraw"
+                  onClick={() => navigate(`/holdings/${poolId}/withdraw`)}
+                  variant="plain"
+                  size="sm"
+                  height="14px"
+                />
+              ),
+            },
+            {
+              label: 'update',
+              element: (
+                <Button
+                  label="Update"
+                  onClick={() => navigate(`/holdings/${poolId}/update`)}
+                  variant="plain"
+                  size="sm"
+                  height="14px"
+                />
+              ),
+            },
           ]}
         />
       )

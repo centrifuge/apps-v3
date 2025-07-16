@@ -3,11 +3,6 @@ import { mockMetadata, useCentrifugeTransaction } from '@centrifuge/shared'
 import { Box, Button } from '@chakra-ui/react'
 import { usePoolProvider } from '@contexts/PoolProvider'
 
-export const handle = {
-  hasSettings: false,
-  hasTabs: false,
-}
-
 export default function UpdateMetadata() {
   const { execute, isPending } = useCentrifugeTransaction()
   const { pool } = usePoolProvider()

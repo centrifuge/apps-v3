@@ -9,11 +9,6 @@ import { NavHoldings } from '@components/nav/NavHoldings'
 import { usePoolProvider } from '@contexts/PoolProvider'
 import { Price } from '@centrifuge/sdk'
 
-export const handle = {
-  hasSettings: false,
-  hasTabs: false,
-}
-
 export default function NavPage() {
   const { shareClassId } = useParams()
   const { poolDetails, shareClass, vaultsDetails } = usePoolProvider()

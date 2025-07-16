@@ -8,7 +8,6 @@ export default defineConfig(() => {
   const envDir = path.resolve(__dirname, '../../.env-config')
   return {
     envDir,
-
     plugins: [
       react(),
       tsconfigPaths(),

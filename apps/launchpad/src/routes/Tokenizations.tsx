@@ -3,11 +3,6 @@ import { truncateAddress, useAddress, usePoolsByManager } from '@centrifuge/shar
 import { PoolOverviewTable } from '@components/tokenizations/PoolOverviewTable'
 import { Loader } from '@centrifuge/ui'
 
-export const handle = {
-  hasSettings: false,
-  hasTabs: true,
-}
-
 export default function Tokenizations() {
   const { address } = useAddress()
   const { data: allPools, isLoading } = usePoolsByManager(address)

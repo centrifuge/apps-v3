@@ -1,7 +1,7 @@
 import { BalanceInput, Form, Select, SubmitButton, useForm } from '@centrifuge/forms'
 import { truncateAddress, useAddress } from '@centrifuge/shared'
-import { BalanceDisplay, Card, DisplayInput, IconInfo, NetworkIcon } from '@centrifuge/ui'
-import { Box, Flex, Grid, Heading, Input, Stack, Text } from '@chakra-ui/react'
+import { Card, DisplayInput, NetworkIcon } from '@centrifuge/ui'
+import { Box, Flex, Grid, Heading, Stack, Text } from '@chakra-ui/react'
 import { SummaryBox } from './SummaryBox'
 import { useEffect, useMemo } from 'react'
 import { Balance } from '@centrifuge/sdk'
@@ -37,6 +37,7 @@ export const HoldingsForm = ({
     },
     mode: 'onChange',
     onSubmit: (values) => {
+      // TODO wait on sdk
       console.log(values)
     },
   })
