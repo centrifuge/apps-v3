@@ -33,8 +33,8 @@ export const HoldingsForm = ({
   const form = useForm({
     schema: z.object({
       holding: z.custom<Holdings[number]>(),
-      availableBalance: z.instanceof(Balance),
-      amount: z.instanceof(Balance),
+      availableBalance: z.string(),
+      amount: z.string(),
     }),
     defaultValues: {
       holding: holdings[0],
