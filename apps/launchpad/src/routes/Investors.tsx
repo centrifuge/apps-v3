@@ -2,7 +2,7 @@ import z from 'zod'
 import { Form, useForm } from '@centrifuge/forms'
 import { truncateAddress, useAllPoolDetails, useCentrifugeTransaction, usePoolsByManager } from '@centrifuge/shared'
 import { Card, Button, Loader } from '@centrifuge/ui'
-import { Box, Flex, Heading, Stack, VStack } from '@chakra-ui/react'
+import { Box, Flex, Heading, Stack, Text, VStack } from '@chakra-ui/react'
 import { useAccount } from 'wagmi'
 import { WhitelistInvestor } from '@components/investors/WhitelistInvestor'
 import { useMemo } from 'react'
@@ -47,12 +47,21 @@ export default function Investors() {
 
   if (isLoading) return <Loader />
 
-  if (!pools?.length)
+  if (!address) {
     return (
       <VStack>
-        <Heading size="md">No pools found for address {truncateAddress(address!)}</Heading>
+        <Text>Connect your wallet to whitelist investors</Text>
       </VStack>
     )
+  }
+
+  if (!pools?.length) {
+    return (
+      <VStack>
+        <Text>No pools found for address {truncateAddress(address!)}</Text>
+      </VStack>
+    )
+  }
 
   return (
     <Form form={form}>

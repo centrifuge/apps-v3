@@ -11,7 +11,7 @@ import RevokeShares from '@routes/orders/RevokeShares'
 import PoolAccess from '@routes/settings/PoolAccess'
 import NotFound from '@routes/NotFound'
 import HeaderLayout from '@layouts/HeaderLayout'
-import AddHolding from '@routes/holdings/addHolding'
+import AddHolding from '@routes/holdings/AddHolding'
 
 export const routes = createBrowserRouter([
   {

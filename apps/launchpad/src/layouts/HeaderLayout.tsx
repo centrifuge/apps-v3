@@ -149,9 +149,13 @@ export default function HeaderLayout() {
                   {poolName}
                 </Heading>
                 {hasSettings ? (
-                  <Button colorPalette="gray" variant="subtle">
+                  <Button
+                    colorPalette="gray"
+                    variant="subtle"
+                    onClick={() => navigate(`settings/${poolId}/poolAccess`)}
+                  >
                     <IoSettingsSharp />
-                    <Text onClick={() => navigate(`settings/${poolId}/poolAccess`)}>Settings</Text>
+                    <Text>Settings</Text>
                   </Button>
                 ) : null}
               </Flex>

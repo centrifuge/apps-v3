@@ -110,14 +110,11 @@ export const PoolOverviewTable = ({ poolIds }: { poolIds: PoolId[] }) => {
     }))
   )
 
-  // TODO: add better UI for loading, skeleton??
-  if (isLoadingPools) return <Loader />
+  if (isLoadingPools) return null
 
   return (
-    <Stack>
-      <Heading size="md" my="4">
-        Pool overview
-      </Heading>
+    <Stack gap={4}>
+      <Heading size="md">Pool overview</Heading>
       {<DataTable columns={columns} data={flattenedData ?? []} />}
     </Stack>
   )

@@ -72,33 +72,31 @@ export default function NavPage() {
   }, [shareClassDetails])
 
   return (
-    <Container maxWidth="6xl">
-      <Form form={form} style={{ height: '100%' }}>
-        <Flex alignItems="center" justifyContent="space-between" my={8}>
-          <Heading size="lg">Update NAV</Heading>
-          <SubmitButton colorPalette="yellow" size="sm" disabled={isPending}>
-            Save Changes
-          </SubmitButton>
-        </Flex>
-        <Card.Root>
-          <Card.Body>
-            <NavForm shareClassDetails={shareClassDetails} />
-            <Grid templateColumns="repeat(2, 1fr)" templateRows="repeat(1, 1fr)" columnGap={6}>
-              <GridItem colSpan={1} rowSpan={1}>
-                <NavHoldings networksNavs={networksNavs} />
-              </GridItem>
-              <GridItem colSpan={1} rowSpan={1}>
-                <NavHoldings networksNavs={networksNavs} />
-              </GridItem>
-            </Grid>
-            <Box border="1px solid" borderColor="gray.200" backgroundColor="gray.200" borderRadius="sm" p={2} mt={6}>
-              <Text fontSize="xs" textAlign="center">
-                {`This action will change the token price from ${formatBalance(parsedCurrentTokenPrice, poolCurrencySymbol, 2)} to ${formatBalance(parsedNewTokenPrice, poolCurrencySymbol, 2)}. Token prices will be propagated to all networks JTRSY is deployed to.`}
-              </Text>
-            </Box>
-          </Card.Body>
-        </Card.Root>
-      </Form>
-    </Container>
+    <Form form={form}>
+      <Flex alignItems="center" justifyContent="space-between" mb={4}>
+        <Heading size="lg">Update NAV</Heading>
+        <SubmitButton colorPalette="yellow" size="sm" disabled={isPending}>
+          Save Changes
+        </SubmitButton>
+      </Flex>
+      <Card.Root>
+        <Card.Body>
+          <NavForm shareClassDetails={shareClassDetails} />
+          <Grid templateColumns="repeat(2, 1fr)" templateRows="repeat(1, 1fr)" columnGap={6}>
+            <GridItem colSpan={1} rowSpan={1}>
+              <NavHoldings networksNavs={networksNavs} />
+            </GridItem>
+            <GridItem colSpan={1} rowSpan={1}>
+              <NavHoldings networksNavs={networksNavs} />
+            </GridItem>
+          </Grid>
+          <Box border="1px solid" borderColor="gray.200" backgroundColor="gray.200" borderRadius="sm" p={2} mt={6}>
+            <Text fontSize="xs" textAlign="center">
+              {`This action will change the token price from ${formatBalance(parsedCurrentTokenPrice, poolCurrencySymbol, 2)} to ${formatBalance(parsedNewTokenPrice, poolCurrencySymbol, 2)}. Token prices will be propagated to all networks JTRSY is deployed to.`}
+            </Text>
+          </Box>
+        </Card.Body>
+      </Card.Root>
+    </Form>
   )
 }
