@@ -6,11 +6,33 @@ on:
       - main
 
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      apps: ${{ steps.filter.outputs.changes }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Detect changed apps
+        uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            derwa:
+              - 'apps/derwa/**'
+              - '.github/workflows/deploy-demo.yml'
+            launchpad:
+              - 'apps/launchpad/**'
+              - '.github/workflows/deploy-demo.yml'
+
   build:
+    needs: changes
+    if: needs.changes.outputs.apps != '[]'
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        app: [derwa, launchpad]
+        app: ${{ fromJSON(needs.changes.outputs.apps) }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -19,6 +41,21 @@ jobs:
         uses: pnpm/action-setup@v3
         with:
           version: 10
+          run_install: false
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -38,11 +75,12 @@ jobs:
           path: ./apps/${{ matrix.app }}/dist
 
   deploy-demo:
-    needs: build
+    needs: [build, changes]
+    if: needs.changes.outputs.apps != '[]'
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        app: [derwa, launchpad]
+        app: ${{ fromJSON(needs.changes.outputs.apps) }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
