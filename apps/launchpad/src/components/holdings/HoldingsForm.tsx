@@ -3,9 +3,10 @@ import { formatUIBalance, Holdings, Portfolio, truncateAddress, useAddress } fro
 import { Card, DisplayInput, NetworkIcon } from '@centrifuge/ui'
 import { Box, Flex, Grid, Heading, Stack, Text } from '@chakra-ui/react'
 import { SummaryBox } from './SummaryBox'
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { Balance } from '@centrifuge/sdk'
 import z from 'zod'
+import { useParams } from 'react-router-dom'
 
 export const HoldingsForm = ({
   isWithdraw = false,
@@ -16,11 +17,13 @@ export const HoldingsForm = ({
   portfolio: Portfolio | undefined
   holdings: Holdings
 }) => {
+  const params = useParams()
+  const holdingId = params.holdingId
   const { address } = useAddress()
   const truncate = truncateAddress(address)
 
   const holdingsItems = holdings?.map((holding) => ({
-    value: holding.asset.address,
+    value: holding.assetId.raw.toString(),
     label: holding.asset.name,
     children: (
       <Flex gap={2} alignItems="center">
@@ -32,23 +35,21 @@ export const HoldingsForm = ({
 
   const schema = z
     .object({
-      holding: z.custom<Holdings[number]>(),
+      holding: z.string().optional(),
       availableBalance: z.custom<Portfolio[number]>().optional(),
-      amount: createBalanceSchema(
-        holdings[0].asset.decimals,
-        z.number().min(1, { message: 'Amount must be at least 1' })
-      ),
+      amount: z.string().min(1, { message: 'Amount is required' }),
     })
     .refine(
       (data) => {
-        if (!data.availableBalance?.balance) {
-          return true
-        }
-        return !data.amount.gt(data.availableBalance.balance)
+        if (!data.availableBalance?.balance || !data.amount) return true
+        const currentHolding = holdings.find((h) => h.assetId.raw.toString() === data.holding)
+        if (!currentHolding) return true
+        const parsedAmount = safeParse(createBalanceSchema(currentHolding.asset.decimals), data.amount)
+        if (!parsedAmount) return true
+        return !parsedAmount.gt(data.availableBalance.balance)
       },
       (data) => {
         const avail = data.availableBalance?.balance
-        console.log(data)
         return {
           message: `Amount cannot exceed your available balance of ${formatUIBalance(avail, {
             precision: 2,
@@ -63,7 +64,7 @@ export const HoldingsForm = ({
   const form = useForm({
     schema: schema,
     defaultValues: {
-      holding: holdings[0],
+      holding: holdingId || (holdings.length > 0 ? holdings[0].assetId.raw.toString() : ''),
       availableBalance: undefined,
       amount: '',
     },
@@ -74,13 +75,30 @@ export const HoldingsForm = ({
     },
   })
 
-  const { watch } = form
-  const [amount, availableBalance] = watch(['amount', 'availableBalance'])
+  const { watch, setValue, getValues } = form
+  const [amountStr, holdingFromForm] = watch(['amount', 'holding'])
 
-  const parsedAmount = useMemo(
-    () => safeParse(schema._def.schema.shape.amount, amount) ?? new Balance(0, 0),
-    [amount, schema]
-  )
+  useEffect(() => {
+    if (!portfolio) return
+
+    const selectedHolding = holdings.find((h) => h.assetId.raw.toString() === holdingFromForm)
+    const newBalance = portfolio.find((p) => p.currency.address === selectedHolding?.asset.address)
+
+    if (getValues('availableBalance')?.currency.address !== newBalance?.currency.address) {
+      setValue('availableBalance', newBalance, { shouldValidate: true })
+    }
+  }, [holdingFromForm, portfolio, holdings, setValue, getValues])
+
+  const selectedHolding = useMemo(() => {
+    return holdings.find((h) => h.assetId.raw.toString() === holdingFromForm)
+  }, [holdings, holdingFromForm])
+
+  const availableBalance = watch('availableBalance')
+
+  const parsedAmount = useMemo(() => {
+    const decimals = selectedHolding?.asset.decimals ?? 18
+    return safeParse(createBalanceSchema(decimals), amountStr) ?? new Balance(0, decimals)
+  }, [amountStr, selectedHolding])
 
   const summaryItems = useMemo(() => {
     return [
@@ -93,28 +111,16 @@ export const HoldingsForm = ({
         balance: parsedAmount,
       },
     ]
-  }, [availableBalance, isWithdraw, amount])
-
-  const isDisabled = useMemo(() => {
-    return Number(amount) === 0 || Number(availableBalance) === 0 || Number(amount) > Number(availableBalance)
-  }, [amount, availableBalance])
+  }, [availableBalance, isWithdraw, parsedAmount])
 
   return (
     <Form form={form}>
       <Stack>
-        <Select
-          name="holding"
-          label="Available holdings"
-          items={holdingsItems || []}
-          maxWidth="40%"
-          onSelectChange={(value) => {
-            const availableBalance = portfolio?.find((item) => item.currency.address === value)
-            form.setValue('availableBalance', availableBalance)
-            form.setValue('holding', value)
-          }}
-        />
+        <Select name="holding" label="Available holdings" items={holdingsItems || []} maxWidth="40%" />
         <Box mt={4}>
-          <Heading>{isWithdraw ? 'Withdraw USDC' : 'Deposit USDC'}</Heading>
+          <Heading>
+            {isWithdraw ? `Withdraw ${selectedHolding?.asset.symbol}` : `Deposit ${selectedHolding?.asset.symbol}`}
+          </Heading>
           <Card mt={4} pt={4} pb={4}>
             <Grid gridTemplateColumns="1fr 1fr" gap={4}>
               <Stack gap={2}>
@@ -123,10 +129,10 @@ export const HoldingsForm = ({
                   name="amount"
                   label="Amount"
                   size="sm"
-                  currency={availableBalance?.currency.symbol}
-                  decimals={availableBalance?.currency.decimals}
+                  currency={selectedHolding?.asset.symbol}
+                  decimals={selectedHolding?.asset.decimals}
                 />
-                <SubmitButton colorPalette="yellow" size="sm" disabled={isDisabled}>
+                <SubmitButton colorPalette="yellow" size="sm" disabled={availableBalance?.balance.isZero()}>
                   {isWithdraw ? 'Withdraw' : 'Deposit'}
                 </SubmitButton>
               </Stack>

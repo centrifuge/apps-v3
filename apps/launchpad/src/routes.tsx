@@ -15,6 +15,7 @@ import AddHolding from '@routes/holdings/AddHolding'
 import DepositHolding from '@routes/holdings/DepositHolding'
 import WithdrawHolding from '@routes/holdings/WithdrawHolding'
 import UpdateHolding from '@routes/holdings/UpdateHolding'
+import Vaults from '@routes/Vaults'
 
 export const routes = createBrowserRouter([
   {
@@ -47,20 +48,16 @@ export const routes = createBrowserRouter([
           },
           { path: 'holdings/:poolId/add', element: <AddHolding />, handle: { hasSettings: false, hasTabs: true } },
           {
-            path: 'holdings/:poolId/deposit',
+            path: 'holdings/:poolId/deposit/:holdingId',
             element: <DepositHolding />,
             handle: { hasSettings: false, hasTabs: true },
           },
           {
-            path: 'holdings/:poolId/withdraw',
+            path: 'holdings/:poolId/withdraw/:holdingId',
             element: <WithdrawHolding />,
             handle: { hasSettings: false, hasTabs: true },
           },
-          {
-            path: 'holdings/:poolId/update',
-            element: <UpdateHolding />,
-            handle: { hasSettings: false, hasTabs: true },
-          },
+          { path: 'vaults/:poolId', element: <Vaults />, handle: { hasSettings: false, hasTabs: false } },
           { path: '*', element: <NotFound /> },
         ],
       },

@@ -4,7 +4,7 @@ import { LogoCentrifugeText } from '@centrifuge/ui'
 import { WalletButton } from '@centrifuge/wallet'
 import { Box, Container, Stack, Tabs, Button, Heading, IconButton, Text, Flex } from '@chakra-ui/react'
 import { Outlet, useLocation, useMatches, useParams, useNavigate } from 'react-router'
-import { useMemo } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import { IoArrowBackSharp, IoSettingsSharp } from 'react-icons/io5'
 
 interface HeaderLayoutHandle {
@@ -45,18 +45,18 @@ const getOrdersTabs = (poolId: string) => [
 ]
 
 // Holdings page tabs
-const getHoldingsTabs = (poolId: string) => [
+const getHoldingsTabs = (poolId: string, holdingId?: string) => [
   {
     label: 'Deposit',
-    path: `/holdings/${poolId}/deposit`,
+    path: `/holdings/${poolId}/deposit/${holdingId}`,
   },
   {
     label: 'Withdraw',
-    path: `/holdings/${poolId}/withdraw`,
+    path: `/holdings/${poolId}/withdraw/${holdingId}`,
   },
   {
     label: 'Update',
-    path: `/holdings/${poolId}/update`,
+    path: `/holdings/${poolId}/update/${holdingId}`,
   },
   {
     label: 'Add',
@@ -79,7 +79,7 @@ const getPoolSettingsTabs = (poolId: string) => [
   },
 ]
 
-function getTabsForRoute(pathname: string, poolId?: string, labels?: string[]) {
+function getTabsForRoute(pathname: string, poolId?: string, labels?: string[], holdingId?: string) {
   if (pathname.includes('/orders/')) {
     return getOrdersTabs(poolId!)
   }
@@ -90,7 +90,10 @@ function getTabsForRoute(pathname: string, poolId?: string, labels?: string[]) {
     return getPoolSettingsTabs(poolId!)
   }
   if (pathname.startsWith('/holdings')) {
-    return getHoldingsTabs(poolId!)
+    return getHoldingsTabs(poolId!, holdingId)
+  }
+  if (pathname.startsWith('/vaults')) {
+    return []
   }
   return MAIN_TABS
 }
@@ -100,8 +103,16 @@ export default function HeaderLayout() {
   const params = useParams()
   const navigate = useNavigate()
   const poolId = params.poolId
+  const { holdingId: holdingIdFromParams } = params
 
-  // Use page component handle functions for header settings
+  const [activeHoldingId, setActiveHoldingId] = useState(holdingIdFromParams)
+
+  useEffect(() => {
+    if (holdingIdFromParams) {
+      setActiveHoldingId(holdingIdFromParams)
+    }
+  }, [holdingIdFromParams])
+
   const matches = useMatches()
   const currentRoute = matches[matches.length - 1]
   const currentHandle = currentRoute?.handle as HeaderLayoutHandle
@@ -116,7 +127,7 @@ export default function HeaderLayout() {
   const shareClasses = poolsDetails?.shareClasses.map((shareClass) => shareClass.details.symbol)
   const poolName = poolsDetails?.metadata?.pool?.name ?? 'Pool'
 
-  const tabs = getTabsForRoute(location.pathname, poolId, shareClasses)
+  const tabs = getTabsForRoute(location.pathname, poolId, shareClasses, activeHoldingId)
   const activeTab = tabs.find((tab) => location.pathname === tab.path)
   const showPoolName = location.pathname !== '/' && location.pathname !== '/investors'
 
@@ -136,7 +147,16 @@ export default function HeaderLayout() {
 
             {showPoolName && (
               <Flex justifyContent={hasSettings ? 'space-between' : ''} alignItems="center" mb={!hasSettings ? 8 : 0}>
-                <IconButton onClick={() => navigate(-1)} aria-label="go back" rounded="full">
+                <IconButton
+                  onClick={() => navigate(-1)}
+                  aria-label="go back"
+                  rounded="full"
+                  variant="outline"
+                  border="none"
+                  _hover={{
+                    backgroundColor: 'transparent',
+                  }}
+                >
                   <IoArrowBackSharp />
                 </IconButton>
                 <Heading
@@ -150,7 +170,7 @@ export default function HeaderLayout() {
                 </Heading>
                 {hasSettings ? (
                   <Button
-                    colorPalette="gray"
+                    colorPalette="black"
                     variant="subtle"
                     onClick={() => navigate(`settings/${poolId}/poolAccess`)}
                   >

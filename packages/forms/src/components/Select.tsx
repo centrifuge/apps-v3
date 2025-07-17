@@ -2,7 +2,6 @@ import type { FieldPath, FieldValues } from 'react-hook-form'
 import { useController, useFormContext } from 'react-hook-form'
 import { createListCollection, Select as ChakraSelect, Field, SelectRootProps, Portal, Group } from '@chakra-ui/react'
 import { useGetFormError } from '../hooks/useGetFormError'
-import { useState } from 'react'
 import { RiArrowDownSLine } from 'react-icons/ri'
 
 export interface CustomSelectProps<TFieldValues extends FieldValues = FieldValues>
@@ -16,7 +15,6 @@ export interface CustomSelectProps<TFieldValues extends FieldValues = FieldValue
 }
 
 export function Select<TFieldValues extends FieldValues = FieldValues>(props: CustomSelectProps<TFieldValues>) {
-  const [value, setValue] = useState<string[]>([])
   const { control, trigger } = useFormContext()
   const { name, rules, label, items, disabled, onSelectChange, ...rest } = props
 
@@ -35,12 +33,12 @@ export function Select<TFieldValues extends FieldValues = FieldValues>(props: Cu
     name,
   })
 
-  const onValueChange = (value: string[]) => {
-    setValue(value)
-    field.onChange(value[0])
+  const onValueChange = (details: { value: string[] }) => {
+    const newValue = details.value[0]
+    field.onChange(newValue)
     trigger(name)
     if (onSelectChange) {
-      onSelectChange(value[0])
+      onSelectChange(newValue)
     }
   }
 
@@ -48,14 +46,13 @@ export function Select<TFieldValues extends FieldValues = FieldValues>(props: Cu
 
   return (
     <Group>
-      <Field.Root invalid={isError} disabled={formState.isSubmitting} id={name}>
+      <Field.Root invalid={isError} disabled={formState.isSubmitting || disabled} id={name}>
         <Field.Label>{label}</Field.Label>
         <ChakraSelect.Root
           collection={collection}
           size="sm"
-          onValueChange={({ value }: { value: string[] }) => onValueChange(value)}
-          disabled={disabled}
-          value={value}
+          onValueChange={onValueChange}
+          value={field.value ? [field.value] : []}
           background="white"
           borderRadius="md"
           {...rest}

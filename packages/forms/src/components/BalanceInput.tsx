@@ -273,6 +273,7 @@ export function BalanceInput<TFieldValues extends FieldValues = FieldValues>(pro
           onPaste={handlePaste}
           inputMode="decimal" // Shows numeric keypad on mobile
           variant={rest.variant ?? 'outline'}
+          borderRadius="md"
         />
       </InputGroup>
       <Field.ErrorText>{errorMessage}</Field.ErrorText>

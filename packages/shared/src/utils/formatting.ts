@@ -2,10 +2,10 @@ import { Balance } from '@centrifuge/sdk'
 import Decimal from 'decimal.js-light'
 import { formatUnits, type Address } from 'viem'
 
-export function truncateAddress(string: Address) {
+export function truncateAddress(string: Address, start = 7, end = 7) {
   if (!string) return ''
-  const first = string.slice(0, 7)
-  const last = string.slice(-7)
+  const first = string.slice(0, start)
+  const last = string.slice(-end)
 
   return `${first}...${last}`
 }
