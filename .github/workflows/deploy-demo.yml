@@ -21,7 +21,7 @@ jobs:
           filters: |
             derwa:
               - 'apps/derwa/**'
-              - '.github/workflows/deploy-demo.yml'
+              - '.github/workflows/deploy-demo.yml' 
             launchpad:
               - 'apps/launchpad/**'
               - '.github/workflows/deploy-demo.yml'
