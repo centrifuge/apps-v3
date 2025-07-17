@@ -52,6 +52,7 @@ export default function IssueOrders() {
           if (pendingInfo && poolDecimals) {
             return {
               assetId: selectedAssetId,
+              // TODO: should be balance?
               issuePricePerShare: new Price(pendingInfo.navPerShare),
             }
           }

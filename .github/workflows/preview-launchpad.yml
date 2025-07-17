@@ -54,10 +54,17 @@ jobs:
           script: |
             const version = '${{ steps.deploy.outputs.version_id }}';
             const url = `https://${version}-launchpad-demo.centrifuge-kf.workers.dev`;
-            const body = `🚀 **launchpad** PR Preview: ${url} ⭐⭐⭐⭐⭐`;
-            await github.rest.issues.createComment({
+            const body = `🚀 **Launchpad** PR Preview: ${url}`;
+            const { data: comments } = await github.rest.issues.listComments({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
-              body
             });
+            if (!comments.some(c => c.body.includes('**Launchpad** PR Preview:'))) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body,
+              });
+            }
