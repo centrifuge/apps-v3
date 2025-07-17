@@ -47,7 +47,7 @@ export default function AddHolding() {
 
   return (
     <Form form={form}>
-      <Flex justifyContent="space-between" alignItems="center" mb={4}>
+      <Flex justifyContent="space-between" alignItems="center">
         <Heading>Add holding</Heading>
         <Button
           label="Save changes"

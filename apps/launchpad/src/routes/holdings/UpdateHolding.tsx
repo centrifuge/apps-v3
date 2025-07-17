@@ -1,3 +1,29 @@
+import { Form, SubmitButton, useForm } from '@centrifuge/forms'
+import { Card } from '@centrifuge/ui'
+import { Flex, Grid, Heading } from '@chakra-ui/react'
+import UpdateVaultForm from '@components/holdings/UpdateVaultForm'
+
 export default function UpdateHolding() {
-  return <div>UpdateHolding</div>
+  const form = useForm({
+    mode: 'onChange',
+    onSubmit: (values) => {
+      console.log(values)
+    },
+  })
+  return (
+    <Form form={form}>
+      <Grid gridTemplateColumns="1fr" gap={4}>
+        <Flex justify="space-between" align="center" gap={4}>
+          <Heading>Update vault</Heading>
+          <SubmitButton colorPalette="yellow">Save changes</SubmitButton>
+        </Flex>
+        <Card>
+          <UpdateVaultForm />
+        </Card>
+        <Card>
+          <UpdateVaultForm />
+        </Card>
+      </Grid>
+    </Form>
+  )
 }
