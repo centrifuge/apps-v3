@@ -30,7 +30,8 @@ export default function RevokeShares() {
   const { execute, isPending } = useCentrifugeTransaction()
   const { isLoading, shareClass, poolDetails } = usePoolProvider()
   const { data: pendingAmounts } = usePendingAmounts(shareClass?.shareClass!)
-  const groupedByChain = useGroupPendingAmountsByChain(pendingAmounts ?? [])
+  const filteredPendingRedeems = pendingAmounts?.filter((p) => p.approvedRedeem.toFloat() > 0)
+  const groupedByChain = useGroupPendingAmountsByChain(filteredPendingRedeems ?? [])
   const pricePerShare = shareClass?.details.pricePerShare.toFloat()
   const poolSymbol = poolDetails?.currency.symbol
   const poolDecimals = poolDetails?.currency.decimals
@@ -52,7 +53,7 @@ export default function RevokeShares() {
           if (pendingInfo && poolDecimals) {
             return {
               assetId: selectedAssetId,
-              revokePricePerShare: new Price(pendingInfo.navPerShare),
+              revokePricePerShare: new Balance(pendingInfo.navPerShare, poolDecimals),
             }
           }
           return null
@@ -112,7 +113,7 @@ export default function RevokeShares() {
     <Container>
       <Form form={form}>
         <Grid templateColumns="1fr 160px" gap={4} alignItems="center">
-          <Heading>Approve investments</Heading>
+          <Heading>Revoke shares</Heading>
           <SubmitButton colorPalette="yellow" size="sm" disabled={isApproveDisabled} loading={isPending}>
             Save changes
           </SubmitButton>
@@ -144,7 +145,7 @@ export default function RevokeShares() {
                       name: `approvedRedeems.${index}.approvedRedeem`,
                       label: 'Revoke shares',
                       currency: shareClass?.details.symbol ?? '',
-                      decimals: 2,
+                      decimals: poolDecimals ?? 18,
                       disabled: true,
                     },
                     {

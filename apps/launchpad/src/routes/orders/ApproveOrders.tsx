@@ -17,7 +17,8 @@ export default function ApproveOrders() {
   const { execute, isPending } = useCentrifugeTransaction()
   const { isLoading, shareClass } = usePoolProvider()
   const { data: pendingAmounts = [] } = usePendingAmounts(shareClass?.shareClass!)
-  const groupedByChain = useGroupPendingAmountsByChain(pendingAmounts ?? [])
+  const filteredPendingDeposits = pendingAmounts?.filter((p) => p.pendingDeposit.toFloat() > 0)
+  const groupedByChain = useGroupPendingAmountsByChain(filteredPendingDeposits ?? [])
 
   const form = useForm({
     schema: SelectAssetsSchema,
@@ -88,7 +89,7 @@ export default function ApproveOrders() {
           </SubmitButton>
         </Grid>
 
-        {Object.keys(groupedByChain ?? {}).map((chainId, index) => {
+        {Object.keys(groupedByChain ?? {}).map((chainId) => {
           const chainIdInt = parseInt(chainId)
           const pendingDeposits = groupedByChain?.[chainIdInt]
           if (!pendingDeposits) return null
@@ -99,13 +100,13 @@ export default function ApproveOrders() {
                 <Heading size="md">{networkToName(chainIdInt)} Investments</Heading>
               </Flex>
               <Card>
-                {groupedByChain?.[chainIdInt]?.map((pendingDeposit) => {
+                {groupedByChain?.[chainIdInt]?.map((pendingDeposit, index) => {
                   const innerSections = [
                     {
                       fieldType: 'displayBalance' as const,
                       label: 'Approve investments',
                       // Todo each pending amount should return the asset currency details
-                      currency: 'USDC',
+                      currency: index === 0 ? 'USDC' : 'USDT',
                       decimals: 2,
                       balance: pendingDeposit.pendingDeposit,
                     },

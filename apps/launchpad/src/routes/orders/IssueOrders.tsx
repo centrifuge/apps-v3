@@ -29,10 +29,10 @@ const schema = z.object({
 export default function IssueOrders() {
   const { execute, isPending } = useCentrifugeTransaction()
   const { isLoading, shareClass, poolDetails } = usePoolProvider()
-  const { data: pendingAmounts } = usePendingAmounts(shareClass?.shareClass!)
-  const groupedByChain = useGroupPendingAmountsByChain(pendingAmounts ?? [])
+  const { data: pendingAmounts, isLoading: isPendingAmountsLoading } = usePendingAmounts(shareClass?.shareClass!)
+  const filteredPendingDeposits = pendingAmounts?.filter((p) => p.approvedDeposit.toFloat() > 0)
+  const groupedByChain = useGroupPendingAmountsByChain(filteredPendingDeposits ?? [])
   const pricePerShare = shareClass?.details.pricePerShare.toFloat()
-  const poolSymbol = poolDetails?.currency.symbol
   const poolDecimals = poolDetails?.currency.decimals
 
   const form = useForm({
@@ -49,10 +49,9 @@ export default function IssueOrders() {
         .map((selectedAssetId) => {
           const pendingInfo = approvedDeposits.find((p) => p.assetId.equals(selectedAssetId))
 
-          if (pendingInfo && poolDecimals) {
+          if (pendingInfo) {
             return {
               assetId: selectedAssetId,
-              // TODO: should be balance?
               issuePricePerShare: new Price(pendingInfo.navPerShare),
             }
           }
@@ -76,7 +75,6 @@ export default function IssueOrders() {
         chainId: p.chainId,
         assetId: p.assetId,
         approvedDeposit: p.approvedDeposit,
-        // TODO: should the nav per share come from the sdk as the time the investment was approved, right now is showing the current nav per share
         navPerShare: pricePerShare?.toString() ?? '0',
       })) ?? []
     )
@@ -95,9 +93,9 @@ export default function IssueOrders() {
     return pendingAmounts?.map((p) => p.approvedDeposit).reduce((acc, curr) => acc + curr.toFloat(), 0)
   }, [pendingAmounts])
 
-  const isApproveDisabled = !selectedAssets.length
+  const isApproveDisabled = selectedAssets.length === 0
 
-  if (isLoading) {
+  if (isLoading || isPendingAmountsLoading) {
     return <Loader />
   }
 
@@ -113,13 +111,13 @@ export default function IssueOrders() {
     <Container>
       <Form form={form}>
         <Grid templateColumns="1fr 160px" gap={4} alignItems="center">
-          <Heading>Approve investments</Heading>
+          <Heading>Issue shares</Heading>
           <SubmitButton colorPalette="yellow" size="sm" disabled={isApproveDisabled} loading={isPending}>
             Save changes
           </SubmitButton>
         </Grid>
 
-        {Object.keys(groupedByChain ?? {}).map((chainId, index) => {
+        {Object.keys(groupedByChain ?? {}).map((chainId) => {
           const pendingDeposits = groupedByChain?.[parseInt(chainId)]
           if (!pendingDeposits) return null
           return (
@@ -129,16 +127,16 @@ export default function IssueOrders() {
                 <Heading size="md">{networkToName(parseInt(chainId, 10))} Investments</Heading>
               </Flex>
               <Card>
-                {groupedByChain?.[parseInt(chainId)]?.map((approvedDeposit) => {
+                {groupedByChain?.[parseInt(chainId)]?.map((approvedDeposit, index) => {
                   const innerSections = [
                     {
                       fieldType: 'balance' as const,
                       name: `approvedDeposits.${index}.navPerShare`,
                       label: 'Issue with nav per share',
-                      subLabel: '(latest)',
                       // Todo each pending amount should return the asset currency details
-                      currency: poolSymbol ?? 'USD',
-                      decimals: 2,
+                      currency: index === 0 ? 'USDC' : 'USDT',
+                      decimals: poolDecimals ?? 18,
+                      buttonLabel: 'Latest',
                     },
                     {
                       fieldType: 'balance' as const,

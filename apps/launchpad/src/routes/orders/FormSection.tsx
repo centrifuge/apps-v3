@@ -1,7 +1,7 @@
 import { BalanceInput, Checkbox } from '@centrifuge/forms'
 import { Balance } from '@centrifuge/sdk'
-import { BalanceInputDisplay, Tooltip } from '@centrifuge/ui'
-import { Box, Grid, Text } from '@chakra-ui/react'
+import { BalanceInputDisplay, Button, Tooltip } from '@centrifuge/ui'
+import { Box, Flex, Grid, InputElement, Text } from '@chakra-ui/react'
 
 const tooltipContent = {
   approveAndIssue:
@@ -17,6 +17,8 @@ type FieldConfig =
       decimals: number
       disabled?: boolean
       subLabel?: string
+      buttonLabel?: string
+      onButtonClick?: () => void
     }
   | {
       fieldType: 'checkbox'
@@ -52,10 +54,10 @@ export const FormSection = ({ fields, templateColumns = '1fr 1fr' }: FormSection
               subLabel={field.subLabel}
               decimals={field.decimals}
               placeholder="0.00"
-              inputGroupProps={{
-                endAddon: field.currency,
-              }}
               disabled={field.disabled}
+              currency={field.currency}
+              buttonLabel={field.buttonLabel}
+              onButtonClick={field.onButtonClick}
             />
           )
         }
