@@ -25,6 +25,9 @@ on:
 jobs:
   rollback-and-deploy:
     name: 'Roll Back ${{ github.event.inputs.app }} to ${{ github.event.inputs.tag }} on ${{ github.event.inputs.environment }}'
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.event.inputs.environment }}-${{ github.event.inputs.app }}
+      cancel-in-progress: false
     environment: ${{ github.event.inputs.environment == 'production' && 'production' || null }}
     runs-on: ubuntu-latest
 
@@ -38,7 +41,21 @@ jobs:
         uses: pnpm/action-setup@v3
         with:
           version: 10
+          run_install: false
 
+      - name: '🔎 Get pnpm store directory'
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - name: '⚡️ Cache pnpm dependencies'
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
       - name: '🔧 Setup Node.js'
         uses: actions/setup-node@v4
         with:
@@ -49,9 +66,9 @@ jobs:
 
       - name: '🛠️ Build for ${{ github.event.inputs.environment }}'
         run: |
-          BUILD_MODE="testnet"
-          if [ "${{ github.event.inputs.environment }}" == "production" ]; then
-            BUILD_MODE="mainnet"
+          BUILD_MODE="mainnet"
+          if [ "${{ github.event.inputs.environment }}" == "staging" ]; then
+            BUILD_MODE="testnet"
           fi
           pnpm --filter=${{ github.event.inputs.app }} build --mode=$BUILD_MODE
 
