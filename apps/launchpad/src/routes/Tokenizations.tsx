@@ -17,7 +17,11 @@ export default function Tokenizations() {
           <Text>Connect your wallet to view your pools</Text>
         </VStack>
       )
-    return <Text>No pools found for {truncateAddress(address)}</Text>
+    return (
+      <VStack>
+        <Text>No pools found for address {truncateAddress(address!)}</Text>
+      </VStack>
+    )
   }
   return <PoolOverviewTable poolIds={poolIds} />
 }
