@@ -6,6 +6,7 @@ import { InvestRedeemSection } from '@components/InvestRedeemSection'
 import { PoolPerformanceChart } from '@components/PoolPerformanceChart'
 import { UnderlyingCollateralSection } from '@components/UnderlyingCollateralSection'
 import { useSelectedPoolContext } from '@contexts/useSelectedPoolContext'
+import { PoolDetails } from '@components/PoolDetails/PoolDetails'
 
 export const PoolPage = () => {
   const { selectedPoolId } = useSelectedPoolContext()
@@ -28,6 +29,9 @@ export const PoolPage = () => {
           <Heading size="2xl">0 USDC</Heading>
         </Stack>
       </Flex>
+      <Box my={8}>
+        <PoolDetails pool={pool} />
+      </Box>
       <Grid templateColumns={{ base: '1fr', sm: '1fr', md: '1fr', lg: '6fr 4fr' }} gap={10} alignItems="stretch">
         <PoolPerformanceChart pool={pool} />
         <InvestRedeemSection pool={pool} />
