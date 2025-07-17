@@ -9,9 +9,11 @@ import IssueOrders from '@routes/orders/IssueOrders'
 import ApproveRedemptions from '@routes/orders/ApproveRedemptions'
 import RevokeShares from '@routes/orders/RevokeShares'
 import PoolAccess from '@routes/settings/PoolAccess'
-import AddHolding from '@routes/holdings/Add'
 import NotFound from '@routes/NotFound'
 import HeaderLayout from '@layouts/HeaderLayout'
+import AddHolding from '@routes/holdings/AddHolding'
+import DepositHolding from '@routes/holdings/DepositHolding'
+import WithdrawHolding from '@routes/holdings/WithdrawHolding'
 
 export const routes = createBrowserRouter([
   {
@@ -21,16 +23,38 @@ export const routes = createBrowserRouter([
       {
         element: <HeaderLayout />,
         children: [
-          { index: true, element: <Tokenizations /> },
-          { path: 'investors', element: <Investors /> },
-          { path: 'account/:poolId', element: <Account /> },
-          { path: 'nav/:shareClassId/:poolId', element: <NavPage /> },
-          { path: 'orders/:poolId/approve', element: <ApproveOrders /> },
-          { path: 'orders/:poolId/issue', element: <IssueOrders /> },
-          { path: 'orders/:poolId/approveRedeem', element: <ApproveRedemptions /> },
-          { path: 'orders/:poolId/revokeRedeem', element: <RevokeShares /> },
-          { path: 'settings/:poolId/poolAccess', element: <PoolAccess /> },
-          { path: 'holdings/:poolId/add', element: <AddHolding /> },
+          { index: true, element: <Tokenizations />, handle: { hasSettings: false, hasTabs: true } },
+          { path: 'investors', element: <Investors />, handle: { hasSettings: false, hasTabs: true } },
+          { path: 'account/:poolId', element: <Account />, handle: { hasSettings: false, hasTabs: true } },
+          { path: 'nav/:shareClassId/:poolId', element: <NavPage />, handle: { hasSettings: false, hasTabs: false } },
+          { path: 'orders/:poolId/approve', element: <ApproveOrders />, handle: { hasSettings: false, hasTabs: true } },
+          { path: 'orders/:poolId/issue', element: <IssueOrders />, handle: { hasSettings: false, hasTabs: true } },
+          {
+            path: 'orders/:poolId/approveRedeem',
+            element: <ApproveRedemptions />,
+            handle: { hasSettings: false, hasTabs: true },
+          },
+          {
+            path: 'orders/:poolId/revokeRedeem',
+            element: <RevokeShares />,
+            handle: { hasSettings: false, hasTabs: true },
+          },
+          {
+            path: 'settings/:poolId/poolAccess',
+            element: <PoolAccess />,
+            handle: { hasSettings: false, hasTabs: false },
+          },
+          { path: 'holdings/:poolId/add', element: <AddHolding />, handle: { hasSettings: false, hasTabs: true } },
+          {
+            path: 'holdings/:poolId/deposit',
+            element: <DepositHolding />,
+            handle: { hasSettings: false, hasTabs: true },
+          },
+          {
+            path: 'holdings/:poolId/withdraw',
+            element: <WithdrawHolding />,
+            handle: { hasSettings: false, hasTabs: true },
+          },
           { path: '*', element: <NotFound /> },
         ],
       },

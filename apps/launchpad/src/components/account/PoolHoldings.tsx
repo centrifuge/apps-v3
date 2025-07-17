@@ -1,10 +1,11 @@
 import { Balance, ShareClass } from '@centrifuge/sdk'
 import { networkToName, useHoldings, formatBalance } from '@centrifuge/shared'
-import { NetworkIcon } from '@centrifuge/ui'
+import { Button, NetworkIcon } from '@centrifuge/ui'
 import { DataTable, ColumnDefinition, ActionsDropdown } from '@centrifuge/ui'
-import { Flex, Heading, Text } from '@chakra-ui/react'
+import { Flex, Heading, Stack, Text } from '@chakra-ui/react'
 import { usePoolProvider } from '@contexts/PoolProvider'
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
 
 type Row = {
   id: number
@@ -65,32 +66,22 @@ const columns: ColumnDefinition<Row>[] = [
   },
 ]
 
-export function PoolHoldings({
-  shareClass,
-  poolDecimals,
-  setTotalValue,
-}: {
-  shareClass: ShareClass
-  poolDecimals: number
-  setTotalValue: (value: Balance) => void
-}) {
+export function PoolHoldings({ shareClass, poolDecimals }: { shareClass: ShareClass; poolDecimals: number }) {
+  const navigate = useNavigate()
+  const { poolId } = useParams()
   const holdings = useHoldings(shareClass)
   const { poolDetails } = usePoolProvider()
   const currencySymbol = poolDetails?.currency.symbol ?? 'USD'
 
   // TODO: Right now we are assuming that 1USD = 1USDC, this needs to be updated in the future
-  const totalValue = holdings?.data?.reduce(
-    (acc, holding) => {
-      return acc.add(holding.value)
-    },
-    new Balance(0, poolDecimals)
-  )
-
-  useEffect(() => {
-    if (totalValue) {
-      setTotalValue(totalValue)
-    }
-  }, [totalValue])
+  const totalValue = useMemo(() => {
+    return holdings?.data?.reduce(
+      (acc, holding) => {
+        return acc.add(holding.value)
+      },
+      new Balance(0, poolDecimals)
+    )
+  }, [holdings, poolDecimals])
 
   if (!holdings || !holdings.data || holdings.data.length === 0) {
     return null
@@ -104,19 +95,68 @@ export function PoolHoldings({
     price: formatBalance(holding.value.mul(holding.amount)),
     value: formatBalance(holding.value, currencySymbol),
     vaults: [],
-    actions: (row: Row) => {
+    actions: () => {
       return (
         <ActionsDropdown
           items={[
-            { label: 'deposit', element: <Text>Deposit</Text> },
-            { label: 'withdraw', element: <Text>Withdraw</Text> },
-            { label: 'buy', element: <Text>Buy</Text> },
-            { label: 'sell', element: <Text>Sell</Text> },
-            { label: 'update', element: <Text>Update</Text> },
+            {
+              label: 'deposit',
+              element: (
+                <Button
+                  label="Deposit"
+                  onClick={() => navigate(`/holdings/${poolId}/deposit`)}
+                  variant="plain"
+                  size="sm"
+                  height="14px"
+                />
+              ),
+            },
+            {
+              label: 'withdraw',
+              element: (
+                <Button
+                  label="Withdraw"
+                  onClick={() => navigate(`/holdings/${poolId}/withdraw`)}
+                  variant="plain"
+                  size="sm"
+                  height="14px"
+                />
+              ),
+            },
+            {
+              label: 'update',
+              element: (
+                <Button
+                  label="Update"
+                  onClick={() => navigate(`/holdings/${poolId}/update`)}
+                  variant="plain"
+                  size="sm"
+                  height="14px"
+                />
+              ),
+            },
           ]}
         />
       )
     },
   }))
-  return <DataTable data={data} columns={columns} />
+
+  return (
+    <Stack mt={8} gap={2}>
+      <Stack gap={0} mb={4}>
+        <Heading size="sm">Holdings</Heading>
+        <Flex justify="space-between">
+          <Heading size="3xl">{formatBalance(totalValue ?? 0)} USDC</Heading>
+          <Button
+            label="Add holding"
+            onClick={() => navigate(`/holdings/${poolId}/add`)}
+            colorPalette="gray"
+            width="140px"
+            size="sm"
+          />
+        </Flex>
+      </Stack>
+      <DataTable data={data} columns={columns} />
+    </Stack>
+  )
 }

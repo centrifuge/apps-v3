@@ -12,12 +12,13 @@ export interface CustomSelectProps<TFieldValues extends FieldValues = FieldValue
   label: string
   name: FieldPath<TFieldValues>
   rules?: object
+  onSelectChange?: (value: any) => void
 }
 
 export function Select<TFieldValues extends FieldValues = FieldValues>(props: CustomSelectProps<TFieldValues>) {
   const [value, setValue] = useState<string[]>([])
   const { control, trigger } = useFormContext()
-  const { name, rules, label, items, disabled, ...rest } = props
+  const { name, rules, label, items, disabled, onSelectChange, ...rest } = props
 
   const {
     field,
@@ -38,6 +39,9 @@ export function Select<TFieldValues extends FieldValues = FieldValues>(props: Cu
     setValue(value)
     field.onChange(value[0])
     trigger(name)
+    if (onSelectChange) {
+      onSelectChange(field.value)
+    }
   }
 
   const collection = createListCollection({ items })
@@ -52,6 +56,8 @@ export function Select<TFieldValues extends FieldValues = FieldValues>(props: Cu
           onValueChange={({ value }: { value: string[] }) => onValueChange(value)}
           disabled={disabled}
           value={value}
+          background="white"
+          borderRadius="md"
           {...rest}
         >
           <ChakraSelect.HiddenSelect />
