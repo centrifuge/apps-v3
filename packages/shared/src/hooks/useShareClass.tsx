@@ -26,3 +26,8 @@ export const useGroupPendingAmountsByChain = (pendingAmounts: PendingAmount[]) =
     }, {})
   }, [pendingAmounts])
 }
+
+export const useBalanceSheet = (shareClass: ShareClass, chainId: number) => {
+  const balanceSheet$ = useMemo(() => shareClass?.balanceSheet(chainId), [shareClass, chainId])
+  return useObservable(balanceSheet$)
+}

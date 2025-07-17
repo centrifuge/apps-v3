@@ -7,11 +7,6 @@ import HubManagers from '@components/settings/HubManagers'
 import SpokeManagers from '@components/settings/SpokeManagers'
 import { usePoolProvider } from '@contexts/PoolProvider'
 
-export const handle = {
-  hasSettings: false,
-  hasTabs: true,
-}
-
 export const SaveChangesButton = ({ onSubmit, isDisabled }: { onSubmit: () => void; isDisabled: boolean }) => {
   return <Button disabled={isDisabled} onClick={onSubmit} label="Save changes" size="sm" width={140} />
 }
@@ -128,7 +123,7 @@ export default function PoolAccess() {
   }
 
   return (
-    <Container mt={8}>
+    <Container>
       <Flex justifyContent="space-between" alignItems="center">
         <Heading size="lg">Pool acccess</Heading>
         <SaveChangesButton isDisabled={isDisabled || !isPoolManager} onSubmit={handleSubmit} />

@@ -1,8 +1,7 @@
 import { Balance } from '@centrifuge/sdk'
-import { Button, Card, NetworkIcon } from '@centrifuge/ui'
+import { Card, NetworkIcon } from '@centrifuge/ui'
 import { Box, Flex, Grid, Heading, Separator, Stack, Text } from '@chakra-ui/react'
-import { formatBalance } from '@centrifuge/shared'
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import {
   formatUIBalance,
   formatBalanceToString,
@@ -13,19 +12,11 @@ import {
 import { FaRegChartBar } from 'react-icons/fa'
 import { Orders } from './Orders'
 import { PoolHoldings } from './PoolHoldings'
-import { useNavigate, useParams } from 'react-router'
 
 export function AccountPage({ sc, poolDetails }: { sc: ShareClassWithDetails; poolDetails: PoolDetails }) {
-  const navigate = useNavigate()
-  const { poolId } = useParams()
   const { data: navPerNetwork } = useNavPerNetwork(sc.shareClass)
   const decimals = poolDetails?.currency.decimals
   const poolCurrencySymbol = poolDetails?.currency.symbol
-  const [totalValue, setTotalValue] = useState<Balance>(new Balance(0, decimals))
-
-  useEffect(() => {
-    setTotalValue(totalValue)
-  }, [totalValue])
 
   const { amounts } = useMemo(() => {
     const initialTotals = {
@@ -54,7 +45,7 @@ export function AccountPage({ sc, poolDetails }: { sc: ShareClassWithDetails; po
   }, [navPerNetwork, decimals])
 
   return (
-    <Box mb={8}>
+    <Box>
       <Grid templateColumns="repeat(2, 1fr)" gap={4} mt={4}>
         <Card>
           <Stack gap={8}>
@@ -110,23 +101,7 @@ export function AccountPage({ sc, poolDetails }: { sc: ShareClassWithDetails; po
           <Orders title="Redemptions" shareClass={sc} poolCurrencySymbol={poolCurrencySymbol} />
         </Grid>
       </Stack>
-      {/* TODO: ADD POOL HOLDINGS ONCE SDK HAS BEEN UPDATED TO RETRIEVE POOL HOLDINGS */}
-      <Stack mt={8} gap={2}>
-        <Stack gap={0} mb={4}>
-          <Heading size="sm">Holdings</Heading>
-          <Flex justify="space-between">
-            <Heading size="3xl">{formatBalance(totalValue)} USDC</Heading>
-            <Button
-              label="Add holding"
-              onClick={() => navigate(`/holdings/${poolId}/add`)}
-              colorPalette="gray"
-              width="140px"
-              size="sm"
-            />
-          </Flex>
-        </Stack>
-        <PoolHoldings poolDecimals={decimals} setTotalValue={setTotalValue} shareClass={sc.shareClass} />
-      </Stack>
+      <PoolHoldings poolDecimals={decimals} shareClass={sc.shareClass} />
     </Box>
   )
 }

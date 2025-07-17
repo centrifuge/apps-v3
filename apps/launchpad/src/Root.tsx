@@ -14,7 +14,7 @@ export default function Root() {
   return (
     <QueryClientProvider client={queryClient}>
       <CentrifugeProvider client={centrifuge}>
-        <WalletProvider projectId={import.meta.env.VITE_REOWN_APP_ID!} networks={networks}>
+        <WalletProvider projectId={import.meta.env.VITE_REOWN_APP_ID} networks={networks}>
           <ChakraCentrifugeProvider themeKey={config.themeKey}>
             <TransactionProvider>
               <PoolProvider>

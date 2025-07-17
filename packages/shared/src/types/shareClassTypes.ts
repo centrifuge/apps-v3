@@ -17,3 +17,5 @@ export type PendingAmount = {
   assetId: AssetId
   chainId: number
 }
+
+export type Holdings = Awaited<ReturnType<typeof ShareClass.prototype.holdings>>

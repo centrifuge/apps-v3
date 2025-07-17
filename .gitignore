@@ -9,21 +9,8 @@ services/tinlake/addresses_tinlake.json
 nft_data_definition.json
 dist
 
-# Environment files
-.env*.local
-.env*
-!.env-config/
-!.env.example
-!.env.kovan-example
-!.env.goerli-example
-!.env.mainnet-example
-!.env.altair
-!.env.development
-!.env.demo
-!.env.catalyst
-!.env.production
-!.env.ff-prod
-
 .react-router/
 .cursor/
 .wrangler/
+
+.env.local

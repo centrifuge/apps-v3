@@ -20,7 +20,7 @@ export default function Account() {
   if (isLoading) return <Loader />
 
   return (
-    <Box mt={10}>
+    <>
       <Flex alignItems="flex-end" justifyContent="space-between">
         <Stack gap={0}>
           <Heading size="sm">Total NAV</Heading>
@@ -32,6 +32,6 @@ export default function Account() {
         <Button label="Update NAV" onClick={() => navigate(`/nav/${shareClassId}/${poolId}`)} size="sm" width="150px" />
       </Flex>
       {shareClass && poolDetails && <AccountPage sc={shareClass} poolDetails={poolDetails} />}
-    </Box>
+    </>
   )
 }

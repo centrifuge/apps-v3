@@ -12,3 +12,14 @@ export const useAssets = (spokeChainId: number, hubChainId?: number) => {
 
   return useObservable(asset$)
 }
+
+export const useAssetValuation = (chainId: number) => {
+  const centrifuge = useCentrifuge()
+
+  const assetValuation$ = useMemo(() => {
+    if (!chainId) return undefined
+    return centrifuge.valuations(Number(chainId))
+  }, [chainId])
+
+  return useObservable(assetValuation$)
+}
