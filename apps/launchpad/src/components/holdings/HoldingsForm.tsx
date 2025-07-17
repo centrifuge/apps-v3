@@ -1,9 +1,9 @@
-import { BalanceInput, Form, Select, SubmitButton, useForm } from '@centrifuge/forms'
+import { BalanceInput, createBalanceSchema, Form, safeParse, Select, SubmitButton, useForm } from '@centrifuge/forms'
 import { Holdings, Portfolio, truncateAddress, useAddress } from '@centrifuge/shared'
 import { Card, DisplayInput, NetworkIcon } from '@centrifuge/ui'
 import { Box, Flex, Grid, Heading, Stack, Text } from '@chakra-ui/react'
 import { SummaryBox } from './SummaryBox'
-import { useEffect, useMemo } from 'react'
+import { useMemo } from 'react'
 import { Balance } from '@centrifuge/sdk'
 import z from 'zod'
 
@@ -30,15 +30,17 @@ export const HoldingsForm = ({
     ),
   }))
 
+  const schema = z.object({
+    holding: z.custom<Holdings[number]>(),
+    availableBalance: z.custom<Portfolio[number]>().optional(),
+    amount: createBalanceSchema(holdings[0].asset.decimals, z.number().min(1).max(Number(0))),
+  })
+
   const form = useForm({
-    schema: z.object({
-      holding: z.custom<Holdings[number]>(),
-      availableBalance: z.string(),
-      amount: z.string(),
-    }),
+    schema: schema,
     defaultValues: {
       holding: holdings[0],
-      availableBalance: '',
+      availableBalance: undefined,
       amount: '',
     },
     mode: 'onChange',
@@ -49,40 +51,46 @@ export const HoldingsForm = ({
   })
 
   const { watch } = form
-  const holding = watch('holding')
-  const availableBalance = watch('availableBalance')
-  const amount = watch('amount')
+  const [amount, availableBalance] = watch(['amount', 'availableBalance'])
+
+  const parsedAmount = useMemo(
+    () => safeParse(schema.shape.amount, amount) ?? new Balance(0, 0),
+    [amount, schema.shape.amount]
+  )
 
   const summaryItems = useMemo(() => {
     return [
       {
         label: 'Available balance',
-        balance: availableBalance,
-        currency: 'USDC',
+        balance: availableBalance?.balance ?? new Balance(0, 0),
       },
       {
         label: isWithdraw ? 'Withdraw amount' : 'Deposit amount',
-        balance: amount,
-        currency: 'USDC',
+        balance: parsedAmount,
       },
     ]
   }, [availableBalance, isWithdraw, amount])
 
-  useEffect(() => {
-    if (portfolio?.length) {
-      const matchingBalance = portfolio.find((balance: any) => balance.currency.address === holding)
-      form.setValue('availableBalance', matchingBalance?.balance ?? new Balance(0, 0))
-    }
-  }, [portfolio, holding])
-
   const isDisabled = useMemo(() => {
-    return Number(amount) === 0 || Number(availableBalance) === 0 || Number(amount) > availableBalance.toFloat()
+    return Number(amount) === 0 || Number(availableBalance) === 0 || Number(amount) > Number(availableBalance)
   }, [amount, availableBalance])
 
   return (
     <Form form={form}>
       <Stack>
-        <Select name="holding" label="Available holdings" items={holdingsItems || []} maxWidth="40%" />
+        <Select
+          name="holding"
+          label="Available holdings"
+          items={holdingsItems || []}
+          maxWidth="40%"
+          onSelectChange={(value) => {
+            form.setValue('holding', value)
+            form.setValue(
+              'availableBalance',
+              portfolio?.find((balance) => balance.currency.address === value.asset.address)
+            )
+          }}
+        />
         <Box mt={4}>
           <Heading>{isWithdraw ? 'Withdraw USDC' : 'Deposit USDC'}</Heading>
           <Card mt={4} pt={4} pb={4}>

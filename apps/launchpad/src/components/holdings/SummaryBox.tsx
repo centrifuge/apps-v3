@@ -9,7 +9,7 @@ export const SummaryBox = ({
   infoText,
 }: {
   title: string
-  summaryItems: { label: string; balance: Balance; currency: string }[]
+  summaryItems: { label: string; balance: Balance }[]
   infoText: string
 }) => {
   return (
