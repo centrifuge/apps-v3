@@ -5,7 +5,7 @@ import { useGetFormError } from '../hooks/useGetFormError'
 import { ReactNode, useState } from 'react'
 import { RiArrowDownSLine } from 'react-icons/ri'
 
-export interface CustomSelectProps<TFieldValues extends FieldValues = FieldValues>
+export interface CustomMultiSelectProps<TFieldValues extends FieldValues = FieldValues>
   extends Omit<SelectRootProps, 'collection'> {
   disabled?: boolean
   items: { value: string; children?: ReactNode; label: string }[]
@@ -15,7 +15,9 @@ export interface CustomSelectProps<TFieldValues extends FieldValues = FieldValue
   onSelectChange?: (value: unknown) => void
 }
 
-export function Select<TFieldValues extends FieldValues = FieldValues>(props: CustomSelectProps<TFieldValues>) {
+export function MultiSelect<TFieldValues extends FieldValues = FieldValues>(
+  props: CustomMultiSelectProps<TFieldValues>
+) {
   const [value, setValue] = useState<string[]>([])
   const { control, trigger } = useFormContext()
   const { name, rules, label, items, disabled, onSelectChange, ...rest } = props
@@ -37,7 +39,7 @@ export function Select<TFieldValues extends FieldValues = FieldValues>(props: Cu
 
   const onValueChange = (value: string[]) => {
     setValue(value)
-    field.onChange(value[0])
+    field.onChange(value)
     trigger(name)
     if (onSelectChange) {
       onSelectChange(field.value)
@@ -58,6 +60,7 @@ export function Select<TFieldValues extends FieldValues = FieldValues>(props: Cu
           value={value}
           background="white"
           borderRadius="md"
+          multiple
           {...rest}
         >
           <ChakraSelect.HiddenSelect />

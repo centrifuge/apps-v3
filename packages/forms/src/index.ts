@@ -5,6 +5,7 @@ export { Form } from './components/Form'
 export { Input } from './components/Input'
 export { SubmitButton } from './components/SubmitButton'
 export { Select } from './components/Select'
+export { MultiSelect } from './components/MultiSelect'
 
 // hooks
 export { useForm } from './hooks/useForm'
