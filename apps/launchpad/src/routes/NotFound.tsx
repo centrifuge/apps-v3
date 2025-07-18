@@ -1,3 +1,9 @@
+import { Container, Heading } from '@chakra-ui/react'
+
 export default function NotFound() {
-  return <div>FALL BACK COMPONENT</div>
+  return (
+    <Container>
+      <Heading>Page not found</Heading>
+    </Container>
+  )
 }
