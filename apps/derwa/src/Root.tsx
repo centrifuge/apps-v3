@@ -4,7 +4,7 @@ import { WalletProvider } from '@centrifuge/wallet'
 import { SelectedPoolProvider } from './contexts/useSelectedPoolContext'
 import Centrifuge from '@centrifuge/sdk'
 import { CentrifugeProvider, TransactionProvider } from '@centrifuge/shared'
-import { ChakraCentrifugeProvider, ChakraCentrifugeProviderProps } from '@centrifuge/ui'
+import { ChakraCentrifugeProvider, ChakraCentrifugeProviderProps, LoadingProvider } from '@centrifuge/ui'
 import { useMemo } from 'react'
 import { DebugFlags } from '@centrifuge/shared/src/components/DebugFlags'
 
@@ -43,7 +43,9 @@ export function Root() {
               <TransactionProvider>
                 <SelectedPoolProvider>
                   <DebugFlags>
-                    <App />
+                    <LoadingProvider>
+                      <App />
+                    </LoadingProvider>
                   </DebugFlags>
                 </SelectedPoolProvider>
               </TransactionProvider>
