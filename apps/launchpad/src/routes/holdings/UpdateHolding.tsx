@@ -1,6 +1,7 @@
-import { Form, SubmitButton, useForm } from '@centrifuge/forms'
+import { BalanceInput, Form, SubmitButton, useForm } from '@centrifuge/forms'
 import { Card } from '@centrifuge/ui'
 import { Flex, Grid, Heading } from '@chakra-ui/react'
+import SelectVault from '@components/holdings/SelectVault'
 import UpdateVaultForm from '@components/holdings/UpdateVaultForm'
 
 export default function UpdateHolding() {
@@ -21,8 +22,14 @@ export default function UpdateHolding() {
           <UpdateVaultForm />
         </Card>
         <Card>
-          <UpdateVaultForm />
+          <BalanceInput name="updatePrice" label="Update price" disabled maxWidth="50%" size="sm" />
         </Card>
+        <Card>
+          <SelectVault />
+        </Card>
+        <Flex justify="center">
+          <SubmitButton colorPalette="yellow">Save changes</SubmitButton>
+        </Flex>
       </Grid>
     </Form>
   )
