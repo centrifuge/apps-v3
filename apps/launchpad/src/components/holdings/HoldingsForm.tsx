@@ -1,5 +1,5 @@
 import { BalanceInput, createBalanceSchema, Form, safeParse, Select, SubmitButton, useForm } from '@centrifuge/forms'
-import { Holdings, Portfolio, truncateAddress, useAddress } from '@centrifuge/shared'
+import { formatUIBalance, Holdings, Portfolio, truncateAddress, useAddress } from '@centrifuge/shared'
 import { Card, DisplayInput, NetworkIcon } from '@centrifuge/ui'
 import { Box, Flex, Grid, Heading, Stack, Text } from '@chakra-ui/react'
 import { SummaryBox } from './SummaryBox'
@@ -30,11 +30,35 @@ export const HoldingsForm = ({
     ),
   }))
 
-  const schema = z.object({
-    holding: z.custom<Holdings[number]>(),
-    availableBalance: z.custom<Portfolio[number]>().optional(),
-    amount: createBalanceSchema(holdings[0].asset.decimals, z.number().min(1).max(Number(0))),
-  })
+  const schema = z
+    .object({
+      holding: z.custom<Holdings[number]>(),
+      availableBalance: z.custom<Portfolio[number]>().optional(),
+      amount: createBalanceSchema(
+        holdings[0].asset.decimals,
+        z.number().min(1, { message: 'Amount must be at least 1' })
+      ),
+    })
+    .refine(
+      (data) => {
+        if (!data.availableBalance?.balance) {
+          return true
+        }
+        return !data.amount.gt(data.availableBalance.balance)
+      },
+      (data) => {
+        const avail = data.availableBalance?.balance
+        console.log(data)
+        return {
+          message: `Amount cannot exceed your available balance of ${formatUIBalance(avail, {
+            precision: 2,
+            currency: data.availableBalance?.currency.symbol,
+            tokenDecimals: data.availableBalance?.currency.decimals,
+          })}`,
+          path: ['amount'],
+        }
+      }
+    )
 
   const form = useForm({
     schema: schema,
@@ -54,8 +78,8 @@ export const HoldingsForm = ({
   const [amount, availableBalance] = watch(['amount', 'availableBalance'])
 
   const parsedAmount = useMemo(
-    () => safeParse(schema.shape.amount, amount) ?? new Balance(0, 0),
-    [amount, schema.shape.amount]
+    () => safeParse(schema._def.schema.shape.amount, amount) ?? new Balance(0, 0),
+    [amount, schema]
   )
 
   const summaryItems = useMemo(() => {
@@ -84,11 +108,9 @@ export const HoldingsForm = ({
           items={holdingsItems || []}
           maxWidth="40%"
           onSelectChange={(value) => {
+            const availableBalance = portfolio?.find((item) => item.currency.address === value)
+            form.setValue('availableBalance', availableBalance)
             form.setValue('holding', value)
-            form.setValue(
-              'availableBalance',
-              portfolio?.find((balance) => balance.currency.address === value.asset.address)
-            )
           }}
         />
         <Box mt={4}>
@@ -97,7 +119,13 @@ export const HoldingsForm = ({
             <Grid gridTemplateColumns="1fr 1fr" gap={4}>
               <Stack gap={2}>
                 <DisplayInput label="Connected wallet" value={`Connected wallet (${truncate})`} size="sm" />
-                <BalanceInput name="amount" label="Amount" size="sm" currency="USDC" />
+                <BalanceInput
+                  name="amount"
+                  label="Amount"
+                  size="sm"
+                  currency={availableBalance?.currency.symbol}
+                  decimals={availableBalance?.currency.decimals}
+                />
                 <SubmitButton colorPalette="yellow" size="sm" disabled={isDisabled}>
                   {isWithdraw ? 'Withdraw' : 'Deposit'}
                 </SubmitButton>

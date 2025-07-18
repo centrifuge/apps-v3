@@ -40,7 +40,7 @@ export function Select<TFieldValues extends FieldValues = FieldValues>(props: Cu
     field.onChange(value[0])
     trigger(name)
     if (onSelectChange) {
-      onSelectChange(field.value)
+      onSelectChange(value[0])
     }
   }
 
