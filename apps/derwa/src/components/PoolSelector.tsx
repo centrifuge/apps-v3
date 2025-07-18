@@ -2,10 +2,12 @@ import { SegmentGroup } from '@chakra-ui/react'
 import { PoolId } from '@centrifuge/sdk'
 import { useAllPoolDetails } from '@centrifuge/shared'
 import { useSelectedPoolContext } from '@contexts/useSelectedPoolContext'
+import { useNavigate } from 'react-router-dom'
 
 export const PoolSelector = ({ poolIds }: { poolIds: PoolId[] }) => {
   const { data: pools } = useAllPoolDetails(poolIds)
   const { selectedPoolId, setSelectedPoolId } = useSelectedPoolContext()
+  const navigate = useNavigate()
 
   const displayPools = pools?.map((pool) => ({
     value: pool.id.toString(),
@@ -21,7 +23,9 @@ export const PoolSelector = ({ poolIds }: { poolIds: PoolId[] }) => {
         if (!details.value) return
         const selectedPool = displayPools.find((pool) => pool.label === details.value)
         if (selectedPool) {
-          setSelectedPoolId(new PoolId(selectedPool.value))
+          const poolId = new PoolId(selectedPool.value)
+          setSelectedPoolId(poolId)
+          navigate(`/pool/${poolId.raw}`)
         }
       }}
       bg="bg-tertiary"
