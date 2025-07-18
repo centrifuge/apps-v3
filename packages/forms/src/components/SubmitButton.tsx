@@ -27,7 +27,6 @@ export function SubmitButton<T extends FieldValues = FieldValues>({
       disabled={isDisabled}
       loading={formState.isSubmitting || loading}
       loadingText={loadingText}
-      mt={4}
     >
       {children}
     </Button>

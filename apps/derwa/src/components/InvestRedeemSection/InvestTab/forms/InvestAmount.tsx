@@ -136,9 +136,7 @@ export function InvestAmount({
             displayDecimals={pricePerShare?.decimals}
             placeholder="0.00"
             disabled
-            inputGroupProps={{
-              endAddon: vaultDetails?.shareCurrency.symbol,
-            }}
+            currency={vaultDetails?.shareCurrency.symbol}
           />
         </>
       )}
