@@ -4,6 +4,7 @@ import { Form, useForm, Select, MultiSelect, Input } from '@centrifuge/forms'
 import { usePoolProvider } from '@contexts/PoolProvider'
 import { useEffect, useState } from 'react'
 import { z } from 'zod'
+import { useFieldArray } from 'react-hook-form'
 
 export const handle = {
   hasSettings: false,
@@ -181,13 +182,13 @@ export default function PoolStructure() {
     onSubmitError: (error) => console.error('Pool Structure form submission error:', error),
   })
 
-  const { register, reset } = form
+  const { control, watch } = form
 
-  useEffect(() => {
-    reset({
-      tokens,
-    })
-  }, [reset, tokens])
+  // useFieldArray to manage the 'tokens' array
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: 'tokens',
+  })
 
   return (
     <Container mt={8}>
@@ -233,13 +234,12 @@ export default function PoolStructure() {
           <Text fontSize="sm" mt={8}>
             Tokens
           </Text>
-          {tokens.map((token, index) => (
+          {fields.map((field, index) => (
             <Card mt={4}>
               <Grid templateColumns="1fr 1fr" gap={4} mt={8}>
                 <Stack>
                   <Input
-                    // {...register(`tokens.${index}.tokenName`)}
-                    name={`tokenName.${token.tokenName}`}
+                    name={`tokens.${index}.tokenName`}
                     placeholder="Type here..."
                     style={{ background: '#F6F6F6' }}
                     label="Token name"
@@ -248,7 +248,6 @@ export default function PoolStructure() {
 
                 <Stack>
                   <Input
-                    // {...register(`tokens.${index}.symbolName`)}
                     placeholder="Type here..."
                     style={{ background: '#F6F6F6' }}
                     name={'symbolName'}
@@ -260,7 +259,6 @@ export default function PoolStructure() {
               <Grid templateColumns="1fr 1fr" gap={4} mt={8}>
                 <Stack>
                   <Input
-                    // {...register(`tokens.${index}.minInvestment`)}
                     placeholder="Type here..."
                     style={{ background: '#F6F6F6' }}
                     name={'minInvestment'}
@@ -270,17 +268,10 @@ export default function PoolStructure() {
 
                 <Stack>
                   <Grid templateColumns="1fr 1fr" gap={4}>
-                    <Select
-                      //   {...register(`tokens.${index}.apy`)}
-                      name={'apy'}
-                      items={apy}
-                      label={'Apy'}
-                      style={{ background: '#F6F6F6' }}
-                    />
+                    <Select name={'apy'} items={apy} label={'Apy'} style={{ background: '#F6F6F6' }} />
 
                     {token.apy !== 'Automatic' && (
                       <Input
-                        // {...register(`tokens.${index}.apyPercentage`)}
                         placeholder="Type here..."
                         style={{ background: '#F6F6F6' }}
                         name={'apyPercentage'}
