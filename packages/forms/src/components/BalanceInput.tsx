@@ -16,11 +16,14 @@ import {
   NativeSelect,
   Flex,
   Text,
+  Group,
+  Button,
 } from '@chakra-ui/react'
 import { useGetFormError } from '../hooks/useGetFormError'
 import { Balance } from '@centrifuge/sdk'
 import Decimal from 'decimal.js-light'
 
+const inputSizes = ['sm', 'md', 'lg', 'xl', '2xl', '2xs', 'xs'] as const
 export interface BalanceInputProps<TFieldValues extends FieldValues = FieldValues>
   extends Omit<ChakraInputProps, 'onChange' | 'onBlur' | 'disabled' | 'value'> {
   currency?: string
@@ -37,6 +40,8 @@ export interface BalanceInputProps<TFieldValues extends FieldValues = FieldValue
   selectOptions?: { label: string; value: number }[]
   onSelectChange?: (value: number) => void
   subLabel?: string
+  buttonLabel?: string
+  onButtonClick?: () => void
 }
 
 const CurrencySelect = ({
@@ -77,6 +82,9 @@ export function BalanceInput<TFieldValues extends FieldValues = FieldValues>(pro
     onSelectChange,
     label,
     subLabel,
+    buttonLabel,
+    size = 'md',
+    onButtonClick,
     ...rest
   } = props
   const currentDisplayDecimals = displayDecimals || decimals
@@ -222,7 +230,9 @@ export function BalanceInput<TFieldValues extends FieldValues = FieldValues>(pro
 
   const isDisabled = formState.isSubmitting || disabled
 
-  return (
+  const buttonSize = typeof size === 'string' ? inputSizes.indexOf(size) : 1
+
+  return !buttonLabel ? (
     <Field.Root invalid={isError}>
       <Flex alignItems="center" gap={2}>
         {label && <Field.Label>{label}</Field.Label>}
@@ -265,6 +275,43 @@ export function BalanceInput<TFieldValues extends FieldValues = FieldValues>(pro
           variant={rest.variant ?? 'outline'}
         />
       </InputGroup>
+      <Field.ErrorText>{errorMessage}</Field.ErrorText>
+    </Field.Root>
+  ) : (
+    <Field.Root invalid={isError}>
+      {label && <Field.Label>{label}</Field.Label>}
+      <Group attached border="1px solid" borderColor="gray.200" borderRadius="md">
+        <ChakraInput
+          {...rest}
+          id={name}
+          name={name}
+          ref={field.ref}
+          type="text"
+          value={getDisplayValue(field.value)}
+          disabled={isDisabled}
+          onChange={mergedOnChange}
+          onBlur={mergedOnBlur}
+          onKeyDown={handleKeyPress}
+          onPaste={handlePaste}
+          inputMode="decimal" // Shows numeric keypad on mobile
+          variant="subtle"
+          backgroundColor="white"
+        />
+        <Text>{currency}</Text>
+        <Button
+          variant="plain"
+          size={inputSizes[buttonSize + 1]}
+          backgroundColor="gray.100"
+          color="text-secondary"
+          borderTopRightRadius={0}
+          borderBottomRightRadius={0}
+          ml={2}
+          onClick={onButtonClick}
+        >
+          {buttonLabel}
+        </Button>
+      </Group>
+
       <Field.ErrorText>{errorMessage}</Field.ErrorText>
     </Field.Root>
   )

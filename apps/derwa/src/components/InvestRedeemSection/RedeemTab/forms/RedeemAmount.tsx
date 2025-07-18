@@ -135,10 +135,8 @@ export function RedeemAmount({
         name="redeemAmount"
         decimals={shareClass?.details.pricePerShare.decimals}
         placeholder="0.00"
-        inputGroupProps={{
-          endAddon: shareCurrencySymbol,
-        }}
         onChange={debouncedCalculateReceiveAmount}
+        currency={shareCurrencySymbol}
       />
       <Flex mt={2} justify="space-between">
         <Flex>
