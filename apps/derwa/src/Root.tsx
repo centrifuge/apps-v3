@@ -1,5 +1,4 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { App } from './App'
 import { WalletProvider } from '@centrifuge/wallet'
 import { SelectedPoolProvider } from './contexts/useSelectedPoolContext'
 import Centrifuge from '@centrifuge/sdk'
@@ -7,6 +6,7 @@ import { CentrifugeProvider, TransactionProvider } from '@centrifuge/shared'
 import { ChakraCentrifugeProvider, ChakraCentrifugeProviderProps, LoadingProvider } from '@centrifuge/ui'
 import { useMemo } from 'react'
 import { DebugFlags } from '@centrifuge/shared/src/components/DebugFlags'
+import { Outlet } from 'react-router-dom'
 
 const config = {
   themeKey: 'light' as ChakraCentrifugeProviderProps['themeKey'],
@@ -14,7 +14,7 @@ const config = {
 
 const queryClient = new QueryClient()
 
-export function Root() {
+export default function Root() {
   /**
    * Initialize Centrifuge SDK with any necessary config.
    * We need to ensure it is created only once, so we must use useMemo.
@@ -44,7 +44,7 @@ export function Root() {
                 <SelectedPoolProvider>
                   <DebugFlags>
                     <LoadingProvider>
-                      <App />
+                      <Outlet />
                     </LoadingProvider>
                   </DebugFlags>
                 </SelectedPoolProvider>
