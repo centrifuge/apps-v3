@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { PoolId } from '@centrifuge/sdk'
 import { useAllPoolDetails } from '@centrifuge/shared'
 import { Card } from '@centrifuge/ui'
+import { routePaths } from '@routes/routePaths'
 
 interface PoolSelectorProps {
   poolIds: PoolId[]
@@ -27,7 +28,7 @@ export const PoolSelector = ({ poolIds, setSelectedPoolId }: PoolSelectorProps) 
   return (
     <>
       {displayPools.map((pool) => (
-        <Link to={`/pool/${pool.link}`} onClick={() => setSelectedPoolId(pool.id)}>
+        <Link to={`${routePaths.poolPage}/${pool.link}`} onClick={() => setSelectedPoolId(pool.id)}>
           <Card>{pool.poolName}</Card>
         </Link>
       ))}

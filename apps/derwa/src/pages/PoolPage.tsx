@@ -10,12 +10,12 @@ import { usePoolDetails } from '@centrifuge/shared'
 import { usePoolsContext } from '@contexts/usePoolsContext'
 import { useParams } from 'react-router'
 import { useEffect } from 'react'
+import { routePaths } from '@routes/routePaths'
 
 export default function PoolPage() {
   const { selectedPoolId, isLoading: isPoolsLoading, setSelectedPoolId, pools } = usePoolsContext()
   const { data: pool, isLoading: isPoolDetailsLoading } = usePoolDetails(selectedPoolId as PoolId)
   const params = useParams()
-  console.log({ params })
 
   // This correctly resets the pool if there is a page refresh
   useEffect(() => {
@@ -32,7 +32,7 @@ export default function PoolPage() {
   return (
     <>
       <Flex justifyContent="space-between" alignItems="center" mb={8}>
-        <Link to="/">
+        <Link to={routePaths.home}>
           <Flex alignItems="center">
             <IoArrowBack />
             <Heading size="2xl" ml={8}>
