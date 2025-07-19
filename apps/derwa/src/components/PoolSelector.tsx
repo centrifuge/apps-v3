@@ -4,6 +4,7 @@ import { PoolId } from '@centrifuge/sdk'
 import { useAllPoolDetails } from '@centrifuge/shared'
 import { Card } from '@centrifuge/ui'
 import { routePaths } from '@routes/routePaths'
+import { Spinner } from '@chakra-ui/react'
 
 interface PoolSelectorProps {
   poolIds: PoolId[]
@@ -11,7 +12,7 @@ interface PoolSelectorProps {
 }
 
 export const PoolSelector = ({ poolIds, setSelectedPoolId }: PoolSelectorProps) => {
-  const { data: pools } = useAllPoolDetails(poolIds)
+  const { data: pools, isLoading } = useAllPoolDetails(poolIds)
 
   const displayPools = useMemo(
     () =>
@@ -22,6 +23,8 @@ export const PoolSelector = ({ poolIds, setSelectedPoolId }: PoolSelectorProps) 
       })),
     [pools]
   )
+
+  if (isLoading) return <Spinner size="lg" />
 
   if (!displayPools || pools?.length === 1) return null
 
