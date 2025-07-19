@@ -1,12 +1,11 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { App } from './App'
-import { WalletProvider } from '@centrifuge/wallet'
-import { SelectedPoolProvider } from './contexts/useSelectedPoolContext'
-import Centrifuge from '@centrifuge/sdk'
-import { CentrifugeProvider, TransactionProvider } from '@centrifuge/shared'
-import { ChakraCentrifugeProvider, ChakraCentrifugeProviderProps, LoadingProvider } from '@centrifuge/ui'
 import { useMemo } from 'react'
-import { DebugFlags } from '@centrifuge/shared/src/components/DebugFlags'
+import { Outlet } from 'react-router-dom'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import Centrifuge from '@centrifuge/sdk'
+import { CentrifugeProvider, DebugFlags, TransactionProvider } from '@centrifuge/shared'
+import { ChakraCentrifugeProvider, ChakraCentrifugeProviderProps, LoadingProvider } from '@centrifuge/ui'
+import { WalletProvider } from '@centrifuge/wallet'
+import { PoolsProvider } from '@contexts/usePoolsContext'
 
 const config = {
   themeKey: 'light' as ChakraCentrifugeProviderProps['themeKey'],
@@ -14,7 +13,7 @@ const config = {
 
 const queryClient = new QueryClient()
 
-export function Root() {
+export default function Root() {
   /**
    * Initialize Centrifuge SDK with any necessary config.
    * We need to ensure it is created only once, so we must use useMemo.
@@ -41,13 +40,13 @@ export function Root() {
           <WalletProvider projectId={import.meta.env.VITE_REOWN_APP_ID!} networks={networks}>
             <ChakraCentrifugeProvider themeKey={config.themeKey}>
               <TransactionProvider>
-                <SelectedPoolProvider>
+                <PoolsProvider>
                   <DebugFlags>
                     <LoadingProvider>
-                      <App />
+                      <Outlet />
                     </LoadingProvider>
                   </DebugFlags>
-                </SelectedPoolProvider>
+                </PoolsProvider>
               </TransactionProvider>
             </ChakraCentrifugeProvider>
           </WalletProvider>

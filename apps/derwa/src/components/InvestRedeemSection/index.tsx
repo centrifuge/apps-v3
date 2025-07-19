@@ -41,7 +41,7 @@ const RestrictedCountry = () => {
   )
 }
 
-export function InvestRedeemSection({ pool: poolDetails }: { pool: PoolDetails }) {
+export function InvestRedeemSection({ pool: poolDetails }: { pool?: PoolDetails }) {
   const connectedChainId = useChainId()
   const { data: location, isLoading: isGeoloationLoading } = useGeolocation()
   const [vault, setVault] = useState<Vault>()
@@ -57,6 +57,8 @@ export function InvestRedeemSection({ pool: poolDetails }: { pool: PoolDetails }
   const kybCountries = poolDetails?.metadata?.onboarding?.kybRestrictedCountries ?? []
   const restrictedCountries = [...kycCountries, ...kybCountries]
   const isRestrictedCountry = restrictedCountries.includes(location?.country_code)
+
+  if (!poolDetails || !shareClassId) return null
 
   return (
     <Flex
