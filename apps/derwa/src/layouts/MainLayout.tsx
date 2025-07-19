@@ -1,17 +1,10 @@
-import { memo, useMemo } from 'react'
+import { memo } from 'react'
 import { Outlet } from 'react-router-dom'
 import { Box } from '@chakra-ui/react'
-import { usePools } from '@centrifuge/shared'
-import { LogoCentrifugeText } from '@centrifuge/ui'
+import { ErrorBoundary, LogoCentrifugeText } from '@centrifuge/ui'
 import { WalletButton } from '@centrifuge/wallet'
-import { PoolSelector } from '@components/PoolSelector'
 
 const MainLayout = memo(() => {
-  const { data: fetchedPools } = usePools()
-
-  const pools = useMemo(() => fetchedPools, [fetchedPools])
-  const poolIds = useMemo(() => pools?.map((p) => p.id).filter((id) => !!id) ?? [], [])
-
   return (
     <>
       <Box bg="bg-secondary" w="100%" minH="100vh">
@@ -22,11 +15,12 @@ const MainLayout = memo(() => {
             </Box>
             <WalletButton />
           </Box>
-          <Outlet />
+
+          <ErrorBoundary>
+            <Outlet />
+          </ErrorBoundary>
         </Box>
       </Box>
-
-      <PoolSelector poolIds={poolIds} />
     </>
   )
 })
