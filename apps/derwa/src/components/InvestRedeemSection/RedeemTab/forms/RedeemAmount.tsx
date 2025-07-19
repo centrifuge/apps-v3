@@ -16,7 +16,7 @@ import {
 } from '@centrifuge/shared'
 import { NetworkIcons } from '@centrifuge/ui'
 import { InfoWrapper } from '@components/InvestRedeemSection/components/InfoWrapper'
-import { useSelectedPoolContext } from '@contexts/useSelectedPoolContext'
+import { usePoolsContext } from '@contexts/usePoolsContext'
 import { infoText } from '@utils/infoText'
 
 interface RedeemAmountProps {
@@ -38,7 +38,7 @@ export function RedeemAmount({
 }: RedeemAmountProps) {
   const { data: vaultsDetails } = useVaultsDetails(vaults)
   const { data: portfolio } = usePortfolio()
-  const { selectedPoolId } = useSelectedPoolContext()
+  const { selectedPoolId } = usePoolsContext()
   const { data: pool } = usePoolDetails(selectedPoolId as PoolId)
   const { data: vaultDetails } = useVaultDetails(vault)
   const { switchChain } = useSwitchChain()
