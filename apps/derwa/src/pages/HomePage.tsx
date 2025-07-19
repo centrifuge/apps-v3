@@ -6,11 +6,11 @@ export default function HomePage() {
   const { pools, setSelectedPoolId, isLoading } = usePoolsContext()
   const poolIds = pools?.map((p) => p.id) ?? []
 
-  if (!pools?.length) return null
-
   if (isLoading) {
     return <Spinner size="lg" />
   }
+
+  if (!pools?.length) return null
 
   return <PoolSelector poolIds={poolIds} setSelectedPoolId={setSelectedPoolId} />
 }
