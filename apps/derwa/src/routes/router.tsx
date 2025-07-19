@@ -1,7 +1,6 @@
 import { createBrowserRouter } from 'react-router-dom'
-import { ErrorBoundary } from '@centrifuge/ui'
+import { LoadingBoundary } from '@centrifuge/ui'
 import MainLayout from '@layouts/MainLayout'
-import PoolLayout from '@layouts/PoolLayout'
 import { HomeRoute, PoolRoute, RootRoute } from '@routes/routes'
 
 export const router = createBrowserRouter([
@@ -15,14 +14,18 @@ export const router = createBrowserRouter([
           {
             index: true,
             element: (
-              <ErrorBoundary>
+              <LoadingBoundary>
                 <HomeRoute />
-              </ErrorBoundary>
+              </LoadingBoundary>
             ),
           },
           {
-            element: <PoolLayout />,
-            children: [{ path: 'pool/:poolId', element: <PoolRoute /> }],
+            path: 'pool/:poolId',
+            element: (
+              <LoadingBoundary>
+                <PoolRoute />
+              </LoadingBoundary>
+            ),
           },
         ],
       },
