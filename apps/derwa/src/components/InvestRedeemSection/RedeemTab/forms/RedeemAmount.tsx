@@ -53,9 +53,7 @@ export function RedeemAmount({
   }))
 
   // Get the pricePerShare
-  const shareClass = pool?.shareClasses.find(
-    (sc) => sc.details.id.raw.toString() === vault?.shareClass.id.raw.toString()
-  )
+  const shareClass = pool?.shareClasses.find((sc) => sc.details.id.toString() === vault?.shareClass.id.toString())
   const pricePerShare = shareClass?.details.pricePerShare
 
   // Get info on the users shares holdings in their wallet

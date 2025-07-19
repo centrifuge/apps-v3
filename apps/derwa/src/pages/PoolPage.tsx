@@ -19,8 +19,8 @@ export default function PoolPage() {
 
   // This correctly resets the pool if there is a page refresh
   useEffect(() => {
-    if (selectedPoolId && selectedPoolId.raw.toString() !== params.poolId) {
-      const poolId = pools?.find((pool) => pool.id.raw.toString() === params.poolId)?.id
+    if (selectedPoolId && selectedPoolId.toString() !== params.poolId) {
+      const poolId = pools?.find((pool) => pool.id.toString() === params.poolId)?.id
       if (poolId) setSelectedPoolId(poolId)
     }
   }, [pools, params, selectedPoolId])

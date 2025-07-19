@@ -18,7 +18,7 @@ export const PoolSelector = ({ poolIds, setSelectedPoolId }: PoolSelectorProps) 
     () =>
       pools?.map((pool) => ({
         poolName: pool.metadata?.pool?.name || pool.id.toString(),
-        link: pool.id.raw,
+        link: pool.id.toString(),
         id: pool.id,
       })),
     [pools]
