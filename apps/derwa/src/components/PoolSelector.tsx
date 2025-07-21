@@ -31,7 +31,11 @@ export const PoolSelector = ({ poolIds, setSelectedPoolId }: PoolSelectorProps) 
   return (
     <>
       {displayPools.map((pool) => (
-        <Link to={`${routePaths.poolPage}/${pool.link}`} onClick={() => setSelectedPoolId(pool.id)}>
+        <Link
+          to={`${routePaths.poolPage}/${pool.link}`}
+          onClick={() => setSelectedPoolId(pool.id)}
+          key={pool.id.toString()}
+        >
           <Card>{pool.poolName}</Card>
         </Link>
       ))}
