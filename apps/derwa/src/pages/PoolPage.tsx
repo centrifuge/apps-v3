@@ -8,22 +8,11 @@ import { Link } from 'react-router-dom'
 import { IoArrowBack } from 'react-icons/io5'
 import { usePoolDetails } from '@centrifuge/shared'
 import { usePoolsContext } from '@contexts/usePoolsContext'
-import { useParams } from 'react-router'
-import { useEffect } from 'react'
 import { routePaths } from '@routes/routePaths'
 
 export default function PoolPage() {
-  const { selectedPoolId, isLoading: isPoolsLoading, setSelectedPoolId, pools } = usePoolsContext()
+  const { selectedPoolId, isLoading: isPoolsLoading } = usePoolsContext()
   const { data: pool, isLoading: isPoolDetailsLoading } = usePoolDetails(selectedPoolId as PoolId)
-  const params = useParams()
-
-  // This correctly resets the pool if there is a page refresh
-  useEffect(() => {
-    if (selectedPoolId && selectedPoolId.toString() !== params.poolId) {
-      const poolId = pools?.find((pool) => pool.id.toString() === params.poolId)?.id
-      if (poolId) setSelectedPoolId(poolId)
-    }
-  }, [pools, params, selectedPoolId])
 
   if (isPoolsLoading || isPoolDetailsLoading) {
     return <LandingPageSkeleton />
