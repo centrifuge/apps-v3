@@ -176,7 +176,7 @@ export function LegendItem({ color, label, value }: { color?: string; label: str
   )
 }
 
-export const PoolPerformanceChart = ({ pool }: { pool: PoolDetails }) => {
+export const PoolPerformanceChart = ({ pool }: { pool?: PoolDetails }) => {
   const targetApy = formatPercentage(Object.values(pool?.metadata?.shareClasses || {})[0]?.apyPercentage || 0)
 
   return (

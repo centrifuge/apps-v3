@@ -30,7 +30,7 @@ export function LoadingProvider({ children }: LoadingProviderProps) {
     <FirstLoadFallback onUnmount={hideLoading} />
   ) : (
     <Box p={3}>
-      <Spinner size="xs" colorPalette="black" />
+      <Spinner size="lg" colorPalette="black" />
     </Box>
   )
 
