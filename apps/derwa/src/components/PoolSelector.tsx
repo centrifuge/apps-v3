@@ -18,8 +18,8 @@ export const PoolSelector = ({ poolIds, setSelectedPoolId }: PoolSelectorProps) 
     () =>
       pools?.map((pool) => ({
         poolName: pool.metadata?.pool?.name || pool.id.toString(),
-        link: pool.id.toString(),
-        id: pool.id,
+        id: pool.id.toString(),
+        setId: () => setSelectedPoolId(pool.id),
       })),
     [pools]
   )
@@ -31,11 +31,7 @@ export const PoolSelector = ({ poolIds, setSelectedPoolId }: PoolSelectorProps) 
   return (
     <>
       {displayPools.map((pool) => (
-        <Link
-          to={`${routePaths.poolPage}/${pool.link}`}
-          onClick={() => setSelectedPoolId(pool.id)}
-          key={pool.id.toString()}
-        >
+        <Link to={`${routePaths.poolPage}/${pool.id}`} onClick={pool.setId} key={pool.id}>
           <Card>{pool.poolName}</Card>
         </Link>
       ))}
