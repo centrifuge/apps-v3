@@ -6,22 +6,20 @@ import { WalletButton } from '@centrifuge/wallet'
 
 const MainLayout = memo(() => {
   return (
-    <>
-      <Box bg="bg-secondary" w="100%" minH="100vh">
-        <Box maxW={{ base: '95vw', xl: '80vw' }} mx="auto" px={{ base: 4, md: 8 }} py={{ base: 4, md: 8 }}>
-          <Box display="flex" justifyContent="space-between" alignItems="center">
-            <Box width={40} mb={8}>
-              <LogoCentrifugeText fill="text-primary" />
-            </Box>
-            <WalletButton />
+    <Box bg="bg-secondary" w="100%" minH="100vh">
+      <Box maxW={{ base: '95vw', xl: '80vw' }} mx="auto" px={{ base: 4, md: 8 }} py={{ base: 4, md: 8 }}>
+        <Box display="flex" justifyContent="space-between" alignItems="center">
+          <Box width={40} mb={8}>
+            <LogoCentrifugeText fill="text-primary" />
           </Box>
-
-          <ErrorBoundary>
-            <Outlet />
-          </ErrorBoundary>
+          <WalletButton />
         </Box>
+
+        <ErrorBoundary>
+          <Outlet />
+        </ErrorBoundary>
       </Box>
-    </>
+    </Box>
   )
 })
 
