@@ -1,29 +1,31 @@
 import { Grid, Stack } from '@chakra-ui/react'
-import { Select, Input, useFormContext } from '@centrifuge/forms'
+import { Select, Input, useFormContext, BalanceInput } from '@centrifuge/forms'
 import { Control, useController } from 'react-hook-form'
 import { useEffect } from 'react'
 
 interface PoolStructureValues {
   poolType: string
-  hubChains: string[]
   tokens: {
     symbolName: string
     minInvestment: string
-    apyPercentage?: unknown
-    tokenName?: string | undefined
-    apy?: string | undefined
+    apyPercentage?: string
+    tokenName?: string
+    apy?: string
+    currency?: string
   }[]
-  poolDenomination?: string | undefined
+  poolDenomination?: string
 }
 
 export const TokenSection = ({
   index,
   apy,
   control,
+  currency,
 }: {
   index: number
   apy: { label: string; value: string }[]
   control: Control<PoolStructureValues>
+  currency?: string
 }) => {
   const { setValue } = useFormContext()
   const { field: apyField } = useController({
@@ -72,10 +74,11 @@ export const TokenSection = ({
 
       <Grid templateColumns="1fr 1fr" gap={4} mt={8}>
         <Stack>
-          <Input
+          <BalanceInput
             name={`tokens.${index}.minInvestment`}
-            placeholder="Type here..."
             label="Min investment*"
+            currency={currency}
+            placeholder="Type here..."
             style={{ background: '#F6F6F6' }}
           />
         </Stack>
@@ -92,7 +95,7 @@ export const TokenSection = ({
 
             {apyField.value !== 'Automatic' && (
               <Input
-                value={[(apyPercentageField.value as string) || '']}
+                value={[apyPercentageField.value || '']}
                 name={`tokens.${index}.apyPercentage`}
                 placeholder="Type here..."
                 style={{ background: '#F6F6F6' }}

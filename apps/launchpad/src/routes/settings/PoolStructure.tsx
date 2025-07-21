@@ -2,7 +2,7 @@ import { Button, NetworkIcon, Card } from '@centrifuge/ui'
 import { Alert, Box, Container, Flex, Grid, Heading, Stack, Text, Button as ChakraButton } from '@chakra-ui/react'
 import { Form, useForm, Select, MultiSelect } from '@centrifuge/forms'
 import { usePoolProvider } from '@contexts/PoolProvider'
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { z } from 'zod'
 import { useController, useFieldArray, UseFieldArrayAppend } from 'react-hook-form'
 import { TokenSection } from '@components/settings/TokenSection'
@@ -14,15 +14,22 @@ export const handle = {
 
 interface PoolStructureValues {
   poolType: string
-  hubChains: string[]
   tokens: {
     symbolName: string
     minInvestment: string
     apyPercentage?: unknown
-    tokenName?: string | undefined
-    apy?: string | undefined
+    tokenName?: string
+    apy?: string
+    currency?: string
   }[]
-  poolDenomination?: string | undefined
+  poolDenomination?: string
+}
+
+const MAP_SYMBOL_TO_CURRENCY: Record<string, string> = {
+  USD: '840',
+  EUR: '978',
+  GBP: '826',
+  JPY: '392',
 }
 
 export const SaveChangesButton = () => {
@@ -30,35 +37,39 @@ export const SaveChangesButton = () => {
 }
 
 export default function PoolStructure() {
-  const { pool, poolDetails } = usePoolProvider()
+  const { poolDetails } = usePoolProvider()
 
-  //   console.log({ pool, poolDetails })
-
-  // TODO: Pull all the data from pool, poolDetails, hub details (chains)
   const poolTypes = [
-    { label: 'Permissioned', value: 'open' },
+    { label: 'Permissioned', value: 'closed' },
     {
       label: 'Permissionless (coming soon)',
-      value: 'closed',
+      value: 'open',
       disabled: true,
     },
   ]
 
+  // TODO: Clarify the proper values for poolDenomination
   const poolDenominations = [
-    { label: 'USDC', value: 'usdc' }, // 6 decimal
-    { label: 'USDT (coming soon)', value: 'usdt', disabled: true },
-    { label: 'DAI (coming soon)', value: 'dai', disabled: true },
+    { label: 'US Dollar', value: '840' },
+    { label: 'Euro', value: '978' },
+    { label: 'British Pound', value: '826' },
+    { label: 'Japanese Yen', value: '392' },
+    // { label: 'USDT (coming soon)', value: 'usdt', disabled: true },
+    // { label: 'DAI (coming soon)', value: 'dai', disabled: true },
   ]
 
+  // TODO: to be removed once we style multi select
   const hubChains = [
     {
       label: 'Centrifuge',
       value: '11155111',
       children: (
-        <Text style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <NetworkIcon networkId={11155111} />
-          Centrifuge
-        </Text>
+        <>
+          <Text style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <NetworkIcon networkId={11155111} />
+            Centrifuge
+          </Text>
+        </>
       ),
     },
     {
@@ -115,6 +126,7 @@ export default function PoolStructure() {
     },
   ]
 
+  // TODO: wait for SDK to type the values and then replace (+ in code as some logic depends on Automatic)
   const apy = [
     { label: 'Target', value: 'Target' },
     { label: '7 Day', value: '7day' },
@@ -126,27 +138,24 @@ export default function PoolStructure() {
   ]
 
   const tokens = useMemo(
-    () => [
-      {
-        apy: 'Target',
-        apyPercentage: '4.086',
-        minInvestment: '1000',
-        tokenName: 'Centrifuge',
-        symbolName: 'CFGG',
-      },
-      {
-        apy: 'Automatic',
-        minInvestment: '1000',
-        tokenName: "Great Onno's Awesome Token",
-        symbolName: 'GOAT',
-      },
-    ],
-    []
+    () =>
+      poolDetails?.shareClasses.map((token) => {
+        const details = poolDetails?.metadata?.shareClasses[token.details.id.toString()]
+
+        return {
+          tokenName: token.details.name,
+          symbolName: token.details.symbol,
+          apy: details?.apy || undefined,
+          apyPercentage: String(details?.apyPercentage) || undefined,
+          minInvestment: details?.minInitialInvestment,
+          currency: poolDetails.currency.symbol,
+        }
+      }),
+    [poolDetails]
   )
 
   const schema = z.object({
     poolType: z.string().min(1, 'Pool type is required'),
-    hubChains: z.array(z.string().min(1, 'At least one hub chain is required')),
     poolDenomination: z.string().optional(),
     tokens: z.array(
       z.object({
@@ -177,13 +186,15 @@ export default function PoolStructure() {
     ),
   })
 
+  const poolCurrencySymbol = poolDetails?.currency?.symbol || 'USD'
+  const poolCurrency = MAP_SYMBOL_TO_CURRENCY[poolCurrencySymbol]
+
   const form = useForm({
     schema,
     mode: 'onChange',
     defaultValues: {
-      poolType: 'open',
-      hubChains: ['11155111', '1'],
-      poolDenomination: 'usdc',
+      poolType: 'closed',
+      poolDenomination: poolCurrency,
       tokens,
     },
     onSubmit: (values) => {
@@ -192,7 +203,7 @@ export default function PoolStructure() {
     onSubmitError: (error) => console.error('Pool Structure form submission error:', error),
   })
 
-  const { control } = form
+  const { control, reset } = form
 
   const { fields, append } = useFieldArray({
     name: 'tokens',
@@ -204,20 +215,23 @@ export default function PoolStructure() {
     control,
   })
 
-  const { field: hubChainsField } = useController({
-    name: 'hubChains',
-    control,
-  })
-
   const { field: poolDenominationField } = useController({
     name: 'poolDenomination',
     control,
   })
 
+  useEffect(() => {
+    reset({
+      poolType: 'closed',
+      poolDenomination: poolCurrency,
+      tokens,
+    })
+  }, [poolDetails])
+
   const appendToken = (append: UseFieldArrayAppend<PoolStructureValues>) => {
     append({
       apy: '',
-      minInvestment: '0',
+      minInvestment: '',
       tokenName: '',
       symbolName: '',
     })
@@ -255,7 +269,6 @@ export default function PoolStructure() {
 
               <Stack>
                 <MultiSelect
-                  value={hubChainsField.value}
                   name={'hubChains'}
                   items={hubChains}
                   label={'Hub chains*'}
@@ -281,8 +294,8 @@ export default function PoolStructure() {
           </Text>
           {fields.map((field, index) => {
             return (
-              <Card mt={4}>
-                <TokenSection index={index} apy={apy} control={control} />
+              <Card key={index} mt={4}>
+                <TokenSection key={index} index={index} apy={apy} control={control} currency={field.currency} />
                 {fields.length - 1 === index && (
                   <Grid templateColumns="1fr 4fr" gap={4} mt={8}>
                     <ChakraButton onClick={() => appendToken(append)}>Add another token</ChakraButton>

@@ -1,9 +1,19 @@
 import type { FieldPath, FieldValues } from 'react-hook-form'
 import { useController, useFormContext } from 'react-hook-form'
-import { createListCollection, Select as ChakraSelect, Field, SelectRootProps, Portal, Group } from '@chakra-ui/react'
+import {
+  createListCollection,
+  Select as ChakraSelect,
+  Field,
+  SelectRootProps,
+  Portal,
+  Group,
+  useSelectContext,
+  Flex,
+} from '@chakra-ui/react'
 import { useGetFormError } from '../hooks/useGetFormError'
 import { ReactNode, useState } from 'react'
 import { RiArrowDownSLine } from 'react-icons/ri'
+import { Checkbox } from './Checkbox'
 
 export interface CustomMultiSelectProps<TFieldValues extends FieldValues = FieldValues>
   extends Omit<SelectRootProps, 'collection'> {
@@ -54,7 +64,8 @@ export function MultiSelect<TFieldValues extends FieldValues = FieldValues>(
         <Field.Label>{label}</Field.Label>
         <ChakraSelect.Root
           collection={collection}
-          size="sm"
+          width="100%"
+          size="lg"
           onValueChange={({ value }: { value: string[] }) => onValueChange(value)}
           disabled={disabled}
           value={value}
@@ -63,25 +74,39 @@ export function MultiSelect<TFieldValues extends FieldValues = FieldValues>(
           multiple
           {...rest}
         >
-          <ChakraSelect.HiddenSelect />
-          <ChakraSelect.Control>
-            <ChakraSelect.Trigger {...{ children: true }} style={{ padding: '10px 14px', borderRadius: '8px' }}>
-              <ChakraSelect.ValueText {...{ placeholder: 'Please select...' }} />
-              <RiArrowDownSLine />
-            </ChakraSelect.Trigger>
-          </ChakraSelect.Control>
-          <Portal>
-            <ChakraSelect.Positioner>
-              <ChakraSelect.Content>
-                {items.map((item) => (
-                  <ChakraSelect.Item {...{ item, children: item.children ?? item.label }} key={item.value} />
-                ))}
-              </ChakraSelect.Content>
-            </ChakraSelect.Positioner>
-          </Portal>
+          <SelectItems items={items} />
         </ChakraSelect.Root>
         <Field.ErrorText>{errorMessage}</Field.ErrorText>
       </Field.Root>
     </Group>
+  )
+}
+
+const SelectItems = ({ items }: { items: { value: string; children?: ReactNode; label: string }[] }) => {
+  const { value: selectedValues } = useSelectContext()
+  return (
+    <>
+      <ChakraSelect.HiddenSelect />
+      <ChakraSelect.Control>
+        <ChakraSelect.Trigger {...{ children: true }}>
+          <ChakraSelect.ValueText {...{ placeholder: 'Please select...' }} />
+          <RiArrowDownSLine />
+        </ChakraSelect.Trigger>
+      </ChakraSelect.Control>
+      <Portal>
+        <ChakraSelect.Positioner>
+          <ChakraSelect.Content>
+            {items.map((item) => (
+              <ChakraSelect.Item key={item.value} item={item}>
+                <Flex key={item.value} alignItems="flex-start" gap={2}>
+                  <Checkbox key={item.value} checked={selectedValues?.includes(item.value)} name={item.value} />
+                  <div style={{ flexGrow: 1 }}>{item.children ? item.children : item.label}</div>
+                </Flex>
+              </ChakraSelect.Item>
+            ))}
+          </ChakraSelect.Content>
+        </ChakraSelect.Positioner>
+      </Portal>
+    </>
   )
 }
