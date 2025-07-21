@@ -1,14 +1,28 @@
 import { Button, NetworkIcon, Card } from '@centrifuge/ui'
 import { Alert, Box, Container, Flex, Grid, Heading, Stack, Text, Button as ChakraButton } from '@chakra-ui/react'
-import { Form, useForm, Select, MultiSelect, Input } from '@centrifuge/forms'
+import { Form, useForm, Select, MultiSelect } from '@centrifuge/forms'
 import { usePoolProvider } from '@contexts/PoolProvider'
-import { useEffect, useState } from 'react'
+import { useMemo } from 'react'
 import { z } from 'zod'
-import { useFieldArray } from 'react-hook-form'
+import { useController, useFieldArray, UseFieldArrayAppend } from 'react-hook-form'
+import { TokenSection } from '@components/settings/TokenSection'
 
 export const handle = {
   hasSettings: false,
   hasTabs: true,
+}
+
+interface PoolStructureValues {
+  poolType: string
+  hubChains: string[]
+  tokens: {
+    symbolName: string
+    minInvestment: string
+    apyPercentage?: unknown
+    tokenName?: string | undefined
+    apy?: string | undefined
+  }[]
+  poolDenomination?: string | undefined
 }
 
 export const SaveChangesButton = () => {
@@ -17,22 +31,6 @@ export const SaveChangesButton = () => {
 
 export default function PoolStructure() {
   const { pool, poolDetails } = usePoolProvider()
-  const [tokens, setTokens] = useState([
-    {
-      apy: 'Target',
-      apyPercentage: '4.086',
-      minInvestment: '1000',
-      tokenName: 'Centrifuge',
-      symbolName: 'CFGG',
-    },
-    {
-      apy: 'Automatic',
-      apyPercentage: null,
-      minInvestment: '1000',
-      tokenName: "Great Onno's Awesome Token",
-      symbolName: 'GOAT',
-    },
-  ])
 
   //   console.log({ pool, poolDetails })
 
@@ -127,18 +125,24 @@ export default function PoolStructure() {
     { label: 'Automatic', value: 'Automatic' },
   ]
 
-  const appendToken = () => {
-    setTokens((prev) => [
-      ...prev,
+  const tokens = useMemo(
+    () => [
       {
-        apy: '',
-        apyPercentage: null,
-        minInvestment: '0',
-        tokenName: '',
-        symbolName: '',
+        apy: 'Target',
+        apyPercentage: '4.086',
+        minInvestment: '1000',
+        tokenName: 'Centrifuge',
+        symbolName: 'CFGG',
       },
-    ])
-  }
+      {
+        apy: 'Automatic',
+        minInvestment: '1000',
+        tokenName: "Great Onno's Awesome Token",
+        symbolName: 'GOAT',
+      },
+    ],
+    []
+  )
 
   const schema = z.object({
     poolType: z.string().min(1, 'Pool type is required'),
@@ -147,28 +151,28 @@ export default function PoolStructure() {
     tokens: z.array(
       z.object({
         tokenName: z.string().optional(),
-        symbolName: z.string().min(4, 'Symbol name is required').max(12, 'Symbol name must be less than 12 characters'),
+        symbolName: z
+          .string()
+          .min(4, 'Symbol name is required and must be at least 4 characters long')
+          .max(12, 'Symbol name must be less than 12 characters'),
         minInvestment: z.string().refine((val) => Number(val) > 0, {
-          message: 'Min investment must be numeric and greater than 0',
+          message: 'Min investment must be a numeric value and greater than 0',
         }),
         apy: z.string().optional(),
-        apyPercentage: z.string().optional().nullable(),
-        // apyPercentage: z
-        //   .string()
-        //   .optional()
-        //   .nullable()
-        //   .refine(
-        //     (val) => {
-        //       console.log({ val })
-        //       if (val !== null || val !== undefined) {
-        //         const num = parseFloat(val)
-        //         return !isNaN(num) && num > 0
-        //       }
-        //     },
-        //     {
-        //       message: 'Min investment must be numeric and greater than 0',
-        //     }
-        //   ),
+        apyPercentage: z
+          .preprocess(
+            (val) => {
+              if (typeof val === 'string' && val.trim() === '') return undefined
+              return val
+            },
+            z
+              .string()
+              .optional()
+              .refine((val) => val && !isNaN(parseFloat(val)), {
+                message: 'Must be a valid number',
+              })
+          )
+          .optional(),
       })
     ),
   })
@@ -176,19 +180,48 @@ export default function PoolStructure() {
   const form = useForm({
     schema,
     mode: 'onChange',
+    defaultValues: {
+      poolType: 'open',
+      hubChains: ['11155111', '1'],
+      poolDenomination: 'usdc',
+      tokens,
+    },
     onSubmit: (values) => {
       console.log('Form submitted with values:', values)
     },
     onSubmitError: (error) => console.error('Pool Structure form submission error:', error),
   })
 
-  const { control, watch } = form
+  const { control } = form
 
-  // useFieldArray to manage the 'tokens' array
-  const { fields, append, remove } = useFieldArray({
-    control,
+  const { fields, append } = useFieldArray({
     name: 'tokens',
+    control,
   })
+
+  const { field: poolTypeField } = useController({
+    name: 'poolType',
+    control,
+  })
+
+  const { field: hubChainsField } = useController({
+    name: 'hubChains',
+    control,
+  })
+
+  const { field: poolDenominationField } = useController({
+    name: 'poolDenomination',
+    control,
+  })
+
+  const appendToken = (append: UseFieldArrayAppend<PoolStructureValues>) => {
+    append({
+      apy: '',
+      minInvestment: '0',
+      tokenName: '',
+      symbolName: '',
+    })
+  }
 
   return (
     <Container mt={8}>
@@ -211,11 +244,18 @@ export default function PoolStructure() {
           <Card mt={4}>
             <Grid templateColumns="1fr 1fr" gap={4} mt={8}>
               <Stack>
-                <Select name={'poolType'} items={poolTypes} label={'Type*'} style={{ background: '#F6F6F6' }} />
+                <Select
+                  value={[poolTypeField.value]}
+                  name={'poolType'}
+                  items={poolTypes}
+                  label={'Type*'}
+                  style={{ background: '#F6F6F6' }}
+                />
               </Stack>
 
               <Stack>
                 <MultiSelect
+                  value={hubChainsField.value}
                   name={'hubChains'}
                   items={hubChains}
                   label={'Hub chains*'}
@@ -226,7 +266,12 @@ export default function PoolStructure() {
 
             <Grid templateColumns="1fr 1fr" gap={4} mt={8}>
               <Stack>
-                <Select name={'poolDenomination'} items={poolDenominations} label={'Pool denomination'} />
+                <Select
+                  value={[poolDenominationField.value || '']}
+                  name={'poolDenomination'}
+                  items={poolDenominations}
+                  label={'Pool denomination'}
+                />
               </Stack>
             </Grid>
           </Card>
@@ -234,60 +279,18 @@ export default function PoolStructure() {
           <Text fontSize="sm" mt={8}>
             Tokens
           </Text>
-          {fields.map((field, index) => (
-            <Card mt={4}>
-              <Grid templateColumns="1fr 1fr" gap={4} mt={8}>
-                <Stack>
-                  <Input
-                    name={`tokens.${index}.tokenName`}
-                    placeholder="Type here..."
-                    style={{ background: '#F6F6F6' }}
-                    label="Token name"
-                  />
-                </Stack>
-
-                <Stack>
-                  <Input
-                    placeholder="Type here..."
-                    style={{ background: '#F6F6F6' }}
-                    name={'symbolName'}
-                    label="Token symbol (4-12 characters)*"
-                  />
-                </Stack>
-              </Grid>
-
-              <Grid templateColumns="1fr 1fr" gap={4} mt={8}>
-                <Stack>
-                  <Input
-                    placeholder="Type here..."
-                    style={{ background: '#F6F6F6' }}
-                    name={'minInvestment'}
-                    label="Min investment*"
-                  />
-                </Stack>
-
-                <Stack>
-                  <Grid templateColumns="1fr 1fr" gap={4}>
-                    <Select name={'apy'} items={apy} label={'Apy'} style={{ background: '#F6F6F6' }} />
-
-                    {token.apy !== 'Automatic' && (
-                      <Input
-                        placeholder="Type here..."
-                        style={{ background: '#F6F6F6' }}
-                        name={'apyPercentage'}
-                        mt={6}
-                      />
-                    )}
+          {fields.map((field, index) => {
+            return (
+              <Card mt={4}>
+                <TokenSection index={index} apy={apy} control={control} />
+                {fields.length - 1 === index && (
+                  <Grid templateColumns="1fr 4fr" gap={4} mt={8}>
+                    <ChakraButton onClick={() => appendToken(append)}>Add another token</ChakraButton>
                   </Grid>
-                </Stack>
-              </Grid>
-              {tokens.length - 1 === index && (
-                <Grid templateColumns="1fr 4fr" gap={4} mt={8}>
-                  <ChakraButton onClick={appendToken}>Add another token</ChakraButton>
-                </Grid>
-              )}
-            </Card>
-          ))}
+                )}
+              </Card>
+            )
+          })}
         </Box>
         <Box mt={8} mb={8}>
           <Flex justifyContent="center" alignItems="center">
