@@ -77,10 +77,10 @@ const getPoolSettingsTabs = (poolId: string) => [
     label: 'Pool access',
     path: `/${poolId}/poolAccess`,
   },
-  {
-    label: 'Pool structure',
-    path: `/${poolId}/poolStructure`,
-  },
+  // {
+  //   label: 'Pool structure',
+  //   path: `/${poolId}/poolStructure`,
+  // },
 ]
 
 function getTabsForRoute(pathname: string, poolId?: string, labels?: string[]) {
