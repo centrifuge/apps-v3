@@ -8,7 +8,7 @@ interface PoolStructureValues {
   tokens: {
     symbolName: string
     minInvestment: string
-    apyPercentage?: string
+    apyPercentage?: unknown
     tokenName?: string
     apy?: string
     currency?: string
@@ -96,7 +96,7 @@ export const TokenSection = ({
             {apyField.value !== 'Automatic' && (
               <Input
                 label="&nbsp;"
-                value={[apyPercentageField.value || '']}
+                value={[(apyPercentageField.value as string) || '']}
                 name={`tokens.${index}.apyPercentage`}
                 placeholder="Type here..."
                 style={{ background: '#F6F6F6' }}

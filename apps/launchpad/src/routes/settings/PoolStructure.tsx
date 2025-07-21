@@ -1,6 +1,6 @@
-import { Button, NetworkIcon, Card } from '@centrifuge/ui'
+import { Button, Card } from '@centrifuge/ui'
 import { Alert, Box, Container, Flex, Grid, Heading, Stack, Text, Button as ChakraButton } from '@chakra-ui/react'
-import { Form, useForm, Select, MultiSelect } from '@centrifuge/forms'
+import { Form, useForm, Select } from '@centrifuge/forms'
 import { usePoolProvider } from '@contexts/PoolProvider'
 import { useEffect, useMemo } from 'react'
 import { z } from 'zod'
@@ -56,74 +56,6 @@ export default function PoolStructure() {
     { label: 'Japanese Yen', value: '392' },
     // { label: 'USDT (coming soon)', value: 'usdt', disabled: true },
     // { label: 'DAI (coming soon)', value: 'dai', disabled: true },
-  ]
-
-  // TODO: to be removed once we style multi select
-  const hubChains = [
-    {
-      label: 'Centrifuge',
-      value: '11155111',
-      children: (
-        <>
-          <Text style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <NetworkIcon networkId={11155111} />
-            Centrifuge
-          </Text>
-        </>
-      ),
-    },
-    {
-      label: 'Etherium',
-      value: '1',
-      children: (
-        <Text style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <NetworkIcon networkId={1} />
-          Etherium
-        </Text>
-      ),
-    },
-    {
-      label: 'Celo',
-      value: '42220',
-      children: (
-        <Text style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <NetworkIcon networkId={42220} />
-          Celo
-        </Text>
-      ),
-    },
-    {
-      label: 'Arbitrum One',
-      value: '42161',
-      children: (
-        <Text style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <NetworkIcon networkId={42161} />
-          Arbitrum One
-        </Text>
-      ),
-    },
-    {
-      label: 'Avalanche (coming soon)',
-      value: '-1',
-      disabled: true,
-      children: (
-        <Text style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <NetworkIcon networkId={1} />
-          Avalanche (coming soon)
-        </Text>
-      ),
-    },
-    {
-      label: 'Polygon (coming soon)',
-      value: '-2',
-      disabled: true,
-      children: (
-        <Text style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <NetworkIcon networkId={1} />
-          Polygon (coming soon)
-        </Text>
-      ),
-    },
   ]
 
   // TODO: wait for SDK to type the values and then replace (+ in code as some logic depends on Automatic)
@@ -234,6 +166,7 @@ export default function PoolStructure() {
       minInvestment: '',
       tokenName: '',
       symbolName: '',
+      currency: poolDetails?.currency.symbol,
     })
   }
 
@@ -263,15 +196,6 @@ export default function PoolStructure() {
                   name={'poolType'}
                   items={poolTypes}
                   label={'Type*'}
-                  style={{ background: '#F6F6F6' }}
-                />
-              </Stack>
-
-              <Stack>
-                <MultiSelect
-                  name={'hubChains'}
-                  items={hubChains}
-                  label={'Hub chains*'}
                   style={{ background: '#F6F6F6' }}
                 />
               </Stack>
