@@ -65,7 +65,7 @@ export function MultiSelect<TFieldValues extends FieldValues = FieldValues>(
         >
           <ChakraSelect.HiddenSelect />
           <ChakraSelect.Control>
-            <ChakraSelect.Trigger {...{ children: true }}>
+            <ChakraSelect.Trigger {...{ children: true }} style={{ padding: '10px 14px', borderRadius: '8px' }}>
               <ChakraSelect.ValueText {...{ placeholder: 'Please select...' }} />
               <RiArrowDownSLine />
             </ChakraSelect.Trigger>

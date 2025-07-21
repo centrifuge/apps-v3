@@ -62,7 +62,7 @@ export function Select<TFieldValues extends FieldValues = FieldValues>(props: Cu
         >
           <ChakraSelect.HiddenSelect />
           <ChakraSelect.Control>
-            <ChakraSelect.Trigger {...{ children: true }}>
+            <ChakraSelect.Trigger {...{ children: true }} style={{ padding: '10px 14px', borderRadius: '8px' }}>
               <ChakraSelect.ValueText {...{ placeholder: 'Please select...' }} />
               <RiArrowDownSLine />
             </ChakraSelect.Trigger>
