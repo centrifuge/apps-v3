@@ -52,7 +52,7 @@ export const TokenSection = ({
 
   return (
     <>
-      <Grid templateColumns="1fr 1fr" gap={4} mt={8}>
+      <Grid templateColumns="1fr 1fr" gap={4} mt={4}>
         <Stack>
           <Input
             name={`tokens.${index}.tokenName`}

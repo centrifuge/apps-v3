@@ -189,7 +189,7 @@ export default function PoolStructure() {
         <Box mt={8}>
           <Text fontSize="sm">Tokenization model</Text>
           <Card mt={4}>
-            <Grid templateColumns="1fr 1fr" gap={4} mt={8}>
+            <Grid templateColumns="1fr 1fr" gap={4} mt={4}>
               <Stack>
                 <Select
                   value={[poolTypeField.value]}
@@ -201,7 +201,7 @@ export default function PoolStructure() {
               </Stack>
             </Grid>
 
-            <Grid templateColumns="1fr 1fr" gap={4} mt={8}>
+            <Grid templateColumns="1fr 1fr" gap={4} mt={8} mb={4}>
               <Stack>
                 <Select
                   value={[poolDenominationField.value || '']}
@@ -221,7 +221,7 @@ export default function PoolStructure() {
               <Card key={index} mt={4}>
                 <TokenSection key={index} index={index} apy={apy} control={control} currency={field.currency} />
                 {fields.length - 1 === index && (
-                  <Grid templateColumns="1fr 4fr" gap={4} mt={8}>
+                  <Grid templateColumns="1fr 4fr" gap={4} mt={4}>
                     <ChakraButton onClick={() => appendToken(append)}>Add another token</ChakraButton>
                   </Grid>
                 )}
