@@ -1,35 +1,40 @@
-import { SegmentGroup } from '@chakra-ui/react'
+import { useMemo } from 'react'
+import { Link } from 'react-router-dom'
 import { PoolId } from '@centrifuge/sdk'
 import { useAllPoolDetails } from '@centrifuge/shared'
-import { useSelectedPoolContext } from '@contexts/useSelectedPoolContext'
+import { Card } from '@centrifuge/ui'
+import { routePaths } from '@routes/routePaths'
+import { Spinner } from '@chakra-ui/react'
 
-export const PoolSelector = ({ poolIds }: { poolIds: PoolId[] }) => {
-  const { data: pools } = useAllPoolDetails(poolIds)
-  const { selectedPoolId, setSelectedPoolId } = useSelectedPoolContext()
+interface PoolSelectorProps {
+  poolIds: PoolId[]
+  setSelectedPoolId: (poolId: PoolId) => void
+}
 
-  const displayPools = pools?.map((pool) => ({
-    value: pool.id.toString(),
-    label: pool.metadata?.pool?.name || pool.id.toString(),
-  }))
+export const PoolSelector = ({ poolIds, setSelectedPoolId }: PoolSelectorProps) => {
+  const { data: pools, isLoading } = useAllPoolDetails(poolIds)
 
-  if (pools?.length === 0 || !displayPools || pools?.length === 1) return null
+  const displayPools = useMemo(
+    () =>
+      pools?.map((pool) => ({
+        poolName: pool.metadata?.pool?.name || pool.id.toString(),
+        id: pool.id.toString(),
+        setId: () => setSelectedPoolId(pool.id),
+      })),
+    [pools]
+  )
+
+  if (isLoading) return <Spinner size="lg" />
+
+  if (!displayPools || pools?.length === 1) return null
 
   return (
-    <SegmentGroup.Root
-      value={displayPools.find((pool) => pool.value === selectedPoolId?.toString())?.label}
-      onValueChange={(details: { value: string | null }) => {
-        if (!details.value) return
-        const selectedPool = displayPools.find((pool) => pool.label === details.value)
-        if (selectedPool) {
-          setSelectedPoolId(new PoolId(selectedPool.value))
-        }
-      }}
-      bg="bg-tertiary"
-      borderRadius="10px"
-      size="sm"
-    >
-      <SegmentGroup.Indicator bg="text-inverted" />
-      <SegmentGroup.Items borderRadius="10px" border="none" items={displayPools?.map((pool) => pool.label)} />
-    </SegmentGroup.Root>
+    <>
+      {displayPools.map((pool) => (
+        <Link to={`${routePaths.poolPage}/${pool.id}`} onClick={pool.setId} key={pool.id}>
+          <Card>{pool.poolName}</Card>
+        </Link>
+      ))}
+    </>
   )
 }

@@ -16,7 +16,7 @@ import {
 } from '@centrifuge/shared'
 import { NetworkIcons } from '@centrifuge/ui'
 import { InfoWrapper } from '@components/InvestRedeemSection/components/InfoWrapper'
-import { useSelectedPoolContext } from '@contexts/useSelectedPoolContext'
+import { usePoolsContext } from '@contexts/usePoolsContext'
 import { infoText } from '@utils/infoText'
 
 interface RedeemAmountProps {
@@ -38,7 +38,7 @@ export function RedeemAmount({
 }: RedeemAmountProps) {
   const { data: vaultsDetails } = useVaultsDetails(vaults)
   const { data: portfolio } = usePortfolio()
-  const { selectedPoolId } = useSelectedPoolContext()
+  const { selectedPoolId } = usePoolsContext()
   const { data: pool } = usePoolDetails(selectedPoolId as PoolId)
   const { data: vaultDetails } = useVaultDetails(vault)
   const { switchChain } = useSwitchChain()
@@ -53,9 +53,7 @@ export function RedeemAmount({
   }))
 
   // Get the pricePerShare
-  const shareClass = pool?.shareClasses.find(
-    (sc) => sc.details.id.raw.toString() === vault?.shareClass.id.raw.toString()
-  )
+  const shareClass = pool?.shareClasses.find((sc) => sc.details.id.toString() === vault?.shareClass.id.toString())
   const pricePerShare = shareClass?.details.pricePerShare
 
   // Get info on the users shares holdings in their wallet
@@ -135,10 +133,8 @@ export function RedeemAmount({
         name="redeemAmount"
         decimals={shareClass?.details.pricePerShare.decimals}
         placeholder="0.00"
-        inputGroupProps={{
-          endAddon: shareCurrencySymbol,
-        }}
         onChange={debouncedCalculateReceiveAmount}
+        currency={shareCurrencySymbol}
       />
       <Flex mt={2} justify="space-between">
         <Flex>

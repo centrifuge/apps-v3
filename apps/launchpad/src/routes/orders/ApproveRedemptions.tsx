@@ -17,7 +17,8 @@ export default function ApproveRedemptions() {
   const { execute, isPending } = useCentrifugeTransaction()
   const { isLoading, shareClass } = usePoolProvider()
   const { data: pendingAmounts } = usePendingAmounts(shareClass?.shareClass!)
-  const groupedByChain = useGroupPendingAmountsByChain(pendingAmounts ?? [])
+  const filteredPendingRedeems = pendingAmounts?.filter((p) => p.pendingRedeem.toFloat() > 0)
+  const groupedByChain = useGroupPendingAmountsByChain(filteredPendingRedeems ?? [])
 
   const form = useForm({
     schema: SelectAssetsSchema,
@@ -83,7 +84,7 @@ export default function ApproveRedemptions() {
     <Container mt={8}>
       <Form form={form}>
         <Grid templateColumns="1fr 160px" gap={4} alignItems="center">
-          <Heading>Approve investments</Heading>
+          <Heading>Approve redemptions</Heading>
           <SubmitButton colorPalette="yellow" size="sm" disabled={isApproveDisabled} loading={isPending}>
             Save changes
           </SubmitButton>

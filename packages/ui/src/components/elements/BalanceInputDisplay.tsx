@@ -16,7 +16,7 @@ export const BalanceInputDisplay = (props: BalanceInputDisplayProps) => {
     <Field.Root required>
       <Field.Label>{label}</Field.Label>
       <InputGroup endElement={currency}>
-        <Input placeholder="0.00" value={formatUIBalance(balance, { precision: decimals })} disabled />
+        <Input placeholder="0.00" value={formatUIBalance(balance, { tokenDecimals: decimals })} disabled />
       </InputGroup>
     </Field.Root>
   )

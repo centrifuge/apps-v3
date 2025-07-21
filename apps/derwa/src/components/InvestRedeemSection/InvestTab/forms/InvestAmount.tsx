@@ -4,7 +4,7 @@ import { BalanceInput, useFormContext } from '@centrifuge/forms'
 import { Balance, PoolId, PoolNetwork, Vault } from '@centrifuge/sdk'
 import { usePortfolio, usePoolDetails, useVaultsDetails } from '@centrifuge/shared'
 import { NetworkIcons } from '@centrifuge/ui'
-import { useSelectedPoolContext } from '@contexts/useSelectedPoolContext'
+import { usePoolsContext } from '@contexts/usePoolsContext'
 import { infoText } from '@utils/infoText'
 import { InvestAction, type InvestActionType } from '@components/InvestRedeemSection/components/defaults'
 import { InfoWrapper } from '@components/InvestRedeemSection/components/InfoWrapper'
@@ -34,7 +34,7 @@ export function InvestAmount({
 }: InvestAmountProps) {
   const { data: vaultsDetails } = useVaultsDetails(vaults)
   const { data: portfolio } = usePortfolio()
-  const { selectedPoolId } = useSelectedPoolContext()
+  const { selectedPoolId } = usePoolsContext()
   const { data: pool } = usePoolDetails(selectedPoolId as PoolId)
   const { setValue } = useFormContext()
   const { switchChain } = useSwitchChain()
@@ -136,9 +136,7 @@ export function InvestAmount({
             displayDecimals={pricePerShare?.decimals}
             placeholder="0.00"
             disabled
-            inputGroupProps={{
-              endAddon: vaultDetails?.shareCurrency.symbol,
-            }}
+            currency={vaultDetails?.shareCurrency.symbol}
           />
         </>
       )}

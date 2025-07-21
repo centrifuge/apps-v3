@@ -9,7 +9,7 @@ export function useNavPerNetwork(shareClass: ShareClass) {
 }
 
 export function useHoldings(shareClass: ShareClass) {
-  const holdings$ = useMemo(() => shareClass.holdings(), [shareClass])
+  const holdings$ = useMemo(() => shareClass.balances(), [shareClass])
   return useObservable(holdings$)
 }
 
