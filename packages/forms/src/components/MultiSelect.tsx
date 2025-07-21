@@ -1,18 +1,18 @@
+import {
+  Select as ChakraSelect,
+  createListCollection,
+  Field,
+  Flex,
+  Group,
+  Portal,
+  SelectRootProps,
+  useSelectContext,
+} from '@chakra-ui/react'
+import { ReactNode, useState } from 'react'
 import type { FieldPath, FieldValues } from 'react-hook-form'
 import { useController, useFormContext } from 'react-hook-form'
-import {
-  createListCollection,
-  Select as ChakraSelect,
-  Field,
-  SelectRootProps,
-  Portal,
-  Group,
-  useSelectContext,
-  Flex,
-} from '@chakra-ui/react'
-import { useGetFormError } from '../hooks/useGetFormError'
-import { ReactNode, useState } from 'react'
 import { RiArrowDownSLine } from 'react-icons/ri'
+import { useGetFormError } from '../hooks/useGetFormError'
 import { Checkbox } from './Checkbox'
 
 export interface CustomMultiSelectProps<TFieldValues extends FieldValues = FieldValues>
@@ -98,8 +98,10 @@ const SelectItems = ({ items }: { items: { value: string; children?: ReactNode; 
           <ChakraSelect.Content>
             {items.map((item) => (
               <ChakraSelect.Item key={item.value} item={item}>
-                <Flex key={item.value} alignItems="flex-start" gap={2}>
-                  <Checkbox key={item.value} checked={selectedValues?.includes(item.value)} name={item.value} />
+                <Flex key={item.value} alignItems="center" gap={2}>
+                  <div>
+                    <Checkbox key={item.value} checked={selectedValues?.includes(item.value)} name={item.value} />
+                  </div>
                   <div style={{ flexGrow: 1 }}>{item.children ? item.children : item.label}</div>
                 </Flex>
               </ChakraSelect.Item>

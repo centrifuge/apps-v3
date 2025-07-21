@@ -1,7 +1,7 @@
+import { BalanceInput, Input, Select, useFormContext } from '@centrifuge/forms'
 import { Grid, Stack } from '@chakra-ui/react'
-import { Select, Input, useFormContext, BalanceInput } from '@centrifuge/forms'
-import { Control, useController } from 'react-hook-form'
 import { useEffect } from 'react'
+import { Control, useController } from 'react-hook-form'
 
 interface PoolStructureValues {
   poolType: string
@@ -84,7 +84,7 @@ export const TokenSection = ({
         </Stack>
 
         <Stack>
-          <Grid templateColumns="1fr 1fr" gap={4}>
+          <Grid templateColumns="1fr 1fr" gap={4} alignItems="start">
             <Select
               value={[apyField.value || '']}
               name={`tokens.${index}.apy`}
@@ -95,11 +95,11 @@ export const TokenSection = ({
 
             {apyField.value !== 'Automatic' && (
               <Input
+                label="&nbsp;"
                 value={[apyPercentageField.value || '']}
                 name={`tokens.${index}.apyPercentage`}
                 placeholder="Type here..."
                 style={{ background: '#F6F6F6' }}
-                mt={6}
               />
             )}
           </Grid>

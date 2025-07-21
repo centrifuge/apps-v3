@@ -1,6 +1,6 @@
+import { type CheckboxRootProps, Checkbox as ChakraCheckbox, Field } from '@chakra-ui/react'
 import type { FieldPath, FieldValues } from 'react-hook-form'
 import { useController, useFormContext } from 'react-hook-form'
-import { type CheckboxRootProps, Checkbox as ChakraCheckbox, Field } from '@chakra-ui/react'
 import { useGetFormError } from '../hooks/useGetFormError'
 
 export interface InputProps<TFieldValues extends FieldValues = FieldValues>
@@ -51,7 +51,7 @@ export function Checkbox<TFieldValues extends FieldValues = FieldValues>(props: 
       >
         <ChakraCheckbox.HiddenInput />
         <ChakraCheckbox.Control />
-        <ChakraCheckbox.Label>{label}</ChakraCheckbox.Label>
+        {label && <ChakraCheckbox.Label>{label}</ChakraCheckbox.Label>}
       </ChakraCheckbox.Root>
       <Field.ErrorText>{errorMessage}</Field.ErrorText>
     </Field.Root>
