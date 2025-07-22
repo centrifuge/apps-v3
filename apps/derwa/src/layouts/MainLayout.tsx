@@ -14,7 +14,9 @@ const MainLayout = memo(() => {
           </Box>
           <WalletButton />
         </Box>
-
+        <Box mb={4}>
+          <hr />
+        </Box>
         <ErrorBoundary>
           <Outlet />
         </ErrorBoundary>

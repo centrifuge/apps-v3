@@ -3,21 +3,85 @@ import { IoArrowBack } from 'react-icons/io5'
 import { Box, Flex, Grid, Heading, Text } from '@chakra-ui/react'
 import { PoolId } from '@centrifuge/sdk'
 import { usePoolDetails } from '@centrifuge/shared'
-import { FAQSection } from '@components/FAQSection'
-import { InvestRedeemSection } from '@components/InvestRedeemSection'
-import { PoolPerformanceChart } from '@components/PoolPerformanceChart'
-import { UnderlyingCollateralSection } from '@components/UnderlyingCollateralSection'
+import { Tabs } from '@components/Tabs'
 import { LandingPageSkeleton } from '@components/Skeletons/LandingPageSkeleton'
 import { usePoolsContext } from '@contexts/usePoolsContext'
 import { routePaths } from '@routes/routePaths'
+import { BalanceInput, Form, useForm } from '@centrifuge/forms'
+import { Button, LogoCentrifugeText, NetworkIcon } from '@centrifuge/ui'
+import { DataTable, ColumnDefinition } from '@centrifuge/ui'
+
+type Row = {
+  id: string
+  cusip: string
+  isin: string
+  marketValue: string
+  tradeQuantity: string
+  maturityDate: string
+  portfolioPercentage: string
+}
 
 export default function PoolPage() {
   const { selectedPoolId, isLoading: isPoolsLoading } = usePoolsContext()
   const { data: pool, isLoading: isPoolDetailsLoading } = usePoolDetails(selectedPoolId as PoolId)
+  const form = useForm({
+    mode: 'onChange',
+    onSubmit: (values) => {
+      console.log(values)
+    },
+  })
 
   if (isPoolsLoading || isPoolDetailsLoading) {
     return <LandingPageSkeleton />
   }
+
+  const holdings = [
+    {
+      id: '912797PE1',
+      cusip: '912797PE1',
+      isin: 'US912797PE18',
+      marketValue: '13,918,329.60 USD',
+      tradeQuantity: '13,920,000.00',
+      maturityDate: 'Oct 15, 2025',
+      portfolioPercentage: '2.1%',
+    },
+    {
+      id: '912797PE2',
+      cusip: '912797PE2',
+      isin: 'US912797PE19',
+      marketValue: '13,918,329.60 USD',
+      tradeQuantity: '13,920,000.00',
+      maturityDate: 'Oct 15, 2025',
+      portfolioPercentage: '2.1%',
+    },
+  ]
+
+  const columns: ColumnDefinition<Row>[] = [
+    {
+      header: 'CUSIP',
+      accessor: 'cusip',
+    },
+    {
+      header: 'ISIN',
+      accessor: 'isin',
+    },
+    {
+      header: 'Market Value (Position...)',
+      accessor: 'marketValue',
+    },
+    {
+      header: 'Trade Date Quantity',
+      accessor: 'tradeQuantity',
+    },
+    {
+      header: 'Maturity Date',
+      accessor: 'maturityDate',
+    },
+    {
+      header: 'Portfolio %',
+      accessor: 'portfolioPercentage',
+    },
+  ]
 
   return (
     <>
@@ -30,24 +94,441 @@ export default function PoolPage() {
             </Heading>
           </Flex>
         </Link>
-        <Box>
-          <Heading size="xl" color="black" width="auto" textAlign="center">
-            Current Holdings
-          </Heading>
-          <Text>$237,890</Text>
+        <Box mt={4}>
+          <Text fontSize="12px" color="black" width="auto" textAlign="right">
+            Your current holdings in {pool?.metadata?.pool.name}
+          </Text>
+          <Flex align={'flex-end'} justifyContent="flex-end">
+            <Text fontSize="24px" fontWeight="bold" textAlign="right">
+              145,984.87&nbsp;
+            </Text>
+            <Text fontSize="24px" textAlign="right">
+              USD
+            </Text>
+          </Flex>
         </Box>
       </Flex>
       <Box marginTop={8}>
-        <Grid templateColumns={{ base: '1fr', sm: '1fr', md: '1fr', lg: '6fr 4fr' }} gap={10} alignItems="stretch">
-          <PoolPerformanceChart pool={pool} />
-          <InvestRedeemSection pool={pool} />
+        <Grid templateColumns={{ base: '1fr', sm: '1fr', md: '1fr', lg: '6fr 4fr' }} gap={10}>
+          <Box minW={0}>
+            <Box
+              bg="bg-primary"
+              padding={6}
+              borderRadius={10}
+              border="1px solid"
+              borderColor="border-primary"
+              shadow="xs"
+            >
+              <Flex justifyContent="space-around" alignItems="center">
+                <Box>
+                  <Text fontSize="12px" color="black" width="auto" textAlign="left">
+                    TVL (USD)
+                  </Text>
+                  <Text fontSize="24px" fontWeight="bold" textAlign="left">
+                    448,663,319
+                  </Text>
+                </Box>
+                <Box pl={6} borderLeft="1px solid" borderColor={'#E7E7E7'}>
+                  <Text fontSize="12px" color="black" width="auto" textAlign="left">
+                    Token price (USD)
+                  </Text>
+                  <Text fontSize="24px" fontWeight="bold" textAlign="left">
+                    12,194.91
+                  </Text>
+                </Box>
+                <Box pl={6} borderLeft="1px solid" borderColor={'#E7E7E7'}>
+                  <Text fontSize="12px" color="black" width="auto" textAlign="left">
+                    APY
+                  </Text>
+                  <Text fontSize="24px" fontWeight="bold" textAlign="left">
+                    2.54%
+                  </Text>
+                </Box>
+              </Flex>
+            </Box>
+
+            <Heading size="lg" mt={8} mb={4}>
+              Overview
+            </Heading>
+
+            <Box
+              bg="bg-primary"
+              width="100%"
+              padding={6}
+              borderRadius={10}
+              border="1px solid"
+              borderColor="border-primary"
+              shadow="xs"
+            >
+              <Flex justifyContent="space-between" alignItems="center">
+                <Text fontWeight={500} fontSize="14px" lineHeight="100%" color="#91969B">
+                  Asset type
+                </Text>
+                <Text fontWeight={600} fontSize="14px" lineHeight="100%" color="#252B34">
+                  Digital assets
+                </Text>
+              </Flex>
+              <Flex justifyContent="space-between" alignItems="center" mt={4}>
+                <Text fontWeight={500} fontSize="14px" lineHeight="100%" color="#91969B">
+                  90-Day APY
+                </Text>
+                <Text fontWeight={600} fontSize="14px" lineHeight="100%" color="#252B34">
+                  5.5%
+                </Text>
+              </Flex>
+              <Flex justifyContent="space-between" alignItems="center" mt={4}>
+                <Text fontWeight={500} fontSize="14px" lineHeight="100%" color="#91969B">
+                  Average asset maturity
+                </Text>
+                <Text fontWeight={600} fontSize="14px" lineHeight="100%" color="#252B34">
+                  45 Days
+                </Text>
+              </Flex>
+              <Flex justifyContent="space-between" alignItems="center" mt={4}>
+                <Text fontWeight={500} fontSize="14px" lineHeight="100%" color="#91969B">
+                  Min. investment
+                </Text>
+                <Text fontWeight={600} fontSize="14px" lineHeight="100%" color="#252B34">
+                  $20k - $500k
+                </Text>
+              </Flex>
+              <Flex justifyContent="space-between" alignItems="center" mt={4}>
+                <Text fontWeight={500} fontSize="14px" lineHeight="100%" color="#91969B">
+                  Investor type
+                </Text>
+                <Text fontWeight={600} fontSize="14px" lineHeight="100%" color="#252B34">
+                  Non-US Professional
+                </Text>
+              </Flex>
+              <Flex justifyContent="space-between" alignItems="center" mt={4}>
+                <Text fontWeight={500} fontSize="14px" lineHeight="100%" color="#91969B">
+                  Available networks
+                </Text>
+                <Flex>
+                  <NetworkIcon networkId={1} />
+                  <NetworkIcon networkId={42161} />
+                  <NetworkIcon networkId={42220} />
+                  <NetworkIcon networkId={8453} />
+                </Flex>
+              </Flex>
+              <Flex justifyContent="space-between" alignItems="center" mt={4}>
+                <Text fontWeight={500} fontSize="14px" lineHeight="100%" color="#91969B">
+                  Pool structure
+                </Text>
+                <Text fontWeight={600} fontSize="14px" lineHeight="100%" color="#252B34">
+                  Revolving
+                </Text>
+              </Flex>
+              <Flex justifyContent="space-between" alignItems="center" mt={4}>
+                <Text fontWeight={500} fontSize="14px" lineHeight="100%" color="#91969B">
+                  Rating
+                </Text>
+                <Text fontWeight={600} fontSize="14px" lineHeight="100%" color="#252B34"></Text>
+              </Flex>
+              <Flex justifyContent="space-between" alignItems="center" mt={4}>
+                <Text fontWeight={500} fontSize="14px" lineHeight="100%" color="#91969B">
+                  Expense ratio
+                </Text>
+                <Text fontWeight={600} fontSize="14px" lineHeight="100%" color="#252B34">
+                  1%
+                </Text>
+              </Flex>
+            </Box>
+
+            <Heading size="lg" mt={8} mb={4}>
+              Key facts
+            </Heading>
+
+            <Box
+              bg="bg-primary"
+              width="100%"
+              padding={6}
+              borderRadius={10}
+              border="1px solid"
+              borderColor="border-primary"
+              shadow="xs"
+              maxW="container.md"
+              overflow={'hidden'}
+            >
+              <Flex justifyContent="space-between" gap={4} alignItems="center">
+                <Box width={20} display={{ base: 'none', md: 'block' }}>
+                  <LogoCentrifugeText fill="text-primary" />
+                </Box>
+
+                <Flex justifyContent="space-between" alignItems="center" gap={2}>
+                  <Button
+                    label="Website"
+                    color="#91969B"
+                    border="1px solid #91969B"
+                    background="transparent"
+                    borderRadius="300px"
+                    height="32px"
+                    fontSize="14px"
+                    display={{ base: 'none', md: 'block' }}
+                  />
+                  <Button
+                    label="Forum"
+                    color="#91969B"
+                    border="1px solid #91969B"
+                    background="transparent"
+                    borderRadius="300px"
+                    height="32px"
+                    fontSize="14px"
+                    display={{ base: 'none', md: 'block' }}
+                  />
+                  <Button
+                    label="Email"
+                    color="#91969B"
+                    border="1px solid #91969B"
+                    background="transparent"
+                    borderRadius="300px"
+                    height="32px"
+                    fontSize="14px"
+                    display={{ base: 'none', md: 'block' }}
+                  />
+                  <Button
+                    label="Executive summary"
+                    color="#91969B"
+                    border="1px solid #91969B"
+                    background="transparent"
+                    borderRadius="300px"
+                    height="32px"
+                    fontSize="14px"
+                    display={{ base: 'none', md: 'block' }}
+                  />
+                </Flex>
+              </Flex>
+
+              <Flex justifyContent="space-between" alignItems="center" mt={2} wrap="wrap">
+                <Box flex={{ base: 1, md: 1, lg: 1 }}>
+                  <Heading
+                    fontWeight="600"
+                    lineHeight={'125%'}
+                    size="xl"
+                    position="relative"
+                    _after={{
+                      content: '" "',
+                      position: 'absolute',
+                      bottom: 0,
+                      left: 0,
+                      width: '54px',
+                      height: '2px',
+                      bg: '#FFC012',
+                    }}
+                  >
+                    Anemoy Capital SPC Limited
+                  </Heading>
+                  <Text fontSize="14px" color="#91969B" mt={8} fontWeight={400} lineHeight={'160%'}>
+                    Anemoy Liquid Treasury Fund 1 is a fully onchain, actively managed US Treasury Yield Fund. It is
+                    BVI-licensed and open to non-US Professional Investors. The fund balances monthly, offers daily
+                    redemptions, holds US T-Bills with a maximum maturity of 6-months, and focuses on maximizing
+                    interest rates and minimizing price and duration risks.
+                  </Text>
+                </Box>
+                <Box bg="bg-primary" padding={6} shadow="xs" boxShadow="none" flex={{ base: 1, md: 1, lg: 1 }}>
+                  <Flex justifyContent="space-between" alignItems="center">
+                    <Text fontWeight={500} fontSize="14px" lineHeight="100%" color="#91969B">
+                      Historical default rate
+                    </Text>
+                    <Text fontWeight={600} fontSize="14px" lineHeight="100%" color="#252B34">
+                      1.2%
+                    </Text>
+                  </Flex>
+                  <Flex justifyContent="space-between" alignItems="center" mt={4}>
+                    <Text fontWeight={500} fontSize="14px" lineHeight="100%" color="#91969B">
+                      Fund admin
+                    </Text>
+                    <Text fontWeight={600} fontSize="14px" lineHeight="100%" color="#252B34">
+                      Galaxy
+                    </Text>
+                  </Flex>
+                  <Flex justifyContent="space-between" alignItems="center" mt={4}>
+                    <Text fontWeight={500} fontSize="14px" lineHeight="100%" color="#91969B">
+                      Trustee
+                    </Text>
+                    <Text fontWeight={600} fontSize="14px" lineHeight="100%" color="#252B34">
+                      UMB Bank, N.A.
+                    </Text>
+                  </Flex>
+                  <Flex justifyContent="space-between" alignItems="center" mt={4}>
+                    <Text fontWeight={500} fontSize="14px" lineHeight="100%" color="#91969B">
+                      Pricing oracle provider
+                    </Text>
+                    <Text fontWeight={600} fontSize="14px" lineHeight="100%" color="#252B34">
+                      Anemoy
+                    </Text>
+                  </Flex>
+                  <Flex justifyContent="space-between" alignItems="center" mt={4}>
+                    <Text fontWeight={500} fontSize="14px" lineHeight="100%" color="#91969B">
+                      Auditor
+                    </Text>
+                    <Text fontWeight={600} fontSize="14px" lineHeight="100%" color="#252B34">
+                      Ernst & Young LLP
+                    </Text>
+                  </Flex>
+                  <Flex justifyContent="space-between" alignItems="center" mt={4}>
+                    <Text fontWeight={500} fontSize="14px" lineHeight="100%" color="#91969B">
+                      Custodian
+                    </Text>
+                    <Text fontWeight={600} fontSize="14px" lineHeight="100%" color="#252B34">
+                      Galaxy
+                    </Text>
+                  </Flex>
+                  <Flex justifyContent="space-between" alignItems="center" mt={4}>
+                    <Text fontWeight={500} fontSize="14px" lineHeight="100%" color="#91969B">
+                      Investment manager
+                    </Text>
+                    <Text fontWeight={600} fontSize="14px" lineHeight="100%" color="#252B34">
+                      UMB Bank, N.A.
+                    </Text>
+                  </Flex>
+                  <Flex justifyContent="space-between" alignItems="center" mt={4}>
+                    <Text fontWeight={500} fontSize="14px" lineHeight="100%" color="#91969B">
+                      Sub-advisor
+                    </Text>
+                    <Text fontWeight={600} fontSize="14px" lineHeight="100%" color="#252B34">
+                      Anemoy
+                    </Text>
+                  </Flex>
+                  <Flex justifyContent="space-between" alignItems="center" mt={4}>
+                    <Text fontWeight={500} fontSize="14px" lineHeight="100%" color="#91969B">
+                      Pool analysis
+                    </Text>
+                    <Text fontWeight={600} fontSize="14px" lineHeight="100%" color="#252B34">
+                      Universal Co.
+                    </Text>
+                  </Flex>
+                </Box>
+              </Flex>
+            </Box>
+
+            <Heading size="lg" mt={8} mb={4}>
+              Holdings
+            </Heading>
+
+            <DataTable columns={columns} data={holdings as Row[]} size="sm" />
+          </Box>
+
+          <Box maxHeight={'350px'}>
+            <Flex
+              direction="column"
+              border="1px solid"
+              borderColor="border-primary"
+              borderRadius="10px"
+              shadow="xs"
+              bg="white"
+              h="100%"
+              overflow="hidden"
+            >
+              <Tabs
+                elements={[
+                  {
+                    label: 'Invest',
+                    value: 'tab-invest',
+                    body: (
+                      <Form form={form} style={{ height: '100%' }}>
+                        <BalanceInput
+                          label="You pay"
+                          subLabel="(Min: 1 USDC)"
+                          name="investAmount"
+                          bg="bg-secondary"
+                          placeholder="0"
+                          decimals={6}
+                          currency={
+                            <Flex bg="white" borderRadius="md" px={2} py={1} alignItems="center">
+                              <Text>USDC</Text>&nbsp;
+                              <NetworkIcon networkId={1} />
+                            </Flex>
+                          }
+                        />
+                        <Flex justify="space-between" mt={2} mb={4}>
+                          <Text
+                            color="#424242"
+                            bg="bg-secondary"
+                            borderRadius={'100px'}
+                            width="55px"
+                            height="24px"
+                            textAlign="center"
+                            fontSize="14px"
+                            fontWeight={400}
+                          >
+                            MAX
+                          </Text>
+                          <Text fontSize="14px" color="#424242" fontWeight={400} lineHeight={'20px'}>
+                            10,250.93 USDC available
+                          </Text>
+                          <Flex>
+                            <NetworkIcon networkId={1} />
+                            <NetworkIcon networkId={42161} />
+                            <NetworkIcon networkId={42220} />
+                            <NetworkIcon networkId={8453} />
+                          </Flex>
+                        </Flex>
+                        <BalanceInput
+                          label="You receive"
+                          name="investAmount"
+                          bg="bg-secondary"
+                          placeholder="0"
+                          decimals={6}
+                          currency="deJTRSY"
+                        />
+                        <Button label="Invest" type="submit" width="100%" mt={4} />
+                      </Form>
+                    ),
+                  },
+                  {
+                    label: 'Redeem',
+                    value: 'tab-redeem',
+                    body: (
+                      <Form form={form} style={{ height: '100%' }}>
+                        <BalanceInput
+                          label="Redeem"
+                          name="investAmount"
+                          bg="bg-secondary"
+                          placeholder="0"
+                          decimals={6}
+                          currency="deJTRSY"
+                        />
+                        <Flex justify="flex-start" mt={2} mb={4}>
+                          <Text
+                            color="#424242"
+                            bg="bg-secondary"
+                            borderRadius={'100px'}
+                            width="55px"
+                            height="24px"
+                            textAlign="center"
+                            fontSize="14px"
+                            lineHeight={'20px'}
+                            fontWeight={400}
+                          >
+                            MAX
+                          </Text>
+                          <Text fontSize="14px" color="#424242" fontWeight={400} lineHeight={'20px'}>
+                            10,250.93 USDC available
+                          </Text>
+                        </Flex>
+                        <BalanceInput
+                          label="Estimated receive amount"
+                          name="investAmount"
+                          bg="bg-secondary"
+                          placeholder="0"
+                          decimals={6}
+                          currency={
+                            <Flex bg="white" borderRadius="md" px={2} py={1} alignItems="center">
+                              <Text>USDC</Text>&nbsp;
+                              <NetworkIcon networkId={1} />
+                            </Flex>
+                          }
+                        />
+                        <Button label="Redeeem" type="submit" width="100%" mt={4} />
+                      </Form>
+                    ),
+                  },
+                ]}
+              />
+            </Flex>
+          </Box>
         </Grid>
-        <Box mt={8}>
-          <UnderlyingCollateralSection />
-        </Box>
-        <Box mt={8}>
-          <FAQSection />
-        </Box>
       </Box>
     </>
   )

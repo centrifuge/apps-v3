@@ -26,7 +26,7 @@ import Decimal from 'decimal.js-light'
 const inputSizes = ['sm', 'md', 'lg', 'xl', '2xl', '2xs', 'xs'] as const
 export interface BalanceInputProps<TFieldValues extends FieldValues = FieldValues>
   extends Omit<ChakraInputProps, 'onChange' | 'onBlur' | 'disabled' | 'value'> {
-  currency?: string
+  currency?: string | ReactNode
   name: FieldPath<TFieldValues>
   label?: string
   rules?: object
