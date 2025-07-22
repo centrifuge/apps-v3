@@ -36,7 +36,13 @@ type SelectedVaultState = {
   holding: any
 }
 
-const VaultsCards = ({ shareClass, networks }: { shareClass: ShareClassWithDetails; networks: PoolNetwork[] }) => {
+const VaultsCards = ({
+  shareClass,
+  networks,
+}: {
+  shareClass: ShareClassWithDetails
+  networks: PoolNetwork[] | undefined
+}) => {
   const { execute } = useCentrifugeTransaction()
 
   const [modal, setModal] = useState<'add' | 'update' | null>(null)
