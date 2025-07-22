@@ -53,7 +53,7 @@ function PoolCard({ poolDetails }: { poolDetails: PoolDetails }) {
   const shareClassDetails = poolDetails.metadata?.shareClasses[shareClassId] ?? {}
 
   return (
-    <Card>
+    <Card height="100%">
       <Flex alignItems="center" justifyContent="space-between">
         <Text fontSize="sm">{poolMetadata?.name}</Text>
         <Image src={ipfsToHttp(iconUri ?? '')} alt={poolMetadata?.name} height="36px" width="36px" />
