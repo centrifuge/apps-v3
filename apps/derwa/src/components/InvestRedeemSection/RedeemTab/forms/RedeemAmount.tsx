@@ -40,7 +40,7 @@ export function RedeemAmount({
   const { data: portfolio } = usePortfolio()
   const { selectedPoolId } = usePoolsContext()
   const { data: pool } = usePoolDetails(selectedPoolId as PoolId)
-  const { data: vaultDetails } = useVaultDetails(vault)
+  const { data: vaultDetails } = useVaultDetails(vault ?? null)
   const { switchChain } = useSwitchChain()
   const { setValue } = useFormContext()
   const { data: investment } = useInvestment(vault)
