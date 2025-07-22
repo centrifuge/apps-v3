@@ -5,9 +5,9 @@ import { PoolId } from '@centrifuge/sdk'
 import { usePoolDetails } from '@centrifuge/shared'
 import { FAQSection } from '@components/FAQSection'
 import { InvestRedeemSection } from '@components/InvestRedeemSection'
-import { PoolPerformanceChart } from '@components/PoolPerformanceChart'
+import { PoolPerformanceChart } from '@components/pools/PoolPerformanceChart'
 import { UnderlyingCollateralSection } from '@components/UnderlyingCollateralSection'
-import { LandingPageSkeleton } from '@components/Skeletons/LandingPageSkeleton'
+import { PoolPageSkeleton } from '@components/Skeletons/PoolPageSkeleton'
 import { usePoolsContext } from '@contexts/usePoolsContext'
 import { routePaths } from '@routes/routePaths'
 
@@ -16,7 +16,7 @@ export default function PoolPage() {
   const { data: pool, isLoading: isPoolDetailsLoading } = usePoolDetails(selectedPoolId as PoolId)
 
   if (isPoolsLoading || isPoolDetailsLoading) {
-    return <LandingPageSkeleton />
+    return <PoolPageSkeleton />
   }
 
   return (
