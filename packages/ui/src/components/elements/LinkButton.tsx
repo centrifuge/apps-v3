@@ -6,7 +6,7 @@ type ChakraLinkButtonProps = ButtonProps & Omit<LinkProps, 'children'>
 
 export const LinkButton = forwardRef<HTMLButtonElement, ChakraLinkButtonProps>(({ children, ...props }, ref) => {
   return (
-    <Button as={Link} ref={ref} {...props}>
+    <Button as={Link} type="button" ref={ref} {...props}>
       {children}
     </Button>
   )
