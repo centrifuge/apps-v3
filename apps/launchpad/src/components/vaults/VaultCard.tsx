@@ -1,8 +1,10 @@
 import { Balance, HexString, Vault } from '@centrifuge/sdk'
 import { formatUIBalance, networkToName, truncateAddress } from '@centrifuge/shared'
-import { AssetIcon, AssetIconText, Button, Card, IconCopy, NetworkIcon } from '@centrifuge/ui'
+import { AssetIconText, Button, Card, NetworkIcon } from '@centrifuge/ui'
 import CopyToClipboard from '@centrifuge/ui/src/components/elements/CopyToClipboard'
+import Modal from '@centrifuge/ui/src/components/elements/Modal'
 import { Flex, Grid, Heading, Separator, Stack, Text } from '@chakra-ui/react'
+import { useState } from 'react'
 
 const GridSystem = ({
   label,
@@ -45,6 +47,7 @@ export default function VaultCard({
   // TODO: fix this type
   holdingsByChain: Record<number, any[]>
 }) {
+  const [isModalOpen, setIsModalOpen] = useState(false)
   const holdings = holdingsByChain[vault.chainId]
 
   if (!holdings) return null
@@ -56,7 +59,7 @@ export default function VaultCard({
           <NetworkIcon networkId={vault.chainId} />
           <Heading size="md">{networkToName(vault.chainId)}</Heading>
         </Flex>
-        <Button label="Add vault" colorPalette="yellow" size="sm" />
+        <Button label="Add vault" colorPalette="yellow" size="sm" onClick={() => setIsModalOpen(true)} />
       </Flex>
       <Grid gridTemplateColumns="1fr 1fr 1fr" gap={2}>
         {holdings?.map((holding) => (
@@ -69,6 +72,9 @@ export default function VaultCard({
           </Card>
         ))}
       </Grid>
+      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Add vault">
+        <Text>Add vault</Text>
+      </Modal>
     </Stack>
   )
 }

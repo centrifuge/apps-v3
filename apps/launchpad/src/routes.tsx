@@ -14,7 +14,6 @@ import HeaderLayout from '@layouts/HeaderLayout'
 import AddHolding from '@routes/holdings/AddHolding'
 import DepositHolding from '@routes/holdings/DepositHolding'
 import WithdrawHolding from '@routes/holdings/WithdrawHolding'
-import UpdateHolding from '@routes/holdings/UpdateHolding'
 import Vaults from '@routes/Vaults'
 
 export const routes = createBrowserRouter([
