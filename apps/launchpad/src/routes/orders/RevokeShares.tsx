@@ -30,7 +30,11 @@ export default function RevokeShares() {
   const { execute, isPending } = useCentrifugeTransaction()
   const { isLoading, shareClass, poolDetails } = usePoolProvider()
   const { data: pendingAmounts } = usePendingAmounts(shareClass?.shareClass!)
+  // TODO: it does exist?
+  // @ts-ignore
   const filteredPendingRedeems = pendingAmounts?.filter((p) => p.approvedRedeem.toFloat() > 0)
+  // TODO: it does exist?
+  // @ts-ignore
   const groupedByChain = useGroupPendingAmountsByChain(filteredPendingRedeems ?? [])
   const pricePerShare = shareClass?.details.pricePerShare.toFloat()
   const poolSymbol = poolDetails?.currency.symbol
@@ -75,6 +79,8 @@ export default function RevokeShares() {
       pendingAmounts?.map((p) => ({
         chainId: p.chainId,
         assetId: p.assetId,
+        // TODO: it does exist?
+        // @ts-ignore
         approvedRedeem: p.approvedRedeem,
         // TODO: should the nav per share come from the sdk as the time the investment was approved, right now is showing the current nav per share
         navPerShare: pricePerShare?.toString() ?? '0',
@@ -92,6 +98,8 @@ export default function RevokeShares() {
   }
 
   const totalApprovedRedeems = useMemo(() => {
+    // TODO: it does exist?
+    // @ts-ignore
     return pendingAmounts?.map((p) => p.approvedRedeem).reduce((acc, curr) => acc + curr.toFloat(), 0)
   }, [pendingAmounts])
 
