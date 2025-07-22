@@ -72,7 +72,8 @@ export default function PoolStructure() {
   const tokens = useMemo(
     () =>
       poolDetails?.shareClasses.map((token) => {
-        const details = poolDetails?.metadata?.shareClasses[token.details.id.toString()]
+        const tokenId = token.details.id.toString()
+        const details = poolDetails?.metadata?.shareClasses[tokenId]
 
         return {
           tokenName: token.details.name,
@@ -114,6 +115,7 @@ export default function PoolStructure() {
               })
           )
           .optional(),
+        currency: z.string().optional(),
       })
     ),
   })
@@ -158,7 +160,7 @@ export default function PoolStructure() {
       poolDenomination: poolCurrency,
       tokens,
     })
-  }, [poolDetails])
+  }, [poolDetails, poolCurrency, reset, tokens])
 
   const appendToken = (append: UseFieldArrayAppend<PoolStructureValues>) => {
     append({
@@ -218,7 +220,7 @@ export default function PoolStructure() {
           </Text>
           {fields.map((field, index) => {
             return (
-              <Card key={index} mt={4}>
+              <Card key={field.id} mt={4}>
                 <TokenSection key={index} index={index} apy={apy} control={control} currency={field.currency} />
                 {fields.length - 1 === index && (
                   <Grid templateColumns="1fr 4fr" gap={4} mt={4}>

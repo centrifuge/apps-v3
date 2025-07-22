@@ -11,7 +11,6 @@ interface PoolStructureValues {
     apyPercentage?: unknown
     tokenName?: string
     apy?: string
-    currency?: string
   }[]
   poolDenomination?: string
 }
