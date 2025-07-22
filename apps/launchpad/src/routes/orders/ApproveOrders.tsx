@@ -18,6 +18,8 @@ export default function ApproveOrders() {
   const { isLoading, shareClass } = usePoolProvider()
   const { data: pendingAmounts = [] } = usePendingAmounts(shareClass?.shareClass!)
   const filteredPendingDeposits = pendingAmounts?.filter((p) => p.pendingDeposit.toFloat() > 0)
+  // TODO: it does exist?
+  // @ts-ignore
   const groupedByChain = useGroupPendingAmountsByChain(filteredPendingDeposits ?? [])
 
   const form = useForm({

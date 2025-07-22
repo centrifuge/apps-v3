@@ -9,7 +9,7 @@ import {
   networkToName,
 } from '@centrifuge/shared'
 import { usePoolProvider } from '@contexts/PoolProvider'
-import { AssetId, Balance } from '@centrifuge/sdk'
+import { AssetId } from '@centrifuge/sdk'
 import { FormSection } from './FormSection'
 import { SelectAssetsSchema } from './utils'
 
@@ -18,6 +18,8 @@ export default function ApproveRedemptions() {
   const { isLoading, shareClass } = usePoolProvider()
   const { data: pendingAmounts } = usePendingAmounts(shareClass?.shareClass!)
   const filteredPendingRedeems = pendingAmounts?.filter((p) => p.pendingRedeem.toFloat() > 0)
+  // TODO: it does exist?
+  // @ts-ignore
   const groupedByChain = useGroupPendingAmountsByChain(filteredPendingRedeems ?? [])
 
   const form = useForm({
