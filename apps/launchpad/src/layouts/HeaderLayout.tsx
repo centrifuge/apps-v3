@@ -55,10 +55,6 @@ const getHoldingsTabs = (poolId: string, holdingId?: string) => [
     path: `/holdings/${poolId}/withdraw/${holdingId}`,
   },
   {
-    label: 'Update',
-    path: `/holdings/${poolId}/update/${holdingId}`,
-  },
-  {
     label: 'Add',
     path: `/holdings/${poolId}/add`,
   },

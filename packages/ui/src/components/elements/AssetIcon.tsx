@@ -9,7 +9,7 @@ interface AssetIconProps extends Omit<ImageProps, 'src'> {
   alt?: string
 }
 
-type AssetSymbol = 'USDC' | 'USDT' | 'WBTC'
+export type AssetSymbol = 'USDC' | 'USDT' | 'WBTC'
 
 export const AssetIcon: React.FC<AssetIconProps> = ({ assetSymbol = 'USDC', boxSize = '24px', alt, ...rest }) => {
   const iconMaps: Record<AssetSymbol, string> = {

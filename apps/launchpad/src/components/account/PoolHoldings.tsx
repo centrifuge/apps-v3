@@ -127,20 +127,6 @@ export function PoolHoldings({ shareClass, poolDecimals }: { shareClass: ShareCl
                 />
               ),
             },
-            {
-              label: 'update',
-              element: (
-                <Button
-                  label="Update"
-                  onClick={() => navigate(`/holdings/${poolId}/update/${holding.assetId}`)}
-                  variant="plain"
-                  width="100%"
-                  height="100%"
-                  _hover={{ bg: 'transparent', boxShadow: 'none' }}
-                  size="sm"
-                />
-              ),
-            },
           ]}
         />
       )

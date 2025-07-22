@@ -11,7 +11,7 @@ interface ModalProps {
   isPrimaryActionLoading?: boolean
 }
 
-const Modal = ({
+export const Modal = ({
   isOpen,
   onClose,
   title,
@@ -93,5 +93,3 @@ const Modal = ({
     </Portal>
   )
 }
-
-export default Modal
