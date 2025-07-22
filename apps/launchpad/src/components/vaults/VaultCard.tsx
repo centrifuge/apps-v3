@@ -30,7 +30,7 @@ export const VaultCard = ({ values }: { values: Value[] }) => {
         {value.label}
       </Text>
       <Flex alignItems="center" justifyContent="flex-end" marginRight={value.type === 'address' ? '-12px' : '0'}>
-        {value.children ? value.children : <Text>{structuredValue(value.value, value.type)}</Text>}
+        {value.children ? value.children : <Text fontSize="sm">{structuredValue(value.value, value.type)}</Text>}
         {value.type === 'address' && <CopyToClipboard value={value.value as string} />}
       </Flex>
     </Grid>

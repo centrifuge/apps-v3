@@ -48,7 +48,7 @@ const VaultsCards = ({ shareClass }: { shareClass: ShareClassWithDetails }) => {
         value: '',
         children: (
           <Box alignSelf="flex-end">
-            <Checkbox name="enabled" label="Enabled" />
+            <Checkbox name="enabled" label="Enabled" checked={true} />
           </Box>
         ),
       },
@@ -61,7 +61,7 @@ const VaultsCards = ({ shareClass }: { shareClass: ShareClassWithDetails }) => {
       },
       {
         label: 'Type',
-        value: 'Async',
+        value: selectedVault?.vaultDetails?.isSyncInvest ? 'Sync-Invest-ERC-7540' : 'ERC-7540',
       },
       {
         label: 'Network',

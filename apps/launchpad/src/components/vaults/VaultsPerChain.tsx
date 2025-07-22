@@ -40,11 +40,11 @@ export const VaultsPerChain = ({
             },
             {
               label: 'Type',
-              value: 'TBD',
+              value: vaultDetails?.isSyncInvest ? 'Sync-Invest-ERC-7540' : 'ERC-7540',
             },
             {
               label: 'Deposits',
-              value: 'USD',
+              value: vaultDetails?.investmentCurrency.symbol ?? '-',
             },
           ]
           return (
