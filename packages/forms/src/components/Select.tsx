@@ -47,6 +47,7 @@ export function Select<TFieldValues extends FieldValues = FieldValues>(props: Cu
           onValueChange={handleValueChange}
           value={field.value ? [field.value] : []}
           positioning={{ strategy: 'absolute', sameWidth: true, placement: 'top' }}
+          backgroundColor="white"
           {...rest}
         >
           <ChakraSelect.HiddenSelect />
