@@ -44,9 +44,13 @@ export function Orders({
   }, [pendingAmounts, isInvestment])
 
   const approvedAmount = useMemo(() => {
-    return pendingAmounts
-      ?.map((p) => (isInvestment ? p.approvedDeposit : p.approvedRedeem))
-      .reduce((acc, curr) => acc + curr.toFloat(), 0)
+    return (
+      pendingAmounts
+        // TODO: it does exist?
+        // @ts-ignore
+        ?.map((p) => (isInvestment ? p.approvedDeposit : p.approvedRedeem))
+        .reduce((acc, curr) => acc + curr.toFloat(), 0)
+    )
   }, [pendingAmounts, isInvestment])
 
   return (
