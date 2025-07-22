@@ -1,12 +1,18 @@
 import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
+import { Box, Flex, Grid, Image, Separator, Text } from '@chakra-ui/react'
 import { PoolId } from '@centrifuge/sdk'
-import { ipfsToHttp, PoolDetails, useAllPoolDetails } from '@centrifuge/shared'
+import {
+  formatBalanceAbbreviated,
+  ipfsToHttp,
+  PoolDetails,
+  useAllPoolDetails,
+  usePoolDetails,
+} from '@centrifuge/shared'
 import { Card, ValueText } from '@centrifuge/ui'
 import { routePaths } from '@routes/routePaths'
-import { Flex, Grid, Separator, Text } from '@chakra-ui/react'
-import { Image } from '@chakra-ui/react'
 import { HomePageSkeleton } from '@components/Skeletons/HomePageSkeleton'
+import { RatingPill } from '@components/RatingPill'
 
 interface PoolSelectorProps {
   poolIds: PoolId[]
@@ -46,11 +52,14 @@ export const PoolCardsSelect = ({ poolIds, setSelectedPoolId }: PoolSelectorProp
 }
 
 function PoolCard({ poolDetails }: { poolDetails: PoolDetails }) {
+  const { data: pool } = usePoolDetails(poolDetails.id)
   const tvl = '450,000,000'
   const poolMetadata = poolDetails.metadata?.pool
   const iconUri = poolMetadata?.icon?.uri
   const shareClassId = Object.keys(poolDetails.metadata?.shareClasses ?? {})[0]
   const shareClassDetails = poolDetails.metadata?.shareClasses[shareClassId] ?? {}
+
+  console.log({ pool })
 
   return (
     <Card height="100%">
@@ -64,23 +73,51 @@ function PoolCard({ poolDetails }: { poolDetails: PoolDetails }) {
         <ValueText label="APY" value={shareClassDetails?.apyPercentage ?? '0%'} />
       </Grid>
       <Separator my={4} />
-      <Text color="gray.400">{poolMetadata?.description ?? 'Description'}</Text>
+      <Text color="gray.400" height="88px" fontSize="sm" textOverflow="ellipsis" overflow="scroll">
+        {poolMetadata?.issuer?.description.replaceAll('"', '') ?? 'Description'}
+      </Text>
       <Separator my={4} />
-      <Flex alignItems="center" justifyContent="space-between">
-        <Text fontSize="xs" fontWeight={500}>
-          Asset type
-        </Text>
-        <Text fontSize="xs" fontWeight={500}>
-          {poolMetadata?.asset.subClass}
-        </Text>
-      </Flex>
-      <Flex alignItems="center" justifyContent="space-between">
-        <Text fontSize="xs" fontWeight={500}>
-          Investor type
-        </Text>
-        <Text fontSize="xs" fontWeight={500}>
-          {poolMetadata?.investorType}
-        </Text>
+      <Flex flexDirection="column" gap={2}>
+        <Flex alignItems="center" justifyContent="space-between">
+          <Text fontSize="xs" fontWeight={500}>
+            Asset type
+          </Text>
+          <Text fontSize="xs" fontWeight={500}>
+            {poolMetadata?.asset.subClass ?? ''}
+          </Text>
+        </Flex>
+        <Flex alignItems="center" justifyContent="space-between">
+          <Text fontSize="xs" fontWeight={500}>
+            Investor type
+          </Text>
+          <Text fontSize="xs" fontWeight={500}>
+            {poolMetadata?.investorType ?? ''}
+          </Text>
+        </Flex>
+        <Flex alignItems="center" justifyContent="space-between">
+          <Text fontSize="xs" fontWeight={500}>
+            Minimum investment
+          </Text>
+          <Text fontSize="xs" fontWeight={500}>
+            {shareClassDetails?.minInitialInvestment
+              ? formatBalanceAbbreviated(shareClassDetails?.minInitialInvestment ?? 0, 0, 'USD')
+              : ''}
+          </Text>
+        </Flex>
+        <Flex alignItems="center" justifyContent="space-between">
+          <Text fontSize="xs" fontWeight={500}>
+            Rating
+          </Text>
+          <Box>
+            {poolMetadata?.poolRatings?.length
+              ? poolMetadata?.poolRatings?.map((rating) => (
+                  <span style={{ marginLeft: '2px' }}>
+                    <RatingPill rating={rating} />
+                  </span>
+                ))
+              : ''}
+          </Box>
+        </Flex>
       </Flex>
     </Card>
   )
