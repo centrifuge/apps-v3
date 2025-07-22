@@ -1,5 +1,5 @@
 import { Form, useForm, Select, Checkbox } from '@centrifuge/forms'
-import { Pool, PoolNetwork, ShareClassId, Vault } from '@centrifuge/sdk'
+import { PoolNetwork, Vault } from '@centrifuge/sdk'
 import {
   chainExplorer,
   networkToName,
@@ -7,6 +7,7 @@ import {
   truncateAddress,
   useCentrifugeTransaction,
   useHoldings,
+  useRestrictionHooks,
   useVaultsPerShareClass,
   VaultDetails,
 } from '@centrifuge/shared'
@@ -49,6 +50,7 @@ const VaultsCards = ({
   const [selectedVault, setSelectedVault] = useState<SelectedVaultState | null>(null)
   const [selectedChainId, setSelectedChainId] = useState<number | null>(null)
 
+  const { data: restrictionHooks } = useRestrictionHooks(selectedChainId ?? 1)
   const { data: vaults, isLoading: isLoadingVaults } = useVaultsPerShareClass(shareClass.shareClass)
   const { data: holdings, isLoading: isLoadingHoldings } = useHoldings(shareClass.shareClass)
 
@@ -62,8 +64,8 @@ const VaultsCards = ({
       const assetId = holdings?.find((holding) => holding.assetId.raw.toString() === currency)?.assetId
       const network = networks?.find((network) => network.chainId === selectedChainId)
 
-      if (!network) {
-        throw new Error('Network not found')
+      if (!network || !restrictionHooks || !assetId) {
+        throw new Error('Network or asset not found')
       }
 
       setModal(null)
@@ -71,14 +73,14 @@ const VaultsCards = ({
         const shareClasses = [
           {
             id: shareClass.shareClass.id,
-            hook: '',
+            hook: restrictionHooks.fullRestrictionsHook,
           },
         ]
         const vaults = [
           {
-            id: shareClass.shareClass.id,
+            shareClassId: shareClass.shareClass.id,
             assetId,
-            kind: type === 'ERC-7540' ? 'async' : 'syncDeposit',
+            kind: (type === 'ERC-7540' ? 'async' : 'syncDeposit') as 'async' | 'syncDeposit',
           },
         ]
         execute(network.deploy(shareClasses, vaults))

@@ -103,3 +103,12 @@ export function useIsBalanceSheetManager(poolId?: PoolId, address?: HexString, c
 
   return useObservable(isBalanceSheetManager$).data
 }
+
+export const useRestrictionHooks = (chainId?: number) => {
+  const centrifuge = useCentrifuge()
+  const restrictionHook$ = useMemo(
+    () => (chainId ? centrifuge?.restrictionHooks(chainId) : undefined),
+    [centrifuge, chainId]
+  )
+  return useObservable(restrictionHook$)
+}

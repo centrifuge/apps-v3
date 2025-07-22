@@ -3,6 +3,7 @@ import { useObservable } from './useObservable'
 import { useMemo } from 'react'
 import { PendingAmount } from '../types'
 import { map, of } from 'rxjs'
+import { useCentrifuge } from './CentrifugeContext'
 
 export function useNavPerNetwork(shareClass: ShareClass) {
   const navPerNetwork$ = useMemo(() => shareClass.navPerNetwork(), [shareClass])
