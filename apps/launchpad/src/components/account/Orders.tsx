@@ -63,7 +63,7 @@ export function Orders({
             })}
           </Heading>
         </Stack>
-        <Button label="Approve" onClick={() => findRoute(true)} colorPalette="gray" size="sm" width="120px" />
+        <Button label="Approve" onClick={() => findRoute(true)} colorPalette="black" size="sm" width="120px" />
       </Flex>
       <Separator mt={4} mb={4} />
       <Flex mt={2} justify="space-between" alignItems="center">
@@ -79,7 +79,7 @@ export function Orders({
         <Button
           label={isInvestment ? 'Issue' : 'Revoke'}
           onClick={() => findRoute(false)}
-          colorPalette="gray"
+          colorPalette="black"
           size="sm"
           width="120px"
         />

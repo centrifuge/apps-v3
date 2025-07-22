@@ -47,6 +47,10 @@ export const buttonRecipe = defineRecipe({
         fontWeight: 600,
         border: 'none',
         boxShadow: 'none',
+        _hover: {
+          background: 'transparent',
+          boxShadow: 'none',
+        },
       },
     },
   },
