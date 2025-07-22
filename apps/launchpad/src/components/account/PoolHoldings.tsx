@@ -1,11 +1,11 @@
 import { Balance, ShareClass } from '@centrifuge/sdk'
 import { networkToName, useHoldings, formatBalance } from '@centrifuge/shared'
-import { Button, NetworkIcon } from '@centrifuge/ui'
+import { LinkButton, NetworkIcon } from '@centrifuge/ui'
 import { DataTable, ColumnDefinition, ActionsDropdown } from '@centrifuge/ui'
-import { Box, Flex, Heading, Stack, Text } from '@chakra-ui/react'
+import { Flex, Heading, Stack, Text } from '@chakra-ui/react'
 import { usePoolProvider } from '@contexts/PoolProvider'
-import { useEffect, useMemo } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useMemo } from 'react'
+import { useParams } from 'react-router-dom'
 
 type Row = {
   id: number
@@ -67,7 +67,6 @@ const columns: ColumnDefinition<Row>[] = [
 ]
 
 export function PoolHoldings({ shareClass, poolDecimals }: { shareClass: ShareClass; poolDecimals: number }) {
-  const navigate = useNavigate()
   const { poolId } = useParams()
   const holdings = useHoldings(shareClass)
   const { poolDetails } = usePoolProvider()
@@ -102,29 +101,17 @@ export function PoolHoldings({ shareClass, poolDecimals }: { shareClass: ShareCl
             {
               label: 'deposit',
               element: (
-                <Button
-                  label="Deposit"
-                  onClick={() => navigate(`/holdings/${poolId}/deposit/${holding.assetId}`)}
-                  variant="plain"
-                  width="100%"
-                  height="100%"
-                  _hover={{ bg: 'transparent', boxShadow: 'none' }}
-                  size="sm"
-                />
+                <LinkButton to={`/holdings/${poolId}/deposit/${holding.assetId}`} size="sm" variant="plain">
+                  Deposit
+                </LinkButton>
               ),
             },
             {
               label: 'withdraw',
               element: (
-                <Button
-                  label="Withdraw"
-                  onClick={() => navigate(`/holdings/${poolId}/withdraw/${holding.assetId}`)}
-                  variant="plain"
-                  width="100%"
-                  height="100%"
-                  _hover={{ bg: 'transparent', boxShadow: 'none' }}
-                  size="sm"
-                />
+                <LinkButton to={`/holdings/${poolId}/withdraw/${holding.assetId}`} size="sm" variant="plain">
+                  Withdraw
+                </LinkButton>
               ),
             },
           ]}
@@ -140,20 +127,12 @@ export function PoolHoldings({ shareClass, poolDecimals }: { shareClass: ShareCl
         <Flex justify="space-between">
           <Heading size="3xl">{formatBalance(totalValue ?? 0)} USDC</Heading>
           <Flex gap={2}>
-            <Button
-              label="Add holding"
-              onClick={() => navigate(`/holdings/${poolId}/add`)}
-              colorPalette="black"
-              width="140px"
-              size="sm"
-            />
-            <Button
-              label="Vaults"
-              onClick={() => navigate(`/vaults/${poolId}`)}
-              colorPalette="yellow"
-              width="140px"
-              size="sm"
-            />
+            <LinkButton to={`/holdings/${poolId}/add`} colorPalette="black" width="140px" size="sm" colorScheme="black">
+              Add holding
+            </LinkButton>
+            <LinkButton to={`/vaults/${poolId}`} colorPalette="yellow" width="140px" size="sm">
+              Vaults
+            </LinkButton>
           </Flex>
         </Flex>
       </Stack>
