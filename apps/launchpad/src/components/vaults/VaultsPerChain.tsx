@@ -7,14 +7,14 @@ import { VaultCard } from './VaultCard'
 export const VaultsPerChain = ({
   vault,
   holdingsByChain,
-  setIsModalOpen,
-  setSelectedVault,
+  onAddVault,
+  onUpdateVault,
 }: {
   vault: Vault | null
   // TODO: fix this type
   holdingsByChain: Record<number, any[]>
-  setIsModalOpen: () => void
-  setSelectedVault: (vault: { vault: Vault; vaultDetails: VaultDetails | null; holding: any }) => void
+  onAddVault: (vault: Vault) => void
+  onUpdateVault: (vault: { vault: Vault; vaultDetails: VaultDetails | null; holding: any }) => void
 }) => {
   const { data: vaultDetails } = useVaultDetails(vault)
   const holdings = vault ? holdingsByChain[vault.chainId] : []
@@ -28,7 +28,7 @@ export const VaultsPerChain = ({
           <NetworkIcon networkId={vault.chainId} />
           <Heading size="md">{networkToName(vault.chainId)}</Heading>
         </Flex>
-        <Button label="Add vault" colorPalette="yellow" size="sm" onClick={setIsModalOpen} />
+        <Button label="Add vault" colorPalette="yellow" size="sm" onClick={() => onAddVault(vault)} />
       </Flex>
       <Grid gridTemplateColumns="1fr 1fr 1fr" gap={2}>
         {holdings?.map((holding) => {
@@ -54,7 +54,7 @@ export const VaultsPerChain = ({
               tabIndex={0}
               aria-label="Vault card"
               onClick={() =>
-                setSelectedVault({
+                onUpdateVault({
                   vault,
                   vaultDetails: vaultDetails || null,
                   holding,

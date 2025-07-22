@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from 'react-router'
+import { useParams } from 'react-router'
 import { Flex, Heading, Stack } from '@chakra-ui/react'
 import { LinkButton, Loader } from '@centrifuge/ui'
 import { AccountPage } from '@components/account/AccountPage'

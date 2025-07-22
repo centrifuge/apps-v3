@@ -1,5 +1,4 @@
 import { formatUIBalance, truncateAddress } from '@centrifuge/shared'
-import { Card } from '@centrifuge/ui'
 import { Flex, Grid, Text } from '@chakra-ui/react'
 import { Balance, HexString } from '@centrifuge/sdk'
 import CopyToClipboard from '@centrifuge/ui/src/components/elements/CopyToClipboard'
@@ -13,7 +12,7 @@ type Value = {
 }
 
 export const VaultCard = ({ values }: { values: Value[] }) => {
-  const structuredValue = (value: Value['value'], type: Value['type']): string | null => {
+  const formatValue = (value: Value['value'], type: Value['type']): string | null => {
     if (type === 'balance') {
       return formatUIBalance(value).toString()
     }
@@ -30,7 +29,7 @@ export const VaultCard = ({ values }: { values: Value[] }) => {
         {value.label}
       </Text>
       <Flex alignItems="center" justifyContent="flex-end" marginRight={value.type === 'address' ? '-12px' : '0'}>
-        {value.children ? value.children : <Text fontSize="sm">{structuredValue(value.value, value.type)}</Text>}
+        {value.children ? value.children : <Text fontSize="sm">{formatValue(value.value, value.type)}</Text>}
         {value.type === 'address' && <CopyToClipboard value={value.value as string} />}
       </Flex>
     </Grid>
