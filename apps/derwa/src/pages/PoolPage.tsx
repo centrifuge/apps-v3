@@ -10,6 +10,7 @@ import { routePaths } from '@routes/routePaths'
 import { BalanceInput, Form, useForm } from '@centrifuge/forms'
 import { Button, LogoCentrifugeText, NetworkIcon } from '@centrifuge/ui'
 import { DataTable, ColumnDefinition } from '@centrifuge/ui'
+import { RatingPill } from '@components/RatingPill'
 
 type Row = {
   id: string
@@ -235,7 +236,11 @@ export default function PoolPage() {
                 <Text fontWeight={500} fontSize="14px" lineHeight="100%" color="#91969B">
                   Rating
                 </Text>
-                <Text fontWeight={600} fontSize="14px" lineHeight="100%" color="#252B34"></Text>
+                <Flex>
+                  <RatingPill rating={{ agency: 'moody', value: 'Aa' }} />
+                  <RatingPill rating={{ agency: 'sp', value: 'AA' }} />
+                  <RatingPill rating={{ agency: 'particula', value: 'BB' }} />
+                </Flex>
               </Flex>
               <Flex justifyContent="space-between" alignItems="center" mt={4}>
                 <Text fontWeight={500} fontSize="14px" lineHeight="100%" color="#91969B">
