@@ -1,9 +1,8 @@
 import { z } from 'zod'
-import { useMemo } from 'react'
 import { useForm, Form, SubmitButton, createBalanceSchema } from '@centrifuge/forms'
-import { Asset, ShareClassWithDetails, useCentrifugeTransaction, useHoldings } from '@centrifuge/shared'
+import { ShareClassWithDetails, useCentrifugeTransaction, useHoldings } from '@centrifuge/shared'
 import { usePoolProvider } from '@contexts/PoolProvider'
-import { AssetId, Balance, Price, ShareClass } from '@centrifuge/sdk'
+import { AssetId } from '@centrifuge/sdk'
 import { Loader } from '@centrifuge/ui'
 import { Container, Flex, Heading } from '@chakra-ui/react'
 import { InternalOrdersTable } from './InternalOrdersTable'
@@ -22,7 +21,6 @@ const IssueAsset = z.object({
 })
 
 export default function OrdersTable({ mode }: { mode: OrderMode }) {
-  const { execute, isPending } = useCentrifugeTransaction()
   const { shareClass, isLoading } = usePoolProvider()
 
   if (!shareClass?.shareClass || isLoading) {
@@ -38,7 +36,6 @@ export default function OrdersTable({ mode }: { mode: OrderMode }) {
 
 export const OrdersForm = ({ mode, shareClass }: { mode: OrderMode; shareClass: ShareClassWithDetails }) => {
   const { execute, isPending } = useCentrifugeTransaction()
-  const { data: holdings } = useHoldings(shareClass.shareClass)
 
   const onSubmit = (values: { selectedAssets: any[] }) => {
     if (values.selectedAssets.length === 0 || !shareClass?.shareClass) {
