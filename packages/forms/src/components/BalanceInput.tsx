@@ -55,7 +55,7 @@ const CurrencySelect = ({
 
   return (
     <NativeSelect.Root size="xs" variant="plain" width="auto" me="-1">
-      <NativeSelect.Field fontSize="sm" onChange={(e) => onChange(Number(e.target.value))}>
+      <NativeSelect.Field fontSize="sm" onChange={(e) => onChange(Number(e.target.value))} bg="white">
         {options.map((option) => (
           <option key={option.value} value={option.value}>
             {option.label}
@@ -261,6 +261,7 @@ export function BalanceInput<TFieldValues extends FieldValues = FieldValues>(pro
       >
         <ChakraInput
           {...rest}
+          bg={rest.bg ?? 'gray.300'}
           id={name}
           name={name}
           ref={field.ref}
