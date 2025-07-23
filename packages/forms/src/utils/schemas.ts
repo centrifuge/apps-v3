@@ -1,5 +1,5 @@
 import { z, type ZodTypeAny, type ZodEffects } from 'zod'
-import { Balance } from '@centrifuge/sdk'
+import { Balance, Price } from '@centrifuge/sdk'
 
 // This file contains utility functions for creating Zod schemas
 

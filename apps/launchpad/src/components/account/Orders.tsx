@@ -1,6 +1,6 @@
 import { formatUIBalance, ShareClassWithDetails } from '@centrifuge/shared'
 import { usePendingAmounts } from '@centrifuge/shared/src/hooks/useShareClass'
-import { Button, Card } from '@centrifuge/ui'
+import { Button, Card, LinkButton } from '@centrifuge/ui'
 import { Flex, Heading, Separator, Stack } from '@chakra-ui/react'
 import { useMemo } from 'react'
 import { useNavigate, useParams } from 'react-router'
@@ -16,7 +16,6 @@ export function Orders({
   isInvestment?: boolean
   poolCurrencySymbol: string
 }) {
-  const navigate = useNavigate()
   const params = useParams()
   const { data: pendingAmounts } = usePendingAmounts(shareClass.shareClass)
   const poolId = params.poolId
@@ -34,7 +33,7 @@ export function Orders({
       route = `/orders/${poolId}/revokeRedeem`
     }
 
-    navigate(route)
+    return route
   }
 
   const pendingAmount = useMemo(() => {
@@ -44,13 +43,9 @@ export function Orders({
   }, [pendingAmounts, isInvestment])
 
   const approvedAmount = useMemo(() => {
-    return (
-      pendingAmounts
-        // TODO: it does exist?
-        // @ts-ignore
-        ?.map((p) => (isInvestment ? p.approvedDeposit : p.approvedRedeem))
-        .reduce((acc, curr) => acc + curr.toFloat(), 0)
-    )
+    return pendingAmounts
+      ?.map((p) => (isInvestment ? p.pendingIssuancesTotal : p.pendingRevocationsTotal))
+      .reduce((acc, curr) => acc + curr.toFloat(), 0)
   }, [pendingAmounts, isInvestment])
 
   return (
@@ -80,13 +75,9 @@ export function Orders({
             })}
           </Heading>
         </Stack>
-        <Button
-          label={isInvestment ? 'Issue' : 'Revoke'}
-          onClick={() => findRoute(false)}
-          colorPalette="black"
-          size="sm"
-          width="120px"
-        />
+        <LinkButton to={findRoute(false)} colorPalette="black" size="sm" width="120px">
+          {isInvestment ? 'Issue' : 'Revoke'}
+        </LinkButton>
       </Flex>
     </Card>
   )

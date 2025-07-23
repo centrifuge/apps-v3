@@ -12,6 +12,12 @@ export interface FormatBalanceOptions {
   useGrouping?: boolean
   /** The currency symbol or name to append (e.g., "USD"). */
   currency?: string
+  /**
+   * Specifies the notation style for displaying numbers.
+   * 'standard': Default number formatting (e.g., 1,234,567).
+   * 'compact': Short-form for large numbers (e.g., 1.2M).
+   */
+  notation?: 'standard' | 'compact'
 }
 
 /**
@@ -30,9 +36,9 @@ export function formatBalance(
     return '0.00'
   }
 
-  const { precision, tokenDecimals, useGrouping = true, currency } = options
-  let decimalValue: Decimal
+  const { precision, tokenDecimals, useGrouping = true, currency, notation = 'standard' } = options
 
+  let decimalValue: Decimal
   try {
     if (value instanceof Balance) {
       decimalValue = value.toDecimal()
@@ -50,14 +56,20 @@ export function formatBalance(
 
   const intlOptions: Intl.NumberFormatOptions = {
     useGrouping,
+    notation,
   }
 
-  if (precision !== undefined) {
-    intlOptions.minimumFractionDigits = precision
-    intlOptions.maximumFractionDigits = precision
+  if (notation === 'compact') {
+    intlOptions.minimumFractionDigits = precision ?? 0
+    intlOptions.maximumFractionDigits = precision ?? 2
   } else {
-    intlOptions.minimumFractionDigits = 2
-    intlOptions.maximumFractionDigits = 6
+    if (precision !== undefined) {
+      intlOptions.minimumFractionDigits = precision
+      intlOptions.maximumFractionDigits = precision
+    } else {
+      intlOptions.minimumFractionDigits = 2
+      intlOptions.maximumFractionDigits = 6
+    }
   }
 
   const numberToFormat = decimalValue.toNumber()

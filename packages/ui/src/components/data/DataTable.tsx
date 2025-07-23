@@ -65,7 +65,7 @@ export const DataTable = <RowType extends { id?: string | number; actions?: (row
               textAlign={col.textAlign || 'start'}
               width={col.width}
               onClick={() => updateSortOrder(col.sortKey)}
-              style={{ cursor: 'pointer' }}
+              style={{ cursor: 'pointer', fontSize: '12px' }}
             >
               {col.header}
               {col.sortKey && (
@@ -81,7 +81,7 @@ export const DataTable = <RowType extends { id?: string | number; actions?: (row
                     style={{
                       display: 'inline',
                       width: '12px',
-                      height: '18px',
+                      height: '12px',
                       color: '#82888D',
                       transform: 'rotate(90deg)',
                     }}

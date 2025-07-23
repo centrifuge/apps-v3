@@ -3,19 +3,21 @@ import { Image, type ImageProps, Flex, Heading } from '@chakra-ui/react'
 import usdc from '../../assets/logos/usdc.svg'
 import usdt from '../../assets/logos/usdt.svg'
 import bitcoin from '../../assets/logos/bitcoin.svg'
+import frax from '../../assets/logos/frax.svg'
 
 interface AssetIconProps extends Omit<ImageProps, 'src'> {
   assetSymbol?: AssetSymbol
   alt?: string
 }
 
-export type AssetSymbol = 'USDC' | 'USDT' | 'WBTC'
+export type AssetSymbol = 'USDC' | 'USDT' | 'WBTC' | 'TFRAX'
 
 export const AssetIcon: React.FC<AssetIconProps> = ({ assetSymbol = 'USDC', boxSize = '24px', alt, ...rest }) => {
   const iconMaps: Record<AssetSymbol, string> = {
     USDC: usdc,
     USDT: usdt,
     WBTC: bitcoin,
+    TFRAX: frax,
   }
 
   const src = iconMaps[assetSymbol.toUpperCase() as AssetSymbol]

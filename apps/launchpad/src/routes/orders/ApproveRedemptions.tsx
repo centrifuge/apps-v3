@@ -18,8 +18,6 @@ export default function ApproveRedemptions() {
   const { isLoading, shareClass } = usePoolProvider()
   const { data: pendingAmounts } = usePendingAmounts(shareClass?.shareClass!)
   const filteredPendingRedeems = pendingAmounts?.filter((p) => p.pendingRedeem.toFloat() > 0)
-  // TODO: it does exist?
-  // @ts-ignore
   const groupedByChain = useGroupPendingAmountsByChain(filteredPendingRedeems ?? [])
 
   const form = useForm({
