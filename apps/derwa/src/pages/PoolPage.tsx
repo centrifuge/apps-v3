@@ -119,28 +119,40 @@ export default function PoolPage() {
               borderColor="border-primary"
               shadow="xs"
             >
-              <Flex justifyContent="space-around" alignItems="center">
-                <Box>
-                  <Text fontSize="12px" color="black" width="auto" textAlign="left">
+              <Flex
+                justifyContent={{ base: 'center', md: 'space-around' }}
+                alignItems="center"
+                flexDirection={{ base: 'column', md: 'row' }}
+              >
+                <Box padding={{ base: '1rem 0 0 0', md: '0' }}>
+                  <Text fontSize="12px" color="black" width="auto" textAlign={{ base: 'center', md: 'left' }}>
                     TVL (USD)
                   </Text>
-                  <Text fontSize="24px" fontWeight="bold" textAlign="left">
+                  <Text fontSize="24px" fontWeight="bold" textAlign={{ base: 'center', md: 'left' }}>
                     448,663,319
                   </Text>
                 </Box>
-                <Box pl={6} borderLeft="1px solid" borderColor={'#E7E7E7'}>
-                  <Text fontSize="12px" color="black" width="auto" textAlign="left">
+                <Box
+                  padding={{ base: '1rem 0 0 0', md: '0 0 0 1.5rem' }}
+                  borderLeft={{ base: 'none', md: '1px solid' }}
+                  borderColor={'#E7E7E7'}
+                >
+                  <Text fontSize="12px" color="black" width="auto" textAlign={{ base: 'center', md: 'left' }}>
                     Token price (USD)
                   </Text>
-                  <Text fontSize="24px" fontWeight="bold" textAlign="left">
+                  <Text fontSize="24px" fontWeight="bold" textAlign={{ base: 'center', md: 'left' }}>
                     12,194.91
                   </Text>
                 </Box>
-                <Box pl={6} borderLeft="1px solid" borderColor={'#E7E7E7'}>
-                  <Text fontSize="12px" color="black" width="auto" textAlign="left">
+                <Box
+                  padding={{ base: '1rem 0 0 0', md: '0 0 0 1.5rem' }}
+                  borderLeft={{ base: 'none', md: '1px solid' }}
+                  borderColor={'#E7E7E7'}
+                >
+                  <Text fontSize="12px" color="black" width="auto" textAlign={{ base: 'center', md: 'left' }}>
                     APY
                   </Text>
-                  <Text fontSize="24px" fontWeight="bold" textAlign="left">
+                  <Text fontSize="24px" fontWeight="bold" textAlign={{ base: 'center', md: 'left' }}>
                     2.54%
                   </Text>
                 </Box>
@@ -154,7 +166,7 @@ export default function PoolPage() {
             <Box
               bg="bg-primary"
               width="100%"
-              padding={6}
+              padding={{ base: 6, md: 8, xl: 12 }}
               borderRadius={10}
               border="1px solid"
               borderColor="border-primary"
@@ -247,15 +259,26 @@ export default function PoolPage() {
               border="1px solid"
               borderColor="border-primary"
               shadow="xs"
-              maxW="container.md"
-              overflow={'hidden'}
             >
-              <Flex justifyContent="space-between" gap={4} alignItems="center">
-                <Box width={20} display={{ base: 'none', md: 'block' }}>
-                  <LogoCentrifugeText fill="text-primary" />
-                </Box>
+              <Grid templateColumns={{ base: '1fr', md: '1fr 5fr' }} gap={2}>
+                <Flex
+                  justifyContent="flex-start"
+                  alignItems="center"
+                  gap={2}
+                  flexDirection={{ base: 'column', md: 'row' }}
+                >
+                  <Box width={20} mb={{ base: 2, md: 0 }}>
+                    <LogoCentrifugeText fill="text-primary" />
+                  </Box>
+                </Flex>
 
-                <Flex justifyContent="space-between" alignItems="center" gap={2}>
+                <Flex
+                  justifyContent="flex-end"
+                  alignItems="center"
+                  gap={2}
+                  flexDirection={{ base: 'column', md: 'row' }}
+                  wrap="wrap"
+                >
                   <Button
                     label="Website"
                     color="#91969B"
@@ -264,7 +287,6 @@ export default function PoolPage() {
                     borderRadius="300px"
                     height="32px"
                     fontSize="14px"
-                    display={{ base: 'none', md: 'block' }}
                   />
                   <Button
                     label="Forum"
@@ -274,7 +296,6 @@ export default function PoolPage() {
                     borderRadius="300px"
                     height="32px"
                     fontSize="14px"
-                    display={{ base: 'none', md: 'block' }}
                   />
                   <Button
                     label="Email"
@@ -284,7 +305,6 @@ export default function PoolPage() {
                     borderRadius="300px"
                     height="32px"
                     fontSize="14px"
-                    display={{ base: 'none', md: 'block' }}
                   />
                   <Button
                     label="Executive summary"
@@ -294,13 +314,17 @@ export default function PoolPage() {
                     borderRadius="300px"
                     height="32px"
                     fontSize="14px"
-                    display={{ base: 'none', md: 'block' }}
                   />
                 </Flex>
-              </Flex>
+              </Grid>
 
-              <Flex justifyContent="space-between" alignItems="center" mt={2} wrap="wrap">
-                <Box flex={{ base: 1, md: 1, lg: 1 }}>
+              <Grid templateColumns={{ base: '1fr', md: '1fr 1fr' }} gap={2} mt={8}>
+                <Flex
+                  flexDirection="column"
+                  alignItems={{ base: 'center', md: 'flex-start' }}
+                  justifyContent={{ base: 'center', md: 'flex-start' }}
+                  gap={{ base: 0, md: 4 }}
+                >
                   <Heading
                     fontWeight="600"
                     lineHeight={'125%'}
@@ -324,8 +348,8 @@ export default function PoolPage() {
                     redemptions, holds US T-Bills with a maximum maturity of 6-months, and focuses on maximizing
                     interest rates and minimizing price and duration risks.
                   </Text>
-                </Box>
-                <Box bg="bg-primary" padding={6} shadow="xs" boxShadow="none" flex={{ base: 1, md: 1, lg: 1 }}>
+                </Flex>
+                <Box bg="bg-primary" shadow="xs" boxShadow="none" mt={{ base: 6, md: 0 }}>
                   <Flex justifyContent="space-between" alignItems="center">
                     <Text fontWeight={500} fontSize="14px" lineHeight="100%" color="#91969B">
                       Historical default rate
@@ -399,7 +423,7 @@ export default function PoolPage() {
                     </Text>
                   </Flex>
                 </Box>
-              </Flex>
+              </Grid>
             </Box>
 
             <Heading size="lg" mt={8} mb={4}>
