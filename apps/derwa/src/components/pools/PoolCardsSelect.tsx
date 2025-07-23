@@ -2,13 +2,7 @@ import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { Box, Flex, Grid, Image, Separator, Text } from '@chakra-ui/react'
 import { PoolId } from '@centrifuge/sdk'
-import {
-  formatBalanceAbbreviated,
-  ipfsToHttp,
-  PoolDetails,
-  useAllPoolDetails,
-  usePoolDetails,
-} from '@centrifuge/shared'
+import { formatBalanceAbbreviated, ipfsToHttp, PoolDetails, useAllPoolDetails } from '@centrifuge/shared'
 import { Card, ValueText } from '@centrifuge/ui'
 import { routePaths } from '@routes/routePaths'
 import { HomePageSkeleton } from '@components/Skeletons/HomePageSkeleton'
@@ -32,8 +26,6 @@ export const PoolCardsSelect = ({ poolIds, setSelectedPoolId }: PoolSelectorProp
     [pools]
   )
 
-  console.log({ pools })
-
   if (isLoading) return <HomePageSkeleton />
 
   if (!displayPools || pools?.length === 1) return null
@@ -52,14 +44,11 @@ export const PoolCardsSelect = ({ poolIds, setSelectedPoolId }: PoolSelectorProp
 }
 
 function PoolCard({ poolDetails }: { poolDetails: PoolDetails }) {
-  const { data: pool } = usePoolDetails(poolDetails.id)
   const tvl = '450,000,000'
   const poolMetadata = poolDetails.metadata?.pool
   const iconUri = poolMetadata?.icon?.uri
   const shareClassId = Object.keys(poolDetails.metadata?.shareClasses ?? {})[0]
   const shareClassDetails = poolDetails.metadata?.shareClasses[shareClassId] ?? {}
-
-  console.log({ pool })
 
   return (
     <Card height="100%">
