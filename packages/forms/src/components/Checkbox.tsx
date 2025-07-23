@@ -10,10 +10,11 @@ export interface InputProps<TFieldValues extends FieldValues = FieldValues>
   rules?: object
   disabled?: boolean
   onChange?: (checked: boolean) => void
+  labelStart?: boolean
 }
 
 export function Checkbox<TFieldValues extends FieldValues = FieldValues>(props: InputProps<TFieldValues>) {
-  const { label, name, rules, disabled, onChange, ...rest } = props
+  const { label, name, rules, disabled, onChange, labelStart = true, ...rest } = props
 
   const { control, trigger } = useFormContext<TFieldValues>()
 
@@ -49,9 +50,11 @@ export function Checkbox<TFieldValues extends FieldValues = FieldValues>(props: 
           }
         }}
       >
+        {labelStart ? <ChakraCheckbox.Label>{label}</ChakraCheckbox.Label> : null}
+
         <ChakraCheckbox.HiddenInput />
         <ChakraCheckbox.Control />
-        {label && <ChakraCheckbox.Label>{label}</ChakraCheckbox.Label>}
+        {!labelStart ? <ChakraCheckbox.Label>{label}</ChakraCheckbox.Label> : null}
       </ChakraCheckbox.Root>
       <Field.ErrorText>{errorMessage}</Field.ErrorText>
     </Field.Root>

@@ -1,9 +1,23 @@
 export const mockMetadata = {
   pool: {
     name: 'Janus Henderson Anemoy Treasury Fund',
+    poolStatus: 'Active',
     asset: {
       class: 'Public credit',
       subClass: 'US Treasuries',
+    },
+    issuer: {
+      description:
+        '"Janus Henderson Anemoy Treasury Fund (the Fund) is a tokenized British Virgin Islands (BVI) professional fund, licensed by the British Virgin Islands Financial Services Commission (FSC), and open to non-US Professional Investors. It solely invests in and holds short-term U.S. Treasury Bills (T-bills) with a remaining maturity of 0 to 3 months to offer minimized price and duration risks in combination with daily liquidity and money market returns. T-bills are held directly by the Fund and Asset Under Management (AUM) can be checked onchain. The fund issues its shares as the JTRSY token to investors. Investments and redemptions are processed in USDC stablecoins. Janus Henderson Investors agreed to sub-advise Anemoy and act as the sub-Investment Manager of the Fund.\n"',
+      email: 'support@anemoy.io',
+      logo: {
+        uri: 'ipfs://QmaJVD2b53xYFSRDBxg6X8977fwvyzoDuCxvambe4QvrqT',
+        mime: 'image/png',
+      },
+      repName: 'Martin Quensel',
+      name: 'Anemoy Capital SPC Limited',
+      shortDescription:
+        'Janus Henderson Anemoy Treasury Fund is a BVI-licensed fund investing in short-term U.S. T-bills.',
     },
     icon: {
       uri: 'ipfs://QmTQwFU4zWuwhm3ft77G7wcP6LYBo6nfhy7aJ4Hd9j6ryG',

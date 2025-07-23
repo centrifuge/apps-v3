@@ -1,5 +1,5 @@
 import { Spinner } from '@chakra-ui/react'
-import { PoolSelector } from '@components/PoolSelector'
+import { PoolCardsSelect } from '@components/pools/PoolCardsSelect'
 import { usePoolsContext } from '@contexts/usePoolsContext'
 
 export default function HomePage() {
@@ -10,7 +10,7 @@ export default function HomePage() {
     return <Spinner size="lg" />
   }
 
-  if (!pools?.length) return null
+  if (!poolIds?.length) return <h3>Sorry, there are no pools available at this time.</h3>
 
-  return <PoolSelector poolIds={poolIds} setSelectedPoolId={setSelectedPoolId} />
+  return <PoolCardsSelect poolIds={poolIds} setSelectedPoolId={setSelectedPoolId} />
 }

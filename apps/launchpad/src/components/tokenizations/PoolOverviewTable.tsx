@@ -65,7 +65,7 @@ const columns: ColumnDefinition<Row>[] = [
       const poolId = id.split('-')[0]
       return (
         <Link to={`/account/${poolId}`}>
-          <Button colorPalette="gray" size="xs">
+          <Button colorPalette="black" size="xs">
             Accounts
           </Button>
         </Link>

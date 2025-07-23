@@ -24,7 +24,7 @@ interface VaultGuardProps {
   isInvestorWhiteListed: boolean
   isLoading: boolean
   pool: PoolDetails
-  shareClassId: ShareClassId
+  shareClassId?: ShareClassId
   tab: ComponentType<TabProps>
   vault?: Vault
   setVault: Dispatch<Vault | undefined>
@@ -58,7 +58,7 @@ export function InvestRedeemSection({ pool: poolDetails }: { pool?: PoolDetails 
   const restrictedCountries = [...kycCountries, ...kybCountries]
   const isRestrictedCountry = restrictedCountries.includes(location?.country_code)
 
-  if (!poolDetails || !shareClassId) return null
+  if (!poolDetails) return null
 
   return (
     <Flex

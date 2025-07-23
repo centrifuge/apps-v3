@@ -1,6 +1,6 @@
 import { Box, Flex, Grid, Skeleton, SkeletonText } from '@chakra-ui/react'
 
-export const LandingPageSkeleton = () => {
+export const PoolPageSkeleton = () => {
   return (
     <Box bg="bg-secondary" p={6}>
       <Flex mb={6} ml={4} align="center" justify="space-between">
