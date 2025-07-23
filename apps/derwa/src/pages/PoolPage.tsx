@@ -14,7 +14,11 @@ import { PoolDetailsPermissionless } from '@components/PoolDetails/PoolDetailsPe
 export default function PoolPage() {
   const { selectedPoolId, isLoading: isPoolsLoading } = usePoolsContext()
   const { data: pool, isLoading: isPoolDetailsLoading } = usePoolDetails(selectedPoolId as PoolId)
+
+  // TODO: This should come from SDK metadata, will be added in the next version
   const poolType = pool?.metadata?.pool.type || 'open'
+
+  // TODO: pull all the needed data from SDK and replace hardcoded values
 
   if (isPoolsLoading || isPoolDetailsLoading) {
     return <LandingPageSkeleton />
