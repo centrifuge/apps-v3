@@ -2,6 +2,7 @@ import { useHoldings, usePortfolio } from '@centrifuge/shared'
 import { Loader, Text } from '@chakra-ui/react'
 import { HoldingsForm } from '@components/holdings/HoldingsForm'
 import { usePoolProvider } from '@contexts/PoolProvider'
+import { useMemo } from 'react'
 
 export default function DepositHolding() {
   const { data: portfolio } = usePortfolio()

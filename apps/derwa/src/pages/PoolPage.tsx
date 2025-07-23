@@ -3,7 +3,7 @@ import { IoArrowBack } from 'react-icons/io5'
 import { Box, Flex, Grid, Heading, Text } from '@chakra-ui/react'
 import { PoolId } from '@centrifuge/sdk'
 import { usePoolDetails } from '@centrifuge/shared'
-import { LandingPageSkeleton } from '@components/Skeletons/LandingPageSkeleton'
+import { PoolPageSkeleton } from '@components/Skeletons/PoolPageSkeleton'
 import { usePoolsContext } from '@contexts/usePoolsContext'
 import { routePaths } from '@routes/routePaths'
 import { InvestRedeemSection } from '@components/InvestRedeemSection'
@@ -21,7 +21,7 @@ export default function PoolPage() {
   // TODO: pull all the needed data from SDK and replace hardcoded values
 
   if (isPoolsLoading || isPoolDetailsLoading) {
-    return <LandingPageSkeleton />
+    return <PoolPageSkeleton />
   }
 
   return (

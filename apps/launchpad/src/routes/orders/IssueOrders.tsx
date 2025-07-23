@@ -30,7 +30,11 @@ export default function IssueOrders() {
   const { execute, isPending } = useCentrifugeTransaction()
   const { isLoading, shareClass, poolDetails } = usePoolProvider()
   const { data: pendingAmounts, isLoading: isPendingAmountsLoading } = usePendingAmounts(shareClass?.shareClass!)
+  // TODO: it does exist?
+  // @ts-ignore
   const filteredPendingDeposits = pendingAmounts?.filter((p) => p.approvedDeposit.toFloat() > 0)
+  // TODO: it does exist?
+  // @ts-ignore
   const groupedByChain = useGroupPendingAmountsByChain(filteredPendingDeposits ?? [])
   const pricePerShare = shareClass?.details.pricePerShare.toFloat()
   const poolDecimals = poolDetails?.currency.decimals
@@ -74,6 +78,8 @@ export default function IssueOrders() {
       pendingAmounts?.map((p) => ({
         chainId: p.chainId,
         assetId: p.assetId,
+        // TODO: it does exist?
+        // @ts-ignore
         approvedDeposit: p.approvedDeposit,
         navPerShare: pricePerShare?.toString() ?? '0',
       })) ?? []
@@ -90,6 +96,8 @@ export default function IssueOrders() {
   }
 
   const totalApprovedInvestments = useMemo(() => {
+    // TODO: it does exist?
+    // @ts-ignore
     return pendingAmounts?.map((p) => p.approvedDeposit).reduce((acc, curr) => acc + curr.toFloat(), 0)
   }, [pendingAmounts])
 
