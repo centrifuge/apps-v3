@@ -3,14 +3,13 @@ import { IoArrowBack } from 'react-icons/io5'
 import { Box, Flex, Grid, Heading, Text } from '@chakra-ui/react'
 import { PoolId } from '@centrifuge/sdk'
 import { usePoolDetails } from '@centrifuge/shared'
-import { Tabs } from '@components/Tabs'
 import { LandingPageSkeleton } from '@components/Skeletons/LandingPageSkeleton'
 import { usePoolsContext } from '@contexts/usePoolsContext'
 import { routePaths } from '@routes/routePaths'
-import { BalanceInput, Form, useForm } from '@centrifuge/forms'
 import { Button, LogoCentrifugeText, NetworkIcon } from '@centrifuge/ui'
 import { DataTable, ColumnDefinition } from '@centrifuge/ui'
 import { RatingPill } from '@components/RatingPill'
+import { InvestRedeemSection } from '@components/InvestRedeemSection'
 
 type Row = {
   id: string
@@ -25,12 +24,6 @@ type Row = {
 export default function PoolPage() {
   const { selectedPoolId, isLoading: isPoolsLoading } = usePoolsContext()
   const { data: pool, isLoading: isPoolDetailsLoading } = usePoolDetails(selectedPoolId as PoolId)
-  const form = useForm({
-    mode: 'onChange',
-    onSubmit: (values) => {
-      console.log(values)
-    },
-  })
 
   if (isPoolsLoading || isPoolDetailsLoading) {
     return <LandingPageSkeleton />
@@ -438,124 +431,8 @@ export default function PoolPage() {
             <DataTable columns={columns} data={holdings as Row[]} size="sm" />
           </Box>
 
-          <Box maxHeight={'350px'}>
-            <Flex
-              direction="column"
-              border="1px solid"
-              borderColor="border-primary"
-              borderRadius="10px"
-              shadow="xs"
-              bg="white"
-              h="100%"
-              overflow="hidden"
-            >
-              <Tabs
-                elements={[
-                  {
-                    label: 'Invest',
-                    value: 'tab-invest',
-                    body: (
-                      <Form form={form} style={{ height: '100%' }}>
-                        <BalanceInput
-                          label="You pay"
-                          subLabel="(Min: 1 USDC)"
-                          name="investAmount"
-                          bg="bg-secondary"
-                          placeholder="0"
-                          decimals={6}
-                          currency={
-                            <Flex bg="white" borderRadius="md" px={2} py={1} alignItems="center">
-                              <Text>USDC</Text>&nbsp;
-                              <NetworkIcon networkId={1} />
-                            </Flex>
-                          }
-                        />
-                        <Flex justify="space-between" mt={2} mb={4}>
-                          <Text
-                            color="#424242"
-                            bg="bg-secondary"
-                            borderRadius={'100px'}
-                            width="55px"
-                            height="24px"
-                            textAlign="center"
-                            fontSize="14px"
-                            fontWeight={400}
-                          >
-                            MAX
-                          </Text>
-                          <Text fontSize="14px" color="#424242" fontWeight={400} lineHeight={'20px'}>
-                            10,250.93 USDC available
-                          </Text>
-                          <Flex>
-                            <NetworkIcon networkId={1} />
-                            <NetworkIcon networkId={42161} />
-                            <NetworkIcon networkId={42220} />
-                            <NetworkIcon networkId={8453} />
-                          </Flex>
-                        </Flex>
-                        <BalanceInput
-                          label="You receive"
-                          name="investAmount"
-                          bg="bg-secondary"
-                          placeholder="0"
-                          decimals={6}
-                          currency="deJTRSY"
-                        />
-                        <Button label="Invest" type="submit" width="100%" mt={4} />
-                      </Form>
-                    ),
-                  },
-                  {
-                    label: 'Redeem',
-                    value: 'tab-redeem',
-                    body: (
-                      <Form form={form} style={{ height: '100%' }}>
-                        <BalanceInput
-                          label="Redeem"
-                          name="investAmount"
-                          bg="bg-secondary"
-                          placeholder="0"
-                          decimals={6}
-                          currency="deJTRSY"
-                        />
-                        <Flex justify="flex-start" mt={2} mb={4}>
-                          <Text
-                            color="#424242"
-                            bg="bg-secondary"
-                            borderRadius={'100px'}
-                            width="55px"
-                            height="24px"
-                            textAlign="center"
-                            fontSize="14px"
-                            lineHeight={'20px'}
-                            fontWeight={400}
-                          >
-                            MAX
-                          </Text>
-                          <Text fontSize="14px" color="#424242" fontWeight={400} lineHeight={'20px'}>
-                            10,250.93 USDC available
-                          </Text>
-                        </Flex>
-                        <BalanceInput
-                          label="Estimated receive amount"
-                          name="investAmount"
-                          bg="bg-secondary"
-                          placeholder="0"
-                          decimals={6}
-                          currency={
-                            <Flex bg="white" borderRadius="md" px={2} py={1} alignItems="center">
-                              <Text>USDC</Text>&nbsp;
-                              <NetworkIcon networkId={1} />
-                            </Flex>
-                          }
-                        />
-                        <Button label="Redeeem" type="submit" width="100%" mt={4} />
-                      </Form>
-                    ),
-                  },
-                ]}
-              />
-            </Flex>
+          <Box maxHeight={'350px'} position={'sticky'} top={8}>
+            <InvestRedeemSection pool={pool} />
           </Box>
         </Grid>
       </Box>
