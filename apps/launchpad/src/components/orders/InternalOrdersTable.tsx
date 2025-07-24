@@ -1,22 +1,13 @@
 import { useCallback, useEffect, useMemo } from 'react'
-import { useFormContext, BalanceInput, Checkbox } from '@centrifuge/forms'
-import { Asset, formatDate, formatUIBalance, networkToName, useHoldings, usePendingAmounts } from '@centrifuge/shared'
-import { AssetId, Balance, Price, ShareClass } from '@centrifuge/sdk'
-import { Card, DataTable, Loader, NetworkIcon, AssetIconText, AssetSymbol } from '@centrifuge/ui'
+import { useFormContext } from '@centrifuge/forms'
+import { useHoldings, usePendingAmounts, networkToName } from '@centrifuge/shared'
+import { Price, ShareClass } from '@centrifuge/sdk'
+import { Card, DataTable, Loader, NetworkIcon } from '@centrifuge/ui'
 import { Flex, Heading, Text } from '@chakra-ui/react'
 import { usePoolProvider } from '@contexts/PoolProvider'
-
-type OrderMode = 'approve' | 'issue'
-
-type Row = {
-  id: string
-  chainId: string
-  amount: Balance
-  asset?: Asset
-  assetId: AssetId
-  approvedAt?: Date
-  epoch?: number
-}
+import { OrderMode } from './modeConfig'
+import { Row, tableColumnsConfig } from './tableColumnsConfig'
+import { tableDataConfig } from './tableDataConfig'
 
 export const InternalOrdersTable = ({
   mode,
@@ -30,78 +21,33 @@ export const InternalOrdersTable = ({
   const { poolDetails } = usePoolProvider()
   const { data: pendingAmounts, isLoading: isPendingAmountsLoading } = usePendingAmounts(shareClass)
   const { data: holdings, isLoading: isHoldingsLoading } = useHoldings(shareClass)
-
+  const { setValue, watch, getValues } = useFormContext()
+  const selectedAssets = watch('selectedAssets')
   const poolDecimals = poolDetails?.currency.decimals
 
-  const { setValue, watch, getValues } = useFormContext<{
-    selectedAssets: Array<{
-      uniqueId: string
-      assetId: AssetId
-      approveAssetAmount?: string
-      issuePricePerShare?: string
-      assetDecimals?: number
-    }>
-  }>()
-
-  const selectedAssets = watch('selectedAssets')
+  const dataConfig = tableDataConfig[mode]
+  const columnConfig = tableColumnsConfig[mode]
 
   const reshapedData = useMemo(() => {
     if (!pendingAmounts || !holdings) return {}
-    return pendingAmounts.reduce<Record<number, Row[]>>((acc, item, idx) => {
+    return pendingAmounts.reduce<Record<number, Row[]>>((acc, item) => {
       const holding = holdings.find((h) => h.assetId.equals(item.assetId) && h.asset.chainId === item.chainId)
-      let newItems: Row[] = []
-
-      if (mode === 'approve' && item.pendingDeposit && !item.pendingDeposit.isZero()) {
-        newItems.push({
-          id: `${item.chainId}-${item.assetId.toString()}-${idx}`,
-          chainId: item.chainId.toString(),
-          amount: item.pendingDeposit,
-          asset: holding?.asset,
-          assetId: item.assetId,
-        })
-      } else if (mode === 'issue') {
-        newItems = item.pendingIssuances.map((issuance) => ({
-          id: `${item.chainId}-${issuance.epoch}-${idx}`,
-          chainId: item.chainId.toString(),
-          amount: issuance.amount,
-          approvedAt: issuance.approvedAt,
-          epoch: issuance.epoch,
-          asset: holding?.asset,
-          assetId: item.assetId,
-        }))
-      }
-
+      const newItems = dataConfig.getRows(item, holding?.asset)
       if (newItems.length > 0) {
         acc[item.chainId] = [...(acc[item.chainId] || []), ...newItems]
       }
       return acc
     }, {})
-  }, [pendingAmounts, holdings, mode])
+  }, [pendingAmounts, holdings, dataConfig])
 
   const data = useMemo(() => Object.values(reshapedData).flat(), [reshapedData])
 
-  useEffect(() => {
-    const current = getValues('selectedAssets') || []
-    if (data.length > 0 && current.length === 0) {
-      const initialFormState = data.map((row) =>
-        mode === 'issue'
-          ? {
-              uniqueId: row.id,
-              assetId: row.assetId,
-              issuePricePerShare: pricePerShare.toFloat().toString(),
-            }
-          : {
-              uniqueId: row.id,
-              assetId: row.assetId,
-              approveAssetAmount: row.amount.toFloat().toString(),
-              assetDecimals: row.asset?.decimals,
-            }
-      )
-      setValue('selectedAssets', initialFormState, {
-        shouldValidate: true,
-      })
-    }
-  }, [data, mode, pricePerShare])
+  const createFormRow = useCallback(
+    (row: Row) => {
+      return dataConfig.createFormRow(row, pricePerShare)
+    },
+    [dataConfig, pricePerShare]
+  )
 
   const handleCheckboxChange = useCallback(
     (checked: boolean, row: Row) => {
@@ -114,119 +60,32 @@ export const InternalOrdersTable = ({
           { shouldValidate: true }
         )
       } else {
-        const newItem =
-          mode === 'issue'
-            ? {
-                uniqueId: row.id,
-                assetId: row.assetId,
-                issuePricePerShare: pricePerShare.toFloat().toString(),
-              }
-            : {
-                uniqueId: row.id,
-                assetId: row.assetId,
-                approveAssetAmount: row.amount.toFloat().toString(),
-                assetDecimals: row.asset?.decimals,
-              }
-
+        const newItem = createFormRow(row)
         setValue('selectedAssets', [...current, newItem], { shouldValidate: true })
       }
     },
-    [getValues, setValue, mode, pricePerShare]
+    [getValues, setValue, createFormRow]
   )
 
+  useEffect(() => {
+    const current = getValues('selectedAssets') || []
+    if (data.length > 0 && current.length === 0) {
+      const initialFormState = data.map(createFormRow)
+      setValue('selectedAssets', initialFormState, { shouldValidate: true })
+    }
+  }, [data, createFormRow, getValues, setValue])
+
   const columns = useMemo(() => {
-    const isChecked = (row: Row) => selectedAssets.some((a) => a.uniqueId === row.id)
-
-    const baseColumns = [
-      {
-        header: 'Amount',
-        accessor: 'amount',
-        render: (row: Row) => (
-          <Text>
-            {formatUIBalance(row.amount, {
-              tokenDecimals: row.asset?.decimals,
-              currency: row.asset?.symbol,
-            })}
-          </Text>
-        ),
-      },
-      {
-        header: 'Currency',
-        accessor: 'currency',
-        render: (row: Row) => <AssetIconText assetSymbol={row.asset?.symbol as AssetSymbol} boxSize="20px" />,
-      },
-    ]
-
-    const sharedCheckboxColumn = {
-      render: (row: Row) => (
-        <Checkbox name="" checked={isChecked(row)} onChange={(e) => handleCheckboxChange(e, row)} />
-      ),
-    }
-
-    if (mode === 'approve') {
-      return [
-        { header: 'Approve', accessor: 'id', ...sharedCheckboxColumn, width: '60px' },
-        ...baseColumns,
-        {
-          header: 'Approve Amount',
-          accessor: 'approveAmount',
-          render: (row: Row) => {
-            const idx = selectedAssets.findIndex((a) => a.uniqueId === row.id)
-            return (
-              <BalanceInput
-                name={`selectedAssets.${idx}.approveAssetAmount`}
-                buttonLabel="Max"
-                decimals={row.asset?.decimals}
-                onButtonClick={() => {
-                  setValue(`selectedAssets.${idx}.approveAssetAmount`, row.amount.toFloat().toString())
-                }}
-              />
-            )
-          },
-        },
-      ]
-    }
-
-    return [
-      { header: 'Issue', accessor: 'id', ...sharedCheckboxColumn },
-      ...baseColumns,
-      {
-        header: 'Approved At',
-        accessor: 'approvedAt',
-        render: (row: Row) => <Text>{formatDate(row.approvedAt ?? new Date(), 'short', true)}</Text>,
-      },
-      {
-        header: 'Issue with NAV per share',
-        accessor: 'issuePricePerShare',
-        render: (row: Row) => {
-          const idx = selectedAssets.findIndex((a) => a.uniqueId === row.id)
-          return (
-            <BalanceInput
-              name={`selectedAssets.${idx}.issuePricePerShare`}
-              disabled={idx === -1}
-              buttonLabel="Latest"
-              onButtonClick={() => {
-                setValue(`selectedAssets.${idx}.issuePricePerShare`, pricePerShare.toFloat().toString())
-              }}
-              currency={poolDetails?.currency.symbol}
-              decimals={poolDecimals}
-            />
-          )
-        },
-      },
-      {
-        header: 'Issue new shares',
-        accessor: 'newShares',
-        render: (row: Row) => {
-          const idx = selectedAssets.findIndex((a) => a.uniqueId === row.id)
-          if (idx === -1) return <Text>-</Text>
-          const issuePrice = new Price(selectedAssets[idx].issuePricePerShare ?? 0)
-          const newShares = issuePrice.mul(row.amount)
-          return <Text>{formatUIBalance(newShares, { precision: 2 })}</Text>
-        },
-      },
-    ]
-  }, [selectedAssets, mode, handleCheckboxChange, pricePerShare, setValue])
+    if (!columnConfig) return []
+    return columnConfig.getColumns({
+      isChecked: (row: Row) => selectedAssets.some((a: any) => a.uniqueId === row.id),
+      handleCheckboxChange,
+      selectedAssets,
+      setValue,
+      pricePerShare,
+      poolDecimals,
+    })
+  }, [selectedAssets, columnConfig, handleCheckboxChange, pricePerShare, setValue, poolDecimals])
 
   if (isPendingAmountsLoading || isHoldingsLoading) {
     return <Loader />
@@ -248,7 +107,7 @@ export const InternalOrdersTable = ({
               <NetworkIcon networkId={chainIdNum} />
               <Heading size="sm">{networkToName(chainIdNum)}</Heading>
             </Flex>
-            {/* @ts-ignore */}
+            {/* @ts-expect-error - TODO: fix this */}
             <DataTable data={tableData} columns={columns} />
           </Card>
         )
