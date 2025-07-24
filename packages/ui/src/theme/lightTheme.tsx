@@ -31,13 +31,13 @@ export const lightTheme = defineConfig({
     semanticTokens: {
       colors: {
         black: {
-          solid: { value: '{colors.black.500}' },
-          contrast: { value: white },
-          fg: { value: '{colors.black.100}' },
-          muted: { value: '{colors.black.100}' },
-          subtle: { value: '{colors.black.50}' },
-          emphasized: { value: '{colors.black.800}' },
-          focusRing: { value: '{colors.gray.500}' },
+          solid: { value: '{colors.gray.800}' },
+          contrast: { value: '{colors.gray.100}' },
+          fg: { value: '{colors.gray.600}' },
+          muted: { value: '{colors.gray.100}' },
+          subtle: { value: '{colors.gray.300}' },
+          emphasized: { value: '{colors.gray.500}' },
+          focusRing: { value: '{colors.gray.800}' },
         },
         blue: {
           solid: { value: '{colors.blue.500}' },
@@ -49,8 +49,8 @@ export const lightTheme = defineConfig({
           focusRing: { value: '{colors.blue.500}' },
         },
         gray: {
-          solid: { value: '{colors.gray.800}' },
-          contrast: { value: '{colors.gray.100}' },
+          solid: { value: '{colors.gray.100}' },
+          contrast: { value: '{colors.black.100}' },
           fg: { value: '{colors.gray.600}' },
           muted: { value: '{colors.gray.100}' },
           subtle: { value: '{colors.gray.300}' },

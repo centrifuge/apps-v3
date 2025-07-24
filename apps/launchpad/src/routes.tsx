@@ -9,12 +9,14 @@ import IssueOrders from '@routes/orders/IssueOrders'
 import ApproveRedemptions from '@routes/orders/ApproveRedemptions'
 import RevokeShares from '@routes/orders/RevokeShares'
 import PoolAccess from '@routes/settings/PoolAccess'
+import PoolStructure from '@routes/settings/PoolStructure'
 import NotFound from '@routes/NotFound'
 import HeaderLayout from '@layouts/HeaderLayout'
 import AddHolding from '@routes/holdings/AddHolding'
 import DepositHolding from '@routes/holdings/DepositHolding'
 import WithdrawHolding from '@routes/holdings/WithdrawHolding'
-import UpdateHolding from '@routes/holdings/UpdateHolding'
+import Vaults from '@routes/Vaults'
+import UpdateMetadata from '@routes/UpdateMetadata'
 
 export const routes = createBrowserRouter([
   {
@@ -45,21 +47,27 @@ export const routes = createBrowserRouter([
             element: <PoolAccess />,
             handle: { hasSettings: false, hasTabs: false },
           },
+          {
+            path: 'settings/:poolId/poolStructure',
+            element: <PoolStructure />,
+            handle: { hasSettings: false, hasTabs: false },
+          },
           { path: 'holdings/:poolId/add', element: <AddHolding />, handle: { hasSettings: false, hasTabs: true } },
           {
-            path: 'holdings/:poolId/deposit',
+            path: 'holdings/:poolId/deposit/:holdingId',
             element: <DepositHolding />,
             handle: { hasSettings: false, hasTabs: true },
           },
           {
-            path: 'holdings/:poolId/withdraw',
+            path: 'holdings/:poolId/withdraw/:holdingId',
             element: <WithdrawHolding />,
             handle: { hasSettings: false, hasTabs: true },
           },
+          { path: 'vaults/:poolId', element: <Vaults />, handle: { hasSettings: false, hasTabs: false } },
           {
-            path: 'holdings/:poolId/update',
-            element: <UpdateHolding />,
-            handle: { hasSettings: false, hasTabs: true },
+            path: 'updateMetadata/:poolId',
+            element: <UpdateMetadata />,
+            handle: { hasSettings: false, hasTabs: false },
           },
           { path: '*', element: <NotFound /> },
         ],

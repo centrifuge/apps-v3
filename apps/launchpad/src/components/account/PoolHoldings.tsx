@@ -1,11 +1,10 @@
 import { Balance, ShareClass } from '@centrifuge/sdk'
-import { networkToName, useHoldings, formatBalance } from '@centrifuge/shared'
-import { Button, NetworkIcon } from '@centrifuge/ui'
+import { networkToName, useHoldings, formatBalance, formatUIBalance } from '@centrifuge/shared'
+import { LinkButton, NetworkIcon } from '@centrifuge/ui'
 import { DataTable, ColumnDefinition, ActionsDropdown } from '@centrifuge/ui'
 import { Flex, Heading, Stack, Text } from '@chakra-ui/react'
-import { usePoolProvider } from '@contexts/PoolProvider'
-import { useEffect, useMemo } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useMemo } from 'react'
+import { useParams } from 'react-router-dom'
 
 type Row = {
   id: number
@@ -67,15 +66,12 @@ const columns: ColumnDefinition<Row>[] = [
 ]
 
 export function PoolHoldings({ shareClass, poolDecimals }: { shareClass: ShareClass; poolDecimals: number }) {
-  const navigate = useNavigate()
   const { poolId } = useParams()
-  const holdings = useHoldings(shareClass)
-  const { poolDetails } = usePoolProvider()
-  const currencySymbol = poolDetails?.currency.symbol ?? 'USD'
+  const { data: holdings } = useHoldings(shareClass)
 
   // TODO: Right now we are assuming that 1USD = 1USDC, this needs to be updated in the future
   const totalValue = useMemo(() => {
-    return holdings?.data?.reduce(
+    return holdings?.reduce(
       (acc, holding) => {
         return acc.add(holding.value)
       },
@@ -83,17 +79,17 @@ export function PoolHoldings({ shareClass, poolDecimals }: { shareClass: ShareCl
     )
   }, [holdings, poolDecimals])
 
-  if (!holdings || !holdings.data || holdings.data.length === 0) {
+  if (!holdings || holdings.length === 0) {
     return null
   }
 
-  const data: Row[] = holdings?.data?.map((holding, idx) => ({
+  const data: Row[] = holdings?.map((holding, idx) => ({
     id: idx,
     asset: holding.asset.symbol,
     network: holding.asset.chainId,
-    quantity: formatBalance(holding.amount),
-    price: formatBalance(holding.value.mul(holding.amount)),
-    value: formatBalance(holding.value, currencySymbol),
+    quantity: formatUIBalance(holding.amount, { precision: 2, tokenDecimals: holding.asset.decimals }),
+    price: formatUIBalance(holding.price.toFloat(), { precision: 2 }),
+    value: formatUIBalance(holding.value, { precision: 2, tokenDecimals: poolDecimals }),
     vaults: [],
     actions: () => {
       return (
@@ -102,37 +98,17 @@ export function PoolHoldings({ shareClass, poolDecimals }: { shareClass: ShareCl
             {
               label: 'deposit',
               element: (
-                <Button
-                  label="Deposit"
-                  onClick={() => navigate(`/holdings/${poolId}/deposit`)}
-                  variant="plain"
-                  size="sm"
-                  height="14px"
-                />
+                <LinkButton to={`/holdings/${poolId}/deposit/${holding.assetId}`} size="sm" variant="plain">
+                  Deposit
+                </LinkButton>
               ),
             },
             {
               label: 'withdraw',
               element: (
-                <Button
-                  label="Withdraw"
-                  onClick={() => navigate(`/holdings/${poolId}/withdraw`)}
-                  variant="plain"
-                  size="sm"
-                  height="14px"
-                />
-              ),
-            },
-            {
-              label: 'update',
-              element: (
-                <Button
-                  label="Update"
-                  onClick={() => navigate(`/holdings/${poolId}/update`)}
-                  variant="plain"
-                  size="sm"
-                  height="14px"
-                />
+                <LinkButton to={`/holdings/${poolId}/withdraw/${holding.assetId}`} size="sm" variant="plain">
+                  Withdraw
+                </LinkButton>
               ),
             },
           ]}
@@ -147,13 +123,14 @@ export function PoolHoldings({ shareClass, poolDecimals }: { shareClass: ShareCl
         <Heading size="sm">Holdings</Heading>
         <Flex justify="space-between">
           <Heading size="3xl">{formatBalance(totalValue ?? 0)} USDC</Heading>
-          <Button
-            label="Add holding"
-            onClick={() => navigate(`/holdings/${poolId}/add`)}
-            colorPalette="gray"
-            width="140px"
-            size="sm"
-          />
+          <Flex gap={2}>
+            <LinkButton to={`/holdings/${poolId}/add`} colorPalette="black" width="140px" size="sm" colorScheme="black">
+              Add holding
+            </LinkButton>
+            <LinkButton to={`/vaults/${poolId}`} colorPalette="yellow" width="140px" size="sm">
+              Vaults
+            </LinkButton>
+          </Flex>
         </Flex>
       </Stack>
       <DataTable data={data} columns={columns} />

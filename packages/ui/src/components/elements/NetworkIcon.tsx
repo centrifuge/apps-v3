@@ -5,8 +5,10 @@ import EthereumSvg from '../../assets/logos/ethereum.svg'
 import ArbitrumSvg from '../../assets/logos/arbitrum.svg'
 import CeloSvg from '../../assets/logos/celo.svg'
 import BaseSvg from '../../assets/logos/base.svg'
+import PlumeSvg from '../../assets/logos/plume.svg'
+import AvalancheSvg from '../../assets/logos/avalanche.svg'
 
-export type Network = 'ethereum' | 'arbitrum' | 'celo' | 'base'
+export type Network = 'ethereum' | 'arbitrum' | 'celo' | 'base' | 'plume' | 'avalanche'
 
 export const NETWORK_ID_MAP: Record<number, Network> = {
   1: 'ethereum', // Ethereum Mainnet
@@ -17,6 +19,10 @@ export const NETWORK_ID_MAP: Record<number, Network> = {
   44787: 'celo', // Celo Alfajores
   8453: 'base', // Base Mainnet
   84532: 'base', // Base Sepolia
+  98866: 'plume', // Plume
+  98867: 'plume', // Plume Testnet
+  43114: 'avalanche', // Avalanche Mainnet
+  43113: 'avalanche', // Avalanche Fuji Testnet
 }
 
 export const capitalizeNetworkName = (networkId: number): string => {
@@ -41,6 +47,8 @@ export const NetworkIcon: React.FC<NetworkIconProps> = ({
     arbitrum: ArbitrumSvg,
     celo: CeloSvg,
     base: BaseSvg,
+    plume: PlumeSvg,
+    avalanche: AvalancheSvg,
   }
 
   const resolvedNetwork = NETWORK_ID_MAP[networkId] || 'ethereum'

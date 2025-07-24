@@ -1,9 +1,9 @@
 import { formatUIBalance, ShareClassWithDetails } from '@centrifuge/shared'
 import { usePendingAmounts } from '@centrifuge/shared/src/hooks/useShareClass'
-import { Button, Card } from '@centrifuge/ui'
+import { Button, Card, LinkButton } from '@centrifuge/ui'
 import { Flex, Heading, Separator, Stack } from '@chakra-ui/react'
 import { useMemo } from 'react'
-import { useNavigate, useParams } from 'react-router'
+import { useParams } from 'react-router'
 
 export function Orders({
   title,
@@ -16,13 +16,12 @@ export function Orders({
   isInvestment?: boolean
   poolCurrencySymbol: string
 }) {
-  const navigate = useNavigate()
   const params = useParams()
   const { data: pendingAmounts } = usePendingAmounts(shareClass.shareClass)
   const poolId = params.poolId
+  const defaultRoute = `/orders/${poolId}/approve`
 
   const findRoute = (isApprove: boolean) => {
-    const defaultRoute = `/orders/${poolId}/approve`
     let route = defaultRoute
     if (isInvestment && isApprove) {
       route = defaultRoute
@@ -34,7 +33,7 @@ export function Orders({
       route = `/orders/${poolId}/revokeRedeem`
     }
 
-    navigate(route)
+    return route
   }
 
   const pendingAmount = useMemo(() => {
@@ -45,7 +44,7 @@ export function Orders({
 
   const approvedAmount = useMemo(() => {
     return pendingAmounts
-      ?.map((p) => (isInvestment ? p.approvedDeposit : p.approvedRedeem))
+      ?.map((p) => (isInvestment ? p.pendingIssuancesTotal : p.pendingRevocationsTotal))
       .reduce((acc, curr) => acc + curr.toFloat(), 0)
   }, [pendingAmounts, isInvestment])
 
@@ -63,7 +62,9 @@ export function Orders({
             })}
           </Heading>
         </Stack>
-        <Button label="Approve" onClick={() => findRoute(true)} colorPalette="gray" size="sm" width="120px" />
+        <LinkButton to={findRoute(true)} colorPalette="black" size="sm" width="120px">
+          Approve
+        </LinkButton>
       </Flex>
       <Separator mt={4} mb={4} />
       <Flex mt={2} justify="space-between" alignItems="center">
@@ -76,13 +77,15 @@ export function Orders({
             })}
           </Heading>
         </Stack>
-        <Button
-          label={isInvestment ? 'Issue' : 'Revoke'}
-          onClick={() => findRoute(false)}
-          colorPalette="gray"
-          size="sm"
-          width="120px"
-        />
+        {isInvestment ? (
+          <LinkButton to={findRoute(false)} colorPalette="black" size="sm" width="120px">
+            Issue
+          </LinkButton>
+        ) : (
+          <LinkButton to={findRoute(false)} colorPalette="black" size="sm" width="120px">
+            Revoke
+          </LinkButton>
+        )}
       </Flex>
     </Card>
   )
