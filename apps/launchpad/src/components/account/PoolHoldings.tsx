@@ -1,9 +1,8 @@
 import { Balance, ShareClass } from '@centrifuge/sdk'
-import { networkToName, useHoldings, formatBalance } from '@centrifuge/shared'
+import { networkToName, useHoldings, formatBalance, formatUIBalance } from '@centrifuge/shared'
 import { LinkButton, NetworkIcon } from '@centrifuge/ui'
 import { DataTable, ColumnDefinition, ActionsDropdown } from '@centrifuge/ui'
 import { Flex, Heading, Stack, Text } from '@chakra-ui/react'
-import { usePoolProvider } from '@contexts/PoolProvider'
 import { useMemo } from 'react'
 import { useParams } from 'react-router-dom'
 
@@ -68,13 +67,11 @@ const columns: ColumnDefinition<Row>[] = [
 
 export function PoolHoldings({ shareClass, poolDecimals }: { shareClass: ShareClass; poolDecimals: number }) {
   const { poolId } = useParams()
-  const holdings = useHoldings(shareClass)
-  const { poolDetails } = usePoolProvider()
-  const currencySymbol = poolDetails?.currency.symbol ?? 'USD'
+  const { data: holdings } = useHoldings(shareClass)
 
   // TODO: Right now we are assuming that 1USD = 1USDC, this needs to be updated in the future
   const totalValue = useMemo(() => {
-    return holdings?.data?.reduce(
+    return holdings?.reduce(
       (acc, holding) => {
         return acc.add(holding.value)
       },
@@ -82,17 +79,17 @@ export function PoolHoldings({ shareClass, poolDecimals }: { shareClass: ShareCl
     )
   }, [holdings, poolDecimals])
 
-  if (!holdings || !holdings.data || holdings.data.length === 0) {
+  if (!holdings || holdings.length === 0) {
     return null
   }
 
-  const data: Row[] = holdings?.data?.map((holding, idx) => ({
+  const data: Row[] = holdings?.map((holding, idx) => ({
     id: idx,
     asset: holding.asset.symbol,
     network: holding.asset.chainId,
-    quantity: formatBalance(holding.amount),
-    price: formatBalance(holding.value.mul(holding.amount)),
-    value: formatBalance(holding.value, currencySymbol),
+    quantity: formatUIBalance(holding.amount, { precision: 2, tokenDecimals: holding.asset.decimals }),
+    price: formatUIBalance(holding.price.toFloat(), { precision: 2 }),
+    value: formatUIBalance(holding.value, { precision: 2, tokenDecimals: poolDecimals }),
     vaults: [],
     actions: () => {
       return (
