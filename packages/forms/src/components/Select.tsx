@@ -1,18 +1,18 @@
-// Select.tsx
-import React from 'react'
-import { Portal, createListCollection, Select as ChakraSelect, Field, SelectRootProps, Group } from '@chakra-ui/react'
-import { useFormContext, useController, FieldValues, FieldPath } from 'react-hook-form'
+import type { FieldPath, FieldValues } from 'react-hook-form'
+import { useFormContext, useController } from 'react-hook-form'
+import { createListCollection, Select as ChakraSelect, Field, SelectRootProps, Group } from '@chakra-ui/react'
+import { ReactNode } from 'react'
 import { RiArrowDownSLine } from 'react-icons/ri'
 import { useGetFormError } from '../hooks/useGetFormError'
 
 export interface CustomSelectProps<TFieldValues extends FieldValues = FieldValues>
   extends Omit<SelectRootProps, 'collection'> {
   disabled?: boolean
-  items: { value: string; children?: React.ReactNode; label: string }[]
+  items: { value: string; children?: ReactNode; label: string }[]
   label: string
   name: FieldPath<TFieldValues>
   rules?: object
-  onSelectChange?: (value: any) => void
+  onSelectChange?: (value: unknown) => void
 }
 
 export function Select<TFieldValues extends FieldValues = FieldValues>(props: CustomSelectProps<TFieldValues>) {
@@ -53,7 +53,7 @@ export function Select<TFieldValues extends FieldValues = FieldValues>(props: Cu
           <ChakraSelect.HiddenSelect />
 
           <ChakraSelect.Control>
-            <ChakraSelect.Trigger>
+            <ChakraSelect.Trigger style={{ borderRadius: '8px' }}>
               <ChakraSelect.ValueText placeholder="Please select..." />
               <RiArrowDownSLine />
             </ChakraSelect.Trigger>
