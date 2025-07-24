@@ -3,7 +3,6 @@ import { networkToName, useHoldings, formatBalance, formatUIBalance } from '@cen
 import { LinkButton, NetworkIcon } from '@centrifuge/ui'
 import { DataTable, ColumnDefinition, ActionsDropdown } from '@centrifuge/ui'
 import { Flex, Heading, Stack, Text } from '@chakra-ui/react'
-import { usePoolProvider } from '@contexts/PoolProvider'
 import { useMemo } from 'react'
 import { useParams } from 'react-router-dom'
 
@@ -69,10 +68,6 @@ const columns: ColumnDefinition<Row>[] = [
 export function PoolHoldings({ shareClass, poolDecimals }: { shareClass: ShareClass; poolDecimals: number }) {
   const { poolId } = useParams()
   const { data: holdings } = useHoldings(shareClass)
-  const { poolDetails } = usePoolProvider()
-  const currencySymbol = poolDetails?.currency.symbol ?? 'USD'
-
-  console.log(holdings)
 
   // TODO: Right now we are assuming that 1USD = 1USDC, this needs to be updated in the future
   const totalValue = useMemo(() => {
