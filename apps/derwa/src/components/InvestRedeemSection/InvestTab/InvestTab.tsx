@@ -31,7 +31,7 @@ export default function InvestTab({
   const { data: vaultDetails, isLoading: isVaultDetailsLoading } = useVaultDetails(vault)
   const { data: investment, isLoading: isInvestmentLoading } = useInvestment(vault)
   const { data: portfolio, isLoading: isPortfolioLoading } = usePortfolio()
-  const { execute } = useCentrifugeTransaction()
+  const { execute, isPending } = useCentrifugeTransaction()
   const [actionType, setActionType] = useState<InvestActionType>(InvestAction.INVEST_AMOUNT)
 
   const claimableSharesAmount = investment?.claimableInvestShares.toBigInt() ?? 0n
@@ -91,6 +91,7 @@ export default function InvestTab({
   )
 
   const isLoading = isTabLoading || isVaultDetailsLoading || isInvestmentLoading || isPortfolioLoading
+  const isDisabled = isPending || !investment || !vaultDetails
 
   if (isLoading) {
     return (
@@ -113,6 +114,7 @@ export default function InvestTab({
       <Box mt={4} height="100%">
         <InvestTabForm
           actionType={actionType}
+          isDisabled={isDisabled}
           maxInvestAmount={maxInvestAmount}
           networks={networks}
           parsedInvestAmount={parsedInvestAmount}

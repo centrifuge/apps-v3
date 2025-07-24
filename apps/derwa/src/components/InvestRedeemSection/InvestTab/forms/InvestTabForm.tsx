@@ -8,6 +8,7 @@ import { VaultDetails } from '@utils/types'
 
 interface InvestTabFormProps {
   actionType: InvestActionType
+  isDisabled: boolean
   maxInvestAmount: string
   networks?: PoolNetwork[]
   parsedInvestAmount: 0 | Balance
@@ -18,6 +19,7 @@ interface InvestTabFormProps {
 
 export function InvestTabForm({
   actionType,
+  isDisabled,
   maxInvestAmount,
   networks,
   parsedInvestAmount,
@@ -34,6 +36,7 @@ export function InvestTabForm({
           parsedInvestAmount={parsedInvestAmount}
           vaults={vaults}
           vaultDetails={vaultDetails}
+          isDisabled={isDisabled}
         />
       )
     // TODO: add this for sync invest form

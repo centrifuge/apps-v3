@@ -12,6 +12,7 @@ import { debounce, formatBalance, formatBalanceToString } from '@centrifuge/shar
 import { useSwitchChain } from 'wagmi'
 
 interface InvestAmountProps {
+  isDisabled: boolean
   maxInvestAmount: string
   networks?: PoolNetwork[]
   parsedInvestAmount: 0 | Balance
@@ -20,6 +21,7 @@ interface InvestAmountProps {
 }
 
 export function InvestAmount({
+  isDisabled,
   maxInvestAmount,
   networks,
   parsedInvestAmount,
@@ -134,7 +136,7 @@ export function InvestAmount({
             </>
           )}
         </Box>
-        <SubmitButton colorPalette="yellow" width="100%">
+        <SubmitButton colorPalette="yellow" width="100%" disabled={isDisabled}>
           Invest
         </SubmitButton>
         {hasNoInvestmentCurrency ? (
