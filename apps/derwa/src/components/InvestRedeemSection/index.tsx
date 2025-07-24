@@ -2,7 +2,7 @@ import { useEffect, useState, type ComponentType, type Dispatch } from 'react'
 import { useChainId } from 'wagmi'
 import { Box, Flex, Heading, Spinner, Stack, Text } from '@chakra-ui/react'
 import type { PoolNetwork, ShareClassId, Vault } from '@centrifuge/sdk'
-import { useIsMember, usePoolNetworks, useVaults } from '@centrifuge/shared'
+import { useInvestment, useIsMember, usePoolNetworks, useVaults } from '@centrifuge/shared'
 import { useGeolocation } from '@hooks/useGeolocation'
 import { ConnectionGuard } from '@components/ConnectionGuard'
 import { Tabs } from '@components/Tabs'
@@ -10,6 +10,7 @@ import { InfoWrapper } from '@components/InvestRedeemSection/components/InfoWrap
 import InvestTab from '@components/InvestRedeemSection/InvestTab/InvestTab'
 import RedeemTab from '@components/InvestRedeemSection/RedeemTab/RedeemTab'
 import type { PoolDetails } from '@utils/types'
+import { InvestRedeemClaimForm } from '@components/InvestRedeemSection/components/InvestRedeemClaimForm'
 
 export interface TabProps {
   isInvestorWhiteListed: boolean
@@ -132,10 +133,16 @@ function VaultGuard({
   setVaults,
 }: VaultGuardProps) {
   const { data: networks, isLoading: isNetworksLoading } = usePoolNetworks(poolDetails.id)
+  const { data: investment, isLoading: isInvestmentLoading } = useInvestment(vault)
   const chainIds = networks?.map((network) => network.chainId) ?? []
   const network = networks?.find((n) => n.chainId === connectedChainId)
   const { data, isLoading: isVaultsLoading } = useVaults(network, shareClassId)
-  const isVaultGuardLoading = isLoading || isNetworksLoading || isVaultsLoading
+  const isVaultGuardLoading = isLoading || isNetworksLoading || isVaultsLoading || isInvestmentLoading
+  const hasClaims =
+    (investment?.claimableInvestShares.toBigInt() ?? 0n) > 0n ||
+    (investment?.claimableRedeemCurrency.toBigInt() ?? 0n) > 0n
+
+  console.log({ investment })
 
   useEffect(() => {
     if (data?.length && (!vault || !data.includes(vault))) {
@@ -153,24 +160,36 @@ function VaultGuard({
     )
   }
 
+  if (!vault) return <Text>No vaults found for this pool on this network.</Text>
+
+  if (hasClaims) {
+    return (
+      <InvestRedeemClaimForm
+        claimableInvestShares={investment?.claimableInvestShares}
+        claimableRedeemCurrency={investment?.claimableRedeemCurrency}
+        claimableInvestCurrencyEquivalent={investment?.claimableInvestCurrencyEquivalent}
+        claimableRedeemSharesEquivalent={investment?.claimableRedeemSharesEquivalent}
+        investmentCurrency={investment?.investmentCurrency}
+        shareCurrency={investment?.shareCurrency}
+        vault={vault}
+      />
+    )
+  }
+
   return (
     <ConnectionGuard
       networks={chainIds}
       message="This pool is only available on specific networks. Please switch to one of the supported networks to continue."
     >
-      {!vault ? (
-        <Text>No vaults found for this pool on this network.</Text>
-      ) : (
-        <Stack height="100%">
-          <Tab
-            isInvestorWhiteListed={isInvestorWhiteListed}
-            isLoading={isVaultGuardLoading}
-            networks={networks}
-            vault={vault}
-            vaults={vaults ?? []}
-          />
-        </Stack>
-      )}
+      <Stack height="100%">
+        <Tab
+          isInvestorWhiteListed={isInvestorWhiteListed}
+          isLoading={isVaultGuardLoading}
+          networks={networks}
+          vault={vault}
+          vaults={vaults ?? []}
+        />
+      </Stack>
     </ConnectionGuard>
   )
 }

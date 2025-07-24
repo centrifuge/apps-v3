@@ -4,7 +4,6 @@ import { Box, Button, Flex, Heading, Spinner, Text } from '@chakra-ui/react'
 import { Form, useForm, safeParse, createBalanceSchema } from '@centrifuge/forms'
 import { Balance } from '@centrifuge/sdk'
 import {
-  formatBalance,
   formatBalanceToString,
   useCentrifugeTransaction,
   useInvestment,
@@ -19,7 +18,6 @@ import {
 import { InvestTabForm } from '@components/InvestRedeemSection/InvestTab/forms/InvestTabForm'
 import { TabProps } from '@components/InvestRedeemSection'
 import { InfoWrapper } from '@components/InvestRedeemSection/components/InfoWrapper'
-import { InvestClaimForm } from '@components/InvestRedeemSection/InvestTab/forms/InvestClaimForm'
 
 export default function InvestTab({
   isInvestorWhiteListed,
@@ -33,11 +31,6 @@ export default function InvestTab({
   const { data: portfolio, isLoading: isPortfolioLoading } = usePortfolio()
   const { execute, isPending } = useCentrifugeTransaction()
   const [actionType, setActionType] = useState<InvestActionType>(InvestAction.INVEST_AMOUNT)
-
-  const claimableSharesAmount = investment?.claimableInvestShares.toBigInt() ?? 0n
-  const claimableAmount = investment?.claimableInvestShares
-    ? formatBalance(investment.claimableInvestShares, investment.shareCurrency.symbol, 2)
-    : undefined
 
   const investmentCurrencyChainId = vaultDetails?.investmentCurrency?.chainId
   const portfolioInvestmentAsset = portfolio?.find((asset) => asset.currency.chainId === investmentCurrencyChainId)
@@ -103,10 +96,6 @@ export default function InvestTab({
 
   if (!isInvestorWhiteListed) {
     return <InvestorOnboardingFeedback />
-  }
-
-  if (claimableAmount && claimableSharesAmount > 0n) {
-    return <InvestClaimForm claimableAmount={claimableAmount} execute={execute} vault={vault} />
   }
 
   return (
