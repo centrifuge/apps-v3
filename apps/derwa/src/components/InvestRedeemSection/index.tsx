@@ -1,6 +1,6 @@
 import { useEffect, useState, type ComponentType, type Dispatch } from 'react'
 import { useChainId } from 'wagmi'
-import { Flex, Heading, Stack, Text } from '@chakra-ui/react'
+import { Box, Flex, Heading, Spinner, Stack, Text } from '@chakra-ui/react'
 import type { PoolNetwork, ShareClassId, Vault } from '@centrifuge/sdk'
 import { useIsMember, usePoolNetworks, useVaults } from '@centrifuge/shared'
 import { useGeolocation } from '@hooks/useGeolocation'
@@ -17,7 +17,6 @@ export interface TabProps {
   networks?: PoolNetwork[]
   vault: Vault
   vaults: Vault[]
-  setVault: Dispatch<Vault>
 }
 interface VaultGuardProps {
   connectedChainId: number
@@ -132,10 +131,11 @@ function VaultGuard({
   setVault,
   setVaults,
 }: VaultGuardProps) {
-  const { data: networks } = usePoolNetworks(poolDetails.id)
+  const { data: networks, isLoading: isNetworksLoading } = usePoolNetworks(poolDetails.id)
   const chainIds = networks?.map((network) => network.chainId) ?? []
   const network = networks?.find((n) => n.chainId === connectedChainId)
-  const { data } = useVaults(network, shareClassId)
+  const { data, isLoading: isVaultsLoading } = useVaults(network, shareClassId)
+  const isVaultGuardLoading = isLoading || isNetworksLoading || isVaultsLoading
 
   useEffect(() => {
     if (data?.length && (!vault || !data.includes(vault))) {
@@ -144,6 +144,14 @@ function VaultGuard({
 
     setVaults(data)
   }, [data, vault, setVault, setVaults])
+
+  if (isVaultGuardLoading) {
+    return (
+      <Box height="100%" display="flex" alignItems="center" justifyContent="center">
+        <Spinner size="lg" color="black.solid" />
+      </Box>
+    )
+  }
 
   return (
     <ConnectionGuard
@@ -156,11 +164,10 @@ function VaultGuard({
         <Stack height="100%">
           <Tab
             isInvestorWhiteListed={isInvestorWhiteListed}
-            isLoading={isLoading}
+            isLoading={isVaultGuardLoading}
             networks={networks}
             vault={vault}
             vaults={vaults ?? []}
-            setVault={setVault}
           />
         </Stack>
       )}
