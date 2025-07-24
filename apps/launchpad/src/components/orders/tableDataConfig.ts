@@ -13,14 +13,19 @@ const createApproveFormRow = (row: Row) => ({
 const createRedeemFormRow = (row: Row) => ({
   uniqueId: row.id,
   assetId: row.assetId,
-  redeemAmount: row.amount.toFloat().toString(),
-  assetDecimals: row.asset?.decimals,
+  approveShareAmount: row.amount.toFloat().toString(),
 })
 
-const createIssueLikeFormRow = (row: Row, pricePerShare: Price) => ({
+const createIssueFormRow = (row: Row, pricePerShare: Price) => ({
   uniqueId: row.id,
   assetId: row.assetId,
   issuePricePerShare: pricePerShare.toFloat().toString(),
+})
+
+const createRevokeFormRow = (row: Row, pricePerShare: Price) => ({
+  uniqueId: row.id,
+  assetId: row.assetId,
+  revokePricePerShare: pricePerShare.toFloat().toString(),
 })
 
 export const tableDataConfig: Record<
@@ -77,7 +82,7 @@ export const tableDataConfig: Record<
         assetId: item.assetId,
       }))
     },
-    createFormRow: createIssueLikeFormRow,
+    createFormRow: createIssueFormRow,
   },
 
   // --- REVOKE MODE ---
@@ -93,6 +98,6 @@ export const tableDataConfig: Record<
         assetId: item.assetId,
       }))
     },
-    createFormRow: createIssueLikeFormRow,
+    createFormRow: createRevokeFormRow,
   },
 }

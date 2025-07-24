@@ -1,70 +1,47 @@
-import { createBalanceSchema } from '@centrifuge/forms'
-import { AssetId } from '@centrifuge/sdk'
-import { z } from 'zod'
+import { Balance, Price } from '@centrifuge/sdk'
 
 export type OrderMode = 'approve' | 'issue' | 'redeem' | 'revoke'
 
-const ApproveAsset = z.object({
-  assetId: z.instanceof(AssetId),
-  approveAssetAmount: createBalanceSchema(6),
-})
-
-// Price is always 18 decimals
-const IssueAsset = z.object({
-  assetId: z.instanceof(AssetId),
-  issuePricePerShare: createBalanceSchema(18),
-})
-
-const RedeemAsset = z.object({
-  assetId: z.instanceof(AssetId),
-  redeemAmount: createBalanceSchema(6),
-})
-
-// Price is always 18 decimals
-const RevokeAsset = z.object({
-  assetId: z.instanceof(AssetId),
-  revokeAmount: createBalanceSchema(18),
-})
+const convertBalance = (balance: string, decimals: number) => {
+  return Balance.fromFloat(balance, decimals)
+}
 
 export const modeConfig = {
   approve: {
-    schema: ApproveAsset,
     headingText: 'Approve Deposits',
     buttonText: 'Approve',
-    mapAssets: (asset: any) => ({
+    mapAssets: (asset: any, decimals: number) => ({
       assetId: asset.assetId,
-      approveAssetAmount: asset.approveAssetAmount,
+      approveAssetAmount: convertBalance(asset.approveAssetAmount, decimals),
     }),
     executeTransaction: (shareClass: any, assets: any[]) => shareClass.approveDepositsAndIssueShares(assets),
   },
   issue: {
-    schema: IssueAsset,
     headingText: 'Issue Shares',
     buttonText: 'Issue',
     mapAssets: (asset: any) => ({
       assetId: asset.assetId,
-      issuePricePerShare: asset.issuePricePerShare,
+      // Price is always 18 decimals
+      issuePricePerShare: new Price(convertBalance(asset.issuePricePerShare, 18).toString()),
     }),
     executeTransaction: (shareClass: any, assets: any[]) => shareClass.approveDepositsAndIssueShares(assets),
   },
   redeem: {
-    schema: RedeemAsset,
     headingText: 'Redeem Shares',
     buttonText: 'Redeem',
-    mapAssets: (asset: any) => ({
+    mapAssets: (asset: any, decimals: number) => ({
       assetId: asset.assetId,
-      redeemAmount: asset.redeemAmount,
+      approveShareAmount: convertBalance(asset.approveShareAmount, decimals),
     }),
-    executeTransaction: (shareClass: any, assets: any[]) => console.log('redeem', assets),
+    executeTransaction: (shareClass: any, assets: any[]) => shareClass.approveRedeemsAndRevokeShares(assets),
   },
   revoke: {
-    schema: RevokeAsset,
     headingText: 'Revoke Shares',
     buttonText: 'Revoke',
     mapAssets: (asset: any) => ({
       assetId: asset.assetId,
-      revokeAmount: asset.revokeAmount,
+      revokePricePerShare: new Price(convertBalance(asset.revokePricePerShare, 18).toString()),
     }),
-    executeTransaction: (shareClass: any, assets: any[]) => shareClass.revokeRedeem(assets),
+    executeTransaction: (shareClass: any, assets: any[]) => shareClass.approveRedeemsAndRevokeShares(assets),
   },
 }

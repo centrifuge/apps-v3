@@ -13,17 +13,19 @@ export const InternalOrdersTable = ({
   mode,
   shareClass,
   pricePerShare,
+  shareClassSymbol,
 }: {
   mode: OrderMode
   shareClass: ShareClass
   pricePerShare: Price
+  shareClassSymbol: string
 }) => {
   const { poolDetails } = usePoolProvider()
   const { data: pendingAmounts, isLoading: isPendingAmountsLoading } = usePendingAmounts(shareClass)
   const { data: holdings, isLoading: isHoldingsLoading } = useHoldings(shareClass)
   const { setValue, watch, getValues } = useFormContext()
   const selectedAssets = watch('selectedAssets')
-  const poolDecimals = poolDetails?.currency.decimals
+  const poolCurrency = poolDetails?.currency
 
   const dataConfig = tableDataConfig[mode]
   const columnConfig = tableColumnsConfig[mode]
@@ -83,9 +85,10 @@ export const InternalOrdersTable = ({
       selectedAssets,
       setValue,
       pricePerShare,
-      poolDecimals,
+      poolCurrency,
+      shareClassSymbol,
     })
-  }, [selectedAssets, columnConfig, handleCheckboxChange, pricePerShare, setValue, poolDecimals])
+  }, [selectedAssets, columnConfig, handleCheckboxChange, pricePerShare, setValue, poolCurrency])
 
   if (isPendingAmountsLoading || isHoldingsLoading) {
     return <Loader />

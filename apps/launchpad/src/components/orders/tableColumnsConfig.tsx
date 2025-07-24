@@ -1,6 +1,6 @@
 import { BalanceInput, Checkbox } from '@centrifuge/forms'
 import { AssetId, Balance, Price } from '@centrifuge/sdk'
-import { Asset, formatUIBalance, formatDate } from '@centrifuge/shared'
+import { Asset, formatUIBalance, formatDate, CurrencyDetails } from '@centrifuge/shared'
 import { AssetIconText, AssetSymbol } from '@centrifuge/ui'
 import { Text } from '@chakra-ui/react'
 
@@ -29,7 +29,8 @@ type GetColumnsArgs = {
   selectedAssets: SelectedAssets
   setValue: (name: any, value: any, options?: any) => void
   pricePerShare: Price
-  poolDecimals?: number
+  poolCurrency?: CurrencyDetails
+  shareClassSymbol: string
 }
 
 const baseCheckboxColumn = (
@@ -40,17 +41,29 @@ const baseCheckboxColumn = (
   header,
   accessor: 'id',
   render: (row: Row) => (
-    <Checkbox name="" checked={isChecked(row)} onChange={(e: any) => handleCheckboxChange(e.target.checked, row)} />
+    <Checkbox
+      name=""
+      checked={isChecked(row)}
+      onChange={(checked) => handleCheckboxChange(checked, row)}
+      value={row.id}
+    />
   ),
   width: '80px',
 })
 
-const baseAmountColumn = () => ({
+const baseAmountColumn = (poolCurrency?: CurrencyDetails, shareClassSymbol?: string) => ({
   header: 'Amount',
   accessor: 'amount',
-  render: (row: Row) => (
-    <Text>{formatUIBalance(row.amount, { tokenDecimals: row.asset?.decimals, currency: row.asset?.symbol })}</Text>
-  ),
+  render: (row: Row) => {
+    return (
+      <Text>
+        {formatUIBalance(row.amount, {
+          tokenDecimals: poolCurrency?.decimals ?? row.asset?.decimals,
+          currency: shareClassSymbol ?? row.asset?.symbol,
+        })}
+      </Text>
+    )
+  },
 })
 
 const baseCurrencyColumn = () => ({
@@ -74,7 +87,7 @@ export const tableColumnsConfig = {
         },
       ]
     },
-    getColumns: ({ isChecked, handleCheckboxChange, selectedAssets, setValue }: GetColumnsArgs) => [
+    getColumns: ({ isChecked, handleCheckboxChange, selectedAssets, setValue, poolCurrency }: GetColumnsArgs) => [
       baseCheckboxColumn('Approve', isChecked, handleCheckboxChange),
       baseAmountColumn(),
       baseCurrencyColumn(),
@@ -88,7 +101,7 @@ export const tableColumnsConfig = {
               name={`selectedAssets.${idx}.approveAmount`}
               disabled={idx === -1}
               buttonLabel="Max"
-              decimals={row.asset?.decimals}
+              decimals={poolCurrency?.decimals}
               onButtonClick={() => {
                 setValue(`selectedAssets.${idx}.approveAmount`, row.amount.toFloat().toString())
               }}
@@ -113,9 +126,16 @@ export const tableColumnsConfig = {
         },
       ]
     },
-    getColumns: ({ isChecked, handleCheckboxChange, selectedAssets, setValue }: GetColumnsArgs) => [
+    getColumns: ({
+      isChecked,
+      handleCheckboxChange,
+      selectedAssets,
+      setValue,
+      poolCurrency,
+      shareClassSymbol,
+    }: GetColumnsArgs) => [
       baseCheckboxColumn('Redeem', isChecked, handleCheckboxChange),
-      baseAmountColumn(),
+      baseAmountColumn(poolCurrency, shareClassSymbol),
       baseCurrencyColumn(),
       {
         header: 'Approve Amount',
@@ -124,12 +144,13 @@ export const tableColumnsConfig = {
           const idx = selectedAssets.findIndex((a) => a.uniqueId === row.id)
           return (
             <BalanceInput
-              name={`selectedAssets.${idx}.approveAmount`}
+              name={`selectedAssets.${idx}.approveShareAmount`}
               disabled={idx === -1}
               buttonLabel="Max"
-              decimals={row.asset?.decimals}
+              decimals={poolCurrency?.decimals}
+              currency={shareClassSymbol}
               onButtonClick={() => {
-                setValue(`selectedAssets.${idx}.approveAmount`, row.amount.toFloat().toString())
+                setValue(`selectedAssets.${idx}.approveShareAmount`, row.amount.toFloat().toString())
               }}
             />
           )
@@ -157,7 +178,7 @@ export const tableColumnsConfig = {
       selectedAssets,
       setValue,
       pricePerShare,
-      poolDecimals,
+      poolCurrency,
     }: GetColumnsArgs) => [
       baseCheckboxColumn('Issue', isChecked, handleCheckboxChange),
       baseAmountColumn(),
@@ -180,8 +201,8 @@ export const tableColumnsConfig = {
               onButtonClick={() => {
                 setValue(`selectedAssets.${idx}.issuePricePerShare`, pricePerShare.toFloat().toString())
               }}
-              currency={poolDecimals?.currency.symbol}
-              decimals={poolDecimals?.currency.decimals}
+              currency={poolCurrency?.symbol}
+              decimals={poolCurrency?.decimals}
             />
           )
         },

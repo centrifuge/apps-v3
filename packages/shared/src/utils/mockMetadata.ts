@@ -1,11 +1,15 @@
 export const mockMetadata = {
   pool: {
-    name: 'Janus Henderson Anemoy Treasury Fund',
+    name: 'Sepolia',
     poolStatus: 'Active',
     asset: {
       class: 'Public credit',
       subClass: 'US Treasuries',
     },
+    expenseRatio: '0.25',
+    listed: true,
+
+    poolStructure: 'Revolving',
     issuer: {
       description:
         '"Janus Henderson Anemoy Treasury Fund (the Fund) is a tokenized British Virgin Islands (BVI) professional fund, licensed by the British Virgin Islands Financial Services Commission (FSC), and open to non-US Professional Investors. It solely invests in and holds short-term U.S. Treasury Bills (T-bills) with a remaining maturity of 0 to 3 months to offer minimized price and duration risks in combination with daily liquidity and money market returns. T-bills are held directly by the Fund and Asset Under Management (AUM) can be checked onchain. The fund issues its shares as the JTRSY token to investors. Investments and redemptions are processed in USDC stablecoins. Janus Henderson Investors agreed to sub-advise Anemoy and act as the sub-Investment Manager of the Fund.\n"',
