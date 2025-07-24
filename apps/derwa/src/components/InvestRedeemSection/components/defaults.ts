@@ -1,6 +1,19 @@
-export const InvestAction = {
+export const InvestSyncAction = {
   INVEST_AMOUNT: 'INVEST_AMOUNT',
   INVESTOR_REQUIREMENTS: 'INVESTOR_REQUIREMENTS',
+  SUCCESS: 'SUCCESS',
+} as const
+
+export type InvestSyncActionType = (typeof InvestAction)[keyof typeof InvestAction]
+
+export const InvestSyncFormDefaultValues = {
+  investAmount: '',
+  receiveAmount: '',
+  investorRequirements: [false, false, false],
+}
+
+export const InvestAction = {
+  INVEST_AMOUNT: 'INVEST_AMOUNT',
   SUCCESS: 'SUCCESS',
 } as const
 
@@ -9,7 +22,6 @@ export type InvestActionType = (typeof InvestAction)[keyof typeof InvestAction]
 export const InvestFormDefaultValues = {
   investAmount: '',
   receiveAmount: '',
-  investorRequirements: [false, false, false],
 }
 
 export const RedeemAction = {
