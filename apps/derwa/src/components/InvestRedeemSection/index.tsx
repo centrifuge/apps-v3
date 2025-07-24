@@ -142,8 +142,6 @@ function VaultGuard({
     (investment?.claimableInvestShares.toBigInt() ?? 0n) > 0n ||
     (investment?.claimableRedeemCurrency.toBigInt() ?? 0n) > 0n
 
-  console.log({ investment })
-
   useEffect(() => {
     if (data?.length && (!vault || !data.includes(vault))) {
       setVault(data[0])
