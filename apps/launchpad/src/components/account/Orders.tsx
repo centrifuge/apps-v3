@@ -3,7 +3,7 @@ import { usePendingAmounts } from '@centrifuge/shared/src/hooks/useShareClass'
 import { Button, Card, LinkButton } from '@centrifuge/ui'
 import { Flex, Heading, Separator, Stack } from '@chakra-ui/react'
 import { useMemo } from 'react'
-import { useNavigate, useParams } from 'react-router'
+import { useParams } from 'react-router'
 
 export function Orders({
   title,
@@ -19,9 +19,9 @@ export function Orders({
   const params = useParams()
   const { data: pendingAmounts } = usePendingAmounts(shareClass.shareClass)
   const poolId = params.poolId
+  const defaultRoute = `/orders/${poolId}/approve`
 
   const findRoute = (isApprove: boolean) => {
-    const defaultRoute = `/orders/${poolId}/approve`
     let route = defaultRoute
     if (isInvestment && isApprove) {
       route = defaultRoute
@@ -62,7 +62,9 @@ export function Orders({
             })}
           </Heading>
         </Stack>
-        <Button label="Approve" onClick={() => findRoute(true)} colorPalette="black" size="sm" width="120px" />
+        <LinkButton to={findRoute(true)} colorPalette="black" size="sm" width="120px">
+          Approve
+        </LinkButton>
       </Flex>
       <Separator mt={4} mb={4} />
       <Flex mt={2} justify="space-between" alignItems="center">
@@ -75,9 +77,15 @@ export function Orders({
             })}
           </Heading>
         </Stack>
-        <LinkButton to={findRoute(false)} colorPalette="black" size="sm" width="120px">
-          {isInvestment ? 'Issue' : 'Revoke'}
-        </LinkButton>
+        {isInvestment ? (
+          <LinkButton to={findRoute(false)} colorPalette="black" size="sm" width="120px">
+            Issue
+          </LinkButton>
+        ) : (
+          <LinkButton to={findRoute(false)} colorPalette="black" size="sm" width="120px">
+            Revoke
+          </LinkButton>
+        )}
       </Flex>
     </Card>
   )
