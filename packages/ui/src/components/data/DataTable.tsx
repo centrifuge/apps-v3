@@ -47,79 +47,81 @@ export const DataTable = <RowType extends { id?: string | number; actions?: (row
   }, [orderBy, data, currentSortKey, page, pageSize])
 
   return (
-    <Table.Root
-      size={size}
-      style={{
-        border: `1px solid ${backgroundSecondary}`,
-      }}
-    >
-      <Table.Header>
-        <Table.Row
-          style={{
-            backgroundColor: TABLE_HEADER_COLOR,
-          }}
-        >
-          {columns.map((col) => (
-            <Table.ColumnHeader
-              key={String(col.accessor)}
-              textAlign={col.textAlign || 'start'}
-              width={col.width}
-              onClick={() => updateSortOrder(col.sortKey)}
-              style={{ cursor: 'pointer' }}
-            >
-              {col.header}
-              {col.sortKey && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  _hover={{ bg: 'transparent', boxShadow: 'none' }}
-                  style={{
-                    color: '#82888D',
-                  }}
-                >
-                  <FiCode
+    <Table.ScrollArea borderWidth="1px">
+      <Table.Root
+        size={size}
+        style={{
+          border: `1px solid ${backgroundSecondary}`,
+        }}
+      >
+        <Table.Header>
+          <Table.Row
+            style={{
+              backgroundColor: TABLE_HEADER_COLOR,
+            }}
+          >
+            {columns.map((col) => (
+              <Table.ColumnHeader
+                key={String(col.accessor)}
+                textAlign={col.textAlign || 'start'}
+                width={col.width}
+                onClick={() => updateSortOrder(col.sortKey)}
+                style={{ cursor: 'pointer' }}
+              >
+                {col.header}
+                {col.sortKey && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    _hover={{ bg: 'transparent', boxShadow: 'none' }}
                     style={{
-                      display: 'inline',
-                      width: '12px',
-                      height: '18px',
                       color: '#82888D',
-                      transform: 'rotate(90deg)',
                     }}
-                  />
-                </Button>
-              )}
+                  >
+                    <FiCode
+                      style={{
+                        display: 'inline',
+                        width: '12px',
+                        height: '18px',
+                        color: '#82888D',
+                        transform: 'rotate(90deg)',
+                      }}
+                    />
+                  </Button>
+                )}
+              </Table.ColumnHeader>
+            ))}
+            <Table.ColumnHeader key={'actions'} textAlign={'center'} width={'50px'} style={{ cursor: 'pointer' }}>
+              {' '}
             </Table.ColumnHeader>
-          ))}
-          <Table.ColumnHeader key={'actions'} textAlign={'center'} width={'50px'} style={{ cursor: 'pointer' }}>
-            {' '}
-          </Table.ColumnHeader>
-        </Table.Row>
-      </Table.Header>
-
-      <Table.Body>
-        {sortedAndPaginatedData.map((row, rowIndex) => (
-          <Table.Row key={row.id ?? rowIndex}>
-            {columns.map((col) => {
-              const rawValue = row[col.accessor]
-              return (
-                <Table.Cell
-                  key={String(col.accessor)}
-                  textAlign={col.textAlign || 'start'}
-                  fontFamily="inter"
-                  width={col.width}
-                >
-                  {col.render ? col.render(row) : String(rawValue ?? '')}
-                </Table.Cell>
-              )
-            })}
-
-            <Table.Cell textAlign={'center'} width={'50px'} style={row.actions && { cursor: 'pointer' }}>
-              {row.actions ? row.actions(row) : ' '}
-            </Table.Cell>
           </Table.Row>
-        ))}
-      </Table.Body>
-    </Table.Root>
+        </Table.Header>
+
+        <Table.Body>
+          {sortedAndPaginatedData.map((row, rowIndex) => (
+            <Table.Row key={row.id ?? rowIndex}>
+              {columns.map((col) => {
+                const rawValue = row[col.accessor]
+                return (
+                  <Table.Cell
+                    key={String(col.accessor)}
+                    textAlign={col.textAlign || 'start'}
+                    fontFamily="inter"
+                    width={col.width}
+                  >
+                    {col.render ? col.render(row) : String(rawValue ?? '')}
+                  </Table.Cell>
+                )
+              })}
+
+              <Table.Cell textAlign={'center'} width={'50px'} style={row.actions && { cursor: 'pointer' }}>
+                {row.actions ? row.actions(row) : ' '}
+              </Table.Cell>
+            </Table.Row>
+          ))}
+        </Table.Body>
+      </Table.Root>
+    </Table.ScrollArea>
   )
 }
 

@@ -1,22 +1,37 @@
 import { Link } from 'react-router-dom'
 import { IoArrowBack } from 'react-icons/io5'
 import { Box, Flex, Grid, Heading, Text } from '@chakra-ui/react'
-import { PoolId } from '@centrifuge/sdk'
-import { usePoolDetails } from '@centrifuge/shared'
-import { FAQSection } from '@components/FAQSection'
-import { InvestRedeemSection } from '@components/InvestRedeemSection'
-import { PoolPerformanceChart } from '@components/pools/PoolPerformanceChart'
-import { UnderlyingCollateralSection } from '@components/UnderlyingCollateralSection'
 import { PoolPageSkeleton } from '@components/Skeletons/PoolPageSkeleton'
 import { usePoolsContext } from '@contexts/usePoolsContext'
 import { routePaths } from '@routes/routePaths'
+import { InvestRedeemSection } from '@components/InvestRedeemSection'
+import { PoolDetailsSummary } from '@components/PoolDetails/PoolDetailsSummary'
+import { PoolDetailsPermissioned } from '@components/PoolDetails/PoolDetailsPermissioned'
+import { PoolDetailsPermissionless } from '@components/PoolDetails/PoolDetailsPermissionless'
+import { formatUIBalance } from '@centrifuge/shared'
 
 export default function PoolPage() {
-  const { selectedPoolId, isLoading: isPoolsLoading } = usePoolsContext()
-  const { data: pool, isLoading: isPoolDetailsLoading } = usePoolDetails(selectedPoolId as PoolId)
+  const {
+    isLoading: isPoolsLoading,
+    poolDetails,
+    isPoolDetailsLoading,
+    networks,
+    isNetworksLoading,
+    shareClass,
+  } = usePoolsContext()
+  // TODO: This should come from SDK metadata, discuss how exactly to handle this
+  const poolType = poolDetails?.metadata?.pool.type || 'open'
 
-  if (isPoolsLoading || isPoolDetailsLoading) {
+  const scId = shareClass?.details.id.toString()
+  const token = scId && poolDetails?.metadata?.shareClasses[scId]
+
+  if (isPoolsLoading || isPoolDetailsLoading || isNetworksLoading) {
     return <PoolPageSkeleton />
+  }
+
+  // TODO: handle case when data is not available
+  if (!poolDetails || !networks || !shareClass) {
+    return null
   }
 
   return (
@@ -26,28 +41,57 @@ export default function PoolPage() {
           <Flex alignItems="center">
             <IoArrowBack />
             <Heading size="2xl" ml={8}>
-              {pool?.metadata?.pool.name}
+              {poolDetails?.metadata?.pool.name}
             </Heading>
           </Flex>
         </Link>
-        <Box>
-          <Heading size="xl" color="black" width="auto" textAlign="center">
-            Current Holdings
-          </Heading>
-          <Text>$237,890</Text>
+        <Box mt={4}>
+          <Text fontSize="12px" color="black" width="auto" textAlign="right">
+            Your current holdings in {poolDetails?.metadata?.pool.name}
+          </Text>
+          <Flex align={'flex-end'} justifyContent="flex-end">
+            <Text fontSize="24px" fontWeight="bold" textAlign="right">
+              145,984.87&nbsp;
+            </Text>
+            <Text fontSize="24px" textAlign="right">
+              USD
+            </Text>
+          </Flex>
         </Box>
       </Flex>
       <Box marginTop={8}>
-        <Grid templateColumns={{ base: '1fr', sm: '1fr', md: '1fr', lg: '6fr 4fr' }} gap={10} alignItems="stretch">
-          <PoolPerformanceChart pool={pool} />
-          <InvestRedeemSection pool={pool} />
+        <Grid templateColumns={{ base: '1fr', sm: '1fr', md: '1fr', lg: '6fr 4fr' }} gap={10}>
+          <Box minW={0}>
+            <PoolDetailsSummary
+              items={[
+                {
+                  label: 'TVL (USD)',
+                  // TODO: is this correct?
+                  value: formatUIBalance(shareClass?.details.nav),
+                },
+                {
+                  label: 'Token price (USD)',
+                  // TODO: such a big number is breaking UI a lot, need to format it more
+                  // value: formatUIBalance(shareClass?.details.pricePerShare),
+                  value: '12,194.91',
+                },
+                {
+                  label: 'APY',
+                  value: token?.apyPercentage?.toString() || '0%',
+                },
+              ]}
+            />
+
+            {poolType === 'open' && (
+              <PoolDetailsPermissioned poolDetails={poolDetails} networks={networks} shareClass={shareClass} />
+            )}
+            {poolType === 'closed' && <PoolDetailsPermissionless poolDetails={poolDetails} />}
+          </Box>
+
+          <Box maxHeight={'350px'} position={'sticky'} top={8}>
+            <InvestRedeemSection pool={poolDetails} />
+          </Box>
         </Grid>
-        <Box mt={8}>
-          <UnderlyingCollateralSection />
-        </Box>
-        <Box mt={8}>
-          <FAQSection />
-        </Box>
       </Box>
     </>
   )

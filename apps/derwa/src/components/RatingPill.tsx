@@ -9,6 +9,19 @@ import moodyLogo from '../assets/logos/moody.svg'
 import spLogo from '../assets/logos/sp.svg'
 import particulaLogo from '../assets/logos/particula.svg'
 
+export const getAgencyNormalisedName = (agency: string | undefined): string => {
+  switch (agency) {
+    case "Moody's":
+      return 'moody'
+    case 'S&P Global':
+      return 'sp'
+    case 'Particula':
+      return 'particula'
+    default:
+      return agency || ''
+  }
+}
+
 const logos = [
   {
     agency: 'moody',
