@@ -3,7 +3,7 @@ import { useInvestment } from '@centrifuge/shared'
 import type { Balance, PoolNetwork, Vault } from '@centrifuge/sdk'
 import { type RedeemActionType, RedeemAction } from '@components/InvestRedeemSection/components/defaults'
 import { RedeemAmount } from '@components/InvestRedeemSection/RedeemTab/forms/RedeemAmount'
-import { RedeemCancel } from '@components/InvestRedeemSection/RedeemTab/forms/RedeemCancel'
+import { RedeemTxFeedback } from '@components/InvestRedeemSection/RedeemTab/forms/RedeemTxFeedback'
 import { RedeemTxCancelled } from '@components/InvestRedeemSection/RedeemTab/forms/RedeemTxCancelled'
 
 interface RedeemTabFormProps {
@@ -53,16 +53,18 @@ export function RedeemTabForm({
           vaults={vaults}
         />
       )
-    case RedeemAction.CANCEL:
+    case RedeemAction.SUCCESS:
       return (
-        <RedeemCancel
+        <RedeemTxFeedback
           currencies={currencies}
+          isDisabled={isDisabled}
           parsedRedeemAmount={parsedRedeemAmount}
           parsedReceiveAmount={parsedReceiveAmount}
           setActionType={setActionType}
         />
       )
-    case RedeemAction.SUCCESS:
-      return <RedeemTxCancelled currencies={currencies} setActionType={setActionType} />
+    // TODO: add step when adding sync redeem
+    // case RedeemAction.CANCEL:
+    //   return <RedeemTxCancelled currencies={currencies} setActionType={setActionType} />
   }
 }

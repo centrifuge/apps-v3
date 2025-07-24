@@ -24,9 +24,21 @@ export const InvestFormDefaultValues = {
   receiveAmount: '',
 }
 
-export const RedeemAction = {
+export const RedeemSyncAction = {
   REDEEM_AMOUNT: 'REDEEM_AMOUNT',
   CANCEL: 'CANCEL',
+  SUCCESS: 'SUCCESS',
+} as const
+
+export type RedeemSyncActionType = (typeof RedeemAction)[keyof typeof RedeemAction]
+
+export const RedeemSyncFormDefaultValues = {
+  redeemAmount: '',
+  receiveAmount: '',
+}
+
+export const RedeemAction = {
+  REDEEM_AMOUNT: 'REDEEM_AMOUNT',
   SUCCESS: 'SUCCESS',
 } as const
 

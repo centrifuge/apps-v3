@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { z } from 'zod'
-import { Box } from '@chakra-ui/react'
+import { Box, Spinner } from '@chakra-ui/react'
 import { createBalanceSchema, Form, safeParse, useForm } from '@centrifuge/forms'
 import { Balance } from '@centrifuge/sdk'
 import { formatBalanceToString, useInvestment, useCentrifugeTransaction, useVaultDetails } from '@centrifuge/shared'
@@ -12,9 +12,9 @@ import {
 import { TabProps } from '@components/InvestRedeemSection'
 import { RedeemTabForm } from '@components/InvestRedeemSection/RedeemTab/forms/RedeemTabForm'
 
-export default function RedeemTab({ networks, vault, vaults }: TabProps) {
-  const { data: vaultDetails } = useVaultDetails(vault)
-  const { data: investment } = useInvestment(vault)
+export default function RedeemTab({ isLoading: isTabLoading, networks, vault, vaults }: TabProps) {
+  const { data: vaultDetails, isLoading: isVaultDetailsLoading } = useVaultDetails(vault)
+  const { data: investment, isLoading: isInvestmentLoading } = useInvestment(vault)
   const { execute, isPending } = useCentrifugeTransaction()
   const [actionType, setActionType] = useState<RedeemActionType>(RedeemAction.REDEEM_AMOUNT)
   const maxRedeemBalance = investment?.shareBalance ?? 0
@@ -43,7 +43,7 @@ export default function RedeemTab({ networks, vault, vaults }: TabProps) {
     mode: 'onChange',
     onSubmit: (values) => {
       redeem(values.redeemAmount)
-      setActionType(RedeemAction.CANCEL)
+      setActionType(RedeemAction.SUCCESS)
     },
     onSubmitError: (error) => console.error('Redeem form submission error:', error),
   })
@@ -60,6 +60,15 @@ export default function RedeemTab({ networks, vault, vaults }: TabProps) {
     [receiveAmount, schema.shape.receiveAmount]
   )
   const isDisabled = isPending || !vaultDetails || !investment || parsedRedeemAmount === 0
+  const isLoading = isTabLoading || isVaultDetailsLoading || isInvestmentLoading
+
+  if (isLoading) {
+    return (
+      <Box height="100%" display="flex" alignItems="center" justifyContent="center">
+        <Spinner size="lg" color="black.solid" />
+      </Box>
+    )
+  }
 
   return (
     <Form form={form} style={{ height: '100%' }}>

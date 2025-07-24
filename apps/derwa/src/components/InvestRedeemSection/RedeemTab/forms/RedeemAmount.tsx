@@ -15,9 +15,7 @@ import {
   useInvestment,
 } from '@centrifuge/shared'
 import { NetworkIcons } from '@centrifuge/ui'
-import { InfoWrapper } from '@components/InvestRedeemSection/components/InfoWrapper'
 import { usePoolsContext } from '@contexts/usePoolsContext'
-import { infoText } from '@utils/infoText'
 
 interface RedeemAmountProps {
   isDisabled: boolean
@@ -125,58 +123,61 @@ export function RedeemAmount({
   }, [maxRedeemAmount, pricePerShare])
 
   return (
-    <Box>
-      <Text fontWeight={500} mb={2}>
-        Redeem
-      </Text>
-      <BalanceInput
-        name="redeemAmount"
-        decimals={shareClass?.details.pricePerShare.decimals}
-        placeholder="0.00"
-        onChange={debouncedCalculateReceiveAmount}
-        currency={shareCurrencySymbol}
-      />
-      <Flex mt={2} justify="space-between">
-        <Flex>
-          <Badge
-            background="bg-tertiary"
-            color="text-primary"
-            opacity={0.5}
-            borderRadius={10}
-            px={3}
-            h="24px"
-            borderColor="gray.500 !important"
-            border="1px solid"
-            cursor="pointer"
-            onClick={setMaxRedeemAmount}
-          >
-            MAX
-          </Badge>
-          <Text color="text-primary" opacity={0.5} alignSelf="flex-end" ml={2}>
-            {formatBalance(maxRedeemBalance, shareCurrencySymbol)}
-          </Text>
-        </Flex>
-        <NetworkIcons networkIds={networkIds} />
-      </Flex>
-      {parsedRedeemAmount !== 0 && (
-        <>
-          <Text fontWeight={500} mt={6} mb={2}>
-            You receive
+    <Box height="100%">
+      <Flex justify="space-between" flexDirection="column" height="100%" mb={2} pb={6}>
+        <Box>
+          <Text fontWeight={500} mb={2}>
+            Redeem
           </Text>
           <BalanceInput
-            name="receiveAmount"
+            name="redeemAmount"
+            decimals={shareClass?.details.pricePerShare.decimals}
             placeholder="0.00"
-            decimals={portfolioInvestmentCurrency?.decimals}
-            onChange={debouncedCalculateRedeemAmount}
-            selectOptions={investmentCurrencies}
-            onSelectChange={changeVault}
+            onChange={debouncedCalculateReceiveAmount}
+            currency={shareCurrencySymbol}
           />
-        </>
-      )}
-      <SubmitButton colorPalette="yellow" disabled={isDisabled} width="100%">
-        Redeem
-      </SubmitButton>
-      {parsedRedeemAmount === 0 && <InfoWrapper text={infoText().redeem} />}
+          <Flex mt={2} justify="space-between">
+            <Flex>
+              <Badge
+                background="bg-tertiary"
+                color="text-primary"
+                opacity={0.5}
+                borderRadius={10}
+                px={3}
+                h="24px"
+                borderColor="gray.500 !important"
+                border="1px solid"
+                cursor="pointer"
+                onClick={setMaxRedeemAmount}
+              >
+                MAX
+              </Badge>
+              <Text color="text-primary" opacity={0.5} alignSelf="flex-end" ml={2}>
+                {formatBalance(maxRedeemBalance, shareCurrencySymbol)}
+              </Text>
+            </Flex>
+            <NetworkIcons networkIds={networkIds} />
+          </Flex>
+          {parsedRedeemAmount !== 0 && (
+            <>
+              <Text fontWeight={500} mt={6} mb={2}>
+                You receive
+              </Text>
+              <BalanceInput
+                name="receiveAmount"
+                placeholder="0.00"
+                decimals={portfolioInvestmentCurrency?.decimals}
+                onChange={debouncedCalculateRedeemAmount}
+                selectOptions={investmentCurrencies}
+                onSelectChange={changeVault}
+              />
+            </>
+          )}
+        </Box>
+        <SubmitButton colorPalette="yellow" disabled={isDisabled} width="100%">
+          Redeem
+        </SubmitButton>
+      </Flex>
     </Box>
   )
 }
