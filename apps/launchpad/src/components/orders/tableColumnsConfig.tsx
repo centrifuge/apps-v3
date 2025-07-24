@@ -179,6 +179,7 @@ export const tableColumnsConfig = {
       setValue,
       pricePerShare,
       poolCurrency,
+      shareClassSymbol,
     }: GetColumnsArgs) => [
       baseCheckboxColumn('Issue', isChecked, handleCheckboxChange),
       baseAmountColumn(),
@@ -189,7 +190,7 @@ export const tableColumnsConfig = {
         render: (row: Row) => <Text>{formatDate(row.approvedAt ?? new Date(), 'short', true)}</Text>,
       },
       {
-        header: 'Price per Share',
+        header: 'Issue with nav per share',
         accessor: 'issuePricePerShare',
         render: (row: Row) => {
           const idx = selectedAssets.findIndex((a) => a.uniqueId === row.id)
@@ -201,7 +202,7 @@ export const tableColumnsConfig = {
               onButtonClick={() => {
                 setValue(`selectedAssets.${idx}.issuePricePerShare`, pricePerShare.toFloat().toString())
               }}
-              currency={poolCurrency?.symbol}
+              currency={shareClassSymbol}
               decimals={poolCurrency?.decimals}
             />
           )
@@ -234,11 +235,53 @@ export const tableColumnsConfig = {
         assetId: item.assetId,
       }))
     },
-    getColumns: (args: GetColumnsArgs) => {
-      const columns = tableColumnsConfig.issue.getColumns(args)
-      columns[0].header = 'Revoke'
-      columns[columns.length - 1].header = 'Payout'
-      return columns
-    },
+    getColumns: ({
+      isChecked,
+      handleCheckboxChange,
+      selectedAssets,
+      setValue,
+      pricePerShare,
+      poolCurrency,
+      shareClassSymbol,
+    }: GetColumnsArgs) => [
+      baseCheckboxColumn('Revoke', isChecked, handleCheckboxChange),
+      baseAmountColumn(poolCurrency, shareClassSymbol),
+      baseCurrencyColumn(),
+      {
+        header: 'Approved At',
+        accessor: 'approvedAt',
+        render: (row: Row) => <Text>{formatDate(row.approvedAt ?? new Date(), 'short', true)}</Text>,
+      },
+      {
+        header: 'Revoke with price per Share',
+        accessor: 'revokePricePerShare',
+        render: (row: Row) => {
+          const idx = selectedAssets.findIndex((a) => a.uniqueId === row.id)
+          return (
+            <BalanceInput
+              name={`selectedAssets.${idx}.revokePricePerShare`}
+              disabled={idx === -1}
+              buttonLabel="Latest"
+              onButtonClick={() => {
+                setValue(`selectedAssets.${idx}.revokePricePerShare`, pricePerShare.toFloat().toString())
+              }}
+              currency={poolCurrency?.symbol}
+              decimals={poolCurrency?.decimals}
+            />
+          )
+        },
+      },
+      {
+        header: 'Issue new shares',
+        accessor: 'payout',
+        render: (row: Row) => {
+          const idx = selectedAssets.findIndex((a) => a.uniqueId === row.id)
+          if (idx === -1) return <Text>-</Text>
+          const issuePrice = new Price(selectedAssets[idx].issuePricePerShare ?? 0)
+          const newShares = issuePrice.mul(row.amount)
+          return <Text>{formatUIBalance(newShares, { precision: 2 })}</Text>
+        },
+      },
+    ],
   },
 }

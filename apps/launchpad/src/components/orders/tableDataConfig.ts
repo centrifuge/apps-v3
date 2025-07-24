@@ -31,17 +31,17 @@ const createRevokeFormRow = (row: Row, pricePerShare: Price) => ({
 export const tableDataConfig: Record<
   OrderMode,
   {
-    getRows: (item: any, holding?: Asset) => Row[]
+    getRows: (item: any, holding?: Asset, index?: number) => Row[]
     createFormRow: (row: Row, pricePerShare: Price) => any
   }
 > = {
   // --- APPROVE ---
   approve: {
-    getRows: (item, holding) => {
+    getRows: (item, holding, index) => {
       if (!item.pendingDeposit || item.pendingDeposit.isZero()) return []
       return [
         {
-          id: `${item.chainId}-${item.assetId.toString()}`,
+          id: `${item.chainId}-${item.assetId.toString()}-${index}`,
           chainId: item.chainId.toString(),
           amount: item.pendingDeposit,
           asset: holding,
@@ -54,11 +54,11 @@ export const tableDataConfig: Record<
 
   // --- REDEEM MODE ---
   redeem: {
-    getRows: (item, holding) => {
+    getRows: (item, holding, index) => {
       if (!item.pendingRedeem || item.pendingRedeem.isZero()) return []
       return [
         {
-          id: `${item.chainId}-${item.assetId.toString()}`,
+          id: `${item.chainId}-${item.assetId.toString()}-${index}`,
           chainId: item.chainId.toString(),
           amount: item.pendingRedeem,
           asset: holding,
@@ -71,9 +71,9 @@ export const tableDataConfig: Record<
 
   // --- ISSUE MODE ---
   issue: {
-    getRows: (item, holding) => {
+    getRows: (item, holding, index) => {
       return item.pendingIssuances.map((issuance: any, idx: number) => ({
-        id: `${item.chainId}-${issuance.epoch}-${idx}`,
+        id: `${item.chainId}-${issuance.epoch}-${idx}-${index}`,
         chainId: item.chainId.toString(),
         amount: issuance.amount,
         approvedAt: issuance.approvedAt,
@@ -87,9 +87,9 @@ export const tableDataConfig: Record<
 
   // --- REVOKE MODE ---
   revoke: {
-    getRows: (item, holding) => {
+    getRows: (item, holding, index) => {
       return item.pendingRevocations.map((revocation: any, idx: number) => ({
-        id: `${item.chainId}-${revocation.epoch}-${idx}`,
+        id: `${item.chainId}-${revocation.epoch}-${index}`,
         chainId: item.chainId.toString(),
         amount: revocation.amount,
         approvedAt: revocation.approvedAt,

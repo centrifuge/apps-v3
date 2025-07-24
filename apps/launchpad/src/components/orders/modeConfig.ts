@@ -12,17 +12,16 @@ export const modeConfig = {
     buttonText: 'Approve',
     mapAssets: (asset: any, decimals: number) => ({
       assetId: asset.assetId,
-      approveAssetAmount: convertBalance(asset.approveAssetAmount, decimals),
+      approveAssetAmount: convertBalance(asset.approveAmount, decimals),
     }),
     executeTransaction: (shareClass: any, assets: any[]) => shareClass.approveDepositsAndIssueShares(assets),
   },
   issue: {
     headingText: 'Issue Shares',
     buttonText: 'Issue',
-    mapAssets: (asset: any) => ({
+    mapAssets: (asset: any, decimals: number) => ({
       assetId: asset.assetId,
-      // Price is always 18 decimals
-      issuePricePerShare: new Price(convertBalance(asset.issuePricePerShare, 18).toString()),
+      issuePricePerShare: new Price(convertBalance(asset.issuePricePerShare, decimals).toString()),
     }),
     executeTransaction: (shareClass: any, assets: any[]) => shareClass.approveDepositsAndIssueShares(assets),
   },
@@ -38,9 +37,9 @@ export const modeConfig = {
   revoke: {
     headingText: 'Revoke Shares',
     buttonText: 'Revoke',
-    mapAssets: (asset: any) => ({
+    mapAssets: (asset: any, decimals: number) => ({
       assetId: asset.assetId,
-      revokePricePerShare: new Price(convertBalance(asset.revokePricePerShare, 18).toString()),
+      revokePricePerShare: new Price(convertBalance(asset.revokePricePerShare, decimals).toString()),
     }),
     executeTransaction: (shareClass: any, assets: any[]) => shareClass.approveRedeemsAndRevokeShares(assets),
   },

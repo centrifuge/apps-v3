@@ -38,7 +38,9 @@ export const OrdersForm = ({
     if (values.selectedAssets.length === 0 || !shareClass?.shareClass) {
       throw new Error('No assets selected or share class not found')
     }
-    const assets = values.selectedAssets.map((asset) => config.mapAssets(asset, poolCurrency?.decimals ?? 18))
+    const assets = values.selectedAssets.map((asset) =>
+      config.mapAssets(asset, asset.assetDecimals ?? poolCurrency?.decimals ?? 18)
+    )
     execute(config.executeTransaction(shareClass.shareClass, assets))
   }
 

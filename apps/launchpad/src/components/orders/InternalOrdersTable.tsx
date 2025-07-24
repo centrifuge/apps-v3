@@ -32,9 +32,9 @@ export const InternalOrdersTable = ({
 
   const reshapedData = useMemo(() => {
     if (!pendingAmounts || !holdings) return {}
-    return pendingAmounts.reduce<Record<number, Row[]>>((acc, item) => {
+    return pendingAmounts.reduce<Record<number, Row[]>>((acc, item, index) => {
       const holding = holdings.find((h) => h.assetId.equals(item.assetId) && h.asset.chainId === item.chainId)
-      const newItems = dataConfig.getRows(item, holding?.asset)
+      const newItems = dataConfig.getRows(item, holding?.asset, index)
       if (newItems.length > 0) {
         acc[item.chainId] = [...(acc[item.chainId] || []), ...newItems]
       }
@@ -42,7 +42,7 @@ export const InternalOrdersTable = ({
     }, {})
   }, [pendingAmounts, holdings, dataConfig])
 
-  const data = useMemo(() => Object.values(reshapedData).flat(), [reshapedData])
+  const data = useMemo(() => Object.values(reshapedData).flat(), [reshapedData, pendingAmounts])
 
   const createFormRow = useCallback(
     (row: Row) => {
