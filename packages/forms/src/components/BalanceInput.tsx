@@ -85,6 +85,7 @@ export function BalanceInput<TFieldValues extends FieldValues = FieldValues>(pro
     buttonLabel,
     size = 'md',
     onButtonClick,
+    defaultValue,
     ...rest
   } = props
   const currentDisplayDecimals = displayDecimals || decimals
@@ -279,9 +280,9 @@ export function BalanceInput<TFieldValues extends FieldValues = FieldValues>(pro
       <Field.ErrorText>{errorMessage}</Field.ErrorText>
     </Field.Root>
   ) : (
-    <Field.Root invalid={isError}>
+    <Field.Root>
       {label && <Field.Label>{label}</Field.Label>}
-      <Group attached border="1px solid" borderColor="gray.200" borderRadius="md">
+      <Group attached border="1px solid" borderColor={isError ? 'red.500' : 'gray.200'} borderRadius="md">
         <ChakraInput
           {...rest}
           id={name}
@@ -297,6 +298,12 @@ export function BalanceInput<TFieldValues extends FieldValues = FieldValues>(pro
           inputMode="decimal" // Shows numeric keypad on mobile
           variant="subtle"
           backgroundColor="white"
+          defaultValue={defaultValue}
+          border="transparent"
+          borderRadius="md"
+          _focusVisible={{
+            borderColor: 'transparent',
+          }}
         />
         <Text>{currency}</Text>
         <Button
@@ -304,8 +311,7 @@ export function BalanceInput<TFieldValues extends FieldValues = FieldValues>(pro
           size={inputSizes[buttonSize + 1]}
           backgroundColor="gray.100"
           color="text-secondary"
-          borderTopRightRadius={0}
-          borderBottomRightRadius={0}
+          border="transparent"
           ml={2}
           onClick={onButtonClick}
         >

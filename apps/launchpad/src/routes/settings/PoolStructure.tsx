@@ -129,6 +129,7 @@ export default function PoolStructure() {
     defaultValues: {
       poolType: 'closed',
       poolDenomination: poolCurrency,
+      // @ts-ignore
       tokens,
     },
     onSubmit: (values) => {
@@ -158,6 +159,7 @@ export default function PoolStructure() {
     reset({
       poolType: 'closed',
       poolDenomination: poolCurrency,
+      // @ts-ignore
       tokens,
     })
   }, [poolDetails, poolCurrency, reset, tokens])

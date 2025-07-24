@@ -11,7 +11,7 @@ export function useNavPerNetwork(shareClass: ShareClass) {
 }
 
 export function useHoldings(shareClass: ShareClass) {
-  const holdings$ = useMemo(() => shareClass.balances(), [shareClass])
+  const holdings$ = useMemo(() => shareClass?.balances(), [shareClass])
   return useObservable(holdings$)
 }
 
@@ -29,9 +29,9 @@ export const usePendingAmounts = (shareClass: ShareClass) => {
   return useObservable(pendingAmounts$)
 }
 
-export const useGroupPendingAmountsByChain = (pendingAmounts: PendingAmount[]) => {
+export const useGroupPendingAmountsByChain = (pendingAmounts: PendingAmount) => {
   return useMemo(() => {
-    return pendingAmounts?.reduce<Record<number, PendingAmount[]>>((acc, curr) => {
+    return pendingAmounts?.reduce<Record<number, PendingAmount[number][]>>((acc, curr) => {
       acc[curr.chainId] = [...(acc[curr.chainId] || []), curr]
       return acc
     }, {})
