@@ -46,9 +46,9 @@ export const PoolCardsSelect = ({ poolIds, setSelectedPoolId }: PoolSelectorProp
 function PoolCard({ poolDetails }: { poolDetails: PoolDetails }) {
   const tvl = '450,000,000'
   const poolMetadata = poolDetails.metadata?.pool
-  const iconUri = poolMetadata?.icon?.uri
+  const iconUri = poolMetadata?.icon?.uri ?? ''
   const shareClassId = Object.keys(poolDetails.metadata?.shareClasses ?? {})[0]
-  const shareClassDetails = poolDetails.metadata?.shareClasses[shareClassId] ?? {}
+  const shareClassDetails = poolDetails.metadata?.shareClasses ? poolDetails.metadata?.shareClasses[shareClassId] : {}
 
   return (
     <Card height="100%">
@@ -62,8 +62,8 @@ function PoolCard({ poolDetails }: { poolDetails: PoolDetails }) {
         <ValueText label="APY" value={shareClassDetails?.apyPercentage ?? '0%'} />
       </Grid>
       <Separator my={4} />
-      <Text color="gray.400" height="88px" fontSize="sm" textOverflow="ellipsis" overflow="scroll">
-        {poolMetadata?.issuer?.description.replaceAll('"', '') ?? 'Description'}
+      <Text color="gray.400" fontSize="sm">
+        {poolMetadata?.issuer?.shortDescription ?? 'Description'}
       </Text>
       <Separator my={4} />
       <Flex flexDirection="column" gap={2}>
@@ -100,7 +100,7 @@ function PoolCard({ poolDetails }: { poolDetails: PoolDetails }) {
           <Box>
             {poolMetadata?.poolRatings?.length
               ? poolMetadata?.poolRatings?.map((rating) => (
-                  <span style={{ marginLeft: '2px' }}>
+                  <span style={{ marginLeft: '2px' }} key={rating?.agency}>
                     <RatingPill rating={rating} />
                   </span>
                 ))
