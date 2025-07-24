@@ -5,7 +5,7 @@ import { PoolId } from '@centrifuge/sdk'
 import { formatBalanceAbbreviated, ipfsToHttp, PoolDetails, useAllPoolDetails } from '@centrifuge/shared'
 import { Card, ValueText } from '@centrifuge/ui'
 import { routePaths } from '@routes/routePaths'
-import { HomePageSkeleton } from '@components/Skeletons/HomePageSkeleton'
+import { PoolCardsSelectSkeleton } from '@components/Skeletons/PoolCardsSelectSkeleton'
 import { RatingPill } from '@components/RatingPill'
 
 interface PoolSelectorProps {
@@ -26,7 +26,7 @@ export const PoolCardsSelect = ({ poolIds, setSelectedPoolId }: PoolSelectorProp
     [pools]
   )
 
-  if (isLoading) return <HomePageSkeleton />
+  if (isLoading) return <PoolCardsSelectSkeleton />
 
   if (!displayPools || pools?.length === 1) return null
 

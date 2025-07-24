@@ -1,6 +1,6 @@
 import { Grid, Skeleton } from '@chakra-ui/react'
 
-export function HomePageSkeleton() {
+export function PoolCardsSelectSkeleton() {
   const cards = Array.from(Array(6).keys())
 
   return (
