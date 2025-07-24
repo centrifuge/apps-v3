@@ -1,9 +1,10 @@
-import React from 'react'
 import { PoolDetailsOverview } from './PoolDetailsOverview'
 import { Flex, Heading } from '@chakra-ui/react'
 import { ColumnDefinition, DataTable, LogoCentrifugeText, NetworkIcon } from '@centrifuge/ui'
-import { RatingPill } from '@components/RatingPill'
+import { getAgencyNormalisedName, RatingPill } from '@components/RatingPill'
 import { PoolDetailsFacts } from './PoolDetailsFacts'
+import { PoolDetails, ShareClassWithDetails, useHoldings } from '@centrifuge/shared'
+import { PoolNetwork } from '@centrifuge/sdk'
 
 type Row = {
   id: string
@@ -15,7 +16,18 @@ type Row = {
   portfolioPercentage: string
 }
 
-export const PoolDetailsPermissioned = () => {
+export const PoolDetailsPermissioned = ({
+  poolDetails,
+  networks,
+  shareClass,
+}: {
+  poolDetails: PoolDetails
+  networks: PoolNetwork[]
+  shareClass: ShareClassWithDetails
+}) => {
+  // TODO: Complains that shareClass.balances is not a function, check the hook as typing look weird
+  // const sdkHoldings = useHoldings(shareClass.shareClass)
+
   const holdings = [
     {
       id: '912797PE1',
@@ -64,42 +76,52 @@ export const PoolDetailsPermissioned = () => {
     },
   ]
 
+  const scId = shareClass?.details.id.toString()
+  const token = scId && poolDetails.metadata?.shareClasses[scId]
+
   return (
     <>
       <PoolDetailsOverview
         heading="Overview"
         items={[
-          { label: 'Asset type', value: 'Digital assets' },
+          { label: 'Asset type', value: poolDetails.metadata?.pool.asset.class },
+          // TODO: missing data, need to wait for SDK updates and to type this correctly
           { label: '90-Day APY', value: '5.5%' },
-          { label: 'Average asset maturity', value: '45 Days' },
-          { label: 'Min. investment', value: '$20k - $500k' },
-          { label: 'Investor type', value: 'Non-US Professional' },
+          // TODO: Missing property in SDK returned type weightedAverageMaturity
+          {
+            label: 'Average asset maturity',
+            value: Math.round(45.9) || 0,
+          },
+          // TODO: Format this to $50k etc
+          { label: 'Min. investment', value: token?.minInitialInvestment || 0 },
+          { label: 'Investor type', value: poolDetails.metadata?.pool.investorType || 'Non-US Professional' },
           {
             label: 'Available networks',
-            value: (
-              <Flex>
-                <NetworkIcon networkId={1} />
-                <NetworkIcon networkId={42161} />
-                <NetworkIcon networkId={42220} />
-                <NetworkIcon networkId={8453} />
-              </Flex>
-            ),
+            value: <Flex>{networks?.map((network) => <NetworkIcon networkId={network.chainId} />)}</Flex>,
           },
+          // TODO: missing data
           { label: 'Pool structure', value: 'Revolving' },
           {
             label: 'Rating',
             value: (
               <Flex>
-                <RatingPill rating={{ agency: 'moody', value: 'Aa' }} />
-                <RatingPill rating={{ agency: 'sp', value: 'AA' }} />
-                <RatingPill rating={{ agency: 'particula', value: 'BB' }} />
+                {poolDetails.metadata?.pool.poolRatings?.map((rating) => {
+                  const agency = getAgencyNormalisedName(rating.agency)
+                  const normalisedRating = {
+                    ...rating,
+                    agency,
+                  }
+                  return <RatingPill key={rating.agency} rating={normalisedRating} />
+                })}
               </Flex>
             ),
           },
+          // TODO: missing data
           { label: 'Expense ratio', value: '1%' },
         ]}
       />
 
+      {/* TODO: Missing data */}
       <PoolDetailsFacts
         heading="Key facts"
         topRow={{
