@@ -158,9 +158,7 @@ function VaultGuard({
     )
   }
 
-  if (!vault) return <Text>No vaults found for this pool on this network.</Text>
-
-  if (hasClaims) {
+  if (hasClaims && vault) {
     return (
       <InvestRedeemClaimForm
         claimableInvestShares={investment?.claimableInvestShares}
@@ -179,15 +177,19 @@ function VaultGuard({
       networks={chainIds}
       message="This pool is only available on specific networks. Please switch to one of the supported networks to continue."
     >
-      <Stack height="100%">
-        <Tab
-          isInvestorWhiteListed={isInvestorWhiteListed}
-          isLoading={isVaultGuardLoading}
-          networks={networks}
-          vault={vault}
-          vaults={vaults ?? []}
-        />
-      </Stack>
+      {!vault ? (
+        <Text>No vaults found for this pool on this network.</Text>
+      ) : (
+        <Stack height="100%">
+          <Tab
+            isInvestorWhiteListed={isInvestorWhiteListed}
+            isLoading={isVaultGuardLoading}
+            networks={networks}
+            vault={vault}
+            vaults={vaults ?? []}
+          />
+        </Stack>
+      )}
     </ConnectionGuard>
   )
 }
