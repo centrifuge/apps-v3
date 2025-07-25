@@ -1,7 +1,7 @@
 export const InvestSyncAction = {
   INVEST_AMOUNT: 'INVEST_AMOUNT',
   INVESTOR_REQUIREMENTS: 'INVESTOR_REQUIREMENTS',
-  SUCCESS: 'SUCCESS',
+  CONFIRM: 'CONFIRM',
 } as const
 
 export type InvestSyncActionType = (typeof InvestAction)[keyof typeof InvestAction]
@@ -14,7 +14,7 @@ export const InvestSyncFormDefaultValues = {
 
 export const InvestAction = {
   INVEST_AMOUNT: 'INVEST_AMOUNT',
-  SUCCESS: 'SUCCESS',
+  CONFIRM: 'CONFIRM',
 } as const
 
 export type InvestActionType = (typeof InvestAction)[keyof typeof InvestAction]
@@ -27,7 +27,7 @@ export const InvestFormDefaultValues = {
 export const RedeemSyncAction = {
   REDEEM_AMOUNT: 'REDEEM_AMOUNT',
   CANCEL: 'CANCEL',
-  SUCCESS: 'SUCCESS',
+  CONFIRM: 'CONFIRM',
 } as const
 
 export type RedeemSyncActionType = (typeof RedeemAction)[keyof typeof RedeemAction]
@@ -39,7 +39,7 @@ export const RedeemSyncFormDefaultValues = {
 
 export const RedeemAction = {
   REDEEM_AMOUNT: 'REDEEM_AMOUNT',
-  SUCCESS: 'SUCCESS',
+  CONFIRM: 'CONFIRM',
 } as const
 
 export type RedeemActionType = (typeof RedeemAction)[keyof typeof RedeemAction]

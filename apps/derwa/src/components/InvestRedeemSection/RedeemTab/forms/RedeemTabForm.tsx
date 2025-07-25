@@ -53,7 +53,7 @@ export function RedeemTabForm({
           vaults={vaults}
         />
       )
-    case RedeemAction.SUCCESS:
+    case RedeemAction.CONFIRM:
       return (
         <RedeemTxFeedback
           currencies={currencies}

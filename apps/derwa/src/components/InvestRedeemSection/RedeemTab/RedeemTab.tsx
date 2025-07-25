@@ -43,7 +43,7 @@ export default function RedeemTab({ isLoading: isTabLoading, networks, vault, va
     mode: 'onChange',
     onSubmit: (values) => {
       redeem(values.redeemAmount)
-      setActionType(RedeemAction.SUCCESS)
+      setActionType(RedeemAction.CONFIRM)
     },
     onSubmitError: (error) => console.error('Redeem form submission error:', error),
   })

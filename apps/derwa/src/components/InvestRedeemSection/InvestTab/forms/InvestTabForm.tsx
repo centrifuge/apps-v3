@@ -42,7 +42,7 @@ export function InvestTabForm({
     // TODO: add this for sync invest form
     // case InvestAction.INVESTOR_REQUIREMENTS:
     //   return <InvestRequirements />
-    case InvestAction.SUCCESS:
+    case InvestAction.CONFIRM:
       return <InvestTxFeedback vaultDetails={vaultDetails} setActionType={setActionType} />
   }
 }

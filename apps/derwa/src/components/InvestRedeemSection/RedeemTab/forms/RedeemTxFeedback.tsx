@@ -49,7 +49,7 @@ export function RedeemTxFeedback({
         width="100%"
         disabled={isDisabled}
         mt={4}
-        onClick={() => setActionType(RedeemAction.SUCCESS)}
+        onClick={() => setActionType(RedeemAction.CONFIRM)}
       >
         Redeem more
       </Button>

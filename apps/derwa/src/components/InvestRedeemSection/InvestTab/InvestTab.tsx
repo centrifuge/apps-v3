@@ -70,7 +70,7 @@ export default function InvestTab({
     mode: 'onChange',
     onSubmit: (values) => {
       invest(values.investAmount)
-      setActionType(InvestAction.SUCCESS)
+      setActionType(InvestAction.CONFIRM)
     },
     onSubmitError: (error) => console.error('Invest form submission error:', error),
   })
