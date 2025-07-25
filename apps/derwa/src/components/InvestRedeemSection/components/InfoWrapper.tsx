@@ -12,7 +12,7 @@ interface InfoWrapperProps {
 export const InfoWrapper = ({ text, title, icon, type = 'info' }: InfoWrapperProps) => {
   return (
     <Flex mt={4} border="1px solid" borderColor={type} borderRadius={10} p={4}>
-      <Icon size="lg" color={type} mr={2} mt={2}>
+      <Icon size="lg" color={type} mr={2}>
         {icon || <IoMdInformationCircleOutline />}
       </Icon>
       <Flex direction="column">

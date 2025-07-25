@@ -15,6 +15,7 @@ import { NetworkIcons } from '@centrifuge/ui'
 import { usePoolsContext } from '@contexts/usePoolsContext'
 import { VaultDetails } from '@utils/types'
 import { useGetPortfolioDetails } from '@hooks/useGetPortfolioDetails'
+import { InfoWrapper } from '@components/InvestRedeemSection/components/InfoWrapper'
 
 interface RedeemAmountProps {
   isDisabled: boolean
@@ -60,6 +61,7 @@ export function RedeemAmount({
   // Get info on the users shares holdings in their wallet
   const shareCurrencySymbol = investment?.shareCurrency.symbol ?? ''
   const maxRedeemBalance = investment?.shareBalance ?? 0
+  const hasRedeemableShares = !investment?.shareBalance.isZero()
 
   const calculateReceiveAmountValue = useCallback(
     (redeemBalance: Balance, pricePerShare?: Price) => {
@@ -119,7 +121,7 @@ export function RedeemAmount({
   )
 
   const setMaxRedeemAmount = useCallback(() => {
-    if (!maxRedeemAmount || !pricePerShare || maxRedeemBalance === 0) return
+    if (!maxRedeemAmount || !pricePerShare || !hasRedeemableShares || maxRedeemBalance === 0) return
 
     const calculatedReceiveAmount = calculateReceiveAmountValue(maxRedeemBalance, pricePerShare)
     setValue('redeemAmount', maxRedeemAmount)
@@ -128,7 +130,7 @@ export function RedeemAmount({
 
   return (
     <Box height="100%">
-      <Flex justify="space-between" flexDirection="column" height="100%" mb={2} pb={6}>
+      <Flex justify="space-between" flexDirection="column" height="100%" pb={6}>
         <Box>
           <Text fontWeight={500} mb={2}>
             Redeem
@@ -139,6 +141,7 @@ export function RedeemAmount({
             placeholder="0.00"
             onChange={debouncedCalculateReceiveAmount}
             currency={shareCurrencySymbol}
+            disabled={!hasRedeemableShares}
           />
           <Flex mt={2} justify="space-between">
             <Flex>
@@ -178,9 +181,14 @@ export function RedeemAmount({
             </>
           )}
         </Box>
-        <SubmitButton colorPalette="yellow" disabled={isDisabled} width="100%">
-          Redeem
-        </SubmitButton>
+        <Box>
+          <SubmitButton colorPalette="yellow" disabled={isDisabled} width="100%">
+            Redeem
+          </SubmitButton>
+          {!hasRedeemableShares ? (
+            <InfoWrapper text="You do not have any shares available to redeem" type="info" />
+          ) : null}
+        </Box>
       </Flex>
     </Box>
   )

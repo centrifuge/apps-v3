@@ -95,6 +95,7 @@ export function InvestAmount({
             selectOptions={investmentCurrencies}
             onSelectChange={changeVault}
             onChange={debouncedCalculateReceiveAmount}
+            disabled={!hasInvestmentCurrency}
           />
           <Flex mt={2} justify="space-between">
             <Flex>
@@ -133,12 +134,14 @@ export function InvestAmount({
             </>
           )}
         </Box>
-        <SubmitButton colorPalette="yellow" width="100%" disabled={isDisabled}>
-          Invest
-        </SubmitButton>
-        {!hasInvestmentCurrency ? (
-          <InfoWrapper text={infoText().portfolioMissingInvestmentCurrency} type="error" />
-        ) : null}
+        <Box>
+          <SubmitButton colorPalette="yellow" width="100%" disabled={isDisabled}>
+            Invest
+          </SubmitButton>
+          {!hasInvestmentCurrency ? (
+            <InfoWrapper text={infoText().portfolioMissingInvestmentCurrency} type="error" />
+          ) : null}
+        </Box>
       </Flex>
     </Box>
   )
