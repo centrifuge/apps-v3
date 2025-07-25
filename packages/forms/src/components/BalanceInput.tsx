@@ -37,8 +37,8 @@ export interface BalanceInputProps<TFieldValues extends FieldValues = FieldValue
   onChange?: (value: string, balance?: Balance) => void
   onBlur?: React.FocusEventHandler<HTMLInputElement>
   inputGroupProps?: Omit<InputGroupProps, 'children'>
-  selectOptions?: { label: string; value: number }[]
-  onSelectChange?: (value: number) => void
+  selectOptions?: { label: string; value: number | string }[]
+  onSelectChange?: (value: number | string) => void
   subLabel?: string
   buttonLabel?: string
   onButtonClick?: () => void
@@ -48,14 +48,14 @@ const CurrencySelect = ({
   options,
   onChange,
 }: {
-  options: { label: string; value: number }[]
-  onChange: (value: number) => void
+  options: { label: string; value: number | string }[]
+  onChange: (value: number | string) => void
 }) => {
   if (options.length === 0) return null
 
   return (
     <NativeSelect.Root size="xs" variant="plain" width="auto" me="-1">
-      <NativeSelect.Field fontSize="sm" onChange={(e) => onChange(Number(e.target.value))}>
+      <NativeSelect.Field fontSize="sm" onChange={(e) => onChange(e.target.value)} bg="white">
         {options.map((option) => (
           <option key={option.value} value={option.value}>
             {option.label}
@@ -262,6 +262,7 @@ export function BalanceInput<TFieldValues extends FieldValues = FieldValues>(pro
       >
         <ChakraInput
           {...rest}
+          bg={rest.bg ?? 'gray.300'}
           id={name}
           name={name}
           ref={field.ref}

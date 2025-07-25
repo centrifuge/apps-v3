@@ -69,12 +69,19 @@ export function formatBalance(
   }
 
   const fixedDecimal = val.toDecimalPlaces(precision ?? undefined, Decimal.ROUND_DOWN)
-  const numToFormat = parseFloat(fixedDecimal.toString())
+  const decimalString = fixedDecimal.toString()
+  const [integerPart, decimalPart = ''] = decimalString.split('.')
+  const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
 
-  const formattedAmount = numToFormat.toLocaleString('en', {
-    minimumFractionDigits: minPrecision,
-    maximumFractionDigits: precision,
-  })
+  let formattedDecimal = decimalPart
+  if (precision !== undefined) {
+    formattedDecimal = decimalPart.padEnd(precision, '0').slice(0, precision)
+  }
+  if (minPrecision !== undefined && formattedDecimal.length < minPrecision) {
+    formattedDecimal = formattedDecimal.padEnd(minPrecision, '0')
+  }
+
+  const formattedAmount = formattedDecimal ? `${formattedInteger}.${formattedDecimal}` : formattedInteger
 
   return currency ? `${formattedAmount} ${currency}` : formattedAmount
 }

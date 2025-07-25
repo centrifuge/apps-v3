@@ -9,13 +9,15 @@ import { infoText } from '@utils/infoText'
 
 interface CancelRedeemProps {
   currencies: { redeemCurrency: string; receiveCurrency: string }
+  isDisabled: boolean
   parsedRedeemAmount: 0 | Balance
   parsedReceiveAmount: 0 | Balance
   setActionType: Dispatch<SetStateAction<RedeemActionType>>
 }
 
-export function RedeemCancel({
+export function RedeemTxFeedback({
   currencies: { redeemCurrency, receiveCurrency },
+  isDisabled,
   parsedRedeemAmount,
   parsedReceiveAmount,
   setActionType,
@@ -45,10 +47,11 @@ export function RedeemCancel({
         background="bg-disabled"
         color="text-primary"
         width="100%"
+        disabled={isDisabled}
         mt={4}
-        onClick={() => setActionType(RedeemAction.SUCCESS)}
+        onClick={() => setActionType(RedeemAction.CONFIRM)}
       >
-        Cancel request
+        Redeem more
       </Button>
     </Box>
   )

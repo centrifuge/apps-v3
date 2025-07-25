@@ -42,7 +42,6 @@ export const Tabs = ({ elements }: TabsProps) => {
           key={element.value}
           value={element.value}
           h="calc(100% - 55px)"
-          bg="bg-accent"
           px={4}
           py={3}
           overflowY="hidden"
