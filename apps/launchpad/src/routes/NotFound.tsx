@@ -1,9 +1,19 @@
-import { Container, Heading } from '@chakra-ui/react'
+import { EmptyState, List, VStack } from '@chakra-ui/react'
+import { HiColorSwatch } from 'react-icons/hi'
 
-export default function NotFound() {
+const NotFound = () => {
   return (
-    <Container>
-      <Heading>Page not found</Heading>
-    </Container>
+    <EmptyState.Root>
+      <EmptyState.Content>
+        <EmptyState.Indicator>
+          <HiColorSwatch />
+        </EmptyState.Indicator>
+        <VStack textAlign="center">
+          <EmptyState.Title>No results found</EmptyState.Title>
+        </VStack>
+      </EmptyState.Content>
+    </EmptyState.Root>
   )
 }
+
+export default NotFound
