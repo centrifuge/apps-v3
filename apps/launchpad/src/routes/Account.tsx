@@ -1,23 +1,23 @@
-import { useParams } from 'react-router'
-import { Flex, Heading, Stack } from '@chakra-ui/react'
-import { LinkButton, Loader } from '@centrifuge/ui'
+import { Flex, Heading, Loader, Stack } from '@chakra-ui/react'
+import { LinkButton } from '@centrifuge/ui'
 import { AccountPage } from '@components/account/AccountPage'
 import { useMemo } from 'react'
-import { usePoolProvider } from '@contexts/PoolProvider'
 import { formatUIBalance } from '@centrifuge/shared'
+import { useSelectedPool } from '@contexts/SelectedPoolProvider'
 
 // TODO: FOR MVP, we are assuming one share class per pool
 // Routing must be fix to handle multiple share classes per pool
 export default function Account() {
-  const { poolId } = useParams()
-  const { shareClass, isLoading, poolDetails, pool } = usePoolProvider()
+  const { shareClass, isLoading, poolDetails, poolId } = useSelectedPool()
   const shareClassId = shareClass?.shareClass?.id.raw ?? ''
 
   const totalNav = useMemo(() => {
     return shareClass?.details.totalIssuance.mul(shareClass?.details.pricePerShare)
   }, [shareClass])
 
-  if (isLoading) return <Loader />
+  if (isLoading) {
+    return <Loader />
+  }
 
   return (
     <>
@@ -33,7 +33,12 @@ export default function Account() {
           </Heading>
         </Stack>
 
-        <LinkButton to={`/nav/${shareClassId}/${poolId}`} size="sm" width="150px" colorPalette="yellow">
+        <LinkButton
+          to={`/pool/${poolId?.toString()}/${shareClassId}/nav`}
+          size="sm"
+          width="150px"
+          colorPalette="yellow"
+        >
           Update NAV
         </LinkButton>
       </Flex>

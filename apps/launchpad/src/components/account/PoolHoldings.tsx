@@ -3,8 +3,8 @@ import { networkToName, useHoldings, formatBalance, formatUIBalance } from '@cen
 import { LinkButton, NetworkIcon } from '@centrifuge/ui'
 import { DataTable, ColumnDefinition, ActionsDropdown } from '@centrifuge/ui'
 import { Flex, Heading, Stack, Text } from '@chakra-ui/react'
+import { useSelectedPool } from '@contexts/SelectedPoolProvider'
 import { useMemo } from 'react'
-import { useParams } from 'react-router-dom'
 
 type Row = {
   id: number
@@ -66,7 +66,7 @@ const columns: ColumnDefinition<Row>[] = [
 ]
 
 export function PoolHoldings({ shareClass, poolDecimals }: { shareClass: ShareClass; poolDecimals: number }) {
-  const { poolId } = useParams()
+  const { poolId } = useSelectedPool()
   const { data: holdings } = useHoldings(shareClass)
 
   // TODO: Right now we are assuming that 1USD = 1USDC, this needs to be updated in the future
@@ -98,7 +98,11 @@ export function PoolHoldings({ shareClass, poolDecimals }: { shareClass: ShareCl
             {
               label: 'deposit',
               element: (
-                <LinkButton to={`/holdings/${poolId}/deposit/${holding.assetId}`} size="sm" variant="plain">
+                <LinkButton
+                  to={`/pool/${poolId?.toString()}/${shareClass.id.toString()}/holdings/deposit/${holding.assetId}`}
+                  size="sm"
+                  variant="plain"
+                >
                   Deposit
                 </LinkButton>
               ),
@@ -106,7 +110,11 @@ export function PoolHoldings({ shareClass, poolDecimals }: { shareClass: ShareCl
             {
               label: 'withdraw',
               element: (
-                <LinkButton to={`/holdings/${poolId}/withdraw/${holding.assetId}`} size="sm" variant="plain">
+                <LinkButton
+                  to={`/pool/${poolId?.toString()}/${shareClass.id.toString()}/holdings/withdraw/${holding.assetId}`}
+                  size="sm"
+                  variant="plain"
+                >
                   Withdraw
                 </LinkButton>
               ),
@@ -124,10 +132,21 @@ export function PoolHoldings({ shareClass, poolDecimals }: { shareClass: ShareCl
         <Flex justify="space-between">
           <Heading size="3xl">{formatBalance(totalValue ?? 0)} USDC</Heading>
           <Flex gap={2}>
-            <LinkButton to={`/holdings/${poolId}/add`} colorPalette="black" width="140px" size="sm" colorScheme="black">
+            <LinkButton
+              to={`/pool/${poolId?.toString()}/${shareClass.id.toString()}/holdings/add`}
+              colorPalette="black"
+              width="140px"
+              size="sm"
+              colorScheme="black"
+            >
               Add holding
             </LinkButton>
-            <LinkButton to={`/vaults/${poolId}`} colorPalette="yellow" width="140px" size="sm">
+            <LinkButton
+              to={`/pool/${poolId?.toString()}/${shareClass.id.toString()}/vaults`}
+              colorPalette="yellow"
+              width="140px"
+              size="sm"
+            >
               Vaults
             </LinkButton>
           </Flex>

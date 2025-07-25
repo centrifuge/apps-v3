@@ -5,8 +5,12 @@ import { PendingAmount } from '../types'
 import { map, of } from 'rxjs'
 import { useCentrifuge } from './CentrifugeContext'
 
-export function useNavPerNetwork(shareClass: ShareClass) {
-  const navPerNetwork$ = useMemo(() => shareClass.navPerNetwork(), [shareClass])
+export function useNavPerNetwork(shareClass?: ShareClass, options?: { enabled?: boolean }) {
+  const enabled = options?.enabled ?? true
+  const navPerNetwork$ = useMemo(
+    () => (enabled && shareClass ? shareClass.navPerNetwork() : undefined),
+    [shareClass, enabled]
+  )
   return useObservable(navPerNetwork$)
 }
 

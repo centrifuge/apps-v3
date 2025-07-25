@@ -1,9 +1,9 @@
 import { formatUIBalance, ShareClassWithDetails } from '@centrifuge/shared'
 import { usePendingAmounts } from '@centrifuge/shared/src/hooks/useShareClass'
-import { Button, Card, LinkButton } from '@centrifuge/ui'
+import { Card, LinkButton } from '@centrifuge/ui'
 import { Flex, Heading, Separator, Stack } from '@chakra-ui/react'
 import { useMemo } from 'react'
-import { useParams } from 'react-router'
+import { useSelectedPool } from '@contexts/SelectedPoolProvider'
 
 export function Orders({
   title,
@@ -16,21 +16,20 @@ export function Orders({
   isInvestment?: boolean
   poolCurrencySymbol: string
 }) {
-  const params = useParams()
+  const { poolId } = useSelectedPool()
   const { data: pendingAmounts } = usePendingAmounts(shareClass.shareClass)
-  const poolId = params.poolId
-  const defaultRoute = `/orders/${poolId}/approve`
+  const defaultRoute = `/pool/${poolId?.toString()}/${shareClass.shareClass.id.toString()}/orders/approve`
 
   const findRoute = (isApprove: boolean) => {
     let route = defaultRoute
     if (isInvestment && isApprove) {
       route = defaultRoute
     } else if (!isInvestment && isApprove) {
-      route = `/orders/${poolId}/approveRedeem`
+      route = `/pool/${poolId?.toString()}/${shareClass.shareClass.id.toString()}/orders/approveRedeem`
     } else if (isInvestment && !isApprove) {
-      route = `/orders/${poolId}/issue`
+      route = `/pool/${poolId?.toString()}/${shareClass.shareClass.id.toString()}/orders/issue`
     } else if (!isInvestment && !isApprove) {
-      route = `/orders/${poolId}/revokeRedeem`
+      route = `/pool/${poolId?.toString()}/${shareClass.shareClass.id.toString()}/orders/revokeRedeem`
     }
 
     return route

@@ -38,7 +38,6 @@ export const AddressInputLabel = ({
       borderColor="border-primary"
       alignItems="center"
       mt={4}
-      borderRadius={10}
       pl={1}
       pr={1}
       w="full"
@@ -97,7 +96,7 @@ export const AddressInput = ({ onAdd, onDelete, addresses, label = 'Wallet Addre
             onBlur={() => setIsValid(isAddress(value))}
             size="sm"
             background="border-secondary"
-            borderRadius={10}
+            borderRadius={4}
             borderTopRightRadius={0}
             borderBottomRightRadius={0}
             zIndex={1}

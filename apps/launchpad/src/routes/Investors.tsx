@@ -1,12 +1,20 @@
 import z from 'zod'
 import { Form, useForm } from '@centrifuge/forms'
-import { useAllPoolDetails, useCentrifugeTransaction, usePools } from '@centrifuge/shared'
-import { Card, Button, Loader } from '@centrifuge/ui'
-import { Box, Flex, Heading, Stack, Text, VStack } from '@chakra-ui/react'
+import {
+  truncateAddress,
+  useAddress,
+  useAllPoolDetails,
+  useCentrifugeTransaction,
+  usePools,
+  usePoolsByManager,
+} from '@centrifuge/shared'
+import { Card, Button, Loader, Modal } from '@centrifuge/ui'
+import { Box, Flex, Grid, Heading, Stack, Text, VStack } from '@chakra-ui/react'
+import { useAccount } from 'wagmi'
 import { WhitelistInvestor } from '@components/investors/WhitelistInvestor'
-import { useAddress } from '@centrifuge/shared'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { isAddress } from 'viem'
+import { useSelectedPool } from '@contexts/SelectedPoolProvider'
 
 const schema = z.object({
   shareClassId: z.string(),
@@ -17,9 +25,21 @@ const schema = z.object({
   }),
 })
 
+/**
+ * Update a member of the share class.
+ * @param address Address of the investor
+ * @param validUntil Time in seconds from Unix epoch until the investor is valid
+ * @param chainId Chain ID of the network on which to update the member
+ */
+// updateMember(address: HexString, validUntil: number, chainId: number) {
+//   return this.updateMembers([{ address, validUntil, chainId }])
+// }
+
 export default function Investors() {
+  const { poolId } = useSelectedPool()
+  const [isOpen, setIsOpen] = useState(false)
   const { address } = useAddress()
-  const { data: pools, isLoading } = usePools()
+  const { data: pools } = usePools()
   const { execute, isPending } = useCentrifugeTransaction()
 
   const poolIds = useMemo(() => {
@@ -38,50 +58,36 @@ export default function Investors() {
         ?.find((pool) => pool.id.raw.toString() === poolId)
         ?.shareClasses.find((sc) => sc.details.id.raw.toString() === shareClassId)
       if (selectedShareClass) {
-        execute(selectedShareClass.shareClass.updateMember(investorAddress, 1800000000, Number(network)))
+        execute(selectedShareClass.shareClass.updateMember(investorAddress, 4294967295, Number(network)))
       }
     },
   })
 
-  const { shareClassId, poolId, network } = form.watch()
-
-  if (isLoading) return <Loader />
-
-  if (!address) {
-    return (
-      <VStack>
-        <Text>Connect your wallet to whitelist investors</Text>
-      </VStack>
-    )
-  }
-
-  if (!pools?.length) {
-    return (
-      <VStack>
-        <Text>No pools found</Text>
-      </VStack>
-    )
-  }
-
   return (
     <Form form={form}>
-      <Box>
-        <Flex justifyContent="space-between" alignItems="center">
-          <Heading size="md">Investors</Heading>
-          <Button
-            label="Save changes"
-            size="sm"
-            onClick={() => form.handleSubmit()}
-            disabled={!form.formState.isValid || !shareClassId || !poolId || !network}
-            loading={isPending}
-          />
+      <Grid templateColumns={['1fr', '1fr 1fr']} justifyContent="space-between" alignItems="center">
+        <Heading size="md">Investors</Heading>
+        <Flex gap={2} justifyContent="flex-end">
+          <Button label="Onboarding settings" colorPalette="gray" />
+          <Button label="Add new investor" colorPalette="black" onClick={() => setIsOpen(true)} />
         </Flex>
-        <Card mt={4}>
-          <Stack gap={4}>
-            <WhitelistInvestor pools={poolsDetails ?? []} />
-          </Stack>
-        </Card>
-      </Box>
+      </Grid>
+      <VStack
+        mt={4}
+        backgroundColor="white"
+        borderRadius="md"
+        p={4}
+        border="1px solid"
+        borderColor="gray.200"
+        h="400px"
+        alignItems="center"
+        justifyContent="center"
+      >
+        Investors table coming soon
+      </VStack>
+      <Modal isOpen={isOpen} onClose={() => setIsOpen(false)} title="Add new investor">
+        <WhitelistInvestor poolId={poolId} />
+      </Modal>
     </Form>
   )
 }
