@@ -1,6 +1,12 @@
 import z from 'zod'
 import { Form, useForm } from '@centrifuge/forms'
-import { truncateAddress, useAllPoolDetails, useCentrifugeTransaction, usePoolsByManager } from '@centrifuge/shared'
+import {
+  truncateAddress,
+  useAllPoolDetails,
+  useCentrifugeTransaction,
+  usePools,
+  usePoolsByManager,
+} from '@centrifuge/shared'
 import { Card, Button, Loader } from '@centrifuge/ui'
 import { Box, Flex, Heading, Stack, Text, VStack } from '@chakra-ui/react'
 import { useAccount } from 'wagmi'
@@ -19,7 +25,7 @@ const schema = z.object({
 
 export default function Investors() {
   const { address } = useAccount()
-  const { data: pools, isLoading } = usePoolsByManager(address!)
+  const { data: pools, isLoading } = usePools()
   const { execute, isPending } = useCentrifugeTransaction()
 
   const poolIds = useMemo(() => {
@@ -38,7 +44,7 @@ export default function Investors() {
         ?.find((pool) => pool.id.raw.toString() === poolId)
         ?.shareClasses.find((sc) => sc.details.id.raw.toString() === shareClassId)
       if (selectedShareClass) {
-        execute(selectedShareClass.shareClass.updateMember(investorAddress, 1800000000, Number(network)))
+        execute(selectedShareClass.shareClass.updateMember(investorAddress, 4294967295, Number(network)))
       }
     },
   })
