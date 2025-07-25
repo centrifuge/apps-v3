@@ -18,6 +18,7 @@ export interface TabProps {
   networks?: PoolNetwork[]
   vault: Vault
   vaults: Vault[]
+  setVault: Dispatch<Vault | undefined>
 }
 interface VaultGuardProps {
   connectedChainId: number
@@ -187,6 +188,7 @@ function VaultGuard({
             networks={networks}
             vault={vault}
             vaults={vaults ?? []}
+            setVault={setVault}
           />
         </Stack>
       )}

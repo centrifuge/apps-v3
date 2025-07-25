@@ -12,7 +12,7 @@ import {
 import { TabProps } from '@components/InvestRedeemSection'
 import { RedeemTabForm } from '@components/InvestRedeemSection/RedeemTab/forms/RedeemTabForm'
 
-export default function RedeemTab({ isLoading: isTabLoading, networks, vault, vaults }: TabProps) {
+export default function RedeemTab({ isLoading: isTabLoading, networks, vault, vaults, setVault }: TabProps) {
   const { data: vaultDetails, isLoading: isVaultDetailsLoading } = useVaultDetails(vault)
   const { data: investment, isLoading: isInvestmentLoading } = useInvestment(vault)
   const { execute, isPending } = useCentrifugeTransaction()
@@ -82,7 +82,9 @@ export default function RedeemTab({ isLoading: isTabLoading, networks, vault, va
           parsedReceiveAmount={parsedReceiveAmount}
           vault={vault}
           vaults={vaults}
+          vaultDetails={vaultDetails}
           setActionType={setActionType}
+          setVault={setVault}
         />
       </Box>
     </Form>

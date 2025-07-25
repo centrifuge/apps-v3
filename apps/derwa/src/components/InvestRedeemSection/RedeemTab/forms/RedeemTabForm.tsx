@@ -4,6 +4,7 @@ import type { Balance, PoolNetwork, Vault } from '@centrifuge/sdk'
 import { type RedeemActionType, RedeemAction } from '@components/InvestRedeemSection/components/defaults'
 import { RedeemAmount } from '@components/InvestRedeemSection/RedeemTab/forms/RedeemAmount'
 import { RedeemTxFeedback } from '@components/InvestRedeemSection/RedeemTab/forms/RedeemTxFeedback'
+import { VaultDetails } from '@utils/types'
 // import { RedeemTxCancelled } from '@components/InvestRedeemSection/RedeemTab/forms/RedeemTxCancelled'
 
 interface RedeemTabFormProps {
@@ -15,7 +16,9 @@ interface RedeemTabFormProps {
   parsedReceiveAmount: 0 | Balance
   vault?: Vault
   vaults?: Vault[]
+  vaultDetails?: VaultDetails
   setActionType: Dispatch<SetStateAction<RedeemActionType>>
+  setVault: Dispatch<Vault | undefined>
 }
 
 export function RedeemTabForm({
@@ -27,7 +30,9 @@ export function RedeemTabForm({
   parsedReceiveAmount,
   vault,
   vaults,
+  vaultDetails,
   setActionType,
+  setVault,
 }: RedeemTabFormProps) {
   const { data: investment } = useInvestment(vault)
   const redeemCurrencySymbol = investment?.shareCurrency.symbol ?? ''
@@ -51,6 +56,8 @@ export function RedeemTabForm({
           parsedRedeemAmount={parsedRedeemAmount}
           vault={vault}
           vaults={vaults}
+          vaultDetails={vaultDetails}
+          setVault={setVault}
         />
       )
     case RedeemAction.CONFIRM:

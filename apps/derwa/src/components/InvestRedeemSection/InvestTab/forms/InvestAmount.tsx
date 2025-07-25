@@ -2,7 +2,7 @@ import { useCallback, useMemo } from 'react'
 import { Badge, Box, Flex, Text } from '@chakra-ui/react'
 import { BalanceInput, SubmitButton, useFormContext } from '@centrifuge/forms'
 import { Balance, PoolId, PoolNetwork, Vault } from '@centrifuge/sdk'
-import { usePortfolio, usePoolDetails, useVaultsDetails } from '@centrifuge/shared'
+import { usePoolDetails, useVaultsDetails } from '@centrifuge/shared'
 import { NetworkIcons } from '@centrifuge/ui'
 import { usePoolsContext } from '@contexts/usePoolsContext'
 import { infoText } from '@utils/infoText'
@@ -18,6 +18,7 @@ interface InvestAmountProps {
   parsedInvestAmount: 0 | Balance
   vaultDetails?: VaultDetails
   vaults: Vault[]
+  setVault: Dispatch<Vault | undefined>
 }
 
 export function InvestAmount({
@@ -27,6 +28,7 @@ export function InvestAmount({
   parsedInvestAmount,
   vaultDetails,
   vaults,
+  setVault,
 }: InvestAmountProps) {
   const { data: vaultsDetails } = useVaultsDetails(vaults)
   const { data: portfolio } = usePortfolio()
@@ -74,6 +76,14 @@ export function InvestAmount({
   )
 
   const debouncedCalculateReceiveAmount = useMemo(() => debounce(calculateReceiveAmount, 500), [calculateReceiveAmount])
+
+  const changeVault = useCallback(
+    (value: string | number) => {
+      const newVault = vaults?.find((vault) => vault.address === value)
+      setVault(newVault)
+    },
+    [vaults]
+  )
 
   const setMaxInvestAmount = useCallback(() => {
     if (!portfolioBalance || !maxInvestAmount || !pricePerShare) return

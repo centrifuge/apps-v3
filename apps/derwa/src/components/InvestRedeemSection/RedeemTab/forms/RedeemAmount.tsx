@@ -24,6 +24,8 @@ interface RedeemAmountProps {
   parsedRedeemAmount: 0 | Balance
   vault?: Vault
   vaults?: Vault[]
+  vaultDetails?: VaultDetails
+  setVault: Dispatch<Vault | undefined>
 }
 
 export function RedeemAmount({
@@ -33,6 +35,8 @@ export function RedeemAmount({
   parsedRedeemAmount,
   vault,
   vaults,
+  vaultDetails,
+  setVault,
 }: RedeemAmountProps) {
   const { data: vaultsDetails } = useVaultsDetails(vaults)
   const { data: portfolio } = usePortfolio()
@@ -112,7 +116,13 @@ export function RedeemAmount({
 
   const debouncedCalculateRedeemAmount = useMemo(() => debounce(calculateRedeemAmount, 500), [calculateRedeemAmount])
 
-  const changeVault = (value: number) => switchChain({ chainId: value })
+  const changeVault = useCallback(
+    (value: string | number) => {
+      const newVault = vaults?.find((vault) => vault.address === value)
+      setVault(newVault)
+    },
+    [vaults]
+  )
 
   const setMaxRedeemAmount = useCallback(() => {
     if (!maxRedeemAmount || !pricePerShare || maxRedeemBalance === 0) return

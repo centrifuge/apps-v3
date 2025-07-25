@@ -25,6 +25,7 @@ export default function InvestTab({
   networks,
   vault,
   vaults,
+  setVault,
 }: TabProps) {
   const { data: vaultDetails, isLoading: isVaultDetailsLoading } = useVaultDetails(vault)
   const { data: investment, isLoading: isInvestmentLoading } = useInvestment(vault)
@@ -47,7 +48,7 @@ export default function InvestTab({
 
   const schema = z.object({
     investAmount: createBalanceSchema(
-      vaultDetails?.investmentCurrency.decimals ?? 6,
+      vaultDetails?.investmentCurrency.decimals ?? 18,
       z.number().min(1).max(Number(maxInvestAmount))
     ),
     receiveAmount: createBalanceSchema(vaultDetails?.shareCurrency.decimals ?? 18).optional(),
@@ -110,6 +111,7 @@ export default function InvestTab({
           vaults={vaults}
           vaultDetails={vaultDetails}
           setActionType={setActionType}
+          setVault={setVault}
         />
       </Box>
     </Form>

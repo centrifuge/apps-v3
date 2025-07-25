@@ -15,6 +15,7 @@ interface InvestTabFormProps {
   vaults: Vault[]
   vaultDetails?: VaultDetails
   setActionType: Dispatch<SetStateAction<InvestActionType>>
+  setVault: Dispatch<Vault | undefined>
 }
 
 export function InvestTabForm({
@@ -26,6 +27,7 @@ export function InvestTabForm({
   vaults,
   vaultDetails,
   setActionType,
+  setVault,
 }: InvestTabFormProps) {
   switch (actionType) {
     case InvestAction.INVEST_AMOUNT:
@@ -37,6 +39,7 @@ export function InvestTabForm({
           vaults={vaults}
           vaultDetails={vaultDetails}
           isDisabled={isDisabled}
+          setVault={setVault}
         />
       )
     // TODO: add this for sync invest form
