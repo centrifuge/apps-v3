@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react'
+import { Dispatch, useCallback, useMemo } from 'react'
 import { Badge, Box, Flex, Text } from '@chakra-ui/react'
 import { BalanceInput, SubmitButton, useFormContext } from '@centrifuge/forms'
 import { Balance, PoolId, PoolNetwork, Vault } from '@centrifuge/sdk'
@@ -9,7 +9,7 @@ import { infoText } from '@utils/infoText'
 import { InfoWrapper } from '@components/InvestRedeemSection/components/InfoWrapper'
 import { VaultDetails } from '@utils/types'
 import { debounce, formatBalance, formatBalanceToString } from '@centrifuge/shared'
-import { useSwitchChain } from 'wagmi'
+import { useGetPortfolioDetails } from '@hooks/useGetPortfolioDetails'
 
 interface InvestAmountProps {
   isDisabled: boolean
@@ -31,35 +31,23 @@ export function InvestAmount({
   setVault,
 }: InvestAmountProps) {
   const { data: vaultsDetails } = useVaultsDetails(vaults)
-  const { data: portfolio } = usePortfolio()
   const { selectedPoolId } = usePoolsContext()
   const { data: pool } = usePoolDetails(selectedPoolId as PoolId)
+  const { portfolioInvestmentCurrency, portfolioBalance, hasInvestmentCurrency } = useGetPortfolioDetails(vaultDetails)
   const { setValue } = useFormContext()
-  const { switchChain } = useSwitchChain()
   const networkIds = networks?.map((network) => network.chainId)
 
   // Investment Currencies for changing asset to invest
   const investmentCurrencies = vaultsDetails?.map((vault) => ({
     label: vault.investmentCurrency.symbol,
-    value: vault.investmentCurrency.chainId,
+    value: vault.address,
   }))
 
-  const changeVault = (value: number) => switchChain({ chainId: value })
-
-  const investmentCurrencyChainId = vaultDetails?.investmentCurrency?.chainId
-
-  // Get user investment asset info
-  const portfolioInvestmentAsset = portfolio?.find((asset) => asset.currency.chainId === investmentCurrencyChainId)
-  const portfolioCurrency = portfolioInvestmentAsset?.currency
-  const portfolioBalance = portfolioInvestmentAsset?.balance
-
   // Get the share class info for calculating shares amount to receive
-  const shareClass = pool?.shareClasses.find((asset) => asset.shareClass.pool.chainId === investmentCurrencyChainId)
-  const pricePerShare = shareClass?.details.pricePerShare
-
-  // Check if the user has the necessary investment currency to invest
-  const hasInvestmentCurrency = portfolioCurrency?.chainId === vaultDetails?.investmentCurrency?.chainId
-  const hasNoInvestmentCurrency = !hasInvestmentCurrency || portfolioBalance?.isZero()
+  const poolShareClass = pool?.shareClasses.find(
+    (sc) => sc.shareClass.id.toString() === vaultDetails?.shareClass.id.toString()
+  )
+  const pricePerShare = poolShareClass?.details.pricePerShare
 
   // Calculate and update amount to receive based on user input on amount to invest
   const calculateReceiveAmount = useCallback(
@@ -102,7 +90,7 @@ export function InvestAmount({
           <Text fontWeight={500}>You pay</Text>
           <BalanceInput
             name="investAmount"
-            decimals={portfolioCurrency?.decimals}
+            decimals={vaultDetails?.investmentCurrency.decimals}
             placeholder="0.00"
             selectOptions={investmentCurrencies}
             onSelectChange={changeVault}
@@ -125,7 +113,7 @@ export function InvestAmount({
                 MAX
               </Badge>
               <Text color="text-primary" opacity={0.5} alignSelf="flex-end" ml={2}>
-                {formatBalance(portfolioBalance ?? 0, portfolioCurrency?.symbol)}
+                {formatBalance(portfolioBalance ?? 0, portfolioInvestmentCurrency?.symbol)}
               </Text>
             </Flex>
             <NetworkIcons networkIds={networkIds} />
@@ -137,8 +125,7 @@ export function InvestAmount({
               </Text>
               <BalanceInput
                 name="receiveAmount"
-                decimals={pricePerShare?.decimals}
-                displayDecimals={pricePerShare?.decimals}
+                decimals={vaultDetails?.shareCurrency.decimals}
                 placeholder="0.00"
                 disabled
                 currency={vaultDetails?.shareCurrency.symbol}
@@ -149,7 +136,7 @@ export function InvestAmount({
         <SubmitButton colorPalette="yellow" width="100%" disabled={isDisabled}>
           Invest
         </SubmitButton>
-        {hasNoInvestmentCurrency ? (
+        {!hasInvestmentCurrency ? (
           <InfoWrapper text={infoText().portfolioMissingInvestmentCurrency} type="error" />
         ) : null}
       </Flex>

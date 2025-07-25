@@ -1,5 +1,4 @@
-import { useCallback, useMemo } from 'react'
-import { useSwitchChain } from 'wagmi'
+import { Dispatch, useCallback, useMemo } from 'react'
 import { Badge, Box, Flex, Text } from '@chakra-ui/react'
 import { BalanceInput, SubmitButton, useFormContext } from '@centrifuge/forms'
 import { Balance, PoolId, PoolNetwork, Price, Vault } from '@centrifuge/sdk'
@@ -7,15 +6,15 @@ import {
   debounce,
   divideBigInts,
   formatBalanceToString,
-  usePortfolio,
   formatBalance,
   usePoolDetails,
-  useVaultDetails,
   useVaultsDetails,
   useInvestment,
 } from '@centrifuge/shared'
 import { NetworkIcons } from '@centrifuge/ui'
 import { usePoolsContext } from '@contexts/usePoolsContext'
+import { VaultDetails } from '@utils/types'
+import { useGetPortfolioDetails } from '@hooks/useGetPortfolioDetails'
 
 interface RedeemAmountProps {
   isDisabled: boolean
@@ -39,33 +38,28 @@ export function RedeemAmount({
   setVault,
 }: RedeemAmountProps) {
   const { data: vaultsDetails } = useVaultsDetails(vaults)
-  const { data: portfolio } = usePortfolio()
   const { selectedPoolId } = usePoolsContext()
   const { data: pool } = usePoolDetails(selectedPoolId as PoolId)
-  const { data: vaultDetails } = useVaultDetails(vault ?? null)
-  const { switchChain } = useSwitchChain()
-  const { setValue } = useFormContext()
   const { data: investment } = useInvestment(vault)
+  const { portfolioInvestmentCurrency } = useGetPortfolioDetails(vaultDetails)
+  const { setValue } = useFormContext()
 
   // Get networkIds and currencies for receiveAmount select currency list
   const networkIds = networks?.map((network) => network.chainId)
   const investmentCurrencies = vaultsDetails?.map((vault) => ({
     label: vault.investmentCurrency.symbol,
-    value: vault.investmentCurrency.chainId,
+    value: vault.address,
   }))
 
   // Get the pricePerShare
-  const shareClass = pool?.shareClasses.find((sc) => sc.details.id.toString() === vault?.shareClass.id.toString())
-  const pricePerShare = shareClass?.details.pricePerShare
+  const poolShareClass = pool?.shareClasses.find(
+    (sc) => sc.shareClass.id.toString() === vaultDetails?.shareClass.id.toString()
+  )
+  const pricePerShare = poolShareClass?.details.pricePerShare
 
   // Get info on the users shares holdings in their wallet
   const shareCurrencySymbol = investment?.shareCurrency.symbol ?? ''
   const maxRedeemBalance = investment?.shareBalance ?? 0
-
-  // Get info on the users investment asset that shares will be converted into
-  const investmentCurrencyChainId = vaultDetails?.investmentCurrency?.chainId
-  const portfolioInvestmentAsset = portfolio?.find((asset) => asset.currency.chainId === investmentCurrencyChainId)
-  const portfolioInvestmentCurrency = portfolioInvestmentAsset?.currency
 
   const calculateReceiveAmountValue = useCallback(
     (redeemBalance: Balance, pricePerShare?: Price) => {
@@ -141,7 +135,7 @@ export function RedeemAmount({
           </Text>
           <BalanceInput
             name="redeemAmount"
-            decimals={shareClass?.details.pricePerShare.decimals}
+            decimals={vaultDetails?.shareCurrency.decimals}
             placeholder="0.00"
             onChange={debouncedCalculateReceiveAmount}
             currency={shareCurrencySymbol}
@@ -176,7 +170,7 @@ export function RedeemAmount({
               <BalanceInput
                 name="receiveAmount"
                 placeholder="0.00"
-                decimals={portfolioInvestmentCurrency?.decimals}
+                decimals={vaultDetails?.investmentCurrency.decimals}
                 onChange={debouncedCalculateRedeemAmount}
                 selectOptions={investmentCurrencies}
                 onSelectChange={changeVault}
