@@ -1,9 +1,14 @@
-import { HexString, PoolId } from '@centrifuge/sdk'
+import { HexString, Pool, PoolId } from '@centrifuge/sdk'
 import { useMemo } from 'react'
 import { combineLatest, map, of, switchMap } from 'rxjs'
 import { Address } from 'viem'
 import { useObservable } from './useObservable'
 import { useCentrifuge } from './CentrifugeContext'
+import { useLoadingObservable } from '../components'
+
+interface Options {
+  enabled?: boolean
+}
 
 export function usePools() {
   const centrifuge = useCentrifuge()
@@ -13,6 +18,16 @@ export function usePools() {
   }, [centrifuge])
 
   return useObservable(pools$)
+}
+
+export function usePoolsWithLoading() {
+  const centrifuge = useCentrifuge()
+
+  const pools$ = useMemo(() => {
+    return centrifuge.pools()
+  }, [centrifuge])
+
+  return useLoadingObservable('pools', pools$)
 }
 
 export function usePoolsByManager(address: Address) {
@@ -44,38 +59,41 @@ export function usePool(poolId: PoolId) {
   return useObservable(pool$)
 }
 
-export function usePoolDetails(poolId: PoolId) {
+export function usePoolDetails(poolId?: PoolId, options?: Options) {
   const centrifuge = useCentrifuge()
+  const enabled = options?.enabled ?? true
 
   const details$ = useMemo(() => {
-    if (!poolId) return undefined
+    if (!enabled || !poolId) return undefined
     return centrifuge.pool(poolId).pipe(switchMap((pool) => (pool ? pool.details() : of(undefined))))
-  }, [poolId, centrifuge])
+  }, [poolId, centrifuge, enabled])
 
   return useObservable(details$)
 }
 
-export function useAllPoolDetails(poolIds: PoolId[]) {
+export function useAllPoolDetails(poolIds: PoolId[], options?: Options) {
   const centrifuge = useCentrifuge()
+  const enabled = options?.enabled ?? true
 
   const details$ = useMemo(() => {
-    if (!poolIds?.length) {
+    if (!enabled || !poolIds?.length) {
       return of([])
     }
 
     const poolDetailObservables$ = poolIds.map((id) => centrifuge.pool(id).pipe(switchMap((pool) => pool.details())))
 
     return combineLatest(poolDetailObservables$)
-  }, [poolIds, centrifuge])
+  }, [poolIds, centrifuge, enabled])
 
   return useObservable(details$)
 }
 
-export function usePoolNetworks(poolId?: PoolId) {
+export function usePoolNetworks(poolId?: PoolId, options?: Options) {
   const centrifuge = useCentrifuge()
+  const enabled = options?.enabled ?? true
 
   const vaults$ = useMemo(() => {
-    if (!poolId) return undefined
+    if (!enabled || !poolId) return undefined
     return centrifuge.pool(poolId).pipe(switchMap((pool) => (pool ? pool.activeNetworks() : of(undefined))))
   }, [poolId, centrifuge])
 
