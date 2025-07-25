@@ -40,36 +40,32 @@ export function InvestRedeemClaimForm({
           <Box mt={6}>
             <Text fontWeight={500}>Claimable shares</Text>
             <Flex alignItems="center" justifyContent="flex-start">
-              <Heading fontSize="2xl">{formatBalance(claimableInvestShares ?? 0)}</Heading>
-              <Heading fontSize="2xl" ml={2}>
-                {shareCurrency?.symbol ?? ''}
+              <Heading fontSize="2xl">
+                {formatBalance(claimableInvestShares ?? 0, shareCurrency?.symbol ?? '', 2)}
               </Heading>
             </Flex>
           </Box>
           <Box mt={3}>
             <Text fontWeight={500}>Claimable invest currency equivalent</Text>
             <Flex alignItems="center" justifyContent="flex-start">
-              <Heading fontSize="2xl">{formatBalance(claimableInvestCurrencyEquivalent ?? 0)}</Heading>
-              <Heading fontSize="2xl" ml={2}>
-                {investmentCurrency?.symbol ?? ''}
+              <Heading fontSize="2xl">
+                {formatBalance(claimableInvestCurrencyEquivalent ?? 0, investmentCurrency?.symbol ?? '', 2)}
               </Heading>
             </Flex>
           </Box>
           <Box mt={3}>
-            <Text fontWeight={500}>Claimable redeem currency</Text>
+            <Text fontWeight={500}>Claimable redeem amount</Text>
             <Flex alignItems="center" justifyContent="flex-start">
-              <Heading fontSize="2xl">{formatBalance(claimableRedeemCurrency ?? 0)}</Heading>
-              <Heading fontSize="2xl" ml={2}>
-                {investmentCurrency?.symbol ?? ''}
+              <Heading fontSize="2xl">
+                {formatBalance(claimableRedeemCurrency ?? 0, shareCurrency?.symbol ?? '', 2)}
               </Heading>
             </Flex>
           </Box>
           <Box mt={3}>
-            <Text fontWeight={500}>Claimable redeem shares equivalent</Text>
+            <Text fontWeight={500}>Claimable redeem currency equivalent</Text>
             <Flex alignItems="center" justifyContent="flex-start">
-              <Heading fontSize="2xl">{formatBalance(claimableRedeemSharesEquivalent ?? 0)}</Heading>
-              <Heading fontSize="2xl" ml={2}>
-                {shareCurrency?.symbol ?? ''}
+              <Heading fontSize="2xl">
+                {formatBalance(claimableRedeemSharesEquivalent ?? 0, investmentCurrency?.symbol ?? '', 2)}
               </Heading>
             </Flex>
           </Box>
