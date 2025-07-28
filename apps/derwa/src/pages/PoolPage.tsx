@@ -88,7 +88,7 @@ export default function PoolPage() {
             {poolType === 'closed' && <PoolDetailsPermissionless poolDetails={poolDetails} />}
           </Box>
 
-          <Box maxHeight={'350px'} position={'sticky'} top={8}>
+          <Box height="fit-content" position="sticky" top={8}>
             <InvestRedeemSection pool={poolDetails} />
           </Box>
         </Grid>
