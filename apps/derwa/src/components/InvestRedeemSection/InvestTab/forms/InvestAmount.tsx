@@ -1,8 +1,8 @@
 import { Dispatch, useCallback, useMemo } from 'react'
 import { Badge, Box, Flex, Text } from '@chakra-ui/react'
 import { BalanceInput, SubmitButton, useFormContext } from '@centrifuge/forms'
-import { Balance, PoolId, PoolNetwork, Vault } from '@centrifuge/sdk'
-import { usePoolDetails, useVaultsDetails } from '@centrifuge/shared'
+import { Balance, PoolId, PoolNetwork, Price, Vault } from '@centrifuge/sdk'
+import { divideBigInts, usePoolDetails, useVaultsDetails } from '@centrifuge/shared'
 import { NetworkIcons } from '@centrifuge/ui'
 import { usePoolsContext } from '@contexts/usePoolsContext'
 import { infoText } from '@utils/infoText'
@@ -49,16 +49,32 @@ export function InvestAmount({
   )
   const pricePerShare = poolShareClass?.details.pricePerShare
 
-  // Calculate and update amount to receive based on user input on amount to invest
+  const calculateReceiveAmountValue = useCallback(
+    (investBalance: Balance, pricePerShare?: Price) => {
+      if (!investBalance || !pricePerShare) {
+        return ''
+      }
+
+      const investAmountDecimals = investBalance.decimals
+      const investAmountBigint = investBalance.toBigInt()
+      const pricePerShareBigint = pricePerShare.toBigInt()
+
+      return divideBigInts(investAmountBigint, pricePerShareBigint, pricePerShare.decimals).formatToString(
+        investAmountDecimals,
+        portfolioInvestmentCurrency?.decimals
+      )
+    },
+    [portfolioInvestmentCurrency?.decimals]
+  )
+
   const calculateReceiveAmount = useCallback(
     (inputStringValue: string, investInputAmount?: Balance) => {
-      if (!inputStringValue || inputStringValue === '0' || !investInputAmount || !pricePerShare) return
+      if (!inputStringValue || inputStringValue === '0' || !investInputAmount || !pricePerShare) {
+        return setValue('receiveAmount', '')
+      }
 
-      const calculatedReceiveAmount = formatBalanceToString(
-        investInputAmount.mul(pricePerShare),
-        investInputAmount.decimals
-      )
-      setValue('receiveAmount', calculatedReceiveAmount)
+      const calculatedReceiveAmount = calculateReceiveAmountValue(investInputAmount, pricePerShare)
+      return setValue('receiveAmount', calculatedReceiveAmount)
     },
     [pricePerShare]
   )

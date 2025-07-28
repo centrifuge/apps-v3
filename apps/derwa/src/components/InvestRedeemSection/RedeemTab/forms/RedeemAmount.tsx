@@ -1,10 +1,9 @@
 import { Dispatch, useCallback, useMemo } from 'react'
 import { Badge, Box, Flex, Text } from '@chakra-ui/react'
 import { BalanceInput, SubmitButton, useFormContext } from '@centrifuge/forms'
-import { Balance, PoolId, PoolNetwork, Price, Vault } from '@centrifuge/sdk'
+import { Balance, PoolId, PoolNetwork, Vault } from '@centrifuge/sdk'
 import {
   debounce,
-  divideBigInts,
   formatBalanceToString,
   formatBalance,
   usePoolDetails,
@@ -14,7 +13,6 @@ import {
 import { NetworkIcons } from '@centrifuge/ui'
 import { usePoolsContext } from '@contexts/usePoolsContext'
 import { VaultDetails } from '@utils/types'
-import { useGetPortfolioDetails } from '@hooks/useGetPortfolioDetails'
 import { InfoWrapper } from '@components/InvestRedeemSection/components/InfoWrapper'
 
 interface RedeemAmountProps {
@@ -42,7 +40,6 @@ export function RedeemAmount({
   const { selectedPoolId } = usePoolsContext()
   const { data: pool } = usePoolDetails(selectedPoolId as PoolId)
   const { data: investment } = useInvestment(vault)
-  const { portfolioInvestmentCurrency } = useGetPortfolioDetails(vaultDetails)
   const { setValue } = useFormContext()
 
   // Get networkIds and currencies for receiveAmount select currency list
@@ -63,32 +60,15 @@ export function RedeemAmount({
   const maxRedeemBalance = investment?.shareBalance ?? 0
   const hasRedeemableShares = !investment?.shareBalance.isZero()
 
-  const calculateReceiveAmountValue = useCallback(
-    (redeemBalance: Balance, pricePerShare?: Price) => {
-      if (!redeemBalance || !pricePerShare) {
-        return ''
-      }
-
-      const redeemAmountDecimals = redeemBalance.decimals
-      const redeemAmountBigint = redeemBalance.toBigInt()
-      const pricePerShareBigint = pricePerShare.toBigInt()
-
-      return divideBigInts(redeemAmountBigint, pricePerShareBigint, redeemAmountDecimals).formatToString(
-        redeemAmountDecimals,
-        portfolioInvestmentCurrency?.decimals
-      )
-    },
-    [portfolioInvestmentCurrency?.decimals]
-  )
-
   const calculateReceiveAmount = useCallback(
     (inputStringValue: string, redeemInputAmount?: Balance) => {
-      if (!inputStringValue || inputStringValue === '0' || !redeemInputAmount || !pricePerShare) {
-        return setValue('receiveAmount', '')
-      }
+      if (!inputStringValue || inputStringValue === '0' || !redeemInputAmount || !pricePerShare) return
 
-      const calculatedReceiveAmount = calculateReceiveAmountValue(redeemInputAmount, pricePerShare)
-      return setValue('receiveAmount', calculatedReceiveAmount)
+      const calculatedReceiveAmount = formatBalanceToString(
+        redeemInputAmount.mul(pricePerShare),
+        redeemInputAmount.decimals
+      )
+      setValue('receiveAmount', calculatedReceiveAmount)
     },
     [pricePerShare]
   )
@@ -123,7 +103,11 @@ export function RedeemAmount({
   const setMaxRedeemAmount = useCallback(() => {
     if (!maxRedeemAmount || !pricePerShare || !hasRedeemableShares || maxRedeemBalance === 0) return
 
-    const calculatedReceiveAmount = calculateReceiveAmountValue(maxRedeemBalance, pricePerShare)
+    const calculatedReceiveAmount = formatBalanceToString(
+      maxRedeemBalance.mul(pricePerShare),
+      maxRedeemBalance.decimals
+    )
+
     setValue('redeemAmount', maxRedeemAmount)
     setValue('receiveAmount', calculatedReceiveAmount)
   }, [maxRedeemAmount, pricePerShare])
