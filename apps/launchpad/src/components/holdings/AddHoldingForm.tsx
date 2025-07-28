@@ -1,24 +1,34 @@
-import { useMemo } from 'react'
-import { CiShare1 } from 'react-icons/ci'
-import { useFormContext, Select } from '@centrifuge/forms'
+import { useMemo, useState } from 'react'
 import { PoolNetwork } from '@centrifuge/sdk'
-import { chainExplorer, networkToName, truncateAddress, useAssets } from '@centrifuge/shared'
-import { NetworkIcon } from '@centrifuge/ui'
+import {
+  chainExplorer,
+  networkToName,
+  truncateAddress,
+  useAssets,
+  useCentrifugeTransaction,
+  usePoolNetworks,
+} from '@centrifuge/shared'
+import { IconShare, Modal, NetworkIcon, Select } from '@centrifuge/ui'
 import { Flex, Grid, Text } from '@chakra-ui/react'
 import { Link } from 'react-router'
 
+import { useSelectedPool } from '@contexts/SelectedPoolProvider'
+
 export const AddHoldingForm = ({
-  networks,
-  poolDetails,
-  hubChainId,
+  openModal,
+  setOpenModal,
 }: {
-  networks: PoolNetwork[]
-  poolDetails: any
-  hubChainId: number
+  openModal: { add: boolean }
+  setOpenModal: (openModal: { add: boolean }) => void
 }) => {
-  const { watch } = useFormContext()
-  const network = watch('network')
-  const { data: assets } = useAssets(network, hubChainId)
+  const { execute, isPending } = useCentrifugeTransaction()
+  const { poolDetails, pool, shareClass } = useSelectedPool()
+  const { data: networks } = usePoolNetworks(poolDetails?.id!)
+
+  const [networkId, setNetworkId] = useState<number | undefined>(undefined)
+  const [assetId, setAssetId] = useState<string | undefined>(undefined)
+
+  const { data: assets } = useAssets(networkId, pool?.chainId, !!networkId)
 
   const networkOptions = useMemo(() => {
     if (!networks) return []
@@ -34,37 +44,59 @@ export const AddHoldingForm = ({
     }))
   }, [networks])
 
-  const shareClassPerPool = useMemo(() => {
-    if (!poolDetails) return []
-    return poolDetails.shareClasses.map((shareClass: any) => ({
-      value: shareClass.details.id,
-      label: shareClass.details.name,
-    }))
-  }, [poolDetails])
-
   const assetOptions = useMemo(() => {
-    if (!assets) return []
+    if (!assets || !networkId) return []
     return assets.map((asset: any) => ({
-      value: asset.id,
+      value: asset.id.toString(),
       label: asset.name,
       children: (
-        <Grid gridTemplateColumns="1fr 20px 1fr 20px" gap={2} alignItems="center" px={1}>
-          <Text>{asset.name}</Text>
-          <NetworkIcon networkId={network} />
-          <Text>{truncateAddress(asset.address)}</Text>
-          <Link to={`${chainExplorer[network]}/address/${asset.address}`} target="_blank">
-            <CiShare1 />
-          </Link>
+        <Grid gridTemplateColumns="2fr 1fr" gap={2} alignItems="center" px={1}>
+          <Flex alignItems="center" gap={2}>
+            <Text>{asset.name}</Text>
+            <NetworkIcon networkId={networkId} />
+          </Flex>
+          <Flex alignItems="center" gap={2}>
+            <Text>{truncateAddress(asset.address)}</Text>
+            <Link to={`${chainExplorer[networkId]}/address/${asset.address}`} target="_blank">
+              <IconShare />
+            </Link>
+          </Flex>
         </Grid>
       ),
     }))
-  }, [assets, network])
+  }, [assets, networkId])
+
+  const handleSubmit = () => {
+    const asset = assets?.find((asset) => asset.id.toString() === assetId?.toString())
+    const foundAssetId = asset?.id
+    if (!shareClass || !foundAssetId) return
+    execute(shareClass.createHolding(foundAssetId, '0x6Bcb240d3e1f1C4321ECAFFDacB45691DC03bE5D', false))
+  }
 
   return (
-    <Grid gridTemplateColumns="1fr 1fr" gap={4}>
-      <Select name="network" items={networkOptions} label="Network" />
-      <Select name="asset" items={assetOptions} label="Available assets" disabled={!assets?.length} />
-      <Select name="sc" items={shareClassPerPool} label="Token" />
-    </Grid>
+    <Modal
+      isOpen={openModal.add}
+      onClose={() => setOpenModal({ ...openModal, add: false })}
+      title="Add holding"
+      onPrimaryAction={() => handleSubmit()}
+      primaryActionText="Add holding"
+      isPrimaryActionLoading={isPending}
+    >
+      <Grid gridTemplateColumns="1fr" gap={4}>
+        <Select
+          items={networkOptions}
+          label="Network"
+          placeholder="Select network"
+          onSelectionChange={(value) => setNetworkId(Number(value))}
+        />
+        <Select
+          items={assetOptions}
+          label="Available assets"
+          disabled={!assets?.length}
+          placeholder="Select asset"
+          onSelectionChange={(value) => setAssetId(value)}
+        />
+      </Grid>
+    </Modal>
   )
 }

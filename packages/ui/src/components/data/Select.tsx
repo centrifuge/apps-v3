@@ -43,6 +43,7 @@ export const Select = ({
       onValueChange={handleSelectionChange}
       value={value ? [value] : undefined}
       defaultValue={defaultValue ? [defaultValue] : undefined}
+      positioning={{ strategy: 'absolute', sameWidth: true, placement: 'top' }}
       {...rest}
     >
       <ChakraSelect.HiddenSelect />
@@ -55,36 +56,34 @@ export const Select = ({
           <ChakraSelect.Indicator />
         </ChakraSelect.IndicatorGroup>
       </ChakraSelect.Control>
-      <Portal>
-        <ChakraSelect.Positioner>
-          <ChakraSelect.Content>
-            {items.map((item) => (
-              <Grid
-                templateColumns={withIndicator ? '1fr 20px' : '1fr'}
-                border={withIndicator ? '1px solid' : 'none'}
-                borderColor={withIndicator ? 'gray.200' : 'transparent'}
-                borderRadius={withIndicator ? 'md' : 'none'}
-                _hover={{ bg: withIndicator ? 'gray.100' : 'transparent' }}
-                mb={withIndicator ? 1 : 0}
-                mt={withIndicator ? 1 : 0}
+      <ChakraSelect.Positioner>
+        <ChakraSelect.Content>
+          {items.map((item) => (
+            <Grid
+              templateColumns={withIndicator ? '1fr 20px' : '1fr'}
+              border={withIndicator ? '1px solid' : 'none'}
+              borderColor={withIndicator ? 'gray.200' : 'transparent'}
+              borderRadius={withIndicator ? 'md' : 'none'}
+              _hover={{ bg: withIndicator ? 'gray.100' : 'transparent' }}
+              mb={withIndicator ? 1 : 0}
+              mt={withIndicator ? 1 : 0}
+              key={item.value}
+            >
+              <ChakraSelect.Item
+                item={item}
                 key={item.value}
+                _hover={{ bg: withIndicator ? 'transparent' : 'gray.100' }}
+                _selected={{ bg: withIndicator ? 'transparent' : 'gray.100' }}
+                _focus={{ bg: withIndicator ? 'transparent' : 'gray.100' }}
+                _active={{ bg: withIndicator ? 'transparent' : 'gray.100' }}
               >
-                <ChakraSelect.Item
-                  item={item}
-                  key={item.value}
-                  _hover={{ bg: withIndicator ? 'transparent' : 'gray.100' }}
-                  _selected={{ bg: withIndicator ? 'transparent' : 'gray.100' }}
-                  _focus={{ bg: withIndicator ? 'transparent' : 'gray.100' }}
-                  _active={{ bg: withIndicator ? 'transparent' : 'gray.100' }}
-                >
-                  {item.children ?? item.label}
-                  {withIndicator && <ChakraSelect.ItemIndicator />}
-                </ChakraSelect.Item>
-              </Grid>
-            ))}
-          </ChakraSelect.Content>
-        </ChakraSelect.Positioner>
-      </Portal>
+                {item.children ?? item.label}
+                {withIndicator && <ChakraSelect.ItemIndicator />}
+              </ChakraSelect.Item>
+            </Grid>
+          ))}
+        </ChakraSelect.Content>
+      </ChakraSelect.Positioner>
     </ChakraSelect.Root>
   )
 }

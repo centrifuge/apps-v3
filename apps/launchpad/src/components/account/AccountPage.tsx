@@ -2,16 +2,9 @@ import { Balance } from '@centrifuge/sdk'
 import { Card, NetworkIcon } from '@centrifuge/ui'
 import { Box, Flex, Grid, Heading, Separator, Stack, Text } from '@chakra-ui/react'
 import { useMemo } from 'react'
-import {
-  formatUIBalance,
-  formatBalanceToString,
-  PoolDetails,
-  ShareClassWithDetails,
-  useNavPerNetwork,
-} from '@centrifuge/shared'
+import { formatUIBalance, PoolDetails, ShareClassWithDetails, useNavPerNetwork } from '@centrifuge/shared'
 import { FaRegChartBar } from 'react-icons/fa'
 import { Orders } from './Orders'
-import { PoolHoldings } from './PoolHoldings'
 
 export function AccountPage({ sc, poolDetails }: { sc: ShareClassWithDetails; poolDetails: PoolDetails }) {
   const { data: navPerNetwork } = useNavPerNetwork(sc.shareClass)
@@ -117,7 +110,6 @@ export function AccountPage({ sc, poolDetails }: { sc: ShareClassWithDetails; po
           <Orders title="Redemptions" shareClass={sc} poolCurrencySymbol={poolCurrencySymbol} />
         </Grid>
       </Stack>
-      <PoolHoldings poolDecimals={decimals} shareClass={sc.shareClass} />
     </Box>
   )
 }

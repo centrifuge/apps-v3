@@ -3,7 +3,6 @@ import { useObservable } from './useObservable'
 import { useMemo } from 'react'
 import { PendingAmount } from '../types'
 import { map, of } from 'rxjs'
-import { useCentrifuge } from './CentrifugeContext'
 
 export function useNavPerNetwork(shareClass?: ShareClass, options?: { enabled?: boolean }) {
   const enabled = options?.enabled ?? true
@@ -14,8 +13,9 @@ export function useNavPerNetwork(shareClass?: ShareClass, options?: { enabled?: 
   return useObservable(navPerNetwork$)
 }
 
-export function useHoldings(shareClass: ShareClass) {
-  const holdings$ = useMemo(() => shareClass?.balances(), [shareClass])
+export function useHoldings(shareClass?: ShareClass, options?: { enabled?: boolean }) {
+  const enabled = options?.enabled ?? true
+  const holdings$ = useMemo(() => (enabled && shareClass ? shareClass.balances() : undefined), [shareClass, enabled])
   return useObservable(holdings$)
 }
 

@@ -1,10 +1,14 @@
 import { Balance, ShareClass } from '@centrifuge/sdk'
-import { networkToName, useHoldings, formatBalance, formatUIBalance } from '@centrifuge/shared'
-import { LinkButton, NetworkIcon } from '@centrifuge/ui'
+import { networkToName, formatUIBalance, Holdings, PoolDetails } from '@centrifuge/shared'
+import { Button, LinkButton, Modal, NetworkIcon } from '@centrifuge/ui'
 import { DataTable, ColumnDefinition, ActionsDropdown } from '@centrifuge/ui'
 import { Flex, Heading, Stack, Text } from '@chakra-ui/react'
 import { useSelectedPool } from '@contexts/SelectedPoolProvider'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
+import AddHolding from './AddHolding'
+import DepositHolding from '@routes/holdings/DepositHolding'
+import WithdrawHolding from '@routes/holdings/WithdrawHolding'
+import { AddHoldingForm } from './AddHoldingForm'
 
 type Row = {
   id: number
@@ -65,23 +69,31 @@ const columns: ColumnDefinition<Row>[] = [
   },
 ]
 
-export function PoolHoldings({ shareClass, poolDecimals }: { shareClass: ShareClass; poolDecimals: number }) {
+export function HoldingsTable({
+  holdings,
+  shareClass,
+  poolCurrency,
+}: {
+  holdings: Holdings
+  shareClass: ShareClass
+  poolCurrency: PoolDetails['currency']
+}) {
+  const [openModal, setOpenModal] = useState<{ add: boolean; deposit: boolean; withdraw: boolean }>({
+    add: false,
+    deposit: false,
+    withdraw: false,
+  })
   const { poolId } = useSelectedPool()
-  const { data: holdings } = useHoldings(shareClass)
+  const poolDecimals = poolCurrency?.decimals ?? 18
 
-  // TODO: Right now we are assuming that 1USD = 1USDC, this needs to be updated in the future
   const totalValue = useMemo(() => {
-    return holdings?.reduce(
-      (acc, holding) => {
-        return acc.add(holding.value)
-      },
-      new Balance(0, poolDecimals)
-    )
-  }, [holdings, poolDecimals])
+    const zero = new Balance(0, poolDecimals)
 
-  if (!holdings || holdings.length === 0) {
-    return null
-  }
+    return holdings?.reduce((acc, holding) => {
+      const normalized = new Balance(holding.value.toBigInt(), poolDecimals)
+      return acc.add(normalized)
+    }, zero)
+  }, [holdings, poolDecimals])
 
   const data: Row[] = holdings?.map((holding, idx) => ({
     id: idx,
@@ -130,29 +142,31 @@ export function PoolHoldings({ shareClass, poolDecimals }: { shareClass: ShareCl
       <Stack gap={0} mb={4}>
         <Heading size="sm">Holdings</Heading>
         <Flex justify="space-between">
-          <Heading size="3xl">{formatBalance(totalValue ?? 0)} USDC</Heading>
+          <Heading size="3xl">
+            {formatUIBalance(totalValue, { precision: 2, tokenDecimals: poolDecimals, currency: poolCurrency?.symbol })}
+          </Heading>
           <Flex gap={2}>
-            <LinkButton
-              to={`/pool/${poolId?.toString()}/${shareClass.id.toString()}/holdings/add`}
+            <Button
               colorPalette="black"
-              width="140px"
               size="sm"
-              colorScheme="black"
-            >
-              Add holding
-            </LinkButton>
-            <LinkButton
-              to={`/pool/${poolId?.toString()}/${shareClass.id.toString()}/vaults`}
-              colorPalette="yellow"
-              width="140px"
-              size="sm"
-            >
-              Vaults
-            </LinkButton>
+              onClick={() => setOpenModal({ ...openModal, add: true })}
+              label="Add holding"
+            />
           </Flex>
         </Flex>
       </Stack>
       <DataTable data={data} columns={columns} />
+      <AddHoldingForm openModal={openModal} setOpenModal={setOpenModal} holdings={holdings} />
+      <Modal isOpen={openModal.deposit} onClose={() => setOpenModal({ ...openModal, deposit: false })} title="Deposit">
+        <DepositHolding />
+      </Modal>
+      <Modal
+        isOpen={openModal.withdraw}
+        onClose={() => setOpenModal({ ...openModal, withdraw: false })}
+        title="Withdraw"
+      >
+        <WithdrawHolding />
+      </Modal>
     </Stack>
   )
 }
