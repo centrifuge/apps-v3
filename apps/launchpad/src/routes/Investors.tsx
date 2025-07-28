@@ -1,10 +1,10 @@
 import z from 'zod'
 import { Form, useForm } from '@centrifuge/forms'
-import { truncateAddress, useAllPoolDetails, useCentrifugeTransaction, usePoolsByManager } from '@centrifuge/shared'
+import { useAllPoolDetails, useCentrifugeTransaction, usePools } from '@centrifuge/shared'
 import { Card, Button, Loader } from '@centrifuge/ui'
 import { Box, Flex, Heading, Stack, Text, VStack } from '@chakra-ui/react'
-import { useAccount } from 'wagmi'
 import { WhitelistInvestor } from '@components/investors/WhitelistInvestor'
+import { useAddress } from '@centrifuge/shared'
 import { useMemo } from 'react'
 import { isAddress } from 'viem'
 
@@ -18,8 +18,8 @@ const schema = z.object({
 })
 
 export default function Investors() {
-  const { address } = useAccount()
-  const { data: pools, isLoading } = usePoolsByManager(address!)
+  const { address } = useAddress()
+  const { data: pools, isLoading } = usePools()
   const { execute, isPending } = useCentrifugeTransaction()
 
   const poolIds = useMemo(() => {
@@ -58,7 +58,7 @@ export default function Investors() {
   if (!pools?.length) {
     return (
       <VStack>
-        <Text>No pools found for address {truncateAddress(address!)}</Text>
+        <Text>No pools found</Text>
       </VStack>
     )
   }
