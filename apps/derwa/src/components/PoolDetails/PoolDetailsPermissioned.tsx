@@ -97,7 +97,9 @@ export const PoolDetailsPermissioned = ({
           { label: 'Investor type', value: poolDetails.metadata?.pool.investorType || 'Non-US Professional' },
           {
             label: 'Available networks',
-            value: <Flex>{networks?.map((network) => <NetworkIcon networkId={network.chainId} />)}</Flex>,
+            value: (
+              <Flex>{networks?.map((network, index) => <NetworkIcon key={index} networkId={network.chainId} />)}</Flex>
+            ),
           },
           // TODO: missing data
           { label: 'Pool structure', value: 'Revolving' },

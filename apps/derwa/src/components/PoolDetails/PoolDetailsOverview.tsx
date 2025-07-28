@@ -24,7 +24,7 @@ export const PoolDetailsOverview = ({
         shadow="xs"
       >
         {items.map((item) => (
-          <Flex justifyContent="space-between" alignItems="center" mt={4}>
+          <Flex key={item.label} justifyContent="space-between" alignItems="center" mt={4}>
             <Text fontWeight={500} fontSize="14px" lineHeight="100%" color="#91969B">
               {item.label}
             </Text>
