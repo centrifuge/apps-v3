@@ -9,6 +9,7 @@ import {
   usePoolDetails,
   useVaultsDetails,
   useInvestment,
+  divideBigInts,
 } from '@centrifuge/shared'
 import { NetworkIcons } from '@centrifuge/ui'
 import { usePoolsContext } from '@contexts/usePoolsContext'
@@ -75,16 +76,32 @@ export function RedeemAmount({
 
   const debouncedCalculateReceiveAmount = useMemo(() => debounce(calculateReceiveAmount, 500), [calculateReceiveAmount])
 
+  const calculateRedeemAmountValue = useCallback(
+    (receiveInputAmount?: Balance) => {
+      if (!receiveInputAmount || !pricePerShare) {
+        return ''
+      }
+
+      const receiveAmountDecimals = receiveInputAmount.decimals
+      const receiveAmountBigint = receiveInputAmount.toBigInt()
+      const pricePerShareBigint = pricePerShare.toBigInt()
+
+      return divideBigInts(receiveAmountBigint, pricePerShareBigint, pricePerShare.decimals).formatToString(
+        receiveAmountDecimals,
+        pricePerShare?.decimals
+      )
+    },
+    [pricePerShare]
+  )
+
   const calculateRedeemAmount = useCallback(
     (inputStringValue: string, receiveInputAmount?: Balance) => {
       if (!inputStringValue || inputStringValue === '0' || !receiveInputAmount || !pricePerShare) {
         return setValue('redeemAmount', '')
       }
 
-      const calculatedRedeemAmount = formatBalanceToString(
-        receiveInputAmount.mul(pricePerShare),
-        receiveInputAmount.decimals
-      )
+      const calculatedRedeemAmount = calculateRedeemAmountValue(receiveInputAmount)
+
       return setValue('redeemAmount', calculatedRedeemAmount)
     },
     [pricePerShare, setValue]
