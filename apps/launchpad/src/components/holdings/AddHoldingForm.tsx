@@ -1,5 +1,7 @@
 import { useMemo, useState } from 'react'
+import { Link } from 'react-router'
 import { PoolNetwork } from '@centrifuge/sdk'
+import { Flex, Grid, Text } from '@chakra-ui/react'
 import {
   chainExplorer,
   networkToName,
@@ -9,9 +11,6 @@ import {
   usePoolNetworks,
 } from '@centrifuge/shared'
 import { IconShare, Modal, NetworkIcon, Select } from '@centrifuge/ui'
-import { Flex, Grid, Text } from '@chakra-ui/react'
-import { Link } from 'react-router'
-
 import { useSelectedPool } from '@contexts/SelectedPoolProvider'
 
 export const AddHoldingForm = ({

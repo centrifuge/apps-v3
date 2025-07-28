@@ -1,154 +1,124 @@
-import { BalanceInput, createBalanceSchema, Form, safeParse, Select, SubmitButton, useForm } from '@centrifuge/forms'
-import { formatUIBalance, Holdings, Portfolio, truncateAddress, useAddress } from '@centrifuge/shared'
-import { Card, DisplayInput, NetworkIcon } from '@centrifuge/ui'
-import { Box, Flex, Grid, Heading, Stack, Text } from '@chakra-ui/react'
+import { BalanceInput, createBalanceSchema, Form, safeParse, useForm } from '@centrifuge/forms'
+import {
+  Holdings,
+  networkToName,
+  truncateAddress,
+  useAddress,
+  useBalanceSheet,
+  useCentrifugeTransaction,
+} from '@centrifuge/shared'
+import { DisplayInput, Modal } from '@centrifuge/ui'
+import { Grid, Stack } from '@chakra-ui/react'
 import { SummaryBox } from './SummaryBox'
-import { useEffect, useMemo } from 'react'
+import { useMemo } from 'react'
 import { Balance } from '@centrifuge/sdk'
+import { useSelectedPool } from '@contexts/SelectedPoolProvider'
+
 import z from 'zod'
-import { useParams } from 'react-router-dom'
 
 export const HoldingsForm = ({
   isWithdraw = false,
-  portfolio,
-  holdings,
+  selectedHolding,
+  availableBalance,
+  openModal,
+  setOpenModal,
 }: {
   isWithdraw?: boolean
-  portfolio: Portfolio | undefined
-  holdings: Holdings
+  selectedHolding: Holdings[number]
+  availableBalance: Balance
+  openModal: { deposit: boolean; withdraw: boolean }
+  setOpenModal: (openModal: { deposit: boolean; withdraw: boolean }) => void
 }) => {
-  const params = useParams()
-  const holdingId = params.holdingId
+  const { execute, isPending } = useCentrifugeTransaction()
   const { address } = useAddress()
+  const { shareClass } = useSelectedPool()
+  const { data: balanceSheet } = useBalanceSheet(shareClass, selectedHolding.asset.chainId, { enabled: !!shareClass })
   const truncate = truncateAddress(address)
 
-  const holdingsItems = holdings?.map((holding) => ({
-    value: holding.assetId.raw.toString(),
-    label: holding.asset.name,
-    children: (
-      <Flex gap={2} alignItems="center">
-        <NetworkIcon networkId={holding.asset.chainId} boxSize="16px" />
-        <Text>{holding.asset.name}</Text>
-      </Flex>
-    ),
-  }))
-
-  const schema = z
-    .object({
-      holding: z.string().optional(),
-      availableBalance: z.custom<Portfolio[number]>().optional(),
-      amount: z.string().min(1, { message: 'Amount is required' }),
-    })
-    .refine(
-      (data) => {
-        if (!data.availableBalance?.balance || !data.amount) return true
-        const currentHolding = holdings.find((h) => h.assetId.raw.toString() === data.holding)
-        if (!currentHolding) return true
-        const parsedAmount = safeParse(createBalanceSchema(currentHolding.asset.decimals), data.amount)
-        if (!parsedAmount) return true
-        return !parsedAmount.gt(data.availableBalance.balance)
-      },
-      (data) => {
-        const avail = data.availableBalance?.balance
-        return {
-          message: `Amount cannot exceed your available balance of ${formatUIBalance(avail, {
-            precision: 2,
-            currency: data.availableBalance?.currency.symbol,
-            tokenDecimals: data.availableBalance?.currency.decimals,
-          })}`,
-          path: ['amount'],
-        }
-      }
-    )
+  const modalTitle = useMemo(() => {
+    return `${isWithdraw ? 'Withdraw' : 'Deposit'} ${selectedHolding.asset.symbol} on ${networkToName(selectedHolding.asset.chainId)}`
+  }, [isWithdraw, selectedHolding])
 
   const form = useForm({
-    schema: schema,
+    schema: z.object({
+      amount: createBalanceSchema(selectedHolding?.asset.decimals ?? 18),
+    }),
     defaultValues: {
-      holding: holdingId || (holdings.length > 0 ? holdings[0].assetId.raw.toString() : ''),
-      availableBalance: undefined,
-      amount: '',
+      amount: '0',
     },
-    mode: 'onChange',
-    onSubmit: (values) => {
-      // TODO wait on sdk
-      console.log(values)
+    onSubmit: async (values) => {
+      const { amount } = values
+      if (!balanceSheet) return
+      if (isWithdraw) {
+        await execute(balanceSheet?.withdraw(selectedHolding.assetId, address, amount))
+        setOpenModal({ ...openModal, withdraw: false })
+      } else {
+        await execute(balanceSheet?.deposit(selectedHolding.assetId, amount))
+        setOpenModal({ ...openModal, deposit: false })
+      }
     },
   })
 
-  const { watch, setValue, getValues } = form
-  const [amountStr, holdingFromForm] = watch(['amount', 'holding'])
-
-  useEffect(() => {
-    if (!portfolio) return
-
-    const selectedHolding = holdings.find((h) => h.assetId.raw.toString() === holdingFromForm)
-    const newBalance = portfolio.find((p) => p.currency.address === selectedHolding?.asset.address)
-
-    if (getValues('availableBalance')?.currency.address !== newBalance?.currency.address) {
-      setValue('availableBalance', newBalance, { shouldValidate: true })
-    }
-  }, [holdingFromForm, portfolio, holdings, setValue, getValues])
-
-  const selectedHolding = useMemo(() => {
-    return holdings.find((h) => h.assetId.raw.toString() === holdingFromForm)
-  }, [holdings, holdingFromForm])
-
-  const availableBalance = watch('availableBalance')
+  const { watch } = form
+  const amount = watch('amount')
 
   const parsedAmount = useMemo(() => {
-    const decimals = selectedHolding?.asset.decimals ?? 18
-    return safeParse(createBalanceSchema(decimals), amountStr) ?? new Balance(0, decimals)
-  }, [amountStr, selectedHolding])
+    return safeParse(createBalanceSchema(selectedHolding?.asset.decimals ?? 18), amount)
+  }, [amount, selectedHolding])
 
   const summaryItems = useMemo(() => {
     return [
       {
         label: 'Available balance',
-        balance: availableBalance?.balance ?? new Balance(0, 0),
+        balance: availableBalance,
+        currency: selectedHolding?.asset.symbol,
       },
       {
         label: isWithdraw ? 'Withdraw amount' : 'Deposit amount',
-        balance: parsedAmount,
+        balance: parsedAmount ?? new Balance(0, selectedHolding?.asset.decimals ?? 18),
+        currency: selectedHolding?.asset.symbol,
       },
     ]
   }, [availableBalance, isWithdraw, parsedAmount])
 
   return (
     <Form form={form}>
-      <Stack>
-        <Select name="holding" label="Available holdings" items={holdingsItems || []} maxWidth="40%" />
-        <Box mt={4}>
-          <Heading>
-            {isWithdraw ? `Withdraw ${selectedHolding?.asset.symbol}` : `Deposit ${selectedHolding?.asset.symbol}`}
-          </Heading>
-          <Card mt={4} pt={4} pb={4}>
-            <Grid gridTemplateColumns="1fr 1fr" gap={4}>
-              <Stack gap={2}>
-                <DisplayInput label="Connected wallet" value={`Connected wallet (${truncate})`} size="sm" />
-                <BalanceInput
-                  name="amount"
-                  label="Amount"
-                  size="sm"
-                  currency={selectedHolding?.asset.symbol}
-                  decimals={selectedHolding?.asset.decimals}
-                />
-                <SubmitButton colorPalette="yellow" size="sm" disabled={availableBalance?.balance.isZero()}>
-                  {isWithdraw ? 'Withdraw' : 'Deposit'}
-                </SubmitButton>
-              </Stack>
-              <SummaryBox
-                title="Transaction summary"
-                summaryItems={summaryItems}
-                infoText={
-                  isWithdraw
-                    ? 'Stablecoins will be transferred to the specified withdrawal addresses on the asset network. '
-                    : 'Stablecoins will be transferred to the escrow account of the pool on the assets networks. Wallet must be connected to the network of the asset.'
-                }
-              />
-            </Grid>
-          </Card>
-        </Box>
-      </Stack>
+      <Modal
+        isOpen={isWithdraw ? openModal.withdraw : openModal.deposit}
+        onClose={() => setOpenModal({ ...openModal, deposit: false, withdraw: false })}
+        title={modalTitle}
+        onPrimaryAction={() => form.handleSubmit()}
+        primaryActionText={isWithdraw ? 'Withdraw' : 'Deposit'}
+        isPrimaryActionLoading={isPending}
+        isPrimaryActionDisabled={!!form.formState.errors.amount || parsedAmount?.isZero()}
+        size="xl"
+      >
+        <Grid gridTemplateColumns="1fr 1fr" gap={4}>
+          <Stack gap={2}>
+            <DisplayInput
+              label={isWithdraw ? 'Destination address' : 'Source address'}
+              value={isWithdraw ? truncate : `Connected wallet (${truncate})`}
+              size="sm"
+            />
+            <BalanceInput
+              name="amount"
+              label="Amount"
+              size="sm"
+              currency={selectedHolding?.asset.symbol}
+              decimals={selectedHolding?.asset.decimals}
+            />
+          </Stack>
+          <SummaryBox
+            title="Transaction summary"
+            summaryItems={summaryItems}
+            infoText={
+              isWithdraw
+                ? 'Stablecoins will be transferred to the specified withdrawal addresses on the asset network. '
+                : 'Stablecoins will be transferred to the escrow account of the pool on the assets networks. Wallet must be connected to the network of the asset.'
+            }
+          />
+        </Grid>
+      </Modal>
     </Form>
   )
 }

@@ -1,50 +1,46 @@
-import { formatUIBalance, ShareClassWithDetails } from '@centrifuge/shared'
+import { formatUIBalance } from '@centrifuge/shared'
 import { usePendingAmounts } from '@centrifuge/shared/src/hooks/useShareClass'
 import { Card, LinkButton } from '@centrifuge/ui'
 import { Flex, Heading, Separator, Stack } from '@chakra-ui/react'
 import { useMemo } from 'react'
 import { useSelectedPool } from '@contexts/SelectedPoolProvider'
+import { Balance } from '@centrifuge/sdk'
 
-export function Orders({
-  title,
-  shareClass,
-  isInvestment,
-  poolCurrencySymbol,
-}: {
-  title: string
-  shareClass: ShareClassWithDetails
-  isInvestment?: boolean
-  poolCurrencySymbol: string
-}) {
-  const { poolId } = useSelectedPool()
-  const { data: pendingAmounts } = usePendingAmounts(shareClass.shareClass)
-  const defaultRoute = `/pool/${poolId?.toString()}/${shareClass.shareClass.id.toString()}/orders/approve`
+export function Orders({ title, isInvestment }: { title: string; isInvestment?: boolean }) {
+  const { poolId, shareClass, poolCurrency } = useSelectedPool()
+  const { data: pendingAmounts } = usePendingAmounts(shareClass, { enabled: !!shareClass })
+  const defaultRoute = `/pool/${poolId?.toString()}/${shareClass?.id.toString()}/orders/approve`
+
+  const poolCurrencySymbol = poolCurrency?.symbol ?? 'USD'
+  const poolCurrencyDecimals = poolCurrency?.decimals ?? 18
 
   const findRoute = (isApprove: boolean) => {
     let route = defaultRoute
     if (isInvestment && isApprove) {
       route = defaultRoute
     } else if (!isInvestment && isApprove) {
-      route = `/pool/${poolId?.toString()}/${shareClass.shareClass.id.toString()}/orders/approveRedeem`
+      route = `/pool/${poolId?.toString()}/${shareClass?.id.toString()}/orders/approveRedeem`
     } else if (isInvestment && !isApprove) {
-      route = `/pool/${poolId?.toString()}/${shareClass.shareClass.id.toString()}/orders/issue`
+      route = `/pool/${poolId?.toString()}/${shareClass?.id.toString()}/orders/issue`
     } else if (!isInvestment && !isApprove) {
-      route = `/pool/${poolId?.toString()}/${shareClass.shareClass.id.toString()}/orders/revokeRedeem`
+      route = `/pool/${poolId?.toString()}/${shareClass?.id.toString()}/orders/revokeRedeem`
     }
 
     return route
   }
 
   const pendingAmount = useMemo(() => {
+    const zero = new Balance(0, poolCurrencyDecimals)
     return pendingAmounts
       ?.map((p) => (isInvestment ? p.pendingDeposit : p.pendingRedeem))
-      .reduce((acc, curr) => acc + curr.toFloat(), 0)
+      .reduce((acc, curr) => acc.add(new Balance(curr.toBigInt(), poolCurrencyDecimals)), zero)
   }, [pendingAmounts, isInvestment])
 
   const approvedAmount = useMemo(() => {
+    const zero = new Balance(0, poolCurrencyDecimals)
     return pendingAmounts
       ?.map((p) => (isInvestment ? p.pendingIssuancesTotal : p.pendingRevocationsTotal))
-      .reduce((acc, curr) => acc + curr.toFloat(), 0)
+      .reduce((acc, curr) => acc.add(new Balance(curr.toBigInt(), poolCurrencyDecimals)), zero)
   }, [pendingAmounts, isInvestment])
 
   return (

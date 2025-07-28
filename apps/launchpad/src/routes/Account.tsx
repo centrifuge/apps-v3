@@ -5,19 +5,19 @@ import { useMemo } from 'react'
 import { formatUIBalance } from '@centrifuge/shared'
 import { useSelectedPool } from '@contexts/SelectedPoolProvider'
 
-// TODO: FOR MVP, we are assuming one share class per pool
-// Routing must be fix to handle multiple share classes per pool
 export default function Account() {
-  const { shareClass, isLoading, poolDetails, poolId } = useSelectedPool()
-  const shareClassId = shareClass?.shareClass?.id.raw ?? ''
+  const { shareClassDetails, isLoading, poolDetails, poolId } = useSelectedPool()
+  const shareClassId = shareClassDetails?.id.raw ?? ''
 
   const totalNav = useMemo(() => {
-    return shareClass?.details.totalIssuance.mul(shareClass?.details.pricePerShare)
-  }, [shareClass])
+    return shareClassDetails?.totalIssuance.mul(shareClassDetails?.pricePerShare)
+  }, [shareClassDetails])
 
   if (isLoading) {
     return <Loader />
   }
+
+  if (!shareClassDetails || !poolDetails) return
 
   return (
     <>
@@ -42,7 +42,7 @@ export default function Account() {
           Update NAV
         </LinkButton>
       </Flex>
-      {shareClass && poolDetails && <AccountPage sc={shareClass} poolDetails={poolDetails} />}
+      <AccountPage />
     </>
   )
 }

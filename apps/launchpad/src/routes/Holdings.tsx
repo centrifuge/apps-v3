@@ -10,11 +10,9 @@ const Holdings = () => {
 
   if (!isLoading && !isIdle && !holdings?.length) return <Text>No holdings found</Text>
 
-  if (!shareClass) return <Text>Share class not found</Text>
-
-  if (!poolCurrency) return <Text>Pool currency not found</Text>
-
   if (isLoading || isIdle) return <Loader />
+
+  if (!shareClass || !poolCurrency) return
 
   return <HoldingsTable holdings={holdings ?? []} shareClass={shareClass} poolCurrency={poolCurrency} />
 }

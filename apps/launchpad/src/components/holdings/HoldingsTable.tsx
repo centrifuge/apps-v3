@@ -1,14 +1,12 @@
+import { useMemo, useState } from 'react'
 import { Balance, ShareClass } from '@centrifuge/sdk'
 import { networkToName, formatUIBalance, Holdings, PoolDetails } from '@centrifuge/shared'
-import { Button, LinkButton, Modal, NetworkIcon } from '@centrifuge/ui'
+import { Button, NetworkIcon } from '@centrifuge/ui'
 import { DataTable, ColumnDefinition, ActionsDropdown } from '@centrifuge/ui'
 import { Flex, Heading, Stack, Text } from '@chakra-ui/react'
-import { useSelectedPool } from '@contexts/SelectedPoolProvider'
-import { useMemo, useState } from 'react'
-import AddHolding from './AddHolding'
-import DepositHolding from '@routes/holdings/DepositHolding'
-import WithdrawHolding from '@routes/holdings/WithdrawHolding'
 import { AddHoldingForm } from './AddHoldingForm'
+import { DepositHolding } from './DepositHolding'
+import WithdrawHolding from './WithdrawHolding'
 
 type Row = {
   id: number
@@ -71,19 +69,18 @@ const columns: ColumnDefinition<Row>[] = [
 
 export function HoldingsTable({
   holdings,
-  shareClass,
   poolCurrency,
 }: {
   holdings: Holdings
   shareClass: ShareClass
   poolCurrency: PoolDetails['currency']
 }) {
+  const [selectedHolding, setSelectedHolding] = useState<Holdings[number] | undefined>(undefined)
   const [openModal, setOpenModal] = useState<{ add: boolean; deposit: boolean; withdraw: boolean }>({
     add: false,
     deposit: false,
     withdraw: false,
   })
-  const { poolId } = useSelectedPool()
   const poolDecimals = poolCurrency?.decimals ?? 18
 
   const totalValue = useMemo(() => {
@@ -110,25 +107,29 @@ export function HoldingsTable({
             {
               label: 'deposit',
               element: (
-                <LinkButton
-                  to={`/pool/${poolId?.toString()}/${shareClass.id.toString()}/holdings/deposit/${holding.assetId}`}
+                <Button
                   size="sm"
                   variant="plain"
-                >
-                  Deposit
-                </LinkButton>
+                  label="Deposit"
+                  onClick={() => {
+                    setSelectedHolding(holding)
+                    setOpenModal({ ...openModal, deposit: true })
+                  }}
+                />
               ),
             },
             {
               label: 'withdraw',
               element: (
-                <LinkButton
-                  to={`/pool/${poolId?.toString()}/${shareClass.id.toString()}/holdings/withdraw/${holding.assetId}`}
+                <Button
                   size="sm"
                   variant="plain"
-                >
-                  Withdraw
-                </LinkButton>
+                  label="Withdraw"
+                  onClick={() => {
+                    setSelectedHolding(holding)
+                    setOpenModal({ ...openModal, withdraw: true })
+                  }}
+                />
               ),
             },
           ]}
@@ -136,6 +137,8 @@ export function HoldingsTable({
       )
     },
   }))
+
+  if (!holdings) return null
 
   return (
     <Stack mt={8} gap={2}>
@@ -156,17 +159,17 @@ export function HoldingsTable({
         </Flex>
       </Stack>
       <DataTable data={data} columns={columns} />
-      <AddHoldingForm openModal={openModal} setOpenModal={setOpenModal} holdings={holdings} />
-      <Modal isOpen={openModal.deposit} onClose={() => setOpenModal({ ...openModal, deposit: false })} title="Deposit">
-        <DepositHolding />
-      </Modal>
-      <Modal
-        isOpen={openModal.withdraw}
-        onClose={() => setOpenModal({ ...openModal, withdraw: false })}
-        title="Withdraw"
-      >
-        <WithdrawHolding />
-      </Modal>
+      <AddHoldingForm openModal={openModal} setOpenModal={(modal) => setOpenModal({ ...openModal, ...modal })} />
+      <DepositHolding
+        openModal={openModal}
+        setOpenModal={(modal) => setOpenModal({ ...openModal, ...modal })}
+        selectedHolding={selectedHolding}
+      />
+      <WithdrawHolding
+        openModal={openModal}
+        setOpenModal={(modal) => setOpenModal({ ...openModal, ...modal })}
+        selectedHolding={selectedHolding}
+      />
     </Stack>
   )
 }

@@ -7,7 +7,7 @@ import { useTransactions } from './TransactionProvider'
 
 export function useCentrifugeTransaction() {
   const centrifuge = useCentrifuge()
-  const { updateTransaction, addOrUpdateTransaction } = useTransactions()
+  const { updateTransaction, addOrUpdateTransaction, addTransaction } = useTransactions()
   const { data: client } = useConnectorClient()
   const { mutateAsync, ...rest } = useMutation({
     mutationFn: execute,
@@ -52,9 +52,19 @@ export function useCentrifugeTransaction() {
       )
       return lastResult as OperationConfirmedStatus
     } catch (e) {
+      const error = e as Error
       if (lastId) {
         updateTransaction(lastId, {
           status: 'failed',
+          failedReason: error.message,
+          error: e,
+        })
+      } else {
+        addTransaction({
+          id: `failed-tx-${Date.now()}`,
+          title: 'Transaction Failed',
+          status: 'failed',
+          failedReason: error.message,
           error: e,
         })
       }

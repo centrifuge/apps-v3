@@ -11,13 +11,10 @@ import ApproveRedemptions from '@routes/orders/ApproveRedemptions'
 import PoolAccess from '@routes/settings/PoolAccess'
 import PoolStructure from '@routes/settings/PoolStructure'
 import NotFound from '@routes/NotFound'
-import AddHolding from '@routes/holdings/AddHolding'
-import DepositHolding from '@routes/holdings/DepositHolding'
-import WithdrawHolding from '@routes/holdings/WithdrawHolding'
 import Vaults from '@routes/Vaults'
 import UpdateMetadata from '@routes/UpdateMetadata'
 import RevokeShares from '@routes/orders/RevokeShares'
-import Holdings from '@routes/holdings/Holdings'
+import Holdings from '@routes/Holdings'
 
 export const routes = createBrowserRouter([
   {
@@ -52,8 +49,6 @@ export const routes = createBrowserRouter([
 
               // Holdings
               { path: 'holdings', element: <Holdings /> },
-              { path: 'holdings/deposit/:holdingId', element: <DepositHolding /> },
-              { path: 'holdings/withdraw/:holdingId', element: <WithdrawHolding /> },
 
               // Vaults & Metadata
               { path: 'vaults', element: <Vaults /> },

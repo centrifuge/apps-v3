@@ -1,7 +1,7 @@
 import React from 'react'
-import { Dialog, Portal, CloseButton, Button, Separator, Flex, Box, Grid } from '@chakra-ui/react'
+import { Dialog, Portal, CloseButton, Button, Separator, Grid } from '@chakra-ui/react'
 
-interface ModalProps {
+interface ModalProps extends Dialog.RootProps {
   isOpen: boolean
   onClose: () => void
   title: string
@@ -9,6 +9,7 @@ interface ModalProps {
   primaryActionText?: string
   onPrimaryAction?: () => void
   isPrimaryActionLoading?: boolean
+  isPrimaryActionDisabled?: boolean
 }
 
 export const Modal = ({
@@ -19,19 +20,15 @@ export const Modal = ({
   primaryActionText = 'Save Changes',
   onPrimaryAction,
   isPrimaryActionLoading = false,
+  isPrimaryActionDisabled = false,
+  size = 'md',
 }: ModalProps) => {
   return (
-    <Dialog.Root open={isOpen} onOpenChange={(open) => !open && onClose()}>
+    <Dialog.Root open={isOpen} onOpenChange={(open) => !open && onClose()} size={size}>
       <Portal>
         <Dialog.Backdrop />
         <Dialog.Positioner>
-          <Dialog.Content
-            bg="white"
-            borderRadius="md"
-            boxShadow="lg"
-            width={{ base: '90%', md: '500px' }}
-            position="relative"
-          >
+          <Dialog.Content bg="white" borderRadius="md" boxShadow="lg" position="relative">
             <Dialog.Header display="flex" justifyContent="space-between" alignItems="center">
               <Dialog.Title fontSize="xl" fontWeight="bold">
                 {title}
@@ -49,7 +46,13 @@ export const Modal = ({
                   Cancel
                 </Button>
                 {onPrimaryAction && (
-                  <Button size="sm" colorPalette="yellow" onClick={onPrimaryAction} loading={isPrimaryActionLoading}>
+                  <Button
+                    size="sm"
+                    colorPalette="yellow"
+                    onClick={onPrimaryAction}
+                    loading={isPrimaryActionLoading}
+                    disabled={isPrimaryActionDisabled}
+                  >
                     {primaryActionText}
                   </Button>
                 )}
