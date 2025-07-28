@@ -4,10 +4,10 @@ import { Box, Button, Flex, Heading, Icon, Text } from '@chakra-ui/react'
 import { useFormContext } from '@centrifuge/forms'
 import { useTransactions } from '@centrifuge/shared'
 import { InvestAction, type InvestActionType } from '@components/InvestRedeemSection/components/defaults'
-import { VaultDetails } from '@utils/types'
 import { IoClose } from 'react-icons/io5'
 import { InfoWrapper } from '@components/InvestRedeemSection/components/InfoWrapper'
 import { infoText } from '@utils/infoText'
+import { useVaultsContext } from '@contexts/useVaultsContext'
 
 interface TxState {
   header: string
@@ -16,11 +16,11 @@ interface TxState {
 }
 
 interface InvestTxFeedbackProps {
-  vaultDetails?: VaultDetails
   setActionType: Dispatch<SetStateAction<InvestActionType>>
 }
 
-export function InvestTxFeedback({ vaultDetails, setActionType }: InvestTxFeedbackProps) {
+export function InvestTxFeedback({ setActionType }: InvestTxFeedbackProps) {
+  const { vaultDetails } = useVaultsContext()
   const { getValues, reset } = useFormContext()
   const { transactions } = useTransactions()
   const [txState, setTxState] = useState<TxState>({

@@ -1,40 +1,31 @@
 import { useMemo, type Dispatch, type SetStateAction } from 'react'
-import { useInvestment } from '@centrifuge/shared'
-import type { Balance, PoolNetwork, Vault } from '@centrifuge/sdk'
+import type { Balance } from '@centrifuge/sdk'
 import { type RedeemActionType, RedeemAction } from '@components/InvestRedeemSection/components/defaults'
 import { RedeemAmount } from '@components/InvestRedeemSection/RedeemTab/forms/RedeemAmount'
 import { RedeemTxFeedback } from '@components/InvestRedeemSection/RedeemTab/forms/RedeemTxFeedback'
-import { VaultDetails } from '@utils/types'
+import { useVaultsContext } from '@contexts/useVaultsContext'
+import { usePoolsContext } from '@contexts/usePoolsContext'
 // import { RedeemTxCancelled } from '@components/InvestRedeemSection/RedeemTab/forms/RedeemTxCancelled'
 
 interface RedeemTabFormProps {
   actionType: RedeemActionType
   isDisabled: boolean
   maxRedeemAmount: string
-  networks?: PoolNetwork[]
   parsedRedeemAmount: 0 | Balance
   parsedReceiveAmount: 0 | Balance
-  vault?: Vault
-  vaults?: Vault[]
-  vaultDetails?: VaultDetails
   setActionType: Dispatch<SetStateAction<RedeemActionType>>
-  setVault: Dispatch<Vault | undefined>
 }
 
 export function RedeemTabForm({
   actionType,
   isDisabled,
   maxRedeemAmount,
-  networks,
   parsedRedeemAmount,
   parsedReceiveAmount,
-  vault,
-  vaults,
-  vaultDetails,
   setActionType,
-  setVault,
 }: RedeemTabFormProps) {
-  const { data: investment } = useInvestment(vault)
+  const { networks } = usePoolsContext()
+  const { investment } = useVaultsContext()
   const redeemCurrencySymbol = investment?.shareCurrency.symbol ?? ''
   const receiveCurrencySymbol = investment?.investmentCurrency.symbol ?? ''
 
@@ -54,10 +45,6 @@ export function RedeemTabForm({
           maxRedeemAmount={maxRedeemAmount}
           networks={networks}
           parsedRedeemAmount={parsedRedeemAmount}
-          vault={vault}
-          vaults={vaults}
-          vaultDetails={vaultDetails}
-          setVault={setVault}
         />
       )
     case RedeemAction.CONFIRM:

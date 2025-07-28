@@ -1,38 +1,26 @@
-import { Dispatch, useCallback, useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 import { Badge, Box, Flex, Text } from '@chakra-ui/react'
 import { BalanceInput, SubmitButton, useFormContext } from '@centrifuge/forms'
-import { Balance, PoolId, PoolNetwork, Price, Vault } from '@centrifuge/sdk'
-import { divideBigInts, usePoolDetails, useVaultsDetails } from '@centrifuge/shared'
+import { Balance, PoolNetwork, Price } from '@centrifuge/sdk'
+import { divideBigInts } from '@centrifuge/shared'
 import { NetworkIcons } from '@centrifuge/ui'
 import { usePoolsContext } from '@contexts/usePoolsContext'
 import { infoText } from '@utils/infoText'
 import { InfoWrapper } from '@components/InvestRedeemSection/components/InfoWrapper'
-import { VaultDetails } from '@utils/types'
 import { debounce, formatBalance, formatBalanceToString } from '@centrifuge/shared'
 import { useGetPortfolioDetails } from '@hooks/useGetPortfolioDetails'
+import { useVaultsContext } from '@contexts/useVaultsContext'
 
 interface InvestAmountProps {
   isDisabled: boolean
   maxInvestAmount: string
-  networks?: PoolNetwork[]
+  networs?: PoolNetwork[]
   parsedInvestAmount: 0 | Balance
-  vaultDetails?: VaultDetails
-  vaults: Vault[]
-  setVault: Dispatch<Vault | undefined>
 }
 
-export function InvestAmount({
-  isDisabled,
-  maxInvestAmount,
-  networks,
-  parsedInvestAmount,
-  vaultDetails,
-  vaults,
-  setVault,
-}: InvestAmountProps) {
-  const { data: vaultsDetails } = useVaultsDetails(vaults)
-  const { selectedPoolId } = usePoolsContext()
-  const { data: pool } = usePoolDetails(selectedPoolId as PoolId)
+export function InvestAmount({ isDisabled, maxInvestAmount, parsedInvestAmount }: InvestAmountProps) {
+  const { poolDetails, networks } = usePoolsContext()
+  const { vaultDetails, vaultsDetails, vaults, setVault } = useVaultsContext()
   const { portfolioInvestmentCurrency, portfolioBalance, hasInvestmentCurrency } = useGetPortfolioDetails(vaultDetails)
   const { setValue } = useFormContext()
   const networkIds = networks?.map((network) => network.chainId)
@@ -44,7 +32,7 @@ export function InvestAmount({
   }))
 
   // Get the share class info for calculating shares amount to receive
-  const poolShareClass = pool?.shareClasses.find(
+  const poolShareClass = poolDetails?.shareClasses.find(
     (sc) => sc.shareClass.id.toString() === vaultDetails?.shareClass.id.toString()
   )
   const pricePerShare = poolShareClass?.details.pricePerShare
@@ -151,7 +139,7 @@ export function InvestAmount({
           )}
         </Box>
         <Box>
-          <SubmitButton colorPalette="yellow" width="100%" disabled={isDisabled}>
+          <SubmitButton colorPalette="yellow" width="100%" disabled={isDisabled} mt={6}>
             Invest
           </SubmitButton>
           {!hasInvestmentCurrency ? (

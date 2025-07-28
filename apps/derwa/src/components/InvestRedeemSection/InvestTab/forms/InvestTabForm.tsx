@@ -4,48 +4,35 @@ import { type InvestActionType, InvestAction } from '@components/InvestRedeemSec
 import { InvestAmount } from '@components/InvestRedeemSection/InvestTab/forms/InvestAmount'
 // import { InvestRequirements } from '@components/InvestRedeemSection/InvestTab/forms/InvestRequirements'
 import { InvestTxFeedback } from '@components/InvestRedeemSection/InvestTab/forms/InvestTxFeedback'
-import { VaultDetails } from '@utils/types'
 
 interface InvestTabFormProps {
   actionType: InvestActionType
   isDisabled: boolean
   maxInvestAmount: string
-  networks?: PoolNetwork[]
   parsedInvestAmount: 0 | Balance
-  vaults: Vault[]
-  vaultDetails?: VaultDetails
   setActionType: Dispatch<SetStateAction<InvestActionType>>
-  setVault: Dispatch<Vault | undefined>
 }
 
 export function InvestTabForm({
   actionType,
   isDisabled,
   maxInvestAmount,
-  networks,
   parsedInvestAmount,
-  vaults,
-  vaultDetails,
   setActionType,
-  setVault,
 }: InvestTabFormProps) {
   switch (actionType) {
     case InvestAction.INVEST_AMOUNT:
       return (
         <InvestAmount
           maxInvestAmount={maxInvestAmount}
-          networks={networks}
           parsedInvestAmount={parsedInvestAmount}
-          vaults={vaults}
-          vaultDetails={vaultDetails}
           isDisabled={isDisabled}
-          setVault={setVault}
         />
       )
     // TODO: add this for sync invest form
     // case InvestAction.INVESTOR_REQUIREMENTS:
     //   return <InvestRequirements />
     case InvestAction.CONFIRM:
-      return <InvestTxFeedback vaultDetails={vaultDetails} setActionType={setActionType} />
+      return <InvestTxFeedback setActionType={setActionType} />
   }
 }

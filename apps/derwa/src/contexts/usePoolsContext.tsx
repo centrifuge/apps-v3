@@ -1,16 +1,6 @@
 import { createContext, ReactNode, useContext, useEffect, useMemo, useRef, useState } from 'react'
-import { Pool, PoolId, PoolNetwork, Vault } from '@centrifuge/sdk'
-import {
-  PoolDetails,
-  ShareClassWithDetails,
-  useInvestmentsPerVaults,
-  usePoolDetails,
-  usePoolNetworks,
-  usePoolsQuery,
-  useVaults,
-  useVaultsDetails,
-  VaultDetails,
-} from '@centrifuge/shared'
+import { Pool, PoolId, PoolNetwork, ShareClassId } from '@centrifuge/sdk'
+import { PoolDetails, ShareClassWithDetails, usePoolDetails, usePoolNetworks, usePoolsQuery } from '@centrifuge/shared'
 import { useParams } from 'react-router-dom'
 import { useChainId } from 'wagmi'
 
@@ -25,13 +15,8 @@ const PoolsContext = createContext<
       network: PoolNetwork | undefined
       networks: PoolNetwork[] | undefined
       isNetworksLoading: boolean
-      vaults: Vault[] | undefined
-      isVaultsLoading: boolean
-      vaultsDetails: VaultDetails[] | undefined
-      isVaultsDetailsLoading: boolean
-      investmentsPerVaults: unknown[] | undefined
-      isInvestmentsPerVaultsLoading: boolean
       shareClass: ShareClassWithDetails | undefined
+      shareClassId: ShareClassId | undefined
     }
   | undefined
 >(undefined)
@@ -53,11 +38,7 @@ export const PoolsProvider = ({ children }: { children: ReactNode }) => {
 
   // In MVP we assume one share class per pool
   const shareClass = poolDetails?.shareClasses?.[0]
-  const scId = shareClass?.details.id
-
-  const { data: vaults, isLoading: isVaultsLoading } = useVaults(network, scId)
-  const { data: vaultsDetails, isLoading: isVaultsDetailsLoading } = useVaultsDetails(vaults)
-  const { data: investmentsPerVaults, isLoading: isInvestmentsPerVaultsLoading } = useInvestmentsPerVaults(vaults)
+  const shareClassId = shareClass?.details.id
 
   // Use a ref to track if we've already set the initial pool ID
   const hasSetInitialPoolRef = useRef(false)
@@ -85,13 +66,8 @@ export const PoolsProvider = ({ children }: { children: ReactNode }) => {
         network,
         networks,
         isNetworksLoading,
-        vaults,
-        isVaultsLoading,
-        vaultsDetails,
-        isVaultsDetailsLoading,
-        investmentsPerVaults,
-        isInvestmentsPerVaultsLoading,
         shareClass,
+        shareClassId,
       }}
     >
       {children}

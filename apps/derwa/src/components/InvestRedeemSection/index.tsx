@@ -1,8 +1,6 @@
-import { useEffect, useState, type ComponentType, type Dispatch } from 'react'
-import { useChainId } from 'wagmi'
+import type { ComponentType } from 'react'
 import { Box, Flex, Heading, Spinner, Stack, Text } from '@chakra-ui/react'
-import type { PoolNetwork, ShareClassId, Vault } from '@centrifuge/sdk'
-import { useInvestment, useIsMember, usePoolNetworks, useVaults } from '@centrifuge/shared'
+import type { Vault } from '@centrifuge/sdk'
 import { useGeolocation } from '@hooks/useGeolocation'
 import { ConnectionGuard } from '@components/ConnectionGuard'
 import { Tabs } from '@components/Tabs'
@@ -11,26 +9,18 @@ import InvestTab from '@components/InvestRedeemSection/InvestTab/InvestTab'
 import RedeemTab from '@components/InvestRedeemSection/RedeemTab/RedeemTab'
 import type { PoolDetails } from '@utils/types'
 import { InvestRedeemClaimForm } from '@components/InvestRedeemSection/components/InvestRedeemClaimForm'
+import { useVaultsContext } from '@contexts/useVaultsContext'
+import { usePoolsContext } from '@contexts/usePoolsContext'
 
 export interface TabProps {
   isInvestorWhiteListed: boolean
   isLoading: boolean
-  networks?: PoolNetwork[]
   vault: Vault
-  vaults: Vault[]
-  setVault: Dispatch<Vault | undefined>
 }
 interface VaultGuardProps {
-  connectedChainId: number
   isInvestorWhiteListed: boolean
   isLoading: boolean
-  pool: PoolDetails
-  shareClassId?: ShareClassId
   tab: ComponentType<TabProps>
-  vault?: Vault
-  setVault: Dispatch<Vault | undefined>
-  setVaults: Dispatch<Vault[] | undefined>
-  vaults?: Vault[]
 }
 
 const RestrictedCountry = () => {
@@ -43,14 +33,8 @@ const RestrictedCountry = () => {
 }
 
 export function InvestRedeemSection({ pool: poolDetails }: { pool?: PoolDetails }) {
-  const connectedChainId = useChainId()
+  const { isMember, isMemberLoading } = useVaultsContext()
   const { data: location, isLoading: isGeoloationLoading } = useGeolocation()
-  const [vault, setVault] = useState<Vault>()
-  const [vaults, setVaults] = useState<Vault[]>()
-
-  // Assuming one share class per pool
-  const shareClassId = poolDetails?.shareClasses?.[0]?.details.id
-  const { data: isMember, isLoading: isMemberLoading } = useIsMember(shareClassId, connectedChainId)
   const isInvestorWhiteListed = !!isMember
   const isTabLoading = isGeoloationLoading || isMemberLoading
 
@@ -80,18 +64,7 @@ export function InvestRedeemSection({ pool: poolDetails }: { pool?: PoolDetails 
             body: isRestrictedCountry ? (
               <RestrictedCountry />
             ) : (
-              <VaultGuard
-                connectedChainId={connectedChainId}
-                isInvestorWhiteListed={isInvestorWhiteListed}
-                isLoading={isTabLoading}
-                pool={poolDetails}
-                shareClassId={shareClassId}
-                tab={InvestTab}
-                vault={vault}
-                vaults={vaults}
-                setVault={setVault}
-                setVaults={setVaults}
-              />
+              <VaultGuard isInvestorWhiteListed={isInvestorWhiteListed} isLoading={isTabLoading} tab={InvestTab} />
             ),
           },
           {
@@ -101,18 +74,7 @@ export function InvestRedeemSection({ pool: poolDetails }: { pool?: PoolDetails 
             body: isRestrictedCountry ? (
               <RestrictedCountry />
             ) : (
-              <VaultGuard
-                connectedChainId={connectedChainId}
-                isInvestorWhiteListed={isInvestorWhiteListed}
-                isLoading={isTabLoading}
-                pool={poolDetails}
-                shareClassId={shareClassId}
-                tab={RedeemTab}
-                vault={vault}
-                vaults={vaults}
-                setVault={setVault}
-                setVaults={setVaults}
-              />
+              <VaultGuard isInvestorWhiteListed={isInvestorWhiteListed} isLoading={isTabLoading} tab={RedeemTab} />
             ),
           },
         ]}
@@ -121,35 +83,16 @@ export function InvestRedeemSection({ pool: poolDetails }: { pool?: PoolDetails 
   )
 }
 
-function VaultGuard({
-  connectedChainId,
-  isInvestorWhiteListed,
-  isLoading,
-  pool: poolDetails,
-  tab: Tab,
-  shareClassId,
-  vault,
-  vaults,
-  setVault,
-  setVaults,
-}: VaultGuardProps) {
-  const { data: networks, isLoading: isNetworksLoading } = usePoolNetworks(poolDetails.id)
-  const { data: investment, isLoading: isInvestmentLoading } = useInvestment(vault)
+function VaultGuard({ isInvestorWhiteListed, isLoading, tab: Tab }: VaultGuardProps) {
+  const { networks, isNetworksLoading } = usePoolsContext()
+  const { investment, isVaultsLoading, vault } = useVaultsContext()
+
   const chainIds = networks?.map((network) => network.chainId) ?? []
-  const network = networks?.find((n) => n.chainId === connectedChainId)
-  const { data, isLoading: isVaultsLoading } = useVaults(network, shareClassId)
-  const isVaultGuardLoading = isLoading || isNetworksLoading || isVaultsLoading || isInvestmentLoading
+  const isVaultGuardLoading = isLoading || isNetworksLoading || isVaultsLoading
+
   const hasClaims =
     (investment?.claimableInvestShares.toBigInt() ?? 0n) > 0n ||
     (investment?.claimableRedeemCurrency.toBigInt() ?? 0n) > 0n
-
-  useEffect(() => {
-    if (data?.length && (!vault || !data.includes(vault))) {
-      setVault(data[0])
-    }
-
-    setVaults(data)
-  }, [data, vault, setVault, setVaults])
 
   if (isVaultGuardLoading) {
     return (
@@ -182,14 +125,7 @@ function VaultGuard({
         <Text>No vaults found for this pool on this network.</Text>
       ) : (
         <Stack height="100%">
-          <Tab
-            isInvestorWhiteListed={isInvestorWhiteListed}
-            isLoading={isVaultGuardLoading}
-            networks={networks}
-            vault={vault}
-            vaults={vaults ?? []}
-            setVault={setVault}
-          />
+          <Tab isInvestorWhiteListed={isInvestorWhiteListed} isLoading={isVaultGuardLoading} vault={vault} />
         </Stack>
       )}
     </ConnectionGuard>
