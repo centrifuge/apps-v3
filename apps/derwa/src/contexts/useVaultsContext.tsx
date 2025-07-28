@@ -37,7 +37,7 @@ const defaultVaultsContextValues: VaultsContextValues = {
   isVaultsLoading: false,
   isVaultDetailsLoading: false,
   vault: undefined,
-  vaults: undefined,
+  vaults: [],
   vaultDetails: undefined,
   vaultsDetails: undefined,
   setVault: () => {},

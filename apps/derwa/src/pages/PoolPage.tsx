@@ -5,10 +5,11 @@ import { PoolPageSkeleton } from '@components/Skeletons/PoolPageSkeleton'
 import { usePoolsContext } from '@contexts/usePoolsContext'
 import { routePaths } from '@routes/routePaths'
 import { InvestRedeemSection } from '@components/InvestRedeemSection'
-import { PoolDetailsSummary } from '@components/PoolDetails/PoolDetailsSummary'
-import { PoolDetailsPermissioned } from '@components/PoolDetails/PoolDetailsPermissioned'
-import { PoolDetailsPermissionless } from '@components/PoolDetails/PoolDetailsPermissionless'
+import { PoolDetailsSummary } from '@components/pools/PoolDetails/PoolDetailsSummary'
+import { PoolDetailsPermissioned } from '@components/pools/PoolDetails/PoolDetailsPermissioned'
+import { PoolDetailsPermissionless } from '@components/pools/PoolDetails/PoolDetailsPermissionless'
 import { formatUIBalance } from '@centrifuge/shared'
+import { useVaultsContext } from '@contexts/useVaultsContext'
 
 export default function PoolPage() {
   const {
@@ -19,8 +20,8 @@ export default function PoolPage() {
     isNetworksLoading,
     shareClass,
   } = usePoolsContext()
-  // TODO: This should come from SDK metadata, discuss how exactly to handle this
-  const poolType = poolDetails?.metadata?.pool.type || 'open'
+  const { vaultDetails } = useVaultsContext()
+  const isSyncInvestVault = vaultDetails?.isSyncInvest || false
 
   const scId = shareClass?.details.id.toString()
   const token = scId && poolDetails?.metadata?.shareClasses[scId]
@@ -82,10 +83,10 @@ export default function PoolPage() {
               ]}
             />
 
-            {poolType === 'open' && (
+            {!isSyncInvestVault && (
               <PoolDetailsPermissioned poolDetails={poolDetails} networks={networks} shareClass={shareClass} />
             )}
-            {poolType === 'closed' && <PoolDetailsPermissionless poolDetails={poolDetails} />}
+            {isSyncInvestVault && <PoolDetailsPermissionless poolDetails={poolDetails} />}
           </Box>
 
           <Box height="fit-content" position="sticky" top={8}>
