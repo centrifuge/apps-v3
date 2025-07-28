@@ -1,16 +1,15 @@
-import { useCallback, useMemo, type Dispatch, type SetStateAction } from 'react'
-import { Badge, Box, Button, Flex, Text } from '@chakra-ui/react'
-import { BalanceInput, useFormContext } from '@centrifuge/forms'
-import { Balance, PoolId, PoolNetwork, Vault } from '@centrifuge/sdk'
-import { usePortfolio, usePoolDetails, useVaultsDetails } from '@centrifuge/shared'
+import { Dispatch, useCallback, useMemo } from 'react'
+import { Badge, Box, Flex, Text } from '@chakra-ui/react'
+import { BalanceInput, SubmitButton, useFormContext } from '@centrifuge/forms'
+import { Balance, PoolId, PoolNetwork, Price, Vault } from '@centrifuge/sdk'
+import { divideBigInts, usePoolDetails, useVaultsDetails } from '@centrifuge/shared'
 import { NetworkIcons } from '@centrifuge/ui'
 import { usePoolsContext } from '@contexts/usePoolsContext'
 import { infoText } from '@utils/infoText'
-import { InvestAction, type InvestActionType } from '@components/InvestRedeemSection/components/defaults'
 import { InfoWrapper } from '@components/InvestRedeemSection/components/InfoWrapper'
 import { VaultDetails } from '@utils/types'
 import { debounce, formatBalance, formatBalanceToString } from '@centrifuge/shared'
-import { useSwitchChain } from 'wagmi'
+import { useGetPortfolioDetails } from '@hooks/useGetPortfolioDetails'
 
 interface InvestAmountProps {
   isDisabled: boolean
@@ -18,9 +17,8 @@ interface InvestAmountProps {
   networks?: PoolNetwork[]
   parsedInvestAmount: 0 | Balance
   vaultDetails?: VaultDetails
-  setActionType: Dispatch<SetStateAction<InvestActionType>>
-  setVault: Dispatch<Vault>
   vaults: Vault[]
+  setVault: Dispatch<Vault | undefined>
 }
 
 export function InvestAmount({
@@ -29,56 +27,67 @@ export function InvestAmount({
   networks,
   parsedInvestAmount,
   vaultDetails,
-  setActionType,
   vaults,
+  setVault,
 }: InvestAmountProps) {
   const { data: vaultsDetails } = useVaultsDetails(vaults)
-  const { data: portfolio } = usePortfolio()
   const { selectedPoolId } = usePoolsContext()
   const { data: pool } = usePoolDetails(selectedPoolId as PoolId)
+  const { portfolioInvestmentCurrency, portfolioBalance, hasInvestmentCurrency } = useGetPortfolioDetails(vaultDetails)
   const { setValue } = useFormContext()
-  const { switchChain } = useSwitchChain()
   const networkIds = networks?.map((network) => network.chainId)
 
   // Investment Currencies for changing asset to invest
   const investmentCurrencies = vaultsDetails?.map((vault) => ({
     label: vault.investmentCurrency.symbol,
-    value: vault.investmentCurrency.chainId,
+    value: vault.address,
   }))
 
-  const changeVault = (value: number) => switchChain({ chainId: value })
-
-  const investmentCurrencyChainId = vaultDetails?.investmentCurrency?.chainId
-
-  // Get user investment asset info
-  const portfolioInvestmentAsset = portfolio?.find((asset) => asset.currency.chainId === investmentCurrencyChainId)
-  const portfolioCurrency = portfolioInvestmentAsset?.currency
-  const portfolioBalance = portfolioInvestmentAsset?.balance
-
   // Get the share class info for calculating shares amount to receive
-  const shareClass = pool?.shareClasses.find((asset) => asset.shareClass.pool.chainId === investmentCurrencyChainId)
-  const pricePerShare = shareClass?.details.pricePerShare
+  const poolShareClass = pool?.shareClasses.find(
+    (sc) => sc.shareClass.id.toString() === vaultDetails?.shareClass.id.toString()
+  )
+  const pricePerShare = poolShareClass?.details.pricePerShare
 
-  // Check if the user has the necessary investment currency to invest
-  const hasInvestmentCurrency = portfolioCurrency?.chainId === vaultDetails?.investmentCurrency?.chainId
-  const hasNoInvestmentCurrency = !hasInvestmentCurrency || portfolioBalance?.isZero()
-  const infoLabel = hasNoInvestmentCurrency ? infoText().portfolioMissingInvestmentCurrency : infoText().redeem
+  const calculateReceiveAmountValue = useCallback(
+    (investBalance: Balance, pricePerShare?: Price) => {
+      if (!investBalance || !pricePerShare) {
+        return ''
+      }
 
-  // Calculate and update amount to receive based on user input on amount to invest
+      const investAmountDecimals = investBalance.decimals
+      const investAmountBigint = investBalance.toBigInt()
+      const pricePerShareBigint = pricePerShare.toBigInt()
+
+      return divideBigInts(investAmountBigint, pricePerShareBigint, pricePerShare.decimals).formatToString(
+        investAmountDecimals,
+        portfolioInvestmentCurrency?.decimals
+      )
+    },
+    [portfolioInvestmentCurrency?.decimals]
+  )
+
   const calculateReceiveAmount = useCallback(
     (inputStringValue: string, investInputAmount?: Balance) => {
-      if (!inputStringValue || inputStringValue === '0' || !investInputAmount || !pricePerShare) return
+      if (!inputStringValue || inputStringValue === '0' || !investInputAmount || !pricePerShare) {
+        return setValue('receiveAmount', '')
+      }
 
-      const calculatedReceiveAmount = formatBalanceToString(
-        investInputAmount.mul(pricePerShare),
-        investInputAmount.decimals
-      )
-      setValue('receiveAmount', calculatedReceiveAmount)
+      const calculatedReceiveAmount = calculateReceiveAmountValue(investInputAmount, pricePerShare)
+      return setValue('receiveAmount', calculatedReceiveAmount)
     },
     [pricePerShare]
   )
 
   const debouncedCalculateReceiveAmount = useMemo(() => debounce(calculateReceiveAmount, 500), [calculateReceiveAmount])
+
+  const changeVault = useCallback(
+    (value: string | number) => {
+      const newVault = vaults?.find((vault) => vault.address === value)
+      setVault(newVault)
+    },
+    [vaults]
+  )
 
   const setMaxInvestAmount = useCallback(() => {
     if (!portfolioBalance || !maxInvestAmount || !pricePerShare) return
@@ -91,66 +100,65 @@ export function InvestAmount({
   }, [maxInvestAmount])
 
   return (
-    <Box>
-      <Flex justify="space-between" mb={2}>
-        <Text fontWeight={500}>You pay</Text>
-      </Flex>
-      <BalanceInput
-        name="investAmount"
-        decimals={portfolioCurrency?.decimals}
-        placeholder="0.00"
-        selectOptions={investmentCurrencies}
-        onSelectChange={changeVault}
-        onChange={debouncedCalculateReceiveAmount}
-      />
-      <Flex mt={2} justify="space-between">
-        <Flex>
-          <Badge
-            background="bg-tertiary"
-            color="text-primary"
-            opacity={0.5}
-            borderRadius={10}
-            px={3}
-            h="24px"
-            onClick={setMaxInvestAmount}
-            borderColor="gray.500 !important"
-            border="1px solid"
-            cursor="pointer"
-          >
-            MAX
-          </Badge>
-          <Text color="text-primary" opacity={0.5} alignSelf="flex-end" ml={2}>
-            {formatBalance(portfolioBalance ?? 0, portfolioCurrency?.symbol)}
-          </Text>
-        </Flex>
-        <NetworkIcons networkIds={networkIds} />
-      </Flex>
-      {parsedInvestAmount !== 0 && (
-        <>
-          <Text fontWeight={500} mt={6} mb={2}>
-            You receive
-          </Text>
+    <Box height="100%">
+      <Flex justify="space-between" flexDirection="column" height="100%" pb={6}>
+        <Box>
+          <Text fontWeight={500}>You pay</Text>
           <BalanceInput
-            name="receiveAmount"
-            decimals={pricePerShare?.decimals}
-            displayDecimals={pricePerShare?.decimals}
+            name="investAmount"
+            decimals={vaultDetails?.investmentCurrency.decimals}
             placeholder="0.00"
-            disabled
-            currency={vaultDetails?.shareCurrency.symbol}
+            selectOptions={investmentCurrencies}
+            onSelectChange={changeVault}
+            onChange={debouncedCalculateReceiveAmount}
+            disabled={!hasInvestmentCurrency}
           />
-        </>
-      )}
-      <Button
-        colorPalette="yellow"
-        type="button"
-        onClick={() => setActionType(InvestAction.INVESTOR_REQUIREMENTS)}
-        disabled={isDisabled}
-        width="100%"
-        mt={4}
-      >
-        Invest
-      </Button>
-      <InfoWrapper text={infoLabel} type={hasNoInvestmentCurrency ? 'error' : 'info'} />
+          <Flex mt={2} justify="space-between">
+            <Flex>
+              <Badge
+                background="bg-tertiary"
+                color="text-primary"
+                opacity={0.5}
+                borderRadius={10}
+                px={3}
+                h="24px"
+                onClick={setMaxInvestAmount}
+                borderColor="gray.500 !important"
+                border="1px solid"
+                cursor="pointer"
+              >
+                MAX
+              </Badge>
+              <Text color="text-primary" opacity={0.5} alignSelf="flex-end" ml={2}>
+                {formatBalance(portfolioBalance ?? 0, portfolioInvestmentCurrency?.symbol)}
+              </Text>
+            </Flex>
+            <NetworkIcons networkIds={networkIds} />
+          </Flex>
+          {parsedInvestAmount !== 0 && (
+            <>
+              <Text fontWeight={500} mt={6} mb={2}>
+                You receive
+              </Text>
+              <BalanceInput
+                name="receiveAmount"
+                decimals={vaultDetails?.shareCurrency.decimals}
+                placeholder="0.00"
+                disabled
+                currency={vaultDetails?.shareCurrency.symbol}
+              />
+            </>
+          )}
+        </Box>
+        <Box>
+          <SubmitButton colorPalette="yellow" width="100%" disabled={isDisabled}>
+            Invest
+          </SubmitButton>
+          {!hasInvestmentCurrency ? (
+            <InfoWrapper text={infoText().portfolioMissingInvestmentCurrency} type="error" />
+          ) : null}
+        </Box>
+      </Flex>
     </Box>
   )
 }

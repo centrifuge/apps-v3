@@ -2,7 +2,7 @@ import { type Dispatch, type SetStateAction } from 'react'
 import type { Balance, PoolNetwork, Vault } from '@centrifuge/sdk'
 import { type InvestActionType, InvestAction } from '@components/InvestRedeemSection/components/defaults'
 import { InvestAmount } from '@components/InvestRedeemSection/InvestTab/forms/InvestAmount'
-import { InvestRequirements } from '@components/InvestRedeemSection/InvestTab/forms/InvestRequirements'
+// import { InvestRequirements } from '@components/InvestRedeemSection/InvestTab/forms/InvestRequirements'
 import { InvestTxFeedback } from '@components/InvestRedeemSection/InvestTab/forms/InvestTxFeedback'
 import { VaultDetails } from '@utils/types'
 
@@ -15,7 +15,7 @@ interface InvestTabFormProps {
   vaults: Vault[]
   vaultDetails?: VaultDetails
   setActionType: Dispatch<SetStateAction<InvestActionType>>
-  setVault: Dispatch<Vault>
+  setVault: Dispatch<Vault | undefined>
 }
 
 export function InvestTabForm({
@@ -33,19 +33,19 @@ export function InvestTabForm({
     case InvestAction.INVEST_AMOUNT:
       return (
         <InvestAmount
-          isDisabled={isDisabled}
           maxInvestAmount={maxInvestAmount}
           networks={networks}
           parsedInvestAmount={parsedInvestAmount}
           vaults={vaults}
           vaultDetails={vaultDetails}
-          setActionType={setActionType}
+          isDisabled={isDisabled}
           setVault={setVault}
         />
       )
-    case InvestAction.INVESTOR_REQUIREMENTS:
-      return <InvestRequirements />
-    case InvestAction.SUCCESS:
+    // TODO: add this for sync invest form
+    // case InvestAction.INVESTOR_REQUIREMENTS:
+    //   return <InvestRequirements />
+    case InvestAction.CONFIRM:
       return <InvestTxFeedback vaultDetails={vaultDetails} setActionType={setActionType} />
   }
 }
