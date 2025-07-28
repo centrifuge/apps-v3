@@ -1,6 +1,6 @@
-import { Button } from '@centrifuge/ui'
+import { Button, type ButtonProps } from '@centrifuge/ui'
 
-export const LinkPill = ({ label, styles }: { label: string; styles?: Record<string, string> }) => {
+export const LinkPill = ({ label, ...rest }: ButtonProps) => {
   return (
     <Button
       label={label}
@@ -10,7 +10,7 @@ export const LinkPill = ({ label, styles }: { label: string; styles?: Record<str
       borderRadius="300px"
       height="32px"
       fontSize="14px"
-      {...styles}
+      {...rest}
     />
   )
 }

@@ -8,7 +8,7 @@ export const PoolDetailsFacts = ({
   bottomRow,
 }: {
   heading: string
-  topRow: { logo: ReactNode; links: { label: string; style?: Record<string, string> }[] }
+  topRow: { logo: ReactNode; links: { label: string }[] }
   bottomRow: { leftPanel: { heading: string; text: string }; rightPanel: { items: { label: string; value: string }[] } }
 }) => {
   return (
@@ -41,7 +41,7 @@ export const PoolDetailsFacts = ({
             wrap="wrap"
           >
             {topRow.links.map((link) => (
-              <LinkPill key={link.label} label={link.label} styles={link.style} />
+              <LinkPill key={link.label} label={link.label} />
             ))}
           </Flex>
         </Grid>
