@@ -1,10 +1,13 @@
-import { useEffect, useState, type Dispatch, type SetStateAction } from 'react'
-import { IoIosCloseCircleOutline, IoMdCheckmarkCircleOutline, IoMdTimer } from 'react-icons/io'
-import { Box, Button, Flex, Heading, Icon, Text, useToken } from '@chakra-ui/react'
+import { useCallback, useEffect, useState, type Dispatch, type SetStateAction } from 'react'
+import { IoMdInformationCircleOutline, IoMdTimer } from 'react-icons/io'
+import { Box, Button, Flex, Heading, Icon, Text } from '@chakra-ui/react'
 import { useFormContext } from '@centrifuge/forms'
 import { useTransactions } from '@centrifuge/shared'
 import { InvestAction, type InvestActionType } from '@components/InvestRedeemSection/components/defaults'
 import { VaultDetails } from '@utils/types'
+import { IoClose } from 'react-icons/io5'
+import { InfoWrapper } from '@components/InvestRedeemSection/components/InfoWrapper'
+import { infoText } from '@utils/infoText'
 
 interface TxState {
   header: string
@@ -20,12 +23,16 @@ interface InvestTxFeedbackProps {
 export function InvestTxFeedback({ vaultDetails, setActionType }: InvestTxFeedbackProps) {
   const { getValues, reset } = useFormContext()
   const { transactions } = useTransactions()
-  const [successColor] = useToken('colors', ['success'])
   const [txState, setTxState] = useState<TxState>({
     header: 'Transaction pending',
     isSuccessful: false,
     isFailed: false,
   })
+
+  const handleClose = useCallback(() => {
+    setActionType(InvestAction.INVEST_AMOUNT)
+    reset()
+  }, [setActionType, reset])
 
   useEffect(() => {
     transactions.forEach((tx) => {
@@ -50,8 +57,8 @@ export function InvestTxFeedback({ vaultDetails, setActionType }: InvestTxFeedba
         }
         case 'succeeded': {
           if (tx.dismissed) return
-          if (tx.title === 'Invest' || tx.title === 'Redeem') {
-            const header = tx.title === 'Invest' ? 'Invest successful' : 'Redeem successful'
+          if (tx.title === 'Invest') {
+            const header = 'Investment in progress'
             setTxState({
               header,
               isSuccessful: true,
@@ -78,7 +85,6 @@ export function InvestTxFeedback({ vaultDetails, setActionType }: InvestTxFeedba
     }
   }, [transactions])
 
-  const txHeaderColor = txState.isSuccessful ? successColor : 'inherit'
   const isButtonDisabled = !txState.isSuccessful && !txState.isFailed
 
   return (
@@ -93,31 +99,43 @@ export function InvestTxFeedback({ vaultDetails, setActionType }: InvestTxFeedba
       >
         <Box width="100%" overflow="hidden">
           <Flex alignItems="center" gap={2} justifyContent="space-between">
-            <Heading color={txHeaderColor}>{txState.header}</Heading>
-            <Icon size="xl">
-              {txState.isSuccessful ? (
-                <IoMdCheckmarkCircleOutline />
-              ) : txState.isFailed ? (
-                <IoIosCloseCircleOutline />
+            <Heading>{txState.header}</Heading>
+            <Icon size="lg">
+              {txState.isSuccessful || txState.isFailed ? (
+                <IoClose onClick={handleClose} cursor="pointer" />
               ) : (
                 <IoMdTimer color="gray.400" />
               )}
             </Icon>
           </Flex>
           <Box opacity={txState.isSuccessful ? 1 : 0.5}>
+            <InfoWrapper type="info" text={infoText().investClaimable} />
             <Flex alignItems="center" gap={2} justifyContent="space-between" mt={6} width="100%">
-              <Box>
-                <Text fontWeight={500}>You invested</Text>
-                <Heading fontSize="lg">{getValues('investAmount').toString()}</Heading>
-              </Box>
-              <Text alignSelf="flex-end">{vaultDetails?.investmentCurrency.symbol}</Text>
+              <Text fontWeight={500} fontSize="md">
+                You invest
+              </Text>
+              <Flex alignItems="center" justifyContent="flex-end">
+                <Text fontSize="md">{getValues('investAmount').toString()}</Text>
+                <Text alignSelf="flex-end" ml={2}>
+                  {vaultDetails?.investmentCurrency.symbol}
+                </Text>
+              </Flex>
             </Flex>
-            <Flex alignItems="center" gap={2} justifyContent="space-between" mt={6}>
-              <Box>
-                <Text fontWeight={500}>Token amount</Text>
-                <Heading fontSize="lg">{getValues('receiveAmount').toString()}</Heading>
-              </Box>
-              <Text alignSelf="flex-end">{vaultDetails?.shareCurrency.symbol}</Text>
+            <Flex alignItems="center" justifyContent="space-between" mt={2}>
+              <Flex alignItems="center" justifyContent="flex-start">
+                <Icon size="md" mr={2}>
+                  <IoMdInformationCircleOutline />
+                </Icon>
+                <Text fontWeight={500} fontSize="md" display="inline">
+                  Est. Token amount
+                </Text>
+              </Flex>
+              <Flex alignItems="center" justifyContent="flex-end">
+                <Text fontSize="md">{getValues('receiveAmount').toString()}</Text>
+                <Text alignSelf="flex-end" ml={2}>
+                  {vaultDetails?.shareCurrency.symbol}
+                </Text>
+              </Flex>
             </Flex>
           </Box>
         </Box>
@@ -125,10 +143,7 @@ export function InvestTxFeedback({ vaultDetails, setActionType }: InvestTxFeedba
           colorPalette="yellow"
           type="button"
           mb={4}
-          onClick={() => {
-            setActionType(InvestAction.INVEST_AMOUNT)
-            reset()
-          }}
+          onClick={handleClose}
           width="100%"
           mt={4}
           disabled={isButtonDisabled}

@@ -176,16 +176,31 @@ const VaultsCards = ({
     setSelectedChainId(null)
   }
 
+  // Group vaults by their chain ID
+  const vaultsByChain = useMemo(() => {
+    if (!vaults) return {}
+    return vaults.reduce((acc: Record<number, Vault[]>, vault) => {
+      const { chainId } = vault
+      if (!acc[chainId]) {
+        acc[chainId] = []
+      }
+      acc[chainId].push(vault)
+      return acc
+    }, {})
+  }, [vaults])
+
   if (isLoadingVaults || isLoadingHoldings) {
     return <Loader />
   }
 
   return (
     <>
-      {vaults?.map((vault) => (
+      {/* Map over the grouped vaults */}
+      {Object.entries(vaultsByChain).map(([chainId, chainVaults]) => (
         <VaultsPerChain
-          key={vault.address}
-          vault={vault}
+          key={chainId}
+          chainId={Number(chainId)}
+          vaults={chainVaults}
           holdingsByChain={holdingsByChain}
           onAddVault={handleOpenAddModal}
           onUpdateVault={handleOpenUpdateModal}

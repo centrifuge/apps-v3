@@ -123,7 +123,7 @@ export const lightTheme = defineConfig({
           value: { _light: 'colors.yellow.500' },
         },
         info: {
-          value: { _light: 'colors.yellow.800' },
+          value: { _light: 'colors.gray.800' },
         },
         success: {
           value: { _light: '#277917' },

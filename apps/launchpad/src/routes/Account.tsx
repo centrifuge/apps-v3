@@ -4,16 +4,17 @@ import { LinkButton, Loader } from '@centrifuge/ui'
 import { AccountPage } from '@components/account/AccountPage'
 import { useMemo } from 'react'
 import { usePoolProvider } from '@contexts/PoolProvider'
+import { formatUIBalance } from '@centrifuge/shared'
 
 // TODO: FOR MVP, we are assuming one share class per pool
 // Routing must be fix to handle multiple share classes per pool
 export default function Account() {
   const { poolId } = useParams()
-  const { shareClass, isLoading, poolDetails } = usePoolProvider()
+  const { shareClass, isLoading, poolDetails, pool } = usePoolProvider()
   const shareClassId = shareClass?.shareClass?.id.raw ?? ''
 
   const totalNav = useMemo(() => {
-    return shareClass?.details.pricePerShare.mul(shareClass?.details.totalIssuance)
+    return shareClass?.details.totalIssuance.mul(shareClass?.details.pricePerShare)
   }, [shareClass])
 
   if (isLoading) return <Loader />
@@ -24,7 +25,11 @@ export default function Account() {
         <Stack gap={0}>
           <Heading size="sm">Total NAV</Heading>
           <Heading size="4xl">
-            {totalNav?.toString() ?? '0'} {poolDetails?.currency.symbol}
+            {formatUIBalance(totalNav, {
+              precision: 2,
+              currency: poolDetails?.currency.symbol,
+              tokenDecimals: poolDetails?.currency.decimals,
+            })}
           </Heading>
         </Stack>
 

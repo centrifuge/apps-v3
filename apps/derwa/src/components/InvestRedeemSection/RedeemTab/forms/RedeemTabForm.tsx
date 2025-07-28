@@ -3,8 +3,9 @@ import { useInvestment } from '@centrifuge/shared'
 import type { Balance, PoolNetwork, Vault } from '@centrifuge/sdk'
 import { type RedeemActionType, RedeemAction } from '@components/InvestRedeemSection/components/defaults'
 import { RedeemAmount } from '@components/InvestRedeemSection/RedeemTab/forms/RedeemAmount'
-import { RedeemCancel } from '@components/InvestRedeemSection/RedeemTab/forms/RedeemCancel'
-import { RedeemTxCancelled } from '@components/InvestRedeemSection/RedeemTab/forms/RedeemTxCancelled'
+import { RedeemTxFeedback } from '@components/InvestRedeemSection/RedeemTab/forms/RedeemTxFeedback'
+import { VaultDetails } from '@utils/types'
+// import { RedeemTxCancelled } from '@components/InvestRedeemSection/RedeemTab/forms/RedeemTxCancelled'
 
 interface RedeemTabFormProps {
   actionType: RedeemActionType
@@ -15,7 +16,9 @@ interface RedeemTabFormProps {
   parsedReceiveAmount: 0 | Balance
   vault?: Vault
   vaults?: Vault[]
+  vaultDetails?: VaultDetails
   setActionType: Dispatch<SetStateAction<RedeemActionType>>
+  setVault: Dispatch<Vault | undefined>
 }
 
 export function RedeemTabForm({
@@ -27,7 +30,9 @@ export function RedeemTabForm({
   parsedReceiveAmount,
   vault,
   vaults,
+  vaultDetails,
   setActionType,
+  setVault,
 }: RedeemTabFormProps) {
   const { data: investment } = useInvestment(vault)
   const redeemCurrencySymbol = investment?.shareCurrency.symbol ?? ''
@@ -51,18 +56,22 @@ export function RedeemTabForm({
           parsedRedeemAmount={parsedRedeemAmount}
           vault={vault}
           vaults={vaults}
+          vaultDetails={vaultDetails}
+          setVault={setVault}
         />
       )
-    case RedeemAction.CANCEL:
+    case RedeemAction.CONFIRM:
       return (
-        <RedeemCancel
+        <RedeemTxFeedback
           currencies={currencies}
+          isDisabled={isDisabled}
           parsedRedeemAmount={parsedRedeemAmount}
           parsedReceiveAmount={parsedReceiveAmount}
           setActionType={setActionType}
         />
       )
-    case RedeemAction.SUCCESS:
-      return <RedeemTxCancelled currencies={currencies} setActionType={setActionType} />
+    // TODO: add step when adding sync redeem
+    // case RedeemAction.CANCEL:
+    //   return <RedeemTxCancelled currencies={currencies} setActionType={setActionType} />
   }
 }

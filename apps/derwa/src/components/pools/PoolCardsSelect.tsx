@@ -2,16 +2,10 @@ import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { Box, Flex, Grid, Image, Separator, Text } from '@chakra-ui/react'
 import { PoolId } from '@centrifuge/sdk'
-import {
-  formatBalanceAbbreviated,
-  ipfsToHttp,
-  PoolDetails,
-  useAllPoolDetails,
-  usePoolDetails,
-} from '@centrifuge/shared'
+import { formatBalanceAbbreviated, ipfsToHttp, PoolDetails, useAllPoolDetails } from '@centrifuge/shared'
 import { Card, ValueText } from '@centrifuge/ui'
 import { routePaths } from '@routes/routePaths'
-import { HomePageSkeleton } from '@components/Skeletons/HomePageSkeleton'
+import { PoolCardsSelectSkeleton } from '@components/Skeletons/PoolCardsSelectSkeleton'
 import { RatingPill } from '@components/RatingPill'
 
 interface PoolSelectorProps {
@@ -32,9 +26,7 @@ export const PoolCardsSelect = ({ poolIds, setSelectedPoolId }: PoolSelectorProp
     [pools]
   )
 
-  console.log({ pools })
-
-  if (isLoading) return <HomePageSkeleton />
+  if (isLoading) return <PoolCardsSelectSkeleton />
 
   if (!displayPools || pools?.length === 1) return null
 
@@ -52,14 +44,11 @@ export const PoolCardsSelect = ({ poolIds, setSelectedPoolId }: PoolSelectorProp
 }
 
 function PoolCard({ poolDetails }: { poolDetails: PoolDetails }) {
-  const { data: pool } = usePoolDetails(poolDetails.id)
   const tvl = '450,000,000'
   const poolMetadata = poolDetails.metadata?.pool
-  const iconUri = poolMetadata?.icon?.uri
+  const iconUri = poolMetadata?.icon?.uri ?? ''
   const shareClassId = Object.keys(poolDetails.metadata?.shareClasses ?? {})[0]
-  const shareClassDetails = poolDetails.metadata?.shareClasses[shareClassId] ?? {}
-
-  console.log({ pool })
+  const shareClassDetails = poolDetails.metadata?.shareClasses ? poolDetails.metadata?.shareClasses[shareClassId] : {}
 
   return (
     <Card height="100%">
@@ -73,8 +62,8 @@ function PoolCard({ poolDetails }: { poolDetails: PoolDetails }) {
         <ValueText label="APY" value={shareClassDetails?.apyPercentage ?? '0%'} />
       </Grid>
       <Separator my={4} />
-      <Text color="gray.400" height="88px" fontSize="sm" textOverflow="ellipsis" overflow="scroll">
-        {poolMetadata?.issuer?.description.replaceAll('"', '') ?? 'Description'}
+      <Text color="gray.400" fontSize="sm">
+        {poolMetadata?.issuer?.shortDescription ?? 'Description'}
       </Text>
       <Separator my={4} />
       <Flex flexDirection="column" gap={2}>
@@ -111,7 +100,7 @@ function PoolCard({ poolDetails }: { poolDetails: PoolDetails }) {
           <Box>
             {poolMetadata?.poolRatings?.length
               ? poolMetadata?.poolRatings?.map((rating) => (
-                  <span style={{ marginLeft: '2px' }}>
+                  <span style={{ marginLeft: '2px' }} key={rating?.agency}>
                     <RatingPill rating={rating} />
                   </span>
                 ))

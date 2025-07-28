@@ -9,6 +9,7 @@ import IssueOrders from '@routes/orders/IssueOrders'
 import ApproveRedemptions from '@routes/orders/ApproveRedemptions'
 import RevokeShares from '@routes/orders/RevokeShares'
 import PoolAccess from '@routes/settings/PoolAccess'
+import PoolStructure from '@routes/settings/PoolStructure'
 import NotFound from '@routes/NotFound'
 import HeaderLayout from '@layouts/HeaderLayout'
 import AddHolding from '@routes/holdings/AddHolding'
@@ -44,6 +45,11 @@ export const routes = createBrowserRouter([
           {
             path: 'settings/:poolId/poolAccess',
             element: <PoolAccess />,
+            handle: { hasSettings: false, hasTabs: false },
+          },
+          {
+            path: 'settings/:poolId/poolStructure',
+            element: <PoolStructure />,
             handle: { hasSettings: false, hasTabs: false },
           },
           { path: 'holdings/:poolId/add', element: <AddHolding />, handle: { hasSettings: false, hasTabs: true } },

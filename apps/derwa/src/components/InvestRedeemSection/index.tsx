@@ -1,8 +1,8 @@
 import { useEffect, useState, type ComponentType, type Dispatch } from 'react'
 import { useChainId } from 'wagmi'
-import { Flex, Heading, Stack, Text } from '@chakra-ui/react'
+import { Box, Flex, Heading, Spinner, Stack, Text } from '@chakra-ui/react'
 import type { PoolNetwork, ShareClassId, Vault } from '@centrifuge/sdk'
-import { useIsMember, usePoolNetworks, useVaults } from '@centrifuge/shared'
+import { useInvestment, useIsMember, usePoolNetworks, useVaults } from '@centrifuge/shared'
 import { useGeolocation } from '@hooks/useGeolocation'
 import { ConnectionGuard } from '@components/ConnectionGuard'
 import { Tabs } from '@components/Tabs'
@@ -10,6 +10,7 @@ import { InfoWrapper } from '@components/InvestRedeemSection/components/InfoWrap
 import InvestTab from '@components/InvestRedeemSection/InvestTab/InvestTab'
 import RedeemTab from '@components/InvestRedeemSection/RedeemTab/RedeemTab'
 import type { PoolDetails } from '@utils/types'
+import { InvestRedeemClaimForm } from '@components/InvestRedeemSection/components/InvestRedeemClaimForm'
 
 export interface TabProps {
   isInvestorWhiteListed: boolean
@@ -17,7 +18,7 @@ export interface TabProps {
   networks?: PoolNetwork[]
   vault: Vault
   vaults: Vault[]
-  setVault: Dispatch<Vault>
+  setVault: Dispatch<Vault | undefined>
 }
 interface VaultGuardProps {
   connectedChainId: number
@@ -132,10 +133,15 @@ function VaultGuard({
   setVault,
   setVaults,
 }: VaultGuardProps) {
-  const { data: networks } = usePoolNetworks(poolDetails.id)
+  const { data: networks, isLoading: isNetworksLoading } = usePoolNetworks(poolDetails.id)
+  const { data: investment, isLoading: isInvestmentLoading } = useInvestment(vault)
   const chainIds = networks?.map((network) => network.chainId) ?? []
   const network = networks?.find((n) => n.chainId === connectedChainId)
-  const { data } = useVaults(network, shareClassId)
+  const { data, isLoading: isVaultsLoading } = useVaults(network, shareClassId)
+  const isVaultGuardLoading = isLoading || isNetworksLoading || isVaultsLoading || isInvestmentLoading
+  const hasClaims =
+    (investment?.claimableInvestShares.toBigInt() ?? 0n) > 0n ||
+    (investment?.claimableRedeemCurrency.toBigInt() ?? 0n) > 0n
 
   useEffect(() => {
     if (data?.length && (!vault || !data.includes(vault))) {
@@ -144,6 +150,28 @@ function VaultGuard({
 
     setVaults(data)
   }, [data, vault, setVault, setVaults])
+
+  if (isVaultGuardLoading) {
+    return (
+      <Box height="100%" display="flex" alignItems="center" justifyContent="center">
+        <Spinner size="lg" color="black.solid" />
+      </Box>
+    )
+  }
+
+  if (hasClaims && vault) {
+    return (
+      <InvestRedeemClaimForm
+        claimableInvestShares={investment?.claimableInvestShares}
+        claimableRedeemCurrency={investment?.claimableRedeemCurrency}
+        claimableInvestCurrencyEquivalent={investment?.claimableInvestCurrencyEquivalent}
+        claimableRedeemSharesEquivalent={investment?.claimableRedeemSharesEquivalent}
+        investmentCurrency={investment?.investmentCurrency}
+        shareCurrency={investment?.shareCurrency}
+        vault={vault}
+      />
+    )
+  }
 
   return (
     <ConnectionGuard
@@ -156,7 +184,7 @@ function VaultGuard({
         <Stack height="100%">
           <Tab
             isInvestorWhiteListed={isInvestorWhiteListed}
-            isLoading={isLoading}
+            isLoading={isVaultGuardLoading}
             networks={networks}
             vault={vault}
             vaults={vaults ?? []}
