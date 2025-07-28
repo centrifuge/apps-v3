@@ -9,7 +9,7 @@ export function useVaults(poolNetwork?: PoolNetwork, scId?: ShareClassId) {
   return useObservable(vaults$)
 }
 
-export function useVaultDetails(vault: Vault | null) {
+export function useVaultDetails(vault?: Vault | null) {
   const vaultDetails$ = useMemo(() => (vault ? vault.details() : undefined), [vault])
   return useObservable(vaultDetails$)
 }
