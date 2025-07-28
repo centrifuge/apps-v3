@@ -5,16 +5,13 @@ import Tokenizations from '@routes/Tokenizations'
 import Investors from '@routes/Investors'
 import Account from '@routes/Account'
 import NavPage from '@routes/NavPage'
-import ApproveOrders from '@routes/orders/ApproveOrders'
-import IssueOrders from '@routes/orders/IssueOrders'
-import ApproveRedemptions from '@routes/orders/ApproveRedemptions'
 import PoolAccess from '@routes/settings/PoolAccess'
 import PoolStructure from '@routes/settings/PoolStructure'
 import NotFound from '@routes/NotFound'
 import Vaults from '@routes/Vaults'
 import UpdateMetadata from '@routes/UpdateMetadata'
-import RevokeShares from '@routes/orders/RevokeShares'
 import Holdings from '@routes/Holdings'
+import Orders from '@routes/Orders'
 
 export const routes = createBrowserRouter([
   {
@@ -38,10 +35,7 @@ export const routes = createBrowserRouter([
               { path: 'nav', element: <NavPage /> },
 
               // Orders
-              { path: 'orders/approve', element: <ApproveOrders /> },
-              { path: 'orders/issue', element: <IssueOrders /> },
-              { path: 'orders/approveRedeem', element: <ApproveRedemptions /> },
-              { path: 'orders/revokeRedeem', element: <RevokeShares /> },
+              { path: 'orders', element: <Orders /> },
 
               // Settings
               { path: 'settings/poolAccess', element: <PoolAccess /> },

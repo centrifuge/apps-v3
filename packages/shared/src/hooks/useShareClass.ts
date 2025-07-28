@@ -55,8 +55,9 @@ export const useBalanceSheet = (shareClass?: ShareClass, chainId?: number, optio
   return useObservable(balanceSheet$)
 }
 
-export const useVaultsPerShareClass = (shareClass: ShareClass) => {
-  const vaults$ = useMemo(() => shareClass?.vaults(), [shareClass])
+export const useVaultsPerShareClass = (shareClass?: ShareClass, options?: { enabled?: boolean }) => {
+  const enabled = options?.enabled ?? true
+  const vaults$ = useMemo(() => (enabled && shareClass ? shareClass.vaults() : undefined), [shareClass, enabled])
   return useObservable(vaults$)
 }
 

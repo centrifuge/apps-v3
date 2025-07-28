@@ -22,8 +22,8 @@ const routes = [
   { label: 'Orders', icon: IconOrders, to: '/orders', dynamic: true },
   { label: 'Holdings', icon: IconHoldings, to: '/holdings', dynamic: true },
   { label: 'Vaults', icon: IconVault, to: '/vaults', dynamic: true },
-  { label: 'Managers', icon: IconManager, to: '/manager', dynamic: true },
-  { label: 'Settings', icon: IconSettings, to: '/settings', dynamic: true },
+  // { label: 'Managers', icon: IconManager, to: '/manager', dynamic: true },
+  //{ label: 'Settings', icon: IconSettings, to: '/settings', dynamic: true },
 ]
 
 const overviewRoute = routes.find((r) => r.to === '/')!
