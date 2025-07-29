@@ -1,33 +1,36 @@
-import { Holdings, useCentrifugeTransaction, usePendingAmounts } from '@centrifuge/shared'
+import { formatDate, useCentrifugeTransaction, usePendingAmounts } from '@centrifuge/shared'
 import { useSelectedPool } from '@contexts/SelectedPoolProvider'
-import { Grid, VStack } from '@chakra-ui/react'
+import { Grid, Text, VStack } from '@chakra-ui/react'
 import { useMemo } from 'react'
 import { convertBalance, useOrdersByChainId } from './utils'
 import { ChainHeader } from './ChainHeader'
 import { Button, Card, ColumnDefinition } from '@centrifuge/ui'
 import { OrdersTable, TableData } from './OrdersTable'
 import { BalanceInput, Form, useForm } from '@centrifuge/forms'
-import { AssetId, Balance } from '@centrifuge/sdk'
+import { AssetId, Price } from '@centrifuge/sdk'
 import { LiveAmountDisplay } from './LiveAmountDisplay'
 
-export const ApproveRedemptions = ({ onClose }: { onClose: () => void }) => {
+export const IssueShares = ({ onClose }: { onClose: () => void }) => {
   const { execute, isPending } = useCentrifugeTransaction()
   const { shareClass, poolCurrency, shareClassDetails } = useSelectedPool()
   const { data: pendingOrders } = usePendingAmounts(shareClass, {
     enabled: !!shareClass,
   })
 
-  const orders = useMemo(() => {
-    return (
+  const orders = useMemo(
+    () =>
       pendingOrders
-        ?.map((order) => ({
-          chainId: order.chainId,
-          amount: order.pendingRedeem,
-          assetId: order.assetId,
-        }))
-        .filter((order) => !order.amount.isZero()) ?? []
-    )
-  }, [pendingOrders])
+        ?.flatMap((order) =>
+          order.pendingIssuances.map((r) => ({
+            chainId: order.chainId,
+            amount: r.amount,
+            assetId: order.assetId,
+            approvedAt: r.approvedAt,
+          }))
+        )
+        .filter((o) => !o.amount.isZero()) ?? [],
+    [pendingOrders]
+  )
 
   const ordersByChain = useOrdersByChainId(orders)
 
@@ -36,12 +39,13 @@ export const ApproveRedemptions = ({ onClose }: { onClose: () => void }) => {
       acc[o.assetId.toString()] = {
         assetId: o.assetId,
         chainId: o.chainId,
-        amount: o.amount,
+        amount: shareClassDetails?.pricePerShare ?? new Price(0),
         isSelected: false,
+        approvedAt: o.approvedAt,
       }
       return acc
     },
-    {} as Record<string, { assetId: AssetId; chainId: number; amount: Balance; isSelected: boolean }>
+    {} as Record<string, { assetId: AssetId; chainId: number; amount: Price; isSelected: boolean; approvedAt: Date }>
   )
 
   const form = useForm({
@@ -59,12 +63,11 @@ export const ApproveRedemptions = ({ onClose }: { onClose: () => void }) => {
         const balance = typeof o.amount !== 'string' ? o.amount.toString() : o.amount
         return {
           assetId: o.assetId,
-          // pool currency decimals
-          approveShareAmount: convertBalance(balance, poolCurrency?.decimals ?? 18),
+          issuePricePerShare: new Price(convertBalance(balance, poolCurrency?.decimals ?? 18).toString()),
         }
       })
 
-      await execute(shareClass.approveRedeemsAndRevokeShares(assets))
+      await execute(shareClass.approveDepositsAndIssueShares(assets))
       onClose()
     },
   })
@@ -75,7 +78,15 @@ export const ApproveRedemptions = ({ onClose }: { onClose: () => void }) => {
   const extraColumns: ColumnDefinition<TableData>[] = useMemo(() => {
     return [
       {
-        header: `Approve amount (${shareClassDetails?.symbol})`,
+        header: 'Approve at',
+        accessor: 'approvedAt',
+        render: ({ approvedAt }) => {
+          return <Text>{approvedAt ? formatDate(approvedAt, 'short', true) : '-'}</Text>
+        },
+        width: '160px',
+      },
+      {
+        header: 'Issue with NAV per share',
         accessor: 'newAmount',
         render: ({ id }: { id: string }) => {
           return (
@@ -96,16 +107,10 @@ export const ApproveRedemptions = ({ onClose }: { onClose: () => void }) => {
         },
       },
       {
-        header: 'Estimated payout',
+        header: `Issue new shares (${shareClassDetails?.symbol})`,
         accessor: 'approvedAmount',
         render: ({ id }: { id: string }) => {
-          return (
-            <LiveAmountDisplay
-              name={`orders.${id}.amount`}
-              poolDecimals={poolCurrency?.decimals}
-              shareClassDetails={shareClassDetails}
-            />
-          )
+          return <LiveAmountDisplay name={`orders.${id}.amount`} poolDecimals={poolCurrency?.decimals} />
         },
       },
     ]

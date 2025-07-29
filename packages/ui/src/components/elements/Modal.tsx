@@ -40,24 +40,26 @@ export const Modal = ({
 
             <Dialog.Body>{children}</Dialog.Body>
 
-            <Dialog.Footer>
-              <Grid w="100%" gap={2} templateColumns={onPrimaryAction ? '1fr 1fr' : '1fr'}>
-                <Button size="sm" variant="solid" colorPalette="gray" onClick={onClose}>
-                  Cancel
-                </Button>
-                {onPrimaryAction && (
-                  <Button
-                    size="sm"
-                    colorPalette="yellow"
-                    onClick={onPrimaryAction}
-                    loading={isPrimaryActionLoading}
-                    disabled={isPrimaryActionDisabled}
-                  >
-                    {primaryActionText}
+            {onPrimaryAction && (
+              <Dialog.Footer>
+                <Grid w="100%" gap={2} templateColumns={'1fr 1fr'}>
+                  <Button size="sm" variant="solid" colorPalette="gray" onClick={onClose}>
+                    Cancel
                   </Button>
-                )}
-              </Grid>
-            </Dialog.Footer>
+                  {onPrimaryAction && (
+                    <Button
+                      size="sm"
+                      colorPalette="yellow"
+                      onClick={onPrimaryAction}
+                      loading={isPrimaryActionLoading}
+                      disabled={isPrimaryActionDisabled}
+                    >
+                      {primaryActionText}
+                    </Button>
+                  )}
+                </Grid>
+              </Dialog.Footer>
+            )}
           </Dialog.Content>
         </Dialog.Positioner>
       </Portal>

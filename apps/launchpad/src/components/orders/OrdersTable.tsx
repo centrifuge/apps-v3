@@ -15,6 +15,7 @@ export type TableData = Item & {
   id: string
   holding?: Holdings[number]
   checkboxId?: string
+  approvedAt?: Date
 }
 
 export const OrdersTable = ({

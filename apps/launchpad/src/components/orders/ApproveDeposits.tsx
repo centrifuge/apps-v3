@@ -1,4 +1,4 @@
-import { Holdings, useCentrifugeTransaction, usePendingAmounts } from '@centrifuge/shared'
+import { Holdings, useCentrifugeTransaction, useHoldings, usePendingAmounts } from '@centrifuge/shared'
 import { useSelectedPool } from '@contexts/SelectedPoolProvider'
 import { Grid, VStack } from '@chakra-ui/react'
 import { useMemo } from 'react'
@@ -10,10 +10,13 @@ import { BalanceInput, Form, useForm } from '@centrifuge/forms'
 import { AssetId, Balance } from '@centrifuge/sdk'
 import { LiveAmountDisplay } from './LiveAmountDisplay'
 
-export const ApproveRedemptions = ({ onClose }: { onClose: () => void }) => {
+export const ApproveDeposits = ({ onClose }: { onClose: () => void }) => {
   const { execute, isPending } = useCentrifugeTransaction()
-  const { shareClass, poolCurrency, shareClassDetails } = useSelectedPool()
+  const { shareClass, poolCurrency } = useSelectedPool()
   const { data: pendingOrders } = usePendingAmounts(shareClass, {
+    enabled: !!shareClass,
+  })
+  const { data: holdings } = useHoldings(shareClass, {
     enabled: !!shareClass,
   })
 
@@ -22,7 +25,7 @@ export const ApproveRedemptions = ({ onClose }: { onClose: () => void }) => {
       pendingOrders
         ?.map((order) => ({
           chainId: order.chainId,
-          amount: order.pendingRedeem,
+          amount: order.pendingDeposit,
           assetId: order.assetId,
         }))
         .filter((order) => !order.amount.isZero()) ?? []
@@ -57,14 +60,15 @@ export const ApproveRedemptions = ({ onClose }: { onClose: () => void }) => {
 
       const assets = arr.map((o) => {
         const balance = typeof o.amount !== 'string' ? o.amount.toString() : o.amount
+        const holding = holdings?.find((o) => o.assetId.toString() === o.assetId.toString())
         return {
           assetId: o.assetId,
-          // pool currency decimals
-          approveShareAmount: convertBalance(balance, poolCurrency?.decimals ?? 18),
+          // Asset to deposit decimals
+          approveAssetAmount: convertBalance(balance, holding?.asset?.decimals ?? poolCurrency?.decimals ?? 18),
         }
       })
 
-      await execute(shareClass.approveRedeemsAndRevokeShares(assets))
+      await execute(shareClass.approveDepositsAndIssueShares(assets))
       onClose()
     },
   })
@@ -75,14 +79,14 @@ export const ApproveRedemptions = ({ onClose }: { onClose: () => void }) => {
   const extraColumns: ColumnDefinition<TableData>[] = useMemo(() => {
     return [
       {
-        header: `Approve amount (${shareClassDetails?.symbol})`,
+        header: 'Approve amount',
         accessor: 'newAmount',
-        render: ({ id }: { id: string }) => {
+        render: ({ id, holding }: { id: string; holding: Holdings[number] }) => {
           return (
             <BalanceInput
               name={`orders.${id}.amount`}
               buttonLabel="MAX"
-              decimals={poolCurrency?.decimals}
+              decimals={holding?.asset?.decimals}
               onButtonClick={() => {
                 const originalOrder = orders.find((o) => o.assetId.toString() === id)
                 if (originalOrder) {
@@ -96,16 +100,10 @@ export const ApproveRedemptions = ({ onClose }: { onClose: () => void }) => {
         },
       },
       {
-        header: 'Estimated payout',
+        header: `Approve amount (${poolCurrency?.symbol})`,
         accessor: 'approvedAmount',
         render: ({ id }: { id: string }) => {
-          return (
-            <LiveAmountDisplay
-              name={`orders.${id}.amount`}
-              poolDecimals={poolCurrency?.decimals}
-              shareClassDetails={shareClassDetails}
-            />
-          )
+          return <LiveAmountDisplay name={`orders.${id}.amount`} poolDecimals={poolCurrency?.decimals} />
         },
       },
     ]

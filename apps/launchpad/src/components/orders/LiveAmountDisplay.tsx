@@ -1,15 +1,21 @@
 import { useWatch, useFormContext } from 'react-hook-form'
-import { Text } from '@chakra-ui/react'
+import { Box, Text } from '@chakra-ui/react'
 import { Balance } from '@centrifuge/sdk'
-import { formatUIBalance } from '@centrifuge/shared'
+import { formatUIBalance, ShareClassDetails } from '@centrifuge/shared'
 
 type LiveAmountDisplayProps = {
   name: string
   poolDecimals?: number
-  holdingDecimals?: number
+  shareClassDetails?: ShareClassDetails
+  calculationType?: 'issue' | 'revoke'
 }
 
-export const LiveAmountDisplay = ({ name, poolDecimals }: LiveAmountDisplayProps) => {
+export const LiveAmountDisplay = ({
+  name,
+  poolDecimals,
+  shareClassDetails,
+  calculationType,
+}: LiveAmountDisplayProps) => {
   const { control } = useFormContext()
 
   const liveAmount = useWatch({
@@ -22,13 +28,27 @@ export const LiveAmountDisplay = ({ name, poolDecimals }: LiveAmountDisplayProps
   }
 
   const balance = typeof liveAmount === 'string' ? parseFloat(liveAmount) : liveAmount.toFloat()
-  const amountToPoolDecimal = Balance.fromFloat(balance, poolDecimals ?? 18)
+  let amountToPoolDecimal = Balance.fromFloat(balance, poolDecimals ?? 18)
+
+  if (shareClassDetails && calculationType === 'issue') {
+    const pricePerShare = shareClassDetails.pricePerShare
+    const balance = amountToPoolDecimal.mul(pricePerShare)
+    amountToPoolDecimal = balance
+  }
+
+  if (shareClassDetails && calculationType === 'revoke') {
+    const pricePerShare = shareClassDetails.pricePerShare
+    const balance = amountToPoolDecimal.div(pricePerShare)
+    amountToPoolDecimal = balance
+  }
 
   return (
-    <Text>
-      {formatUIBalance(amountToPoolDecimal, {
-        tokenDecimals: poolDecimals,
-      })}
-    </Text>
+    <Box display="flex" alignItems="center">
+      <Text>
+        {formatUIBalance(amountToPoolDecimal, {
+          tokenDecimals: poolDecimals,
+        })}
+      </Text>
+    </Box>
   )
 }

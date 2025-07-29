@@ -1,22 +1,21 @@
 import { Modal } from '@centrifuge/ui'
+import { ApproveDeposits } from './ApproveDeposits'
 import { ApproveRedemptions } from './ApproveRedemptions'
+import { IssueShares } from './IssueShares'
+import { RevokeShares } from './RevokeShares'
 
 const modalConfig = {
   approve: {
     title: 'Approve investments',
-    buttonText: 'Approve',
   },
   redeem: {
-    title: 'Issue shares',
-    buttonText: 'Issue',
+    title: 'Approve redemptions',
   },
   issue: {
-    title: 'Aprove redemptions',
-    buttonText: 'Approve',
+    title: 'Issue shares',
   },
   revoke: {
     title: 'Revoke shares',
-    buttonText: 'Revoke',
   },
 }
 
@@ -27,14 +26,17 @@ export const OrdersModal = ({
   modal: { approve: boolean; redeem: boolean; issue: boolean; revoke: boolean }
   setModal: (modal: { approve: boolean; redeem: boolean; issue: boolean; revoke: boolean }) => void
 }) => {
-  // Basically check if any value is true so we can return the title and right config
   const trueKey = Object.keys(modal).find((key) => modal[key as keyof typeof modal] === true)
 
   const components = {
-    approve: <ApproveRedemptions />,
-    redeem: <ApproveRedemptions />,
-    issue: <ApproveRedemptions />,
-    revoke: <ApproveRedemptions />,
+    approve: (
+      <ApproveDeposits onClose={() => setModal({ approve: false, redeem: false, issue: false, revoke: false })} />
+    ),
+    redeem: (
+      <ApproveRedemptions onClose={() => setModal({ approve: false, redeem: false, issue: false, revoke: false })} />
+    ),
+    issue: <IssueShares onClose={() => setModal({ approve: false, redeem: false, issue: false, revoke: false })} />,
+    revoke: <RevokeShares onClose={() => setModal({ approve: false, redeem: false, issue: false, revoke: false })} />,
   }
 
   if (!trueKey) return null
@@ -45,10 +47,6 @@ export const OrdersModal = ({
       onClose={() => setModal({ approve: false, redeem: false, issue: false, revoke: false })}
       title={modalConfig[trueKey as keyof typeof modalConfig].title}
       size="xl"
-      primaryActionText={modalConfig[trueKey as keyof typeof modalConfig].buttonText}
-      onPrimaryAction={() => {
-        console.log('primaryAction')
-      }}
     >
       {components[trueKey as keyof typeof components]}
     </Modal>

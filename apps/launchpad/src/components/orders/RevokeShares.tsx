@@ -1,33 +1,36 @@
-import { Holdings, useCentrifugeTransaction, usePendingAmounts } from '@centrifuge/shared'
+import { formatDate, Holdings, useCentrifugeTransaction, useHoldings, usePendingAmounts } from '@centrifuge/shared'
 import { useSelectedPool } from '@contexts/SelectedPoolProvider'
-import { Grid, VStack } from '@chakra-ui/react'
+import { Grid, Text, VStack } from '@chakra-ui/react'
 import { useMemo } from 'react'
 import { convertBalance, useOrdersByChainId } from './utils'
 import { ChainHeader } from './ChainHeader'
 import { Button, Card, ColumnDefinition } from '@centrifuge/ui'
 import { OrdersTable, TableData } from './OrdersTable'
 import { BalanceInput, Form, useForm } from '@centrifuge/forms'
-import { AssetId, Balance } from '@centrifuge/sdk'
+import { AssetId, Balance, Price } from '@centrifuge/sdk'
 import { LiveAmountDisplay } from './LiveAmountDisplay'
 
-export const ApproveRedemptions = ({ onClose }: { onClose: () => void }) => {
+export const RevokeShares = ({ onClose }: { onClose: () => void }) => {
   const { execute, isPending } = useCentrifugeTransaction()
-  const { shareClass, poolCurrency, shareClassDetails } = useSelectedPool()
+  const { shareClass, poolCurrency } = useSelectedPool()
   const { data: pendingOrders } = usePendingAmounts(shareClass, {
     enabled: !!shareClass,
   })
 
-  const orders = useMemo(() => {
-    return (
+  const orders = useMemo(
+    () =>
       pendingOrders
-        ?.map((order) => ({
-          chainId: order.chainId,
-          amount: order.pendingRedeem,
-          assetId: order.assetId,
-        }))
-        .filter((order) => !order.amount.isZero()) ?? []
-    )
-  }, [pendingOrders])
+        ?.flatMap((order) =>
+          order.pendingRevocations.map((r) => ({
+            chainId: order.chainId,
+            amount: r.amount,
+            assetId: order.assetId,
+            approvedAt: r.approvedAt,
+          }))
+        )
+        .filter((o) => !o.amount.isZero()) ?? [],
+    [pendingOrders]
+  )
 
   const ordersByChain = useOrdersByChainId(orders)
 
@@ -38,10 +41,11 @@ export const ApproveRedemptions = ({ onClose }: { onClose: () => void }) => {
         chainId: o.chainId,
         amount: o.amount,
         isSelected: false,
+        approvedAt: o.approvedAt,
       }
       return acc
     },
-    {} as Record<string, { assetId: AssetId; chainId: number; amount: Balance; isSelected: boolean }>
+    {} as Record<string, { assetId: AssetId; chainId: number; amount: Balance; isSelected: boolean; approvedAt: Date }>
   )
 
   const form = useForm({
@@ -59,8 +63,7 @@ export const ApproveRedemptions = ({ onClose }: { onClose: () => void }) => {
         const balance = typeof o.amount !== 'string' ? o.amount.toString() : o.amount
         return {
           assetId: o.assetId,
-          // pool currency decimals
-          approveShareAmount: convertBalance(balance, poolCurrency?.decimals ?? 18),
+          revokePricePerShare: new Price(convertBalance(balance, poolCurrency?.decimals ?? 18).toString()),
         }
       })
 
@@ -75,9 +78,17 @@ export const ApproveRedemptions = ({ onClose }: { onClose: () => void }) => {
   const extraColumns: ColumnDefinition<TableData>[] = useMemo(() => {
     return [
       {
-        header: `Approve amount (${shareClassDetails?.symbol})`,
+        header: 'Approve at',
+        accessor: 'approvedAt',
+        render: ({ approvedAt }) => {
+          return <Text>{approvedAt ? formatDate(approvedAt, 'short', true) : '-'}</Text>
+        },
+        width: '160px',
+      },
+      {
+        header: 'Revoke with NAV per share',
         accessor: 'newAmount',
-        render: ({ id }: { id: string }) => {
+        render: ({ id, holding }: { id: string; holding: Holdings[number] }) => {
           return (
             <BalanceInput
               name={`orders.${id}.amount`}
@@ -96,16 +107,10 @@ export const ApproveRedemptions = ({ onClose }: { onClose: () => void }) => {
         },
       },
       {
-        header: 'Estimated payout',
+        header: `Approve amount (${poolCurrency?.symbol})`,
         accessor: 'approvedAmount',
         render: ({ id }: { id: string }) => {
-          return (
-            <LiveAmountDisplay
-              name={`orders.${id}.amount`}
-              poolDecimals={poolCurrency?.decimals}
-              shareClassDetails={shareClassDetails}
-            />
-          )
+          return <LiveAmountDisplay name={`orders.${id}.amount`} poolDecimals={poolCurrency?.decimals} />
         },
       },
     ]

@@ -56,3 +56,7 @@ export const sumAmounts = (
         Balance.fromFloat(0, poolCurrencyDecimals)
       )
 }
+
+export const convertBalance = (balance: string, decimals: number) => {
+  return Balance.fromFloat(balance, decimals)
+}
