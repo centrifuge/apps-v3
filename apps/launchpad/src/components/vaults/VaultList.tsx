@@ -28,7 +28,7 @@ export const VaultList = ({ vaults }: { vaults: Vault[] }) => {
     }, {})
   }, [vaults])
 
-  if (!holdings) return <Text>No holdings found</Text>
+  if (!holdings) return
 
   return (
     <>

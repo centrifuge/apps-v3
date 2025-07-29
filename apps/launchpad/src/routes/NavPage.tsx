@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { Form, SubmitButton, useForm } from '@centrifuge/forms'
+import { createBalanceSchema, Form, SubmitButton, useForm } from '@centrifuge/forms'
 import { Box, Card, Flex, Grid, GridItem, Heading, Text } from '@chakra-ui/react'
 import { formatUIBalance, useCentrifugeTransaction, useNavPerNetwork, useVaultsDetails } from '@centrifuge/shared'
 import { NavForm } from '@components/nav/NavForm'
@@ -23,6 +23,7 @@ export default function NavPage() {
 
   const { data: networksNavs } = useNavPerNetwork(vaultDetails?.shareClass, { enabled: !!vaultDetails?.shareClass })
 
+  // TODO: add schema for price which is different from Balance
   const form = useForm({
     defaultValues: {
       newTokenPrice: '',
@@ -44,7 +45,7 @@ export default function NavPage() {
     <Form form={form}>
       <Flex alignItems="center" justifyContent="space-between" mb={4}>
         <Heading size="lg">Update NAV</Heading>
-        <SubmitButton colorPalette="yellow" size="sm" disabled={isPending}>
+        <SubmitButton colorPalette="yellow" size="sm" disabled={isPending || !newTokenPrice}>
           Save Changes
         </SubmitButton>
       </Flex>
