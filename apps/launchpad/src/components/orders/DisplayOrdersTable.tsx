@@ -1,9 +1,26 @@
 import { Balance } from '@centrifuge/sdk'
-import { formatDate, formatUIBalance, networkToName, PendingAmount } from '@centrifuge/shared'
-import { DataTable, NetworkIcon } from '@centrifuge/ui'
+import { formatDate, formatUIBalance, networkToName } from '@centrifuge/shared'
+import { DataTable, ColumnDefinition, NetworkIcon } from '@centrifuge/ui'
 import { Box, Flex, Text } from '@chakra-ui/react'
 import { useSelectedPool } from '@contexts/SelectedPoolProvider'
 import { useMemo } from 'react'
+
+type Order = {
+  chainId: number
+  pendingDeposit?: Balance
+  pendingRedeem?: Balance
+  pendingIssuances?: { amount: Balance; approvedAt: Date }[]
+  pendingRevocations?: { amount: Balance; approvedAt: Date }[]
+}
+
+type PendingAmount = Order[]
+
+type DataTableRow = {
+  id: string | number
+  amount: Balance
+  network: number
+  approvedAt: Date | null
+}
 
 type Key = 'pendingDeposit' | 'pendingRedeem' | 'pendingRevocations' | 'pendingIssuances'
 
@@ -12,78 +29,89 @@ export function DisplayOrdersTable({ orders, dataKey }: { orders: PendingAmount;
   const isArray = dataKey === 'pendingRevocations' || dataKey === 'pendingIssuances'
 
   const columns = useMemo(() => {
-    return [
+    const columnDefinitions: ColumnDefinition<DataTableRow>[] = [
       {
         header: 'Amount',
         accessor: 'amount',
-        render: ({ amount }: { amount: Balance }) => {
-          return (
-            <Text>
-              {formatUIBalance(amount, {
-                currency: poolCurrency?.symbol ?? 'USD',
-                precision: 2,
-                tokenDecimals: poolCurrency?.decimals ?? 0,
-              })}
-            </Text>
-          )
-        },
+        render: (row) => (
+          <Text>
+            {formatUIBalance(row.amount, {
+              currency: poolCurrency?.symbol ?? 'USD',
+              precision: 2,
+              tokenDecimals: poolCurrency?.decimals ?? 18,
+            })}
+          </Text>
+        ),
       },
       ...(isArray
         ? [
             {
               header: 'Approved at',
-              accessor: 'approvedAt',
-              render: ({ approvedAt }: { approvedAt: Date }) => {
-                return <Text>{formatDate(approvedAt, 'short', true)}</Text>
-              },
+              accessor: 'approvedAt' as keyof DataTableRow,
+              render: (row: DataTableRow) => (
+                <Text>{row.approvedAt ? formatDate(row.approvedAt, 'short', true) : '-'}</Text>
+              ),
             },
           ]
         : []),
       {
         header: 'Network',
         accessor: 'network',
-        render: ({ network }: { network: number }) => {
-          return (
-            <Flex alignItems="center" gap={2}>
-              <NetworkIcon networkId={network} />
-              <Text>{networkToName(network)}</Text>
-            </Flex>
-          )
-        },
+        render: (row) => (
+          <Flex alignItems="center" gap={2}>
+            <NetworkIcon networkId={row.network} />
+            <Text>{networkToName(row.network)}</Text>
+          </Flex>
+        ),
       },
     ]
-  }, [isArray])
+    return columnDefinitions
+  }, [isArray, poolCurrency])
 
-  const data = useMemo(() => {
+  const data = useMemo((): DataTableRow[] => {
     if (!isArray) {
-      return orders.map((order, index) => {
-        return {
-          id: Number(index),
-          amount: order[dataKey as keyof typeof order],
-          network: order.chainId,
-          approvedAt: null,
+      return (orders || []).flatMap((order, index) => {
+        const amount = order[dataKey as 'pendingDeposit' | 'pendingRedeem']!
+
+        if (amount && !amount.isZero()) {
+          return [
+            {
+              id: index,
+              amount: amount,
+              network: order.chainId,
+              approvedAt: null,
+            },
+          ]
         }
+        return []
       })
     }
 
-    return orders.flatMap((order, orderIndex) => {
-      const value = order[dataKey as keyof typeof order]
+    return (orders || []).flatMap((order, orderIndex) => {
+      const value = order[dataKey as 'pendingIssuances' | 'pendingRevocations']
       if (Array.isArray(value)) {
-        return value.map((item: any, itemIndex: number) => ({
-          id: Number(`${orderIndex}-${itemIndex}`),
-          amount: item.amount,
-          network: order.chainId,
-          approvedAt: item.approvedAt,
-        }))
+        return value.flatMap((item) => {
+          if (item.amount && !item.amount.isZero()) {
+            return [
+              {
+                id: `${orderIndex}-${item.amount.toString()}`,
+                amount: item.amount,
+                network: order.chainId,
+                approvedAt: item.approvedAt,
+              },
+            ]
+          }
+          return []
+        })
       }
       return []
     })
-  }, [orders, isArray])
+  }, [orders, dataKey, isArray])
 
   if (!data.length) {
     return (
       <Box border="1px solid" borderColor="border-primary" borderRadius="lg" p={4}>
-        <Text fontSize="sm">No pending orders</Text>
+        <Text fontSize="sm">No orders to display</Text>
       </Box>
     )
   }

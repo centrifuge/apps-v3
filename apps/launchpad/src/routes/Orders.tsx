@@ -1,15 +1,28 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { Balance } from '@centrifuge/sdk'
 import { formatUIBalance, usePendingAmounts } from '@centrifuge/shared'
-import { Button, Card, Loader } from '@centrifuge/ui'
+import { Button, Card, Loader, Modal } from '@centrifuge/ui'
 import { Flex, Grid, GridItem, Heading, Stack, VStack } from '@chakra-ui/react'
 import { DisplayOrdersTable } from '@components/orders/DisplayOrdersTable'
 import { useSelectedPool } from '@contexts/SelectedPoolProvider'
+import { OrdersModal } from '@components/orders/OrdersModal'
 
 export default function Orders() {
   const { shareClass, poolCurrency, isLoading } = useSelectedPool()
   const { data: pendingOrders, isLoading: isPendingOrdersLoading } = usePendingAmounts(shareClass, {
     enabled: !!shareClass,
+  })
+
+  const [modal, setModal] = useState<{
+    approve: boolean
+    redeem: boolean
+    issue: boolean
+    revoke: boolean
+  }>({
+    approve: false,
+    redeem: false,
+    issue: false,
+    revoke: false,
   })
 
   const poolCurrencyDecimals = poolCurrency?.decimals ?? 18
@@ -49,7 +62,7 @@ export default function Orders() {
       <Stack>
         <Heading size="md">Pending orders</Heading>
         <Card>
-          <Grid templateColumns={{ base: '1fr', lg: '1fr 1fr' }} gap={4}>
+          <Grid templateColumns={{ base: '1fr', lg: '1fr 1fr' }} gap={12}>
             <GridItem>
               <Flex alignItems="center" justifyContent="space-between" mb={4}>
                 <Stack gap={0}>
@@ -62,7 +75,13 @@ export default function Orders() {
                     })}
                   </Heading>
                 </Stack>
-                <Button size="sm" colorPalette="yellow" label="Approve" w="120px" />
+                <Button
+                  size="sm"
+                  colorPalette="yellow"
+                  label="Approve"
+                  w="120px"
+                  onClick={() => setModal({ approve: true, redeem: false, issue: false, revoke: false })}
+                />
               </Flex>
               <DisplayOrdersTable dataKey="pendingDeposit" orders={pendingOrders ?? []} />
             </GridItem>
@@ -78,7 +97,13 @@ export default function Orders() {
                     })}
                   </Heading>
                 </Stack>
-                <Button size="sm" colorPalette="yellow" label="Redeem" w="120px" />
+                <Button
+                  size="sm"
+                  colorPalette="yellow"
+                  label="Redeem"
+                  w="120px"
+                  onClick={() => setModal({ approve: false, redeem: true, issue: false, revoke: false })}
+                />
               </Flex>
               <DisplayOrdersTable dataKey="pendingRedeem" orders={pendingOrders ?? []} />
             </GridItem>
@@ -88,7 +113,7 @@ export default function Orders() {
       <Stack>
         <Heading size="md">Approved orders</Heading>
         <Card>
-          <Grid templateColumns={{ base: '1fr', lg: '1fr 1fr' }} gap={4}>
+          <Grid templateColumns={{ base: '1fr', lg: '1fr 1fr' }} gap={12}>
             <GridItem>
               <Flex alignItems="center" justifyContent="space-between" mb={4}>
                 <Stack gap={0}>
@@ -101,7 +126,13 @@ export default function Orders() {
                     })}
                   </Heading>
                 </Stack>
-                <Button size="sm" colorPalette="yellow" label="Issue" w="120px" />
+                <Button
+                  size="sm"
+                  colorPalette="yellow"
+                  label="Issue"
+                  w="120px"
+                  onClick={() => setModal({ approve: false, redeem: false, issue: true, revoke: false })}
+                />
               </Flex>
               <DisplayOrdersTable dataKey="pendingIssuances" orders={pendingOrders ?? []} />
             </GridItem>
@@ -117,13 +148,20 @@ export default function Orders() {
                     })}
                   </Heading>
                 </Stack>
-                <Button size="sm" colorPalette="yellow" label="Revoke" w="120px" />
+                <Button
+                  size="sm"
+                  colorPalette="yellow"
+                  label="Revoke"
+                  w="120px"
+                  onClick={() => setModal({ approve: false, redeem: false, issue: false, revoke: true })}
+                />
               </Flex>
               <DisplayOrdersTable dataKey="pendingRevocations" orders={pendingOrders ?? []} />
             </GridItem>
           </Grid>
         </Card>
       </Stack>
+      <OrdersModal modal={modal} setModal={setModal} orders={pendingOrders ?? []} />
     </Stack>
   )
 }
