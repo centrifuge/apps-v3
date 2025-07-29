@@ -1,3 +1,120 @@
+import { Balance } from '@centrifuge/sdk'
+import { formatUIBalance, usePendingAmounts } from '@centrifuge/shared'
+import { Button, Card } from '@centrifuge/ui'
+import { Flex, Grid, GridItem, Heading, Stack, Text } from '@chakra-ui/react'
+import { useSelectedPool } from '@contexts/SelectedPoolProvider'
+import { useMemo } from 'react'
+
 export default function Orders() {
-  return <div>Orders</div>
+  const { shareClass, poolCurrency } = useSelectedPool()
+  const { data: pendingOrders } = usePendingAmounts(shareClass, { enabled: !!shareClass })
+
+  const poolCurrencyDecimals = poolCurrency?.decimals ?? 18
+
+  // normalize the amounts to the pool currency decimals
+  const sumAmounts = (key: string): Balance | undefined => {
+    return pendingOrders?.reduce(
+      (acc, order) => {
+        const value = order[key as keyof typeof order]
+
+        const amount = value instanceof Balance ? value : Balance.fromFloat(value as number, poolCurrencyDecimals)
+
+        if (!amount) return acc
+
+        const normalizedAmount = Balance.fromFloat(amount.toFloat(), poolCurrencyDecimals)
+
+        return acc.add(normalizedAmount)
+      },
+      Balance.fromFloat(0, poolCurrencyDecimals)
+    )
+  }
+  const { pendingInvestments, pendingRedemptions, pendingIssuances, pendingRevocations } = useMemo(() => {
+    return {
+      pendingInvestments: sumAmounts('pendingDeposit'),
+      pendingRedemptions: sumAmounts('pendingRedeem'),
+      pendingIssuances: sumAmounts('pendingIssuancesTotal'),
+      pendingRevocations: sumAmounts('pendingRevocationsTotal'),
+    }
+  }, [pendingOrders])
+
+  console.log(pendingOrders)
+
+  return (
+    <Stack gap={8}>
+      <Stack>
+        <Heading size="md">Pending orders</Heading>
+        <Card>
+          <Grid templateColumns={{ base: '1fr', lg: '1fr 1fr' }} gap={4}>
+            <GridItem>
+              <Flex alignItems="center" justifyContent="space-between">
+                <Stack gap={0}>
+                  <Heading size="xs">Pending investments</Heading>
+                  <Heading size="md">
+                    {formatUIBalance(pendingInvestments, {
+                      currency: poolCurrency?.symbol,
+                      precision: 2,
+                      tokenDecimals: poolCurrencyDecimals,
+                    })}
+                  </Heading>
+                </Stack>
+                <Button size="sm" colorPalette="yellow" label="Approve" w="120px" />
+              </Flex>
+            </GridItem>
+            <GridItem>
+              <Flex alignItems="center" justifyContent="space-between">
+                <Stack gap={0}>
+                  <Heading size="xs">Pending redemptions</Heading>
+                  <Heading size="md">
+                    {formatUIBalance(pendingRedemptions, {
+                      currency: poolCurrency?.symbol,
+                      precision: 2,
+                      tokenDecimals: poolCurrencyDecimals,
+                    })}
+                  </Heading>
+                </Stack>
+                <Button size="sm" colorPalette="yellow" label="Redeem" w="120px" />
+              </Flex>
+            </GridItem>
+          </Grid>
+        </Card>
+      </Stack>
+      <Stack>
+        <Heading size="md">Approved orders</Heading>
+        <Card>
+          <Grid templateColumns={{ base: '1fr', lg: '1fr 1fr' }} gap={4}>
+            <GridItem>
+              <Flex alignItems="center" justifyContent="space-between">
+                <Stack gap={0}>
+                  <Heading size="xs">Approved investments</Heading>
+                  <Heading size="md">
+                    {formatUIBalance(pendingIssuances, {
+                      currency: poolCurrency?.symbol,
+                      precision: 2,
+                      tokenDecimals: poolCurrencyDecimals,
+                    })}
+                  </Heading>
+                </Stack>
+                <Button size="sm" colorPalette="yellow" label="Issue" w="120px" />
+              </Flex>
+            </GridItem>
+            <GridItem>
+              <Flex alignItems="center" justifyContent="space-between">
+                <Stack gap={0}>
+                  <Heading size="xs">Approved redemptions</Heading>
+                  <Heading size="md">
+                    {formatUIBalance(pendingRevocations, {
+                      currency: poolCurrency?.symbol,
+                      precision: 2,
+                      tokenDecimals: poolCurrencyDecimals,
+                    })}
+                  </Heading>
+                </Stack>
+                <Button size="sm" colorPalette="yellow" label="Revoke" w="120px" />
+              </Flex>
+            </GridItem>
+          </Grid>
+        </Card>
+      </Stack>
+    </Stack>
+  )
 }
