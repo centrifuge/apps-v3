@@ -11,11 +11,9 @@ export const VaultList = ({ vaults }: { vaults: Vault[] }) => {
   const { shareClass } = useSelectedPool()
   const { data: holdings } = useHoldings(shareClass)
   const [selectedVault, setSelectedVault] = useState<Vault | null>(null)
-  const [selectedHolding, setSelectedHolding] = useState<Holdings[number] | null>(null)
 
   const closeModal = () => {
     setSelectedVault(null)
-    setSelectedHolding(null)
   }
 
   const vaultsByChain = useMemo(() => {
@@ -38,7 +36,7 @@ export const VaultList = ({ vaults }: { vaults: Vault[] }) => {
         const chainIdNumber = Number(chainId)
         const holdingsPerVault = holdings?.filter((holding) => holding.asset.chainId === chainIdNumber)
         return (
-          <Stack>
+          <Stack key={`${chainIdNumber}-${vault}`}>
             <Flex justifyContent="space-between" alignItems="center">
               <Flex alignItems="center" gap={2}>
                 <NetworkIcon networkId={chainIdNumber} />
@@ -48,12 +46,7 @@ export const VaultList = ({ vaults }: { vaults: Vault[] }) => {
             </Flex>
             <Grid gridTemplateColumns={['1fr', '1fr 1fr 1fr']} gap={2}>
               {holdingsPerVault.map((holding, index) => (
-                <HoldingDetailsCard
-                  key={`${holding.asset.address}-${index}`}
-                  vault={vault[0]}
-                  holding={holding}
-                  onClick={() => setSelectedHolding(holding)}
-                />
+                <HoldingDetailsCard key={`${holding.asset.address}-${index}`} vault={vault[0]} holding={holding} />
               ))}
             </Grid>
           </Stack>
