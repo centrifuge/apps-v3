@@ -1,11 +1,14 @@
 import { Input, Select, useFormContext } from '@centrifuge/forms'
 import { Pool, PoolId, PoolNetwork } from '@centrifuge/sdk'
-import { networkToName, usePoolDetails, usePoolNetworks } from '@centrifuge/shared'
+import { networkToName, useCentrifugeTransaction, usePoolDetails, usePoolNetworks } from '@centrifuge/shared'
 import { AddressInput, NetworkIcon } from '@centrifuge/ui'
 import { Flex, Grid, Heading, Text } from '@chakra-ui/react'
+import { useSelectedPool } from '@contexts/SelectedPoolProvider'
 import { useMemo } from 'react'
 
 export const WhitelistInvestor = ({ poolId }: { poolId: PoolId }) => {
+  const { execute } = useCentrifugeTransaction()
+  const { pool, shareClass } = useSelectedPool()
   const { data: networks } = usePoolNetworks(poolId, { enabled: !!poolId })
 
   const networkOptions = useMemo(() => {

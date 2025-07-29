@@ -6,6 +6,7 @@ import { Flex, Grid, GridItem, Heading, Stack, VStack } from '@chakra-ui/react'
 import { DisplayOrdersTable } from '@components/orders/DisplayOrdersTable'
 import { useSelectedPool } from '@contexts/SelectedPoolProvider'
 import { OrdersModal } from '@components/orders/OrdersModal'
+import { sumAmounts } from '@components/orders/utils'
 
 export default function Orders() {
   const { shareClass, poolCurrency, isLoading } = useSelectedPool()
@@ -27,29 +28,12 @@ export default function Orders() {
 
   const poolCurrencyDecimals = poolCurrency?.decimals ?? 18
 
-  // normalize the amounts to the pool currency decimals
-  const sumAmounts = (key: string): Balance | undefined => {
-    return pendingOrders?.reduce(
-      (acc, order) => {
-        const value = order[key as keyof typeof order]
-
-        const amount = value instanceof Balance ? value : Balance.fromFloat(value as number, poolCurrencyDecimals)
-
-        if (!amount) return acc
-
-        const normalizedAmount = Balance.fromFloat(amount.toFloat(), poolCurrencyDecimals)
-
-        return acc.add(normalizedAmount)
-      },
-      Balance.fromFloat(0, poolCurrencyDecimals)
-    )
-  }
   const { pendingInvestments, pendingRedemptions, pendingIssuances, pendingRevocations } = useMemo(() => {
     return {
-      pendingInvestments: sumAmounts('pendingDeposit'),
-      pendingRedemptions: sumAmounts('pendingRedeem'),
-      pendingIssuances: sumAmounts('pendingIssuancesTotal'),
-      pendingRevocations: sumAmounts('pendingRevocationsTotal'),
+      pendingInvestments: sumAmounts('pendingDeposit', pendingOrders, poolCurrencyDecimals),
+      pendingRedemptions: sumAmounts('pendingRedeem', pendingOrders, poolCurrencyDecimals),
+      pendingIssuances: sumAmounts('pendingIssuancesTotal', pendingOrders, poolCurrencyDecimals),
+      pendingRevocations: sumAmounts('pendingRevocationsTotal', pendingOrders, poolCurrencyDecimals),
     }
   }, [pendingOrders])
 
@@ -161,7 +145,7 @@ export default function Orders() {
           </Grid>
         </Card>
       </Stack>
-      <OrdersModal modal={modal} setModal={setModal} orders={pendingOrders ?? []} />
+      <OrdersModal modal={modal} setModal={setModal} />
     </Stack>
   )
 }

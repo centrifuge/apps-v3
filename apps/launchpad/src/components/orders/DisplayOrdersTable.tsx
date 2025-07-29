@@ -72,7 +72,6 @@ export function DisplayOrdersTable({ orders, dataKey }: { orders: PendingAmount;
     if (!isArray) {
       return (orders || []).flatMap((order, index) => {
         const amount = order[dataKey as 'pendingDeposit' | 'pendingRedeem']!
-
         if (amount && !amount.isZero()) {
           return [
             {
@@ -90,11 +89,11 @@ export function DisplayOrdersTable({ orders, dataKey }: { orders: PendingAmount;
     return (orders || []).flatMap((order, orderIndex) => {
       const value = order[dataKey as 'pendingIssuances' | 'pendingRevocations']
       if (Array.isArray(value)) {
-        return value.flatMap((item) => {
+        return value.flatMap((item, itemIndex) => {
           if (item.amount && !item.amount.isZero()) {
             return [
               {
-                id: `${orderIndex}-${item.amount.toString()}`,
+                id: `${orderIndex}-${itemIndex}`,
                 amount: item.amount,
                 network: order.chainId,
                 approvedAt: item.approvedAt,
