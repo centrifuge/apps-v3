@@ -1,4 +1,4 @@
-import { createContext, ReactNode, useContext, useEffect, useMemo, useRef, useState } from 'react'
+import { createContext, ReactNode, useContext, useEffect, useRef, useState } from 'react'
 import { Pool, PoolId, PoolNetwork, ShareClassId } from '@centrifuge/sdk'
 import { PoolDetails, ShareClassWithDetails, usePoolDetails, usePoolNetworks, usePoolsQuery } from '@centrifuge/shared'
 import { useParams } from 'react-router-dom'
@@ -23,6 +23,7 @@ const PoolsContext = createContext<
 
 export const PoolsProvider = ({ children }: { children: ReactNode }) => {
   const { data: pools, isLoading } = usePoolsQuery()
+  const [network, setNetwork] = useState<PoolNetwork | undefined>(undefined)
   const [selectedPoolId, setSelectedPoolId] = useState<PoolId | undefined>(undefined)
 
   const { poolId } = useParams()
@@ -32,13 +33,18 @@ export const PoolsProvider = ({ children }: { children: ReactNode }) => {
   const { data: networks, isLoading: isNetworksLoading } = usePoolNetworks(poolDetails?.id)
   const connectedChainId = useChainId()
 
-  const network = useMemo(() => {
-    return networks?.find((n) => n.chainId === connectedChainId)
-  }, [networks, connectedChainId])
-
   // In MVP we assume one share class per pool
   const shareClass = poolDetails?.shareClasses?.[0]
   const shareClassId = shareClass?.details.id
+
+  useEffect(() => {
+    if (networks?.length && connectedChainId) {
+      const currentNetwork = networks.find((n) => n.chainId === connectedChainId)
+      if (currentNetwork && currentNetwork !== network) {
+        setNetwork(currentNetwork)
+      }
+    }
+  })
 
   // Use a ref to track if we've already set the initial pool ID
   const hasSetInitialPoolRef = useRef(false)

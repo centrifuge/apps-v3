@@ -47,10 +47,10 @@ const defaultVaultsContextValues: VaultsContextValues = {
 const VaultsContext = createContext<VaultsContextValues>(defaultVaultsContextValues)
 
 export const VaultsProvider = ({ children }: { children: ReactNode }) => {
+  const { network, shareClassId, selectedPoolId } = usePoolsContext()
   const [vault, setVault] = useState<Vault | undefined>(undefined)
   const [vaults, setVaults] = useState<Vault[] | undefined>(undefined)
-  const { network, shareClass, shareClassId } = usePoolsContext()
-  const { data: poolNetworkVaults, isLoading: isPoolVaultsLoading } = useVaults(network, shareClass?.details.id)
+  const { data: poolNetworkVaults, isLoading: isPoolVaultsLoading } = useVaults(network, shareClassId)
   const { data: vaultsDetails, isLoading: isVaultsDetailsLoading } = useVaultsDetails(vaults)
   const { data: vaultDetails, isLoading: isVaultDetailsLoading } = useVaultDetails(vault)
   const { data: investment, isLoading: isInvestmentLoading } = useInvestment(vault)
@@ -62,8 +62,12 @@ export const VaultsProvider = ({ children }: { children: ReactNode }) => {
       setVault(poolNetworkVaults[0])
     }
 
+    if (vault && !poolNetworkVaults?.length) {
+      setVault(undefined)
+    }
+
     setVaults(poolNetworkVaults)
-  }, [poolNetworkVaults, vault, setVault, setVaults])
+  }, [poolNetworkVaults, selectedPoolId, vault, setVault, setVaults])
 
   const isVaultsLoading =
     isPoolVaultsLoading ||
@@ -98,7 +102,7 @@ export const VaultsProvider = ({ children }: { children: ReactNode }) => {
 
 export const useVaultsContext = () => {
   const context = useContext(VaultsContext)
-  if (!context || context === defaultVaultsContextValues) {
+  if (!context) {
     throw new Error('useVaultsContext must be used within a VaultsProvider that is in a PoolsProvider')
   }
   return context
