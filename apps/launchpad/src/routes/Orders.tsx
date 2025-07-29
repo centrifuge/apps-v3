@@ -1,13 +1,16 @@
+import { useMemo } from 'react'
 import { Balance } from '@centrifuge/sdk'
 import { formatUIBalance, usePendingAmounts } from '@centrifuge/shared'
-import { Button, Card } from '@centrifuge/ui'
-import { Flex, Grid, GridItem, Heading, Stack, Text } from '@chakra-ui/react'
+import { Button, Card, Loader } from '@centrifuge/ui'
+import { Flex, Grid, GridItem, Heading, Stack, VStack } from '@chakra-ui/react'
+import { DisplayOrdersTable } from '@components/orders/DisplayOrdersTable'
 import { useSelectedPool } from '@contexts/SelectedPoolProvider'
-import { useMemo } from 'react'
 
 export default function Orders() {
-  const { shareClass, poolCurrency } = useSelectedPool()
-  const { data: pendingOrders } = usePendingAmounts(shareClass, { enabled: !!shareClass })
+  const { shareClass, poolCurrency, isLoading } = useSelectedPool()
+  const { data: pendingOrders, isLoading: isPendingOrdersLoading } = usePendingAmounts(shareClass, {
+    enabled: !!shareClass,
+  })
 
   const poolCurrencyDecimals = poolCurrency?.decimals ?? 18
 
@@ -37,7 +40,9 @@ export default function Orders() {
     }
   }, [pendingOrders])
 
-  console.log(pendingOrders)
+  if (isPendingOrdersLoading || isLoading) return <Loader />
+
+  if (!pendingOrders?.length) return <VStack>pending orders</VStack>
 
   return (
     <Stack gap={8}>
@@ -46,7 +51,7 @@ export default function Orders() {
         <Card>
           <Grid templateColumns={{ base: '1fr', lg: '1fr 1fr' }} gap={4}>
             <GridItem>
-              <Flex alignItems="center" justifyContent="space-between">
+              <Flex alignItems="center" justifyContent="space-between" mb={4}>
                 <Stack gap={0}>
                   <Heading size="xs">Pending investments</Heading>
                   <Heading size="md">
@@ -59,9 +64,10 @@ export default function Orders() {
                 </Stack>
                 <Button size="sm" colorPalette="yellow" label="Approve" w="120px" />
               </Flex>
+              <DisplayOrdersTable dataKey="pendingDeposit" orders={pendingOrders ?? []} />
             </GridItem>
             <GridItem>
-              <Flex alignItems="center" justifyContent="space-between">
+              <Flex alignItems="center" justifyContent="space-between" mb={4}>
                 <Stack gap={0}>
                   <Heading size="xs">Pending redemptions</Heading>
                   <Heading size="md">
@@ -74,6 +80,7 @@ export default function Orders() {
                 </Stack>
                 <Button size="sm" colorPalette="yellow" label="Redeem" w="120px" />
               </Flex>
+              <DisplayOrdersTable dataKey="pendingRedeem" orders={pendingOrders ?? []} />
             </GridItem>
           </Grid>
         </Card>
@@ -83,7 +90,7 @@ export default function Orders() {
         <Card>
           <Grid templateColumns={{ base: '1fr', lg: '1fr 1fr' }} gap={4}>
             <GridItem>
-              <Flex alignItems="center" justifyContent="space-between">
+              <Flex alignItems="center" justifyContent="space-between" mb={4}>
                 <Stack gap={0}>
                   <Heading size="xs">Approved investments</Heading>
                   <Heading size="md">
@@ -96,9 +103,10 @@ export default function Orders() {
                 </Stack>
                 <Button size="sm" colorPalette="yellow" label="Issue" w="120px" />
               </Flex>
+              <DisplayOrdersTable dataKey="pendingIssuances" orders={pendingOrders ?? []} />
             </GridItem>
             <GridItem>
-              <Flex alignItems="center" justifyContent="space-between">
+              <Flex alignItems="center" justifyContent="space-between" mb={4}>
                 <Stack gap={0}>
                   <Heading size="xs">Approved redemptions</Heading>
                   <Heading size="md">
@@ -111,6 +119,7 @@ export default function Orders() {
                 </Stack>
                 <Button size="sm" colorPalette="yellow" label="Revoke" w="120px" />
               </Flex>
+              <DisplayOrdersTable dataKey="pendingRevocations" orders={pendingOrders ?? []} />
             </GridItem>
           </Grid>
         </Card>
