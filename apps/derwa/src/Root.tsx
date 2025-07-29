@@ -6,6 +6,7 @@ import { CentrifugeProvider, DebugFlags, TransactionProvider } from '@centrifuge
 import { ChakraCentrifugeProvider, ChakraCentrifugeProviderProps, LoadingProvider } from '@centrifuge/ui'
 import { WalletProvider } from '@centrifuge/wallet'
 import { PoolsProvider } from '@contexts/usePoolsContext'
+import { VaultsProvider } from '@contexts/useVaultsContext'
 
 const config = {
   themeKey: 'light' as ChakraCentrifugeProviderProps['themeKey'],
@@ -41,11 +42,13 @@ export default function Root() {
             <ChakraCentrifugeProvider themeKey={config.themeKey}>
               <TransactionProvider>
                 <PoolsProvider>
-                  <DebugFlags>
-                    <LoadingProvider>
-                      <Outlet />
-                    </LoadingProvider>
-                  </DebugFlags>
+                  <VaultsProvider>
+                    <DebugFlags>
+                      <LoadingProvider>
+                        <Outlet />
+                      </LoadingProvider>
+                    </DebugFlags>
+                  </VaultsProvider>
                 </PoolsProvider>
               </TransactionProvider>
             </ChakraCentrifugeProvider>

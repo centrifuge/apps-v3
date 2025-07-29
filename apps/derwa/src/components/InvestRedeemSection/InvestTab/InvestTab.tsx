@@ -19,14 +19,7 @@ import { InvestTabForm } from '@components/InvestRedeemSection/InvestTab/forms/I
 import { TabProps } from '@components/InvestRedeemSection'
 import { InfoWrapper } from '@components/InvestRedeemSection/components/InfoWrapper'
 
-export default function InvestTab({
-  isInvestorWhiteListed,
-  isLoading: isTabLoading,
-  networks,
-  vault,
-  vaults,
-  setVault,
-}: TabProps) {
+export default function InvestTab({ isInvestorWhiteListed, isLoading: isTabLoading, vault }: TabProps) {
   const { data: vaultDetails, isLoading: isVaultDetailsLoading } = useVaultDetails(vault)
   const { data: investment, isLoading: isInvestmentLoading } = useInvestment(vault)
   const { data: portfolio, isLoading: isPortfolioLoading } = usePortfolio()
@@ -106,12 +99,8 @@ export default function InvestTab({
           actionType={actionType}
           isDisabled={isDisabled}
           maxInvestAmount={maxInvestAmount}
-          networks={networks}
           parsedInvestAmount={parsedInvestAmount}
-          vaults={vaults}
-          vaultDetails={vaultDetails}
           setActionType={setActionType}
-          setVault={setVault}
         />
       </Box>
     </Form>

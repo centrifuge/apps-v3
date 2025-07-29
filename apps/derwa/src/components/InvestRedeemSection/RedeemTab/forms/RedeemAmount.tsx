@@ -1,46 +1,23 @@
-import { Dispatch, useCallback, useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 import { Badge, Box, Flex, Text } from '@chakra-ui/react'
 import { BalanceInput, SubmitButton, useFormContext } from '@centrifuge/forms'
-import { Balance, PoolId, PoolNetwork, Vault } from '@centrifuge/sdk'
-import {
-  debounce,
-  formatBalanceToString,
-  formatBalance,
-  usePoolDetails,
-  useVaultsDetails,
-  useInvestment,
-  divideBigInts,
-} from '@centrifuge/shared'
+import { Balance, PoolNetwork } from '@centrifuge/sdk'
+import { debounce, formatBalanceToString, formatBalance, divideBigInts } from '@centrifuge/shared'
 import { NetworkIcons } from '@centrifuge/ui'
 import { usePoolsContext } from '@contexts/usePoolsContext'
-import { VaultDetails } from '@utils/types'
 import { InfoWrapper } from '@components/InvestRedeemSection/components/InfoWrapper'
+import { useVaultsContext } from '@contexts/useVaultsContext'
 
 interface RedeemAmountProps {
   isDisabled: boolean
   maxRedeemAmount: string
   networks?: PoolNetwork[]
   parsedRedeemAmount: 0 | Balance
-  vault?: Vault
-  vaults?: Vault[]
-  vaultDetails?: VaultDetails
-  setVault: Dispatch<Vault | undefined>
 }
 
-export function RedeemAmount({
-  isDisabled,
-  maxRedeemAmount,
-  networks,
-  parsedRedeemAmount,
-  vault,
-  vaults,
-  vaultDetails,
-  setVault,
-}: RedeemAmountProps) {
-  const { data: vaultsDetails } = useVaultsDetails(vaults)
-  const { selectedPoolId } = usePoolsContext()
-  const { data: pool } = usePoolDetails(selectedPoolId as PoolId)
-  const { data: investment } = useInvestment(vault)
+export function RedeemAmount({ isDisabled, maxRedeemAmount, networks, parsedRedeemAmount }: RedeemAmountProps) {
+  const { poolDetails } = usePoolsContext()
+  const { investment, vaults, vaultDetails, vaultsDetails, setVault } = useVaultsContext()
   const { setValue } = useFormContext()
 
   // Get networkIds and currencies for receiveAmount select currency list
@@ -51,7 +28,7 @@ export function RedeemAmount({
   }))
 
   // Get the pricePerShare
-  const poolShareClass = pool?.shareClasses.find(
+  const poolShareClass = poolDetails?.shareClasses.find(
     (sc) => sc.shareClass.id.toString() === vaultDetails?.shareClass.id.toString()
   )
   const pricePerShare = poolShareClass?.details.pricePerShare
@@ -183,7 +160,7 @@ export function RedeemAmount({
           )}
         </Box>
         <Box>
-          <SubmitButton colorPalette="yellow" disabled={isDisabled} width="100%">
+          <SubmitButton colorPalette="yellow" disabled={isDisabled} width="100%" mt={6}>
             Redeem
           </SubmitButton>
           {!hasRedeemableShares ? (

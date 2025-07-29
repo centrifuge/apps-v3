@@ -3,7 +3,7 @@ import { z } from 'zod'
 import { Box, Spinner } from '@chakra-ui/react'
 import { createBalanceSchema, Form, safeParse, useForm } from '@centrifuge/forms'
 import { Balance } from '@centrifuge/sdk'
-import { formatBalanceToString, useInvestment, useCentrifugeTransaction, useVaultDetails } from '@centrifuge/shared'
+import { formatBalanceToString, useCentrifugeTransaction } from '@centrifuge/shared'
 import {
   RedeemAction,
   RedeemFormDefaultValues,
@@ -11,10 +11,10 @@ import {
 } from '@components/InvestRedeemSection/components/defaults'
 import { TabProps } from '@components/InvestRedeemSection'
 import { RedeemTabForm } from '@components/InvestRedeemSection/RedeemTab/forms/RedeemTabForm'
+import { useVaultsContext } from '@contexts/useVaultsContext'
 
-export default function RedeemTab({ isLoading: isTabLoading, networks, vault, vaults, setVault }: TabProps) {
-  const { data: vaultDetails, isLoading: isVaultDetailsLoading } = useVaultDetails(vault)
-  const { data: investment, isLoading: isInvestmentLoading } = useInvestment(vault)
+export default function RedeemTab({ isLoading: isTabLoading, vault }: TabProps) {
+  const { isInvestmentLoading, isVaultDetailsLoading, investment, vaultDetails } = useVaultsContext()
   const { execute, isPending } = useCentrifugeTransaction()
   const [actionType, setActionType] = useState<RedeemActionType>(RedeemAction.REDEEM_AMOUNT)
   const maxRedeemBalance = investment?.shareBalance ?? 0
@@ -77,14 +77,9 @@ export default function RedeemTab({ isLoading: isTabLoading, networks, vault, va
           actionType={actionType}
           isDisabled={isDisabled}
           maxRedeemAmount={maxRedeemAmount}
-          networks={networks}
           parsedRedeemAmount={parsedRedeemAmount}
           parsedReceiveAmount={parsedReceiveAmount}
-          vault={vault}
-          vaults={vaults}
-          vaultDetails={vaultDetails}
           setActionType={setActionType}
-          setVault={setVault}
         />
       </Box>
     </Form>

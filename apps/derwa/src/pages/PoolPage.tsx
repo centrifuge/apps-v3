@@ -1,22 +1,36 @@
 import { Link } from 'react-router-dom'
 import { IoArrowBack } from 'react-icons/io5'
 import { Box, Flex, Grid, Heading, Text } from '@chakra-ui/react'
-import { PoolId } from '@centrifuge/sdk'
-import { usePoolDetails } from '@centrifuge/shared'
-import { FAQSection } from '@components/FAQSection'
-import { InvestRedeemSection } from '@components/InvestRedeemSection'
-import { PoolPerformanceChart } from '@components/pools/PoolPerformanceChart'
-import { UnderlyingCollateralSection } from '@components/UnderlyingCollateralSection'
 import { PoolPageSkeleton } from '@components/Skeletons/PoolPageSkeleton'
 import { usePoolsContext } from '@contexts/usePoolsContext'
 import { routePaths } from '@routes/routePaths'
+import { InvestRedeemSection } from '@components/InvestRedeemSection'
+import { PoolDetailsSummary } from '@components/pools/PoolDetails/PoolDetailsSummary'
+import { PoolDetailsPermissioned } from '@components/pools/PoolDetails/PoolDetailsPermissioned'
+import { PoolDetailsPermissionless } from '@components/pools/PoolDetails/PoolDetailsPermissionless'
+import { formatBalance, formatBigintToString } from '@centrifuge/shared'
+import { useVaultsContext } from '@contexts/useVaultsContext'
 
 export default function PoolPage() {
-  const { selectedPoolId, isLoading: isPoolsLoading } = usePoolsContext()
-  const { data: pool, isLoading: isPoolDetailsLoading } = usePoolDetails(selectedPoolId as PoolId)
+  const {
+    isLoading: isPoolsLoading,
+    poolDetails,
+    isPoolDetailsLoading,
+    networks,
+    isNetworksLoading,
+    shareClass,
+  } = usePoolsContext()
+  const { investment, vaultDetails } = useVaultsContext()
+  const isSyncInvestVault = vaultDetails?.isSyncInvest || false
+  const apy = shareClass?.details.apyPercentage?.toString()
 
-  if (isPoolsLoading || isPoolDetailsLoading) {
+  if (isPoolsLoading || isPoolDetailsLoading || isNetworksLoading) {
     return <PoolPageSkeleton />
+  }
+
+  // TODO: handle case when data is not available
+  if (!poolDetails || !networks || !shareClass) {
+    return null
   }
 
   return (
@@ -26,28 +40,55 @@ export default function PoolPage() {
           <Flex alignItems="center">
             <IoArrowBack />
             <Heading size="2xl" ml={8}>
-              {pool?.metadata?.pool.name}
+              {poolDetails?.metadata?.pool.name}
             </Heading>
           </Flex>
         </Link>
-        <Box>
-          <Heading size="xl" color="black" width="auto" textAlign="center">
-            Current Holdings
-          </Heading>
-          <Text>$237,890</Text>
+        <Box mt={4}>
+          <Text fontSize="12px" color="black" width="auto" textAlign="right">
+            Your current holdings in {poolDetails?.metadata?.pool.name}
+          </Text>
+          <Flex align={'flex-end'} justifyContent="flex-end">
+            <Text fontSize="24px" fontWeight="bold" textAlign="right">
+              {formatBalance(investment?.investmentCurrencyBalance ?? 0, 'USD', 2)}
+            </Text>
+          </Flex>
         </Box>
       </Flex>
       <Box marginTop={8}>
-        <Grid templateColumns={{ base: '1fr', sm: '1fr', md: '1fr', lg: '6fr 4fr' }} gap={10} alignItems="stretch">
-          <PoolPerformanceChart pool={pool} />
-          <InvestRedeemSection pool={pool} />
+        <Grid templateColumns={{ base: '1fr', sm: '1fr', md: '1fr', lg: '6fr 4fr' }} gap={10}>
+          <Box minW={0}>
+            <PoolDetailsSummary
+              items={[
+                {
+                  label: 'TVL (USD)',
+                  value: '450,000,000',
+                },
+                {
+                  label: 'Token price (USD)',
+                  value: formatBigintToString(
+                    shareClass?.details.pricePerShare.toBigInt(),
+                    shareClass?.details.pricePerShare.decimals,
+                    2
+                  ),
+                },
+                {
+                  label: 'APY',
+                  value: apy ? `${apy}%` : '0%',
+                },
+              ]}
+            />
+
+            {!isSyncInvestVault && (
+              <PoolDetailsPermissioned poolDetails={poolDetails} networks={networks} shareClass={shareClass} />
+            )}
+            {isSyncInvestVault && <PoolDetailsPermissionless poolDetails={poolDetails} />}
+          </Box>
+
+          <Box height="fit-content" position="sticky" top={8}>
+            <InvestRedeemSection pool={poolDetails} />
+          </Box>
         </Grid>
-        <Box mt={8}>
-          <UnderlyingCollateralSection />
-        </Box>
-        <Box mt={8}>
-          <FAQSection />
-        </Box>
       </Box>
     </>
   )

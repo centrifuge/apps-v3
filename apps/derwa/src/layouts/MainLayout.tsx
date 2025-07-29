@@ -1,6 +1,6 @@
 import { memo } from 'react'
 import { Outlet } from 'react-router-dom'
-import { Box } from '@chakra-ui/react'
+import { Box, Separator } from '@chakra-ui/react'
 import { ErrorBoundary, LogoCentrifugeText } from '@centrifuge/ui'
 import { WalletButton } from '@centrifuge/wallet'
 
@@ -14,7 +14,7 @@ const MainLayout = memo(() => {
           </Box>
           <WalletButton />
         </Box>
-
+        <Separator mb={4} />
         <ErrorBoundary>
           <Outlet />
         </ErrorBoundary>
