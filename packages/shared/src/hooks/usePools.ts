@@ -1,10 +1,9 @@
-import { HexString, Pool, PoolId } from '@centrifuge/sdk'
+import { HexString, PoolId } from '@centrifuge/sdk'
 import { useMemo } from 'react'
 import { combineLatest, map, of, switchMap } from 'rxjs'
 import { Address } from 'viem'
 import { useObservable } from './useObservable'
 import { useCentrifuge } from './CentrifugeContext'
-import { useLoadingObservable } from '../components'
 
 interface Options {
   enabled?: boolean
