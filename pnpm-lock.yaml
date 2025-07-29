@@ -12,8 +12,8 @@ importers:
         specifier: ^5.15.1
         version: 5.15.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@centrifuge/sdk':
-        specifier: 0.0.0-alpha.34
-        version: 0.0.0-alpha.34(viem@2.28.2(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.67))(ws@8.18.1(bufferutil@4.0.9)(utf-8-validate@5.0.10))
+        specifier: 0.0.0-alpha.35
+        version: 0.0.0-alpha.35(viem@2.28.2(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.67))(ws@8.18.1(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       '@chakra-ui/react':
         specifier: ^3.19.1
         version: 3.21.0(@emotion/react@11.14.0(@types/react@19.1.8)(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -427,8 +427,8 @@ packages:
     resolution: {integrity: sha512-ETyHEk2VHHvl9b9jZP5IHPavHYk57EhanlRRuae9XCpb/j5bDCbPPMOBfCWhnl/7EDJz0jEMCi/RhccCE8r1+Q==}
     engines: {node: '>=6.9.0'}
 
-  '@centrifuge/sdk@0.0.0-alpha.34':
-    resolution: {integrity: sha512-l+etPaQ6J/KFCRMxCkGbM7iP7irw4sqQ8KnkDTuNB0nNGHPEyHSW2jjW/CMKObQRod1d5jlCZ/loZzLsYol+0g==}
+  '@centrifuge/sdk@0.0.0-alpha.35':
+    resolution: {integrity: sha512-eFfj9eV9hRFnde4LstOtJlsBB5THS2e4DH/IcD36tomzotuGQt0DS0YBamSSprCfx+hwGHp1bt2bvhRvt0r4FQ==}
     engines: {node: '>=18.18'}
     peerDependencies:
       viem: '>=2.23.11'
@@ -3269,9 +3269,6 @@ packages:
     resolution: {integrity: sha512-ITJTvqoCw6OVMLs7pI8f4gG92n/St6x80ACtHodeS+IXmO0w+t1T5OOzfSt7KLSMLRkVUoexV7tztLgDxg+iig==}
     engines: {node: '>=14.0.0'}
 
-  eth-permit@0.2.3:
-    resolution: {integrity: sha512-d4tbiRQgbpdeJbdC9hdyT0SUJcJx28FIy3o2RxEAoeYI+zyYbNC0ZpdE6kxBK+7iY2payjHRE7rs7tr5EcOVLg==}
-
   eth-query@2.1.2:
     resolution: {integrity: sha512-srES0ZcvwkR/wd5OQBRA1bIJMww1skfGS0s8wlwK3/oNP4+wnds60krvu5R1QbpRQjMmpG5OMIWro5s7gvDPsA==}
 
@@ -5215,9 +5212,6 @@ packages:
     resolution: {integrity: sha512-Z6czzLq4u8fPOyx7TU6X3dvUZVvoJmxSQ+IcrlmagKhilxlhZgxPK6C5Jqbkw1IDUmFTM+cz9QDnnLTwDz/2gQ==}
     engines: {node: '>=6.14.2'}
 
-  utf8@3.0.0:
-    resolution: {integrity: sha512-E8VjFIQ/TyQgp+TZfS6l8yp/xWppSAHzidGiRrqe4bK4XP9pTRyKFgGJpO3SN7zdX4DeomTrwaseCHovfpFcqQ==}
-
   util-deprecate@1.0.2:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}
 
@@ -5943,10 +5937,9 @@ snapshots:
       '@babel/helper-string-parser': 7.27.1
       '@babel/helper-validator-identifier': 7.27.1
 
-  '@centrifuge/sdk@0.0.0-alpha.34(viem@2.28.2(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.67))(ws@8.18.1(bufferutil@4.0.9)(utf-8-validate@5.0.10))':
+  '@centrifuge/sdk@0.0.0-alpha.35(viem@2.28.2(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.67))(ws@8.18.1(bufferutil@4.0.9)(utf-8-validate@5.0.10))':
     dependencies:
       decimal.js-light: 2.5.1
-      eth-permit: 0.2.3
       isomorphic-ws: 5.0.0(ws@8.18.1(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       rxjs: 7.8.2
       viem: 2.28.2(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.67)
@@ -10095,10 +10088,6 @@ snapshots:
       json-rpc-engine: 6.1.0
       pify: 5.0.0
 
-  eth-permit@0.2.3:
-    dependencies:
-      utf8: 3.0.0
-
   eth-query@2.1.2:
     dependencies:
       json-rpc-random-id: 1.0.1
@@ -12067,8 +12056,6 @@ snapshots:
   utf-8-validate@5.0.10:
     dependencies:
       node-gyp-build: 4.8.4
-
-  utf8@3.0.0: {}
 
   util-deprecate@1.0.2: {}
 
