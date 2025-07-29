@@ -1,9 +1,9 @@
 import { PoolDetailsOverview } from './PoolDetailsOverview'
-import { Flex, Heading } from '@chakra-ui/react'
+import { Box, Flex, Heading } from '@chakra-ui/react'
 import { ColumnDefinition, DataTable, LogoCentrifugeText, NetworkIcon } from '@centrifuge/ui'
 import { getAgencyNormalisedName, RatingPill } from '@components/RatingPill'
 import { PoolDetailsFacts } from './PoolDetailsFacts'
-import { PoolDetails, ShareClassWithDetails, useHoldings } from '@centrifuge/shared'
+import { PoolDetails, ShareClassWithDetails } from '@centrifuge/shared'
 import { PoolNetwork } from '@centrifuge/sdk'
 
 type Row = {
@@ -25,7 +25,7 @@ export const PoolDetailsPermissioned = ({
   networks: PoolNetwork[]
   shareClass: ShareClassWithDetails
 }) => {
-  // TODO: Complains that shareClass.balances is not a function, check the hook as typing look weird
+  // TODO: Update holdings data once SDK supports it
   // const sdkHoldings = useHoldings(shareClass.shareClass)
 
   const holdings = [
@@ -113,7 +113,11 @@ export const PoolDetailsPermissioned = ({
                     ...rating,
                     agency,
                   }
-                  return <RatingPill key={rating.agency} rating={normalisedRating} />
+                  return (
+                    <Box ml={2} key={rating.agency}>
+                      <RatingPill rating={normalisedRating} />
+                    </Box>
+                  )
                 })}
               </Flex>
             ),
@@ -128,7 +132,7 @@ export const PoolDetailsPermissioned = ({
         heading="Key facts"
         topRow={{
           logo: <LogoCentrifugeText fill="text-primary" />,
-          links: [{ label: 'Website' }, { label: 'Forum' }, { label: 'Email' }, { label: 'Executive summary' }],
+          links: [{ label: 'Website' }, { label: 'Forum' }, { label: 'Email' }, { label: 'Summary' }],
         }}
         bottomRow={{
           leftPanel: {

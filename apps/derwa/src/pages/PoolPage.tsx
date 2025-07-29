@@ -8,7 +8,7 @@ import { InvestRedeemSection } from '@components/InvestRedeemSection'
 import { PoolDetailsSummary } from '@components/pools/PoolDetails/PoolDetailsSummary'
 import { PoolDetailsPermissioned } from '@components/pools/PoolDetails/PoolDetailsPermissioned'
 import { PoolDetailsPermissionless } from '@components/pools/PoolDetails/PoolDetailsPermissionless'
-import { formatUIBalance } from '@centrifuge/shared'
+import { formatBalance, formatBigintToString } from '@centrifuge/shared'
 import { useVaultsContext } from '@contexts/useVaultsContext'
 
 export default function PoolPage() {
@@ -20,11 +20,9 @@ export default function PoolPage() {
     isNetworksLoading,
     shareClass,
   } = usePoolsContext()
-  const { vaultDetails } = useVaultsContext()
+  const { investment, vaultDetails } = useVaultsContext()
   const isSyncInvestVault = vaultDetails?.isSyncInvest || false
-
-  const scId = shareClass?.details.id.toString()
-  const token = scId && poolDetails?.metadata?.shareClasses[scId]
+  const apy = shareClass?.details.apyPercentage?.toString()
 
   if (isPoolsLoading || isPoolDetailsLoading || isNetworksLoading) {
     return <PoolPageSkeleton />
@@ -52,10 +50,7 @@ export default function PoolPage() {
           </Text>
           <Flex align={'flex-end'} justifyContent="flex-end">
             <Text fontSize="24px" fontWeight="bold" textAlign="right">
-              145,984.87&nbsp;
-            </Text>
-            <Text fontSize="24px" textAlign="right">
-              USD
+              {formatBalance(investment?.investmentCurrencyBalance ?? 0, 'USD', 2)}
             </Text>
           </Flex>
         </Box>
@@ -67,18 +62,19 @@ export default function PoolPage() {
               items={[
                 {
                   label: 'TVL (USD)',
-                  // TODO: is this correct?
-                  value: formatUIBalance(shareClass?.details.nav),
+                  value: '450,000,000',
                 },
                 {
                   label: 'Token price (USD)',
-                  // TODO: such a big number is breaking UI a lot, need to format it more
-                  // value: formatUIBalance(shareClass?.details.pricePerShare),
-                  value: '12,194.91',
+                  value: formatBigintToString(
+                    shareClass?.details.pricePerShare.toBigInt(),
+                    shareClass?.details.pricePerShare.decimals,
+                    2
+                  ),
                 },
                 {
                   label: 'APY',
-                  value: token?.apyPercentage?.toString() || '0%',
+                  value: apy ? `${apy}%` : '0%',
                 },
               ]}
             />
