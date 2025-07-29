@@ -16,6 +16,7 @@ type Row = {
   apy: number
   nav: Balance
   tokenPrice: Balance
+  shareClassId: string
 }
 
 const columns: ColumnDefinition<Row>[] = [
@@ -61,10 +62,10 @@ const columns: ColumnDefinition<Row>[] = [
   {
     header: '',
     accessor: '',
-    render: ({ id }) => {
+    render: ({ id, shareClassId }) => {
       const poolId = id.split('-')[0]
       return (
-        <Link to={`/account/${poolId}`}>
+        <Link to={`/pool/${poolId}/${shareClassId}/account`}>
           <Button colorPalette="black" size="xs">
             Accounts
           </Button>
@@ -93,6 +94,7 @@ export const PoolOverviewTable = ({ poolIds }: { poolIds: PoolId[] }) => {
           tokenPrice: sc.details.pricePerShare,
           totalIssuance: sc.details.totalIssuance,
           networks: sc.shareClass.pool.chainId,
+          shareClassId: sc.shareClass.id,
         })),
       }
     }) ?? []
@@ -107,6 +109,7 @@ export const PoolOverviewTable = ({ poolIds }: { poolIds: PoolId[] }) => {
       apy: sc.apy,
       nav: sc.totalIssuance,
       tokenPrice: sc.tokenPrice,
+      shareClassId: sc.shareClassId,
     }))
   )
 

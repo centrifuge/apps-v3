@@ -4,8 +4,16 @@ import { combineLatest, of } from 'rxjs'
 import { useObservable } from './useObservable'
 import { useAddress } from './useAddress'
 
-export function useVaults(poolNetwork?: PoolNetwork, scId?: ShareClassId) {
-  const vaults$ = useMemo(() => (poolNetwork && scId ? poolNetwork.vaults(scId) : undefined), [poolNetwork, scId])
+interface Options {
+  enabled?: boolean
+}
+
+export function useVaults(poolNetwork?: PoolNetwork, scId?: ShareClassId, options?: Options) {
+  const enabled = options?.enabled ?? true
+  const vaults$ = useMemo(() => {
+    if (!poolNetwork || !scId || !enabled) return undefined
+    return poolNetwork.vaults(scId)
+  }, [poolNetwork, scId, enabled])
   return useObservable(vaults$)
 }
 
@@ -14,10 +22,10 @@ export function useVaultDetails(vault?: Vault | null) {
   return useObservable(vaultDetails$)
 }
 
-export function useVaultsDetails(vaults?: Vault[]) {
+export function useVaultsDetails(vaults?: Vault[], options?: Options) {
+  const enabled = options?.enabled ?? true
   const vaultsDetails$ = useMemo(() => {
-    if (!vaults || vaults.length === 0) return undefined
-
+    if (!vaults || vaults.length === 0 || !enabled) return undefined
     const vaultDetails$ = vaults.map((vault) => vault.details())
     return combineLatest(vaultDetails$)
   }, [vaults])

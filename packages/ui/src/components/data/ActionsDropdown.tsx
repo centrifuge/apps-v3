@@ -1,4 +1,4 @@
-import { Button, Menu, Portal } from '@chakra-ui/react'
+import { Button, ButtonProps, Menu, Portal } from '@chakra-ui/react'
 import { ReactNode } from 'react'
 import { FiMoreVertical } from 'react-icons/fi'
 
@@ -7,23 +7,11 @@ type MenuItem = {
   element: ReactNode
 }
 
-const ActionsDropdown = ({ items }: { items: MenuItem[] }) => {
+const ActionsDropdown = ({ items, ...rest }: { items: MenuItem[] } & ButtonProps) => {
   return (
     <Menu.Root>
       <Menu.Trigger asChild>
-        <Button
-          variant="ghost"
-          size="sm"
-          _hover={{ bg: 'transparent', boxShadow: 'none' }}
-          style={{
-            width: '36px',
-            height: '36px',
-            backgroundColor: '#F6F6F6',
-            margin: '0 auto',
-            padding: '8px',
-            borderRadius: '4px',
-          }}
-        >
+        <Button variant="ghost" size="sm" _hover={{ bg: 'transparent', boxShadow: 'none' }}>
           <FiMoreVertical />
         </Button>
       </Menu.Trigger>
@@ -35,7 +23,8 @@ const ActionsDropdown = ({ items }: { items: MenuItem[] }) => {
                 key={index}
                 value={item.label}
                 _hover={{ bg: '#F9FAFB', cursor: 'pointer' }}
-                style={{ minWidth: '226px', padding: '16px' }}
+                style={{ minWidth: '200px', padding: '16px' }}
+                asChild
               >
                 {item.element}
               </Menu.Item>

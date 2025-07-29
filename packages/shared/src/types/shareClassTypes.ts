@@ -5,6 +5,8 @@ export type ShareClassWithDetails = {
   details: Awaited<ReturnType<typeof ShareClass.prototype.details>>
 }
 
+export type ShareClassDetails = Awaited<ReturnType<typeof ShareClass.prototype.details>>
+
 export type PendingAmount = Awaited<ReturnType<typeof ShareClass.prototype.pendingAmounts>>
 
 export type Holdings = Awaited<ReturnType<typeof ShareClass.prototype.balances>>

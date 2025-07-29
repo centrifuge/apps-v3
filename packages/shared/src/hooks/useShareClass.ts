@@ -3,15 +3,19 @@ import { useObservable } from './useObservable'
 import { useMemo } from 'react'
 import { PendingAmount } from '../types'
 import { map, of } from 'rxjs'
-import { useCentrifuge } from './CentrifugeContext'
 
-export function useNavPerNetwork(shareClass: ShareClass) {
-  const navPerNetwork$ = useMemo(() => shareClass.navPerNetwork(), [shareClass])
+export function useNavPerNetwork(shareClass?: ShareClass, options?: { enabled?: boolean }) {
+  const enabled = options?.enabled ?? true
+  const navPerNetwork$ = useMemo(
+    () => (enabled && shareClass ? shareClass.navPerNetwork() : undefined),
+    [shareClass, enabled]
+  )
   return useObservable(navPerNetwork$)
 }
 
-export function useHoldings(shareClass: ShareClass) {
-  const holdings$ = useMemo(() => shareClass?.balances(), [shareClass])
+export function useHoldings(shareClass?: ShareClass, options?: { enabled?: boolean }) {
+  const enabled = options?.enabled ?? true
+  const holdings$ = useMemo(() => (enabled && shareClass ? shareClass.balances() : undefined), [shareClass, enabled])
   return useObservable(holdings$)
 }
 
@@ -24,8 +28,12 @@ export function useHolding(shareClass: ShareClass, holdingId?: string) {
   return useObservable(holding$)
 }
 
-export const usePendingAmounts = (shareClass: ShareClass) => {
-  const pendingAmounts$ = useMemo(() => shareClass?.pendingAmounts(), [shareClass])
+export const usePendingAmounts = (shareClass?: ShareClass, options?: { enabled?: boolean }) => {
+  const enabled = options?.enabled ?? true
+  const pendingAmounts$ = useMemo(
+    () => (enabled && shareClass ? shareClass.pendingAmounts() : undefined),
+    [shareClass, enabled]
+  )
   return useObservable(pendingAmounts$)
 }
 
@@ -38,12 +46,26 @@ export const useGroupPendingAmountsByChain = (pendingAmounts: PendingAmount) => 
   }, [pendingAmounts])
 }
 
-export const useBalanceSheet = (shareClass: ShareClass, chainId: number) => {
-  const balanceSheet$ = useMemo(() => shareClass?.balanceSheet(chainId), [shareClass, chainId])
+export const useBalanceSheet = (shareClass?: ShareClass, chainId?: number, options?: { enabled?: boolean }) => {
+  const enabled = options?.enabled ?? true
+  const balanceSheet$ = useMemo(
+    () => (enabled && shareClass && chainId ? shareClass.balanceSheet(chainId) : undefined),
+    [shareClass, chainId, enabled]
+  )
   return useObservable(balanceSheet$)
 }
 
-export const useVaultsPerShareClass = (shareClass: ShareClass) => {
-  const vaults$ = useMemo(() => shareClass?.vaults(), [shareClass])
+export const useVaultsPerShareClass = (shareClass?: ShareClass, options?: { enabled?: boolean }) => {
+  const enabled = options?.enabled ?? true
+  const vaults$ = useMemo(() => (enabled && shareClass ? shareClass.vaults() : undefined), [shareClass, enabled])
   return useObservable(vaults$)
+}
+
+export const useBalances = (shareClass?: ShareClass, chainId?: number, options?: { enabled?: boolean }) => {
+  const enabled = options?.enabled ?? true
+  const balances$ = useMemo(
+    () => (enabled && shareClass && chainId ? shareClass.balances(chainId) : undefined),
+    [shareClass, chainId, enabled]
+  )
+  return useObservable(balances$)
 }

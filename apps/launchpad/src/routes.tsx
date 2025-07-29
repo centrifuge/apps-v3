@@ -1,22 +1,17 @@
 import { createBrowserRouter } from 'react-router-dom'
 import Root from './Root'
+import Sidebar from './layouts/Sidebar'
 import Tokenizations from '@routes/Tokenizations'
 import Investors from '@routes/Investors'
 import Account from '@routes/Account'
 import NavPage from '@routes/NavPage'
-import ApproveOrders from '@routes/orders/ApproveOrders'
-import IssueOrders from '@routes/orders/IssueOrders'
-import ApproveRedemptions from '@routes/orders/ApproveRedemptions'
-import RevokeShares from '@routes/orders/RevokeShares'
 import PoolAccess from '@routes/settings/PoolAccess'
 import PoolStructure from '@routes/settings/PoolStructure'
 import NotFound from '@routes/NotFound'
-import HeaderLayout from '@layouts/HeaderLayout'
-import AddHolding from '@routes/holdings/AddHolding'
-import DepositHolding from '@routes/holdings/DepositHolding'
-import WithdrawHolding from '@routes/holdings/WithdrawHolding'
 import Vaults from '@routes/Vaults'
 import UpdateMetadata from '@routes/UpdateMetadata'
+import Holdings from '@routes/Holdings'
+import Orders from '@routes/Orders'
 
 export const routes = createBrowserRouter([
   {
@@ -24,51 +19,41 @@ export const routes = createBrowserRouter([
     element: <Root />,
     children: [
       {
-        element: <HeaderLayout />,
+        element: <Sidebar />,
         children: [
-          { index: true, element: <Tokenizations />, handle: { hasSettings: false, hasTabs: true } },
-          { path: 'investors', element: <Investors />, handle: { hasSettings: false, hasTabs: true } },
-          { path: 'account/:poolId', element: <Account />, handle: { hasSettings: false, hasTabs: true } },
-          { path: 'nav/:shareClassId/:poolId', element: <NavPage />, handle: { hasSettings: false, hasTabs: false } },
-          { path: 'orders/:poolId/approve', element: <ApproveOrders />, handle: { hasSettings: false, hasTabs: true } },
-          { path: 'orders/:poolId/issue', element: <IssueOrders />, handle: { hasSettings: false, hasTabs: true } },
+          // Public pool list
+          { index: true, element: <Tokenizations /> },
+
+          // All dynamic routes under /:poolId/:shareClassId
           {
-            path: 'orders/:poolId/approveRedeem',
-            element: <ApproveRedemptions />,
-            handle: { hasSettings: false, hasTabs: true },
+            path: 'pool/:poolId/:shareClassId/*',
+            children: [
+              { index: true, element: <Tokenizations /> },
+
+              { path: 'investors', element: <Investors /> },
+              { path: 'account', element: <Account /> },
+              { path: 'nav', element: <NavPage /> },
+
+              // Orders
+              { path: 'orders', element: <Orders /> },
+
+              // Settings
+              { path: 'settings/poolAccess', element: <PoolAccess /> },
+              { path: 'settings/poolStructure', element: <PoolStructure /> },
+
+              // Holdings
+              { path: 'holdings', element: <Holdings /> },
+
+              // Vaults & Metadata
+              { path: 'vaults', element: <Vaults /> },
+              { path: 'updateMetadata', element: <UpdateMetadata /> },
+
+              // fallback for truly unknown nested paths
+              { path: '*', element: <NotFound /> },
+            ],
           },
-          {
-            path: 'orders/:poolId/revokeRedeem',
-            element: <RevokeShares />,
-            handle: { hasSettings: false, hasTabs: true },
-          },
-          {
-            path: 'settings/:poolId/poolAccess',
-            element: <PoolAccess />,
-            handle: { hasSettings: false, hasTabs: false },
-          },
-          {
-            path: 'settings/:poolId/poolStructure',
-            element: <PoolStructure />,
-            handle: { hasSettings: false, hasTabs: false },
-          },
-          { path: 'holdings/:poolId/add', element: <AddHolding />, handle: { hasSettings: false, hasTabs: true } },
-          {
-            path: 'holdings/:poolId/deposit/:holdingId',
-            element: <DepositHolding />,
-            handle: { hasSettings: false, hasTabs: true },
-          },
-          {
-            path: 'holdings/:poolId/withdraw/:holdingId',
-            element: <WithdrawHolding />,
-            handle: { hasSettings: false, hasTabs: true },
-          },
-          { path: 'vaults/:poolId', element: <Vaults />, handle: { hasSettings: false, hasTabs: false } },
-          {
-            path: 'updateMetadata/:poolId',
-            element: <UpdateMetadata />,
-            handle: { hasSettings: false, hasTabs: false },
-          },
+
+          // Global 404
           { path: '*', element: <NotFound /> },
         ],
       },
