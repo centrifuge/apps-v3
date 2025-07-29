@@ -9,7 +9,7 @@ export const SummaryBox = ({
   infoText,
 }: {
   title: string
-  summaryItems: { label: string; balance: Balance }[]
+  summaryItems: { label: string; balance: Balance; currency: string }[]
   infoText: string
 }) => {
   return (
@@ -23,7 +23,7 @@ export const SummaryBox = ({
               <Heading color="gray.500" size="sm">
                 {item.label}
               </Heading>
-              <Text>{formatUIBalance(item.balance)}</Text>
+              <Text>{formatUIBalance(item.balance, { currency: item.currency })}</Text>
             </Flex>
           ))}
         </Stack>

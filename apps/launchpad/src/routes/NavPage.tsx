@@ -1,76 +1,51 @@
-import { useEffect, useMemo } from 'react'
-import { useParams } from 'react-router'
-import z from 'zod'
-import { createBalanceSchema, Form, safeParse, SubmitButton, useForm } from '@centrifuge/forms'
-import { Box, Card, Container, Flex, Grid, GridItem, Heading, Text } from '@chakra-ui/react'
-import { formatBalance, formatBalanceToString, useCentrifugeTransaction, useNavPerNetwork } from '@centrifuge/shared'
+import { useMemo } from 'react'
+import { createBalanceSchema, Form, SubmitButton, useForm } from '@centrifuge/forms'
+import { Box, Card, Flex, Grid, GridItem, Heading, Text } from '@chakra-ui/react'
+import { formatUIBalance, useCentrifugeTransaction, useNavPerNetwork, useVaultsDetails } from '@centrifuge/shared'
 import { NavForm } from '@components/nav/NavForm'
 import { NavHoldings } from '@components/nav/NavHoldings'
-import { usePoolProvider } from '@contexts/PoolProvider'
 import { Price } from '@centrifuge/sdk'
+import { useSelectedPool } from '@contexts/SelectedPoolProvider'
 
 export default function NavPage() {
-  const { shareClassId } = useParams()
-  const { poolDetails, shareClass, vaultsDetails } = usePoolProvider()
   const { execute, isPending } = useCentrifugeTransaction()
-  const shareClassDetails = useMemo(() => shareClass?.details, [shareClass])
-  const vaultDetails = useMemo(
-    () => vaultsDetails?.find((vault) => vault.shareClass.id.raw === shareClassId),
-    [vaultsDetails, shareClassId]
-  )
-  const { data: networksNavs } = vaultDetails?.shareClass
-    ? useNavPerNetwork(vaultDetails.shareClass)
-    : { data: undefined }
+  const { poolDetails, shareClass, shareClassDetails, vaults } = useSelectedPool()
+  const { data: vaultsDetails } = useVaultsDetails(vaults, { enabled: !!vaults })
+
+  const shareClassId = shareClass?.id
   const poolCurrencySymbol = poolDetails?.currency.symbol ?? ''
   const poolCurrencyDecimals = poolDetails?.currency.decimals ?? 18
 
-  function updateSharePrice(pricePerShare: Price) {
-    if (!shareClass?.shareClass || !pricePerShare) return
-    execute(shareClass.shareClass.updateSharePrice(pricePerShare))
-  }
+  const vaultDetails = useMemo(
+    () => vaultsDetails?.find((vault) => vault.shareClass.id.toString() === shareClassId?.toString()),
+    [vaultsDetails, shareClassId]
+  )
 
-  const schema = z.object({
-    currentNav: createBalanceSchema(poolCurrencyDecimals).optional(),
-    currentTokenPrice: createBalanceSchema(poolCurrencyDecimals).optional(),
-    newNav: createBalanceSchema(poolCurrencyDecimals).optional(),
-    newTokenPrice: createBalanceSchema(poolCurrencyDecimals),
-  })
+  const { data: networksNavs } = useNavPerNetwork(vaultDetails?.shareClass, { enabled: !!vaultDetails?.shareClass })
 
+  // TODO: add schema for price which is different from Balance
   const form = useForm({
-    schema,
     defaultValues: {
-      currentNav: '',
-      currentTokenPrice: '',
-      newNav: '',
       newTokenPrice: '',
     },
     mode: 'onChange',
     onSubmit: (values) => {
-      updateSharePrice(values.newTokenPrice)
+      if (!shareClass || !values.newTokenPrice) return
+      const tokenPrice = Price.fromFloat(values.newTokenPrice)
+      execute(shareClass.updateSharePrice(tokenPrice))
     },
     onSubmitError: (error) => console.error('Nav form submission error:', error),
   })
 
-  const { watch, setValue } = form
-  const [currentTokenPrice, newTokenPrice] = watch(['currentTokenPrice', 'newTokenPrice'])
-
-  const parsedCurrentTokenPrice = useMemo(
-    () => safeParse(schema.shape.currentTokenPrice, currentTokenPrice) ?? 0,
-    [currentTokenPrice]
-  )
-  const parsedNewTokenPrice = useMemo(() => safeParse(schema.shape.newTokenPrice, newTokenPrice) ?? 0, [newTokenPrice])
-
-  useEffect(() => {
-    if (!shareClassDetails) return
-    setValue('currentNav', formatBalanceToString(shareClassDetails.nav))
-    setValue('currentTokenPrice', formatBalanceToString(shareClassDetails.pricePerShare))
-  }, [shareClassDetails])
+  const { watch } = form
+  const [newTokenPrice] = watch(['newTokenPrice'])
+  const tokenPrice = newTokenPrice ? Price.fromFloat(newTokenPrice) : 0
 
   return (
     <Form form={form}>
       <Flex alignItems="center" justifyContent="space-between" mb={4}>
         <Heading size="lg">Update NAV</Heading>
-        <SubmitButton colorPalette="yellow" size="sm" disabled={isPending}>
+        <SubmitButton colorPalette="yellow" size="sm" disabled={isPending || !newTokenPrice}>
           Save Changes
         </SubmitButton>
       </Flex>
@@ -82,12 +57,20 @@ export default function NavPage() {
               <NavHoldings networksNavs={networksNavs} />
             </GridItem>
             <GridItem colSpan={1} rowSpan={1}>
-              <NavHoldings networksNavs={networksNavs} />
+              <NavHoldings networksNavs={networksNavs} withNewNav />
             </GridItem>
           </Grid>
           <Box border="1px solid" borderColor="gray.200" backgroundColor="gray.200" borderRadius="sm" p={2} mt={6}>
             <Text fontSize="xs" textAlign="center">
-              {`This action will change the token price from ${formatBalance(parsedCurrentTokenPrice, poolCurrencySymbol, 2)} to ${formatBalance(parsedNewTokenPrice, poolCurrencySymbol, 2)}. Token prices will be propagated to all networks JTRSY is deployed to.`}
+              {`This action will change the token price from ${formatUIBalance(shareClassDetails?.pricePerShare ?? 0, {
+                currency: poolCurrencySymbol,
+                precision: 2,
+                tokenDecimals: poolCurrencyDecimals,
+              })} to ${formatUIBalance(tokenPrice, {
+                currency: poolCurrencySymbol,
+                precision: 2,
+                tokenDecimals: poolCurrencyDecimals,
+              })}. Token prices will be propagated to all networks JTRSY is deployed to.`}
             </Text>
           </Box>
         </Card.Body>

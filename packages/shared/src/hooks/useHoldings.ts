@@ -2,13 +2,13 @@ import { useMemo } from 'react'
 import { useObservable } from './useObservable'
 import { useCentrifuge } from './CentrifugeContext'
 
-export const useAssets = (spokeChainId: number, hubChainId?: number) => {
+export const useAssets = (spokeChainId?: number, hubChainId?: number, enabled?: boolean) => {
   const centrifuge = useCentrifuge()
 
   const asset$ = useMemo(() => {
-    if (!spokeChainId) return undefined
+    if (!spokeChainId || !enabled) return undefined
     return centrifuge.assets(Number(spokeChainId), Number(hubChainId))
-  }, [spokeChainId, hubChainId])
+  }, [spokeChainId, hubChainId, enabled])
 
   return useObservable(asset$)
 }

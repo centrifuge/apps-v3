@@ -100,30 +100,27 @@ export function TransactionToasts() {
             break
           }
           case 'failed': {
-            if (activeToastIds.current[tx.id] && !processedTransactions.current.has(txKey)) {
+            if (!processedTransactions.current.has(txKey)) {
               processedTransactions.current.add(txKey)
 
               deferToastOperation(() => {
-                const toastIdToUpdate = activeToastIds.current[tx.id]
-                if (toastIdToUpdate) {
-                  const reason = tx.failedReason || tx.error?.shortMessage || ''
-                  const message = `Transaction failed${reason ? `: ${reason}` : ''}`
-                  const txHash = (tx.result?.transactionHash as string) || tx.hash
-
-                  toaster.dismiss(toastIdToUpdate)
-
-                  setTimeout(() => {
-                    const newToastId = toaster.create({
-                      title: tx.title,
-                      description: txHashLink(message, txHash),
-                      type: 'error',
-                      duration: 60_000,
-                      closable: true,
-                    })
-
-                    activeToastIds.current[tx.id] = newToastId
-                  }, 100)
+                const oldId = activeToastIds.current[tx.id]
+                if (oldId) {
+                  toaster.dismiss(oldId)
                 }
+
+                const reason = tx.failedReason ?? tx.error?.shortMessage ?? tx.error?.message ?? ''
+                const msg = `Transaction failed${reason ? `: ${reason}` : ''}`
+                const txHash = (tx.result?.transactionHash as string) || tx.hash
+
+                const newId = toaster.create({
+                  title: tx.title,
+                  description: txHashLink(msg, txHash),
+                  type: 'error',
+                  duration: 60_000,
+                  closable: true,
+                })
+                activeToastIds.current[tx.id] = newId
               })
             }
             break

@@ -2,21 +2,17 @@ import { Balance } from '@centrifuge/sdk'
 import { Card, NetworkIcon } from '@centrifuge/ui'
 import { Box, Flex, Grid, Heading, Separator, Stack, Text } from '@chakra-ui/react'
 import { useMemo } from 'react'
-import {
-  formatUIBalance,
-  formatBalanceToString,
-  PoolDetails,
-  ShareClassWithDetails,
-  useNavPerNetwork,
-} from '@centrifuge/shared'
+import { formatUIBalance, useNavPerNetwork } from '@centrifuge/shared'
 import { FaRegChartBar } from 'react-icons/fa'
 import { Orders } from './Orders'
-import { PoolHoldings } from './PoolHoldings'
+import { useSelectedPool } from '@contexts/SelectedPoolProvider'
 
-export function AccountPage({ sc, poolDetails }: { sc: ShareClassWithDetails; poolDetails: PoolDetails }) {
-  const { data: navPerNetwork } = useNavPerNetwork(sc.shareClass)
-  const decimals = poolDetails?.currency.decimals
-  const poolCurrencySymbol = poolDetails?.currency.symbol
+export function AccountPage() {
+  const { shareClass, poolDetails } = useSelectedPool()
+  const { data: navPerNetwork } = useNavPerNetwork(shareClass, { enabled: !!shareClass })
+
+  const decimals = poolDetails?.currency.decimals ?? 18
+  const poolCurrencySymbol = poolDetails?.currency.symbol ?? 'USD'
 
   const { amounts } = useMemo(() => {
     const initialTotals = {
@@ -113,11 +109,10 @@ export function AccountPage({ sc, poolDetails }: { sc: ShareClassWithDetails; po
       <Stack mt={8} gap={2}>
         <Heading size="sm">Orders</Heading>
         <Grid templateColumns="repeat(2, 1fr)" gap={4}>
-          <Orders title="Investments" shareClass={sc} isInvestment poolCurrencySymbol={poolCurrencySymbol} />
-          <Orders title="Redemptions" shareClass={sc} poolCurrencySymbol={poolCurrencySymbol} />
+          <Orders title="Investments" isInvestment />
+          <Orders title="Redemptions" />
         </Grid>
       </Stack>
-      <PoolHoldings poolDecimals={decimals} shareClass={sc.shareClass} />
     </Box>
   )
 }

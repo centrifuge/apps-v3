@@ -1,5 +1,5 @@
-import { Stack, Text, VStack } from '@chakra-ui/react'
-import { truncateAddress, useAddress, usePools, usePoolsByManager } from '@centrifuge/shared'
+import { Text, VStack } from '@chakra-ui/react'
+import { useAddress, usePools } from '@centrifuge/shared'
 import { PoolOverviewTable } from '@components/tokenizations/PoolOverviewTable'
 import { Loader } from '@centrifuge/ui'
 
