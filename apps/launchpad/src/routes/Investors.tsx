@@ -63,6 +63,8 @@ export default function Investors() {
     },
   })
 
+  if (!poolId) return <Text>No pool selected</Text>
+
   return (
     <Form form={form}>
       <Grid templateColumns={['1fr', '1fr 1fr']} justifyContent="space-between" alignItems="center">

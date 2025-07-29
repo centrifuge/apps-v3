@@ -9,11 +9,10 @@ import { useSelectedPool } from '@contexts/SelectedPoolProvider'
 
 export default function NavPage() {
   const { execute, isPending } = useCentrifugeTransaction()
-  const { poolDetails, shareClass, vaults } = useSelectedPool()
+  const { poolDetails, shareClass, shareClassDetails, vaults } = useSelectedPool()
   const { data: vaultsDetails } = useVaultsDetails(vaults, { enabled: !!vaults })
 
-  const shareClassId = shareClass?.details.id
-  const shareClassDetails = shareClass?.details
+  const shareClassId = shareClass?.id
   const poolCurrencySymbol = poolDetails?.currency.symbol ?? ''
   const poolCurrencyDecimals = poolDetails?.currency.decimals ?? 18
 
@@ -30,9 +29,9 @@ export default function NavPage() {
     },
     mode: 'onChange',
     onSubmit: (values) => {
-      if (!shareClass?.shareClass || !values.newTokenPrice) return
+      if (!shareClass || !values.newTokenPrice) return
       const tokenPrice = Price.fromFloat(values.newTokenPrice)
-      execute(shareClass.shareClass.updateSharePrice(tokenPrice))
+      execute(shareClass.updateSharePrice(tokenPrice))
     },
     onSubmitError: (error) => console.error('Nav form submission error:', error),
   })
