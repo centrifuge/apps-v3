@@ -3,13 +3,13 @@ import { Box, Flex, Text } from '@chakra-ui/react'
 import { usePoolsContext } from '@contexts/usePoolsContext'
 
 export function PoolDetailsSummary() {
-  const { shareClass } = usePoolsContext()
+  const { shareClass, poolTVL } = usePoolsContext()
   const apy = shareClass?.details.apyPercentage?.toString() ?? '0'
 
   const items = [
     {
       label: 'TVL (USD)',
-      value: '450,000,000',
+      value: poolTVL ?? 'unknown',
     },
     {
       label: 'Token price (USD)',
