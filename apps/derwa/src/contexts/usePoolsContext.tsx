@@ -1,22 +1,32 @@
 import { createContext, ReactNode, useContext, useEffect, useRef, useState } from 'react'
 import { Pool, PoolId, PoolNetwork, ShareClassId } from '@centrifuge/sdk'
-import { PoolDetails, ShareClassWithDetails, usePoolDetails, usePoolNetworks, usePoolsQuery } from '@centrifuge/shared'
+import {
+  Holdings,
+  PoolDetails,
+  ShareClassWithDetails,
+  useHoldings,
+  usePoolDetails,
+  usePoolNetworks,
+  usePoolsQuery,
+} from '@centrifuge/shared'
 import { useParams } from 'react-router-dom'
 import { useChainId } from 'wagmi'
 
 const PoolsContext = createContext<
   | {
+      holdings?: Holdings
+      isLoading: boolean
+      isNetworksLoading: boolean
+      isPoolDetailsLoading: boolean
+      isHoldingsLoading: boolean
+      network: PoolNetwork | undefined
+      networks: PoolNetwork[] | undefined
       pools: Pool[] | undefined
       poolDetails: PoolDetails | undefined
       selectedPoolId: PoolId | undefined
-      setSelectedPoolId: (poolId: PoolId) => void
-      isLoading: boolean
-      isPoolDetailsLoading: boolean
-      network: PoolNetwork | undefined
-      networks: PoolNetwork[] | undefined
-      isNetworksLoading: boolean
       shareClass: ShareClassWithDetails | undefined
       shareClassId: ShareClassId | undefined
+      setSelectedPoolId: (poolId: PoolId) => void
     }
   | undefined
 >(undefined)
@@ -30,12 +40,12 @@ export const PoolsProvider = ({ children }: { children: ReactNode }) => {
   const currentPagePoolId = pools?.find((pool) => pool.id.toString() === poolId)?.id
 
   const { data: poolDetails, isLoading: isPoolDetailsLoading } = usePoolDetails(selectedPoolId as PoolId)
-  const { data: networks, isLoading: isNetworksLoading } = usePoolNetworks(poolDetails?.id)
-  const connectedChainId = useChainId()
-
   // In MVP we assume one share class per pool
   const shareClass = poolDetails?.shareClasses?.[0]
   const shareClassId = shareClass?.details.id
+  const { data: holdings, isLoading: isHoldingsLoading } = useHoldings(shareClass?.shareClass)
+  const { data: networks, isLoading: isNetworksLoading } = usePoolNetworks(poolDetails?.id)
+  const connectedChainId = useChainId()
 
   useEffect(() => {
     if (networks?.length && connectedChainId) {
@@ -63,17 +73,19 @@ export const PoolsProvider = ({ children }: { children: ReactNode }) => {
   return (
     <PoolsContext.Provider
       value={{
-        pools,
-        selectedPoolId,
-        setSelectedPoolId,
+        holdings,
+        isHoldingsLoading,
         isLoading,
-        poolDetails,
+        isNetworksLoading,
         isPoolDetailsLoading,
         network,
         networks,
-        isNetworksLoading,
+        pools,
+        poolDetails: poolDetails as PoolDetails,
+        selectedPoolId,
         shareClass,
         shareClassId,
+        setSelectedPoolId,
       }}
     >
       {children}
