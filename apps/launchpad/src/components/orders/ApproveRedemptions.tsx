@@ -1,4 +1,4 @@
-import { Holdings, useCentrifugeTransaction, usePendingAmounts } from '@centrifuge/shared'
+import { useCentrifugeTransaction, usePendingAmounts } from '@centrifuge/shared'
 import { useSelectedPool } from '@contexts/SelectedPoolProvider'
 import { Grid, VStack } from '@chakra-ui/react'
 import { useMemo } from 'react'
@@ -38,10 +38,14 @@ export const ApproveRedemptions = ({ onClose }: { onClose: () => void }) => {
         chainId: o.chainId,
         amount: o.amount,
         isSelected: false,
+        pricePerShare: shareClassDetails?.pricePerShare?.toFloat() ?? 0,
       }
       return acc
     },
-    {} as Record<string, { assetId: AssetId; chainId: number; amount: Balance; isSelected: boolean }>
+    {} as Record<
+      string,
+      { assetId: AssetId; chainId: number; amount: Balance; isSelected: boolean; pricePerShare: number }
+    >
   )
 
   const form = useForm({
@@ -103,7 +107,8 @@ export const ApproveRedemptions = ({ onClose }: { onClose: () => void }) => {
             <LiveAmountDisplay
               name={`orders.${id}.amount`}
               poolDecimals={poolCurrency?.decimals}
-              shareClassDetails={shareClassDetails}
+              calculationType="revoke"
+              pricePerShareName={`orders.${id}.pricePerShare`}
             />
           )
         },

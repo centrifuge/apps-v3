@@ -57,6 +57,6 @@ export const sumAmounts = (
       )
 }
 
-export const convertBalance = (balance: string, decimals: number) => {
+export const convertBalance = (balance: string | number, decimals: number) => {
   return Balance.fromFloat(balance, decimals)
 }

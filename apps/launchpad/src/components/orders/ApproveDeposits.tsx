@@ -124,7 +124,7 @@ export const ApproveDeposits = ({ onClose }: { onClose: () => void }) => {
           </Card>
         )
       })}
-      <Grid templateColumns={'1fr 1fr'} gap={2} mt={4}>
+      <Grid templateColumns={{ base: '1fr', md: '1fr 1fr' }} gap={2} mt={4}>
         <Button size="sm" variant="solid" colorPalette="gray" onClick={onClose} label="Cancel" />
         <Button
           size="sm"

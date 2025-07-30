@@ -7,7 +7,7 @@ import { ChainHeader } from './ChainHeader'
 import { Button, Card, ColumnDefinition } from '@centrifuge/ui'
 import { OrdersTable, TableData } from './OrdersTable'
 import { BalanceInput, Form, useForm } from '@centrifuge/forms'
-import { AssetId, Price } from '@centrifuge/sdk'
+import { AssetId, Balance, Price } from '@centrifuge/sdk'
 import { LiveAmountDisplay } from './LiveAmountDisplay'
 
 export const IssueShares = ({ onClose }: { onClose: () => void }) => {
@@ -39,13 +39,24 @@ export const IssueShares = ({ onClose }: { onClose: () => void }) => {
       acc[o.assetId.toString()] = {
         assetId: o.assetId,
         chainId: o.chainId,
-        amount: shareClassDetails?.pricePerShare ?? new Price(0),
+        amount: o.amount,
         isSelected: false,
         approvedAt: o.approvedAt,
+        pricePerShare: shareClassDetails?.pricePerShare?.toFloat() ?? 0,
       }
       return acc
     },
-    {} as Record<string, { assetId: AssetId; chainId: number; amount: Price; isSelected: boolean; approvedAt: Date }>
+    {} as Record<
+      string,
+      {
+        assetId: AssetId
+        chainId: number
+        amount: Balance
+        isSelected: boolean
+        approvedAt: Date
+        pricePerShare: number
+      }
+    >
   )
 
   const form = useForm({
@@ -60,10 +71,9 @@ export const IssueShares = ({ onClose }: { onClose: () => void }) => {
       }
 
       const assets = arr.map((o) => {
-        const balance = typeof o.amount !== 'string' ? o.amount.toString() : o.amount
         return {
           assetId: o.assetId,
-          issuePricePerShare: new Price(convertBalance(balance, poolCurrency?.decimals ?? 18).toString()),
+          issuePricePerShare: new Price(convertBalance(o.pricePerShare, poolCurrency?.decimals ?? 18).toString()),
         }
       })
 
@@ -87,19 +97,17 @@ export const IssueShares = ({ onClose }: { onClose: () => void }) => {
       },
       {
         header: 'Issue with NAV per share',
-        accessor: 'newAmount',
+        accessor: 'pricePerShare',
         render: ({ id }: { id: string }) => {
           return (
             <BalanceInput
-              name={`orders.${id}.amount`}
-              buttonLabel="MAX"
-              decimals={poolCurrency?.decimals}
+              name={`orders.${id}.pricePerShare`}
+              buttonLabel="Latest"
               onButtonClick={() => {
                 const originalOrder = orders.find((o) => o.assetId.toString() === id)
+                const raw = shareClassDetails?.pricePerShare?.toFloat() ?? 0
                 if (originalOrder) {
-                  setValue(`orders.${id}.amount`, originalOrder.amount, {
-                    shouldDirty: true,
-                  })
+                  setValue(`orders.${id}.pricePerShare`, raw)
                 }
               }}
             />
@@ -110,7 +118,14 @@ export const IssueShares = ({ onClose }: { onClose: () => void }) => {
         header: `Issue new shares (${shareClassDetails?.symbol})`,
         accessor: 'approvedAmount',
         render: ({ id }: { id: string }) => {
-          return <LiveAmountDisplay name={`orders.${id}.amount`} poolDecimals={poolCurrency?.decimals} />
+          return (
+            <LiveAmountDisplay
+              name={`orders.${id}.amount`}
+              poolDecimals={poolCurrency?.decimals}
+              calculationType="issue"
+              pricePerShareName={`orders.${id}.pricePerShare`}
+            />
+          )
         },
       },
     ]
@@ -131,7 +146,7 @@ export const IssueShares = ({ onClose }: { onClose: () => void }) => {
           </Card>
         )
       })}
-      <Grid templateColumns={'1fr 1fr'} gap={2} mt={4}>
+      <Grid templateColumns={{ base: '1fr', md: '1fr 1fr' }} gap={2} mt={4}>
         <Button size="sm" variant="solid" colorPalette="gray" onClick={onClose} label="Cancel" />
         <Button
           size="sm"

@@ -1,4 +1,4 @@
-import { formatDate, Holdings, useCentrifugeTransaction, useHoldings, usePendingAmounts } from '@centrifuge/shared'
+import { formatDate, useCentrifugeTransaction, usePendingAmounts } from '@centrifuge/shared'
 import { useSelectedPool } from '@contexts/SelectedPoolProvider'
 import { Grid, Text, VStack } from '@chakra-ui/react'
 import { useMemo } from 'react'
@@ -12,7 +12,7 @@ import { LiveAmountDisplay } from './LiveAmountDisplay'
 
 export const RevokeShares = ({ onClose }: { onClose: () => void }) => {
   const { execute, isPending } = useCentrifugeTransaction()
-  const { shareClass, poolCurrency } = useSelectedPool()
+  const { shareClass, poolCurrency, shareClassDetails } = useSelectedPool()
   const { data: pendingOrders } = usePendingAmounts(shareClass, {
     enabled: !!shareClass,
   })
@@ -42,10 +42,21 @@ export const RevokeShares = ({ onClose }: { onClose: () => void }) => {
         amount: o.amount,
         isSelected: false,
         approvedAt: o.approvedAt,
+        pricePerShare: shareClassDetails?.pricePerShare?.toFloat() ?? 0,
       }
       return acc
     },
-    {} as Record<string, { assetId: AssetId; chainId: number; amount: Balance; isSelected: boolean; approvedAt: Date }>
+    {} as Record<
+      string,
+      {
+        assetId: AssetId
+        chainId: number
+        amount: Balance
+        isSelected: boolean
+        approvedAt: Date
+        pricePerShare: number
+      }
+    >
   )
 
   const form = useForm({
@@ -60,10 +71,9 @@ export const RevokeShares = ({ onClose }: { onClose: () => void }) => {
       }
 
       const assets = arr.map((o) => {
-        const balance = typeof o.amount !== 'string' ? o.amount.toString() : o.amount
         return {
           assetId: o.assetId,
-          revokePricePerShare: new Price(convertBalance(balance, poolCurrency?.decimals ?? 18).toString()),
+          revokePricePerShare: new Price(convertBalance(o.pricePerShare, poolCurrency?.decimals ?? 18).toString()),
         }
       })
 
@@ -87,19 +97,17 @@ export const RevokeShares = ({ onClose }: { onClose: () => void }) => {
       },
       {
         header: 'Revoke with NAV per share',
-        accessor: 'newAmount',
-        render: ({ id, holding }: { id: string; holding: Holdings[number] }) => {
+        accessor: 'pricePerShare',
+        render: ({ id }: { id: string }) => {
           return (
             <BalanceInput
-              name={`orders.${id}.amount`}
-              buttonLabel="MAX"
-              decimals={poolCurrency?.decimals}
+              name={`orders.${id}.pricePerShare`}
+              buttonLabel="Latest"
               onButtonClick={() => {
                 const originalOrder = orders.find((o) => o.assetId.toString() === id)
+                const raw = shareClassDetails?.pricePerShare?.toFloat() ?? 0
                 if (originalOrder) {
-                  setValue(`orders.${id}.amount`, originalOrder.amount, {
-                    shouldDirty: true,
-                  })
+                  setValue(`orders.${id}.pricePerShare`, raw)
                 }
               }}
             />
@@ -107,10 +115,17 @@ export const RevokeShares = ({ onClose }: { onClose: () => void }) => {
         },
       },
       {
-        header: `Approve amount (${poolCurrency?.symbol})`,
+        header: `Issue new shares (${shareClassDetails?.symbol})`,
         accessor: 'approvedAmount',
         render: ({ id }: { id: string }) => {
-          return <LiveAmountDisplay name={`orders.${id}.amount`} poolDecimals={poolCurrency?.decimals} />
+          return (
+            <LiveAmountDisplay
+              name={`orders.${id}.amount`}
+              poolDecimals={poolCurrency?.decimals}
+              calculationType="issue"
+              pricePerShareName={`orders.${id}.pricePerShare`}
+            />
+          )
         },
       },
     ]
@@ -131,14 +146,14 @@ export const RevokeShares = ({ onClose }: { onClose: () => void }) => {
           </Card>
         )
       })}
-      <Grid templateColumns={'1fr 1fr'} gap={2} mt={4}>
+      <Grid templateColumns={{ base: '1fr', md: '1fr 1fr' }} gap={2} mt={4}>
         <Button size="sm" variant="solid" colorPalette="gray" onClick={onClose} label="Cancel" />
         <Button
           size="sm"
           variant="solid"
           colorPalette="yellow"
           onClick={() => form.handleSubmit()}
-          label="Approve"
+          label="Revoke"
           loading={isPending}
         />
       </Grid>
