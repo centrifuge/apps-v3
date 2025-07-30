@@ -6,5 +6,11 @@ export type CurrencyDetails = {
   decimals: number
 }
 
-export type PoolDetails = Awaited<ReturnType<typeof Pool.prototype.details>>
+export type PoolDetails = Awaited<ReturnType<typeof Pool.prototype.details>> & {
+  metadata?: {
+    pool: {
+      expenseRatio: number
+    }
+  } | null
+}
 export type VaultDetails = Awaited<ReturnType<typeof Vault.prototype.details>>
