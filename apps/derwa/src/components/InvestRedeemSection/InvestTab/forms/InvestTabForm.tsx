@@ -1,5 +1,5 @@
 import { type Dispatch, type SetStateAction } from 'react'
-import type { Balance, PoolNetwork, Vault } from '@centrifuge/sdk'
+import type { Balance } from '@centrifuge/sdk'
 import { type InvestActionType, InvestAction } from '@components/InvestRedeemSection/components/defaults'
 import { InvestAmount } from '@components/InvestRedeemSection/InvestTab/forms/InvestAmount'
 // import { InvestRequirements } from '@components/InvestRedeemSection/InvestTab/forms/InvestRequirements'
