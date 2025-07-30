@@ -26,7 +26,7 @@ export function InvestorOnboardingFeedback() {
             }
           />
         </Box>
-        <Button disabled colorPalette="yellow" mt={6}>
+        <Button disabled colorPalette="yellow" mt={8}>
           Invest
         </Button>
       </Flex>

@@ -36,11 +36,11 @@ export default function PoolPage() {
       <Flex justifyContent="space-between" alignItems="center" mb={8}>
         <BackLink heading={poolDetails.metadata?.pool.name ?? 'Back to pools'} />
         <Box mt={4}>
-          <Text fontSize="12px" color="black" width="auto" textAlign="right">
+          <Text fontSize=".75rem" color="black" width="auto" textAlign="right">
             Your current holdings in {poolDetails?.metadata?.pool.name}
           </Text>
           <Flex align={'flex-end'} justifyContent="flex-end">
-            <Text fontSize="24px" fontWeight="bold" textAlign="right">
+            <Text fontSize="xl" fontWeight="bold" textAlign="right">
               {formatBalance(investment?.shareBalance ?? 0, investment?.shareCurrency.symbol ?? '', 0)}
             </Text>
           </Flex>
@@ -68,7 +68,7 @@ function BackLink({ heading }: { heading: string }) {
     <Link to={routePaths.home}>
       <Flex alignItems="center">
         <IoArrowBack />
-        <Heading size="2xl" ml={8}>
+        <Heading size="xl" ml={8}>
           {heading}
         </Heading>
       </Flex>

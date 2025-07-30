@@ -41,7 +41,7 @@ export function PoolDetailsSummary() {
             <Text fontSize="12px" color="black" width="auto" textAlign={{ base: 'center', md: 'left' }}>
               {item.label}
             </Text>
-            <Text fontSize="24px" fontWeight="bold" textAlign={{ base: 'center', md: 'left' }}>
+            <Text fontSize="xl" fontWeight="bold" textAlign={{ base: 'center', md: 'left' }}>
               {item.value}
             </Text>
           </Box>

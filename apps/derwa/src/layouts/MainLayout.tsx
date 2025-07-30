@@ -10,8 +10,8 @@ const MainLayout = memo(() => {
     <Box bg="white">
       <Box minH="100vh" bgImage={`url(${mainBg})`} bgRepeat="no-repeat" bgSize="cover" backgroundPosition="center">
         <Box maxW={{ base: '95vw', xl: '80vw' }} mx="auto" px={{ base: 4, md: 8 }} py={{ base: 4, md: 8 }}>
-          <Box display="flex" justifyContent="space-between" alignItems="center">
-            <Box width={40} mb={8}>
+          <Box display="flex" justifyContent="space-between" alignItems="center" mb={8}>
+            <Box width={32}>
               <LogoCentrifugeText fill="text-primary" />
             </Box>
             <WalletButton />
