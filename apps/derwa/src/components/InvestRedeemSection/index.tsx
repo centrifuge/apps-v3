@@ -96,7 +96,7 @@ function VaultGuard({ isInvestorWhiteListed, isLoading, tab: Tab }: VaultGuardPr
 
   if (isVaultGuardLoading) {
     return (
-      <Box height="100%" display="flex" alignItems="center" justifyContent="center">
+      <Box height="100%" minH="210px" display="flex" alignItems="center" justifyContent="center">
         <Spinner size="lg" color="black.solid" />
       </Box>
     )
