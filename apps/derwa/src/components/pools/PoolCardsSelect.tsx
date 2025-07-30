@@ -7,6 +7,7 @@ import { Card, ValueText } from '@centrifuge/ui'
 import { routePaths } from '@routes/routePaths'
 import { PoolCardsSelectSkeleton } from '@components/Skeletons/PoolCardsSelectSkeleton'
 import { RatingPill } from '@components/RatingPill'
+import { getPoolTVL } from '@utils/getPoolTVL'
 
 interface PoolSelectorProps {
   poolIds: PoolId[]
@@ -35,7 +36,7 @@ export const PoolCardsSelect = ({ poolIds, setSelectedPoolId }: PoolSelectorProp
       <Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' }} gap="6">
         {displayPools.map((pool) => (
           <Link to={`${routePaths.poolPage}/${pool.id}`} onClick={pool.setId} key={pool.id}>
-            <PoolCard poolDetails={pool.pool} />
+            <PoolCard poolDetails={pool.pool as PoolDetails} />
           </Link>
         ))}
       </Grid>
@@ -44,7 +45,7 @@ export const PoolCardsSelect = ({ poolIds, setSelectedPoolId }: PoolSelectorProp
 }
 
 function PoolCard({ poolDetails }: { poolDetails: PoolDetails }) {
-  const tvl = '450,000,000'
+  const poolTVL = getPoolTVL(poolDetails as PoolDetails | undefined)
   const poolMetadata = poolDetails.metadata?.pool
   const iconUri = poolMetadata?.icon?.uri ?? ''
   const shareClassId = Object.keys(poolDetails.metadata?.shareClasses ?? {})[0]
@@ -58,7 +59,7 @@ function PoolCard({ poolDetails }: { poolDetails: PoolDetails }) {
       </Flex>
       <Separator my={4} />
       <Grid templateColumns="repeat(2, 1fr)" gap={4}>
-        <ValueText label="TVL(USDC)" value={tvl} />
+        <ValueText label="TVL(USD)" value={poolTVL} />
         <ValueText label="APY" value={shareClassDetails?.apyPercentage ?? '0%'} />
       </Grid>
       <Separator my={4} />

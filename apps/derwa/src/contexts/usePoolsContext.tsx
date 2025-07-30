@@ -1,7 +1,6 @@
 import { createContext, ReactNode, useContext, useEffect, useRef, useState } from 'react'
-import { Balance, Pool, PoolId, PoolNetwork, ShareClassId } from '@centrifuge/sdk'
+import { Pool, PoolId, PoolNetwork, ShareClassId } from '@centrifuge/sdk'
 import {
-  formatBalance,
   Holdings,
   PoolDetails,
   ShareClassWithDetails,
@@ -12,6 +11,7 @@ import {
 } from '@centrifuge/shared'
 import { useParams } from 'react-router-dom'
 import { useChainId } from 'wagmi'
+import { getPoolTVL } from '@utils/getPoolTVL'
 
 const PoolsContext = createContext<
   | {
@@ -47,16 +47,8 @@ export const PoolsProvider = ({ children }: { children: ReactNode }) => {
   const { data: holdings, isLoading: isHoldingsLoading } = useHoldings(shareClass?.shareClass)
   const { data: networks, isLoading: isNetworksLoading } = usePoolNetworks(poolDetails?.id)
   const connectedChainId = useChainId()
-  const zeroBalance: Balance = new Balance(0n, 18)
 
-  const poolTvlBalance =
-    poolDetails?.shareClasses.reduce((acc, shareClass) => {
-      const { totalIssuance, pricePerShare } = shareClass.details
-      const tvl = totalIssuance.mul(pricePerShare)
-      return acc.add(tvl)
-    }, zeroBalance) ?? zeroBalance
-
-  const poolTVL = formatBalance(poolTvlBalance, '', 0)
+  const poolTVL = getPoolTVL(poolDetails as PoolDetails | undefined)
 
   useEffect(() => {
     if (networks?.length && connectedChainId) {
