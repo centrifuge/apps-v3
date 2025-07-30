@@ -35,11 +35,10 @@ export const PoolsProvider = ({ children }: { children: ReactNode }) => {
   const { data: pools, isLoading } = usePoolsQuery()
   const [network, setNetwork] = useState<PoolNetwork | undefined>(undefined)
   const [selectedPoolId, setSelectedPoolId] = useState<PoolId | undefined>(undefined)
-
   const { poolId } = useParams()
   const currentPagePoolId = pools?.find((pool) => pool.id.toString() === poolId)?.id
-
   const { data: poolDetails, isLoading: isPoolDetailsLoading } = usePoolDetails(selectedPoolId as PoolId)
+
   // In MVP we assume one share class per pool
   const shareClass = poolDetails?.shareClasses?.[0]
   const shareClassId = shareClass?.details.id

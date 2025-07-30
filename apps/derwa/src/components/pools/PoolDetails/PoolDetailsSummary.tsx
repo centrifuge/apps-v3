@@ -1,6 +1,30 @@
+import { formatBigintToString } from '@centrifuge/shared'
 import { Box, Flex, Text } from '@chakra-ui/react'
+import { usePoolsContext } from '@contexts/usePoolsContext'
 
-export const PoolDetailsSummary = ({ items }: { items: { label: string; value: string }[] }) => {
+export function PoolDetailsSummary() {
+  const { shareClass } = usePoolsContext()
+  const apy = shareClass?.details.apyPercentage?.toString() ?? '0'
+
+  const items = [
+    {
+      label: 'TVL (USD)',
+      value: '450,000,000',
+    },
+    {
+      label: 'Token price (USD)',
+      value: formatBigintToString(
+        shareClass?.details.pricePerShare.toBigInt() ?? 0n,
+        shareClass?.details.pricePerShare.decimals ?? 6,
+        2
+      ),
+    },
+    {
+      label: 'APY',
+      value: `${apy}%`,
+    },
+  ]
+
   return (
     <Box bg="bg-primary" padding={6} borderRadius={10} border="1px solid" borderColor="border-primary" shadow="xs">
       <Flex
