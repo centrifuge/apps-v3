@@ -281,7 +281,7 @@ export function BalanceInput<TFieldValues extends FieldValues = FieldValues>(pro
       <Field.ErrorText>{errorMessage}</Field.ErrorText>
     </Field.Root>
   ) : (
-    <Field.Root>
+    <Field.Root invalid={isError}>
       {label && <Field.Label>{label}</Field.Label>}
       <Group attached border="1px solid" borderColor={isError ? 'red.500' : 'gray.200'} borderRadius="md">
         <ChakraInput

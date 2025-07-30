@@ -53,6 +53,7 @@ export const HoldingsForm = ({
         await execute(balanceSheet?.withdraw(selectedHolding.assetId, address, amount))
         setOpenModal({ ...openModal, withdraw: false })
       } else {
+        console.log('Depositing', amount, selectedHolding)
         await execute(balanceSheet?.deposit(selectedHolding.assetId, amount))
         setOpenModal({ ...openModal, deposit: false })
       }

@@ -76,6 +76,7 @@ export const Select = ({
                 _selected={{ bg: withIndicator ? 'transparent' : 'gray.100' }}
                 _focus={{ bg: withIndicator ? 'transparent' : 'gray.100' }}
                 _active={{ bg: withIndicator ? 'transparent' : 'gray.100' }}
+                color="black"
               >
                 {item.children ?? item.label}
                 {withIndicator && <ChakraSelect.ItemIndicator />}

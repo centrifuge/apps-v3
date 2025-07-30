@@ -1,6 +1,6 @@
 import React from 'react'
-import { Button, Table, useToken } from '@chakra-ui/react'
-import { FiCode } from 'react-icons/fi'
+import { Table, Icon, Box } from '@chakra-ui/react'
+import { FiChevronUp, FiChevronDown, FiCode } from 'react-icons/fi'
 
 export type ColumnDefinition<RowType> = {
   header: string
@@ -30,121 +30,106 @@ export const DataTable = <RowType extends { id?: string | number; actions?: (row
   pageSize = Infinity,
   page = 1,
 }: DataTableProps<RowType>) => {
-  const [backgroundSecondary] = useToken('colors', 'border-primary')
-  const [orderBy, setOrderBy] = React.useState<Record<string, OrderBy>>({})
-  const [currentSortKey, setCurrentSortKey] = React.useState('')
+  const [sortConfig, setSortConfig] = React.useState<{ key: string; direction: OrderBy } | null>(null)
 
-  const updateSortOrder = (sortKey: ColumnDefinition<RowType>['sortKey']) => {
+  const handleSort = (sortKey?: string) => {
     if (!sortKey) return
-    const updatedOrderBy = orderBy[sortKey] === 'desc' ? 'asc' : 'desc'
-    setOrderBy({ [sortKey]: updatedOrderBy })
-    setCurrentSortKey(sortKey)
+
+    let direction: OrderBy = 'asc'
+    if (sortConfig?.key === sortKey && sortConfig.direction === 'asc') {
+      direction = 'desc'
+    }
+    setSortConfig({ key: sortKey, direction })
   }
 
   const sortedAndPaginatedData = React.useMemo(() => {
-    const sortedData = sorter([...data], orderBy[currentSortKey], currentSortKey)
+    const sortedData = sorter([...data], sortConfig?.direction, sortConfig?.key)
     return sortedData.slice((page - 1) * pageSize, page * pageSize)
-  }, [orderBy, data, currentSortKey, page, pageSize])
+  }, [data, sortConfig, page, pageSize])
 
   return (
-    <Table.ScrollArea borderWidth="1px">
-      <Table.Root
-        size={size}
-        style={{
-          border: `1px solid ${backgroundSecondary}`,
-        }}
-      >
+    // Chakra UI Table has a bug where the border is not applied to the table root
+    // This is a workaround to apply the border to the table root
+    <Box borderRadius="lg" border="1px solid" borderColor="border-primary" overflow="hidden">
+      <Table.Root size={size} overflow="hidden" border="none">
         <Table.Header>
-          <Table.Row
-            style={{
-              backgroundColor: TABLE_HEADER_COLOR,
-            }}
-          >
+          <Table.Row bg={TABLE_HEADER_COLOR}>
             {columns.map((col) => (
               <Table.ColumnHeader
                 key={String(col.accessor)}
-                textAlign={col.textAlign || 'start'}
+                textAlign={col.textAlign}
                 width={col.width}
-                onClick={() => updateSortOrder(col.sortKey)}
-                style={{ cursor: 'pointer' }}
+                onClick={() => handleSort(col.sortKey)}
+                cursor={col.sortKey ? 'pointer' : 'default'}
+                userSelect="none"
+                fontSize="xs"
+                color="gray.500"
+                role="group"
               >
                 {col.header}
                 {col.sortKey && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    _hover={{ bg: 'transparent', boxShadow: 'none' }}
-                    style={{
-                      color: '#82888D',
-                    }}
-                  >
-                    <FiCode
-                      style={{
-                        display: 'inline',
-                        width: '12px',
-                        height: '18px',
-                        color: '#82888D',
-                        transform: 'rotate(90deg)',
-                      }}
-                    />
-                  </Button>
+                  <>
+                    {sortConfig?.key === col.sortKey ? (
+                      <Icon
+                        as={sortConfig.direction === 'asc' ? FiChevronUp : FiChevronDown}
+                        aria-label={sortConfig.direction}
+                        ml={2}
+                        boxSize={4}
+                        color="gray.800"
+                      />
+                    ) : (
+                      <Icon
+                        as={FiCode}
+                        aria-label="Sortable"
+                        ml={2}
+                        boxSize={3}
+                        color="gray.400"
+                        transform="rotate(90deg)"
+                        opacity={0}
+                        _groupHover={{ opacity: 1 }}
+                      />
+                    )}
+                  </>
                 )}
               </Table.ColumnHeader>
             ))}
-            <Table.ColumnHeader key={'actions'} textAlign={'center'} width={'50px'} style={{ cursor: 'pointer' }}>
-              {' '}
-            </Table.ColumnHeader>
+            <Table.ColumnHeader key="actions" textAlign="end" width="50px" />
           </Table.Row>
         </Table.Header>
-
         <Table.Body>
           {sortedAndPaginatedData.map((row, rowIndex) => (
             <Table.Row key={row.id ?? rowIndex}>
-              {columns.map((col) => {
-                const rawValue = row[col.accessor]
-                return (
-                  <Table.Cell
-                    key={String(col.accessor)}
-                    textAlign={col.textAlign || 'start'}
-                    fontFamily="inter"
-                    width={col.width}
-                  >
-                    {col.render ? col.render(row) : String(rawValue ?? '')}
-                  </Table.Cell>
-                )
-              })}
-
-              <Table.Cell textAlign={'center'} width={'50px'} style={row.actions && { cursor: 'pointer' }}>
-                {row.actions ? row.actions(row) : ' '}
+              {columns.map((col) => (
+                <Table.Cell key={String(col.accessor)} textAlign={col.textAlign} width={col.width}>
+                  {col.render ? col.render(row) : String(row[col.accessor] ?? '')}
+                </Table.Cell>
+              ))}
+              <Table.Cell key="actions-cell" textAlign="end">
+                {row.actions ? row.actions(row) : null}
               </Table.Cell>
             </Table.Row>
           ))}
         </Table.Body>
       </Table.Root>
-    </Table.ScrollArea>
+    </Box>
   )
 }
 
-const sorter = <T extends Record<string, unknown>>(data: Array<T>, order: OrderBy, sortKey?: string) => {
-  if (!sortKey) return data
-  const up = order === 'asc' ? 1 : -1
-  const down = order === 'asc' ? -1 : 1
+const sorter = <T extends Record<string, unknown>>(data: Array<T>, order?: OrderBy, sortKey?: string) => {
+  if (!sortKey || !order) return data
 
-  return data.sort((a, b) => {
+  return [...data].sort((a, b) => {
     const A = a[sortKey]
     const B = b[sortKey]
-
-    if (A == null && B == null) return 0
-    if (A == null) return down
-    if (B == null) return up
-
+    if (A == null) return 1
+    if (B == null) return -1
     if (typeof A === 'number' && typeof B === 'number') {
-      return A > B ? up : down
+      return order === 'asc' ? A - B : B - A
     }
-
     const aStr = String(A).toLowerCase()
     const bStr = String(B).toLowerCase()
-
-    return aStr > bStr ? up : down
+    if (aStr < bStr) return order === 'asc' ? -1 : 1
+    if (aStr > bStr) return order === 'asc' ? 1 : -1
+    return 0
   })
 }

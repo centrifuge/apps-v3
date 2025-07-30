@@ -1,81 +1,67 @@
-import { z } from 'zod'
-import { useForm, Form, SubmitButton, useWatch } from '@centrifuge/forms'
-import { CurrencyDetails, ShareClassWithDetails, useCentrifugeTransaction } from '@centrifuge/shared'
-import { usePoolProvider } from '@contexts/PoolProvider'
-import { Loader } from '@centrifuge/ui'
-import { Container, Flex, Heading } from '@chakra-ui/react'
-import { InternalOrdersTable } from './InternalOrdersTable'
-import { modeConfig, OrderMode } from './modeConfig'
+import { Checkbox } from '@centrifuge/forms'
+import { formatUIBalance, Holdings, useHoldings } from '@centrifuge/shared'
+import { AssetId, Balance, ShareClass } from '@centrifuge/sdk'
+import { AssetIconText, AssetSymbol, ColumnDefinition, DataTable } from '@centrifuge/ui'
+import { useMemo } from 'react'
+import { Text } from '@chakra-ui/react'
 
-export default function OrdersTable({ mode }: { mode: OrderMode }) {
-  const { shareClass, poolDetails, isLoading } = usePoolProvider()
-  const poolCurrency = poolDetails?.currency
-
-  if (!shareClass?.shareClass || isLoading) {
-    return (
-      <Container>
-        <Loader />
-      </Container>
-    )
-  }
-
-  return <OrdersForm shareClass={shareClass} mode={mode} poolCurrency={poolCurrency} />
+type Item = {
+  chainId: number
+  amount: Balance
+  assetId: AssetId
 }
 
-export const OrdersForm = ({
-  mode,
+export type TableData = Item & {
+  id: string
+  holding?: Holdings[number]
+  checkboxId?: string
+  approvedAt?: Date
+}
+
+export const OrdersTable = ({
+  items,
   shareClass,
-  poolCurrency,
+  extraColumns,
 }: {
-  mode: OrderMode
-  shareClass: ShareClassWithDetails
-  poolCurrency: CurrencyDetails | undefined
+  items: Item[]
+  shareClass: ShareClass
+  extraColumns?: ColumnDefinition<TableData>[]
 }) => {
-  const { execute, isPending } = useCentrifugeTransaction()
-  const config = modeConfig[mode]
+  const { data: holdings } = useHoldings(shareClass)
 
-  const onSubmit = (values: { selectedAssets: any[] }) => {
-    if (values.selectedAssets.length === 0 || !shareClass?.shareClass) {
-      throw new Error('No assets selected or share class not found')
-    }
-    const assets = values.selectedAssets.map((asset) =>
-      config.mapAssets(asset, asset.assetDecimals ?? poolCurrency?.decimals ?? 18)
-    )
-    execute(config.executeTransaction(shareClass.shareClass, assets))
-  }
+  const data: TableData[] = useMemo(() => {
+    return items.map((item) => ({
+      ...item,
+      id: item.assetId.toString(),
+      holding: holdings?.find((h) => h.assetId.toString() === item.assetId.toString()),
+    }))
+  }, [items, holdings])
 
-  const form = useForm({
-    defaultValues: { selectedAssets: [] },
-    mode: 'onChange',
-    onSubmit,
-  })
+  //  @ts-ignore TODO: fix datatable
+  const columns: ColumnDefinition<TableData>[] = useMemo(() => {
+    return [
+      {
+        header: 'Approve',
+        render: ({ id }) => {
+          return <Checkbox name={`orders.${id}.isSelected`} />
+        },
+        width: '40px',
+      },
+      {
+        header: 'Amount',
+        accessor: 'amount',
+        render: ({ amount }) => <Text>{formatUIBalance(amount, { tokenDecimals: 18 })}</Text>,
+        width: '100px',
+      },
+      {
+        header: 'Currency',
+        accessor: 'holding',
+        render: ({ holding }) => <AssetIconText assetSymbol={holding?.asset?.symbol as AssetSymbol} boxSize="18px" />,
+        width: '100px',
+      },
+      ...(extraColumns ?? []),
+    ]
+  }, [extraColumns])
 
-  const watch = useWatch({ control: form.control, name: 'selectedAssets' })
-  const isDisabled = watch.length === 0
-
-  if (!shareClass?.shareClass) return <Loader />
-
-  return (
-    <Container>
-      <Form form={form}>
-        <Flex alignItems="center" justifyContent="space-between">
-          <Heading size="md">{config.headingText}</Heading>
-          <SubmitButton
-            colorPalette="yellow"
-            loading={isPending}
-            onSubmit={() => form.handleSubmit()}
-            disabled={isDisabled}
-          >
-            {config.buttonText}
-          </SubmitButton>
-        </Flex>
-        <InternalOrdersTable
-          mode={mode}
-          shareClass={shareClass.shareClass}
-          pricePerShare={shareClass?.details.pricePerShare}
-          shareClassSymbol={shareClass?.details.symbol}
-        />
-      </Form>
-    </Container>
-  )
+  return <DataTable data={data} columns={columns} />
 }
