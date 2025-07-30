@@ -1,11 +1,11 @@
 import { Balance, PoolId } from '@centrifuge/sdk'
 import { formatBalance, formatDate, useAllPoolDetails } from '@centrifuge/shared'
 import { Card } from '@centrifuge/ui'
-import { Flex, Text } from '@chakra-ui/react'
+import { Flex, Skeleton, Text } from '@chakra-ui/react'
 import { IoBarChart } from 'react-icons/io5'
 
 export function PoolsTvlCard({ poolIds }: { poolIds: PoolId[] }) {
-  const { data: poolsDetails } = useAllPoolDetails(poolIds)
+  const { data: poolsDetails, isLoading } = useAllPoolDetails(poolIds)
   const zeroBalance: Balance = new Balance(0n, 18)
 
   const totalTVL = poolsDetails?.reduce((acc, pool) => {
@@ -19,6 +19,10 @@ export function PoolsTvlCard({ poolIds }: { poolIds: PoolId[] }) {
   }, zeroBalance)
 
   const formattedTotalTVL = totalTVL ? formatBalance(totalTVL, 'USD', 0) : 'unknown'
+
+  if (isLoading) {
+    return <Skeleton height="102px" width="380px" borderRadius="md" />
+  }
 
   return (
     <Card borderRadius="xl">
