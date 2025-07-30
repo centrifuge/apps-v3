@@ -29,7 +29,7 @@ export const PoolCardsSelect = ({ poolIds, setSelectedPoolId }: PoolSelectorProp
 
   if (isLoading) return <PoolCardsSelectSkeleton />
 
-  if (!displayPools || pools?.length === 1) return null
+  if (!displayPools) return null
 
   return (
     <>

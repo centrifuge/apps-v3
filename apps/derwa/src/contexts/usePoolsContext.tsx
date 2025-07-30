@@ -34,7 +34,11 @@ const PoolsContext = createContext<
 >(undefined)
 
 export const PoolsProvider = ({ children }: { children: ReactNode }) => {
+  // TODO: Remove hardcoded pool IDs after MVP
+  // const dePoolsIds = [281474976710659n, 281474976710660n]
   const { data: pools, isLoading } = usePoolsQuery()
+  // const filteredPools = pools?.filter((pool) => dePoolsIds.includes(pool.id.raw))
+
   const [network, setNetwork] = useState<PoolNetwork | undefined>(undefined)
   const [selectedPoolId, setSelectedPoolId] = useState<PoolId | undefined>(undefined)
   const { poolId } = useParams()
