@@ -53,7 +53,7 @@ const columns: ColumnDefinition<Row>[] = [
     header: 'Price',
     accessor: 'price',
     render: (row: Row) => {
-      return <Text fontSize="xs">{row.price}</Text>
+      return <Text fontSize="xs">{formatUIBalance(row.price, { precision: 6 })}</Text>
     },
     sortKey: 'price',
   },
