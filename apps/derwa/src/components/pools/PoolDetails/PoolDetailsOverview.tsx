@@ -41,7 +41,8 @@ export function PoolDetailsOverview() {
         </Flex>
       ),
     },
-    { label: 'Expense ratio', value: poolDetails?.metadata?.pool.expenseRatio || 'Unknown' },
+    // Todo: expense ratio in the future would come from onchain and not metadata
+    { label: 'Expense ratio', value: (poolDetails?.metadata?.pool as any)?.expenseRatio || 'Unknown' },
   ]
 
   return (
