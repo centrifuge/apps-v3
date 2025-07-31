@@ -12,7 +12,6 @@ type Item = {
   id: string
   approvedAt?: Date
   epoch?: number
-  isDisabled?: boolean
   pricePerShare?: string
 }
 
