@@ -3,7 +3,13 @@ import { z } from 'zod'
 import { Box, Spinner } from '@chakra-ui/react'
 import { Form, useForm, safeParse, createBalanceSchema } from '@centrifuge/forms'
 import { Balance } from '@centrifuge/sdk'
-import { formatBalanceToString, useCentrifugeTransaction, useInvestment, useVaultDetails } from '@centrifuge/shared'
+import {
+  formatBalance,
+  formatBalanceToString,
+  useCentrifugeTransaction,
+  useInvestment,
+  useVaultDetails,
+} from '@centrifuge/shared'
 import {
   type InvestActionType,
   InvestAction,
@@ -22,7 +28,7 @@ export default function InvestTab({ isLoading: isTabLoading, vault }: TabProps) 
 
   const maxInvestAmount = useMemo(() => {
     if (!portfolioBalance) return '0'
-    return formatBalanceToString(portfolioBalance, portfolioBalance.decimals) ?? '0'
+    return formatBalance(portfolioBalance, investment?.investmentCurrency.symbol, 0) ?? '0'
   }, [portfolioBalance])
 
   function invest(amount: Balance) {

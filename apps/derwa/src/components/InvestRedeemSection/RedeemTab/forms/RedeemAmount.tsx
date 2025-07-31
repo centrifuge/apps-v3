@@ -138,7 +138,7 @@ export function RedeemAmount({ isDisabled, maxRedeemAmount, networks, parsedRede
                 MAX
               </Badge>
               <Text color="text-primary" opacity={0.5} alignSelf="flex-end" ml={2}>
-                {formatBalance(maxRedeemBalance, shareCurrencySymbol)}
+                {formatBalance(maxRedeemBalance, shareCurrencySymbol, 0)}
               </Text>
             </Flex>
             <NetworkIcons networkIds={networkIds} />
