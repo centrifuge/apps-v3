@@ -1,4 +1,4 @@
-import { Holdings, useCentrifugeTransaction, useHoldings, usePendingAmounts } from '@centrifuge/shared'
+import { useCentrifugeTransaction, useHoldings, usePendingAmounts } from '@centrifuge/shared'
 import { useSelectedPool } from '@contexts/SelectedPoolProvider'
 import { Grid, VStack } from '@chakra-ui/react'
 import { useMemo } from 'react'
@@ -7,7 +7,7 @@ import { ChainHeader } from './ChainHeader'
 import { Button, Card, ColumnDefinition } from '@centrifuge/ui'
 import { OrdersTable, TableData } from './OrdersTable'
 import { BalanceInput, Form, useForm } from '@centrifuge/forms'
-import { AssetId, Balance } from '@centrifuge/sdk'
+import { AssetId } from '@centrifuge/sdk'
 import { LiveAmountDisplay } from './LiveAmountDisplay'
 
 export const ApproveDeposits = ({ onClose }: { onClose: () => void }) => {
@@ -23,12 +23,13 @@ export const ApproveDeposits = ({ onClose }: { onClose: () => void }) => {
   const orders = useMemo(() => {
     return (
       pendingOrders
-        ?.map((order) => ({
+        ?.map((order, index) => ({
           chainId: order.chainId,
-          amount: order.pendingDeposit,
+          amount: order.pendingDeposit.toFloat().toString(),
           assetId: order.assetId,
+          id: `${order.assetId.toString()}-${index}`,
         }))
-        .filter((order) => !order.amount.isZero()) ?? []
+        .filter((order) => order.amount !== '0') ?? []
     )
   }, [pendingOrders])
 
@@ -37,6 +38,7 @@ export const ApproveDeposits = ({ onClose }: { onClose: () => void }) => {
   const defaultOrders = orders.reduce(
     (acc, o) => {
       acc[o.assetId.toString()] = {
+        id: o.id,
         assetId: o.assetId,
         chainId: o.chainId,
         amount: o.amount,
@@ -44,7 +46,7 @@ export const ApproveDeposits = ({ onClose }: { onClose: () => void }) => {
       }
       return acc
     },
-    {} as Record<string, { assetId: AssetId; chainId: number; amount: Balance; isSelected: boolean }>
+    {} as Record<string, { id: string; assetId: AssetId; chainId: number; amount: string; isSelected: boolean }>
   )
 
   const form = useForm({
@@ -59,12 +61,10 @@ export const ApproveDeposits = ({ onClose }: { onClose: () => void }) => {
       }
 
       const assets = arr.map((o) => {
-        const balance = typeof o.amount !== 'string' ? o.amount.toString() : o.amount
         const holding = holdings?.find((o) => o.assetId.toString() === o.assetId.toString())
         return {
           assetId: o.assetId,
-          // Asset to deposit decimals
-          approveAssetAmount: convertBalance(balance, holding?.asset?.decimals ?? poolCurrency?.decimals ?? 18),
+          approveAssetAmount: convertBalance(o.amount, holding?.asset?.decimals ?? 18),
         }
       })
 
@@ -75,20 +75,18 @@ export const ApproveDeposits = ({ onClose }: { onClose: () => void }) => {
 
   const { setValue } = form
 
-  // @ts-ignore
   const extraColumns: ColumnDefinition<TableData>[] = useMemo(() => {
     return [
       {
         header: 'Approve amount',
-        accessor: 'newAmount',
-        render: ({ id, holding }: { id: string; holding: Holdings[number] }) => {
+        render: ({ id, holding }: TableData) => {
           return (
             <BalanceInput
               name={`orders.${id}.amount`}
               buttonLabel="MAX"
               decimals={holding?.asset?.decimals}
               onButtonClick={() => {
-                const originalOrder = orders.find((o) => o.assetId.toString() === id)
+                const originalOrder = orders.find((o) => o.id === id)
                 if (originalOrder) {
                   setValue(`orders.${id}.amount`, originalOrder.amount, {
                     shouldDirty: true,
@@ -101,8 +99,7 @@ export const ApproveDeposits = ({ onClose }: { onClose: () => void }) => {
       },
       {
         header: `Approve amount (${poolCurrency?.symbol})`,
-        accessor: 'approvedAmount',
-        render: ({ id }: { id: string }) => {
+        render: ({ id }: TableData) => {
           return <LiveAmountDisplay name={`orders.${id}.amount`} poolDecimals={poolCurrency?.decimals} />
         },
       },
@@ -124,7 +121,7 @@ export const ApproveDeposits = ({ onClose }: { onClose: () => void }) => {
           </Card>
         )
       })}
-      <Grid templateColumns={'1fr 1fr'} gap={2} mt={4}>
+      <Grid templateColumns={{ base: '1fr', md: '1fr 1fr' }} gap={2} mt={4}>
         <Button size="sm" variant="solid" colorPalette="gray" onClick={onClose} label="Cancel" />
         <Button
           size="sm"
