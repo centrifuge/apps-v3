@@ -62,7 +62,6 @@ export const ApproveDeposits = ({ onClose }: { onClose: () => void }) => {
 
       const assets = arr.map((o) => {
         const holding = holdings?.find((o) => o.assetId.toString() === o.assetId.toString())
-        console.log(o.amount)
         return {
           assetId: o.assetId,
           approveAssetAmount: convertBalance(o.amount, holding?.asset?.decimals ?? 18),
