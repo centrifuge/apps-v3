@@ -23,14 +23,14 @@ export const RevokeShares = ({ onClose }: { onClose: () => void }) => {
     }
 
     return pendingOrders.flatMap((order, index) => {
-      return order.pendingRevocations.map((revocation) => ({
+      return order.pendingRevocations.map((revocation, revocationIndex) => ({
         assetId: order.assetId,
         chainId: order.chainId,
         approvedAt: revocation.approvedAt,
         pricePerShare: shareClassDetails?.pricePerShare?.toFloat().toString() ?? '0',
         epoch: revocation.epoch,
         amount: revocation.amount.toFloat().toString(),
-        id: `${order.assetId.toString()}-${index}`,
+        id: `${order.assetId.toString()}-${index}-${revocationIndex}`,
         isSelected: false,
       }))
     })
