@@ -1,4 +1,4 @@
-import { Holdings, useCentrifugeTransaction, useHoldings, usePendingAmounts } from '@centrifuge/shared'
+import { useCentrifugeTransaction, useHoldings, usePendingAmounts } from '@centrifuge/shared'
 import { useSelectedPool } from '@contexts/SelectedPoolProvider'
 import { Grid, VStack } from '@chakra-ui/react'
 import { useMemo } from 'react'
@@ -7,7 +7,7 @@ import { ChainHeader } from './ChainHeader'
 import { Button, Card, ColumnDefinition } from '@centrifuge/ui'
 import { OrdersTable, TableData } from './OrdersTable'
 import { BalanceInput, Form, useForm } from '@centrifuge/forms'
-import { AssetId, Balance } from '@centrifuge/sdk'
+import { AssetId } from '@centrifuge/sdk'
 import { LiveAmountDisplay } from './LiveAmountDisplay'
 
 export const ApproveDeposits = ({ onClose }: { onClose: () => void }) => {
@@ -65,23 +65,22 @@ export const ApproveDeposits = ({ onClose }: { onClose: () => void }) => {
         console.log(o.amount)
         return {
           assetId: o.assetId,
+          approveAssetAmount: convertBalance(o.amount, holding?.asset?.decimals ?? 18),
         }
       })
 
-      // await execute(shareClass.approveDepositsAndIssueShares(assets))
+      await execute(shareClass.approveDepositsAndIssueShares(assets))
       onClose()
     },
   })
 
   const { setValue } = form
 
-  // @ts-ignore
   const extraColumns: ColumnDefinition<TableData>[] = useMemo(() => {
     return [
       {
         header: 'Approve amount',
-        accessor: 'newAmount',
-        render: ({ id, holding }: { id: string; holding: Holdings[number] }) => {
+        render: ({ id, holding }: TableData) => {
           return (
             <BalanceInput
               name={`orders.${id}.amount`}
@@ -101,8 +100,7 @@ export const ApproveDeposits = ({ onClose }: { onClose: () => void }) => {
       },
       {
         header: `Approve amount (${poolCurrency?.symbol})`,
-        accessor: 'approvedAmount',
-        render: ({ id }: { id: string }) => {
+        render: ({ id }: TableData) => {
           return <LiveAmountDisplay name={`orders.${id}.amount`} poolDecimals={poolCurrency?.decimals} />
         },
       },

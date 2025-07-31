@@ -1,4 +1,4 @@
-import { Checkbox } from '@centrifuge/forms'
+import { Checkbox, useFormContext } from '@centrifuge/forms'
 import { formatUIBalance, Holdings, useHoldings } from '@centrifuge/shared'
 import { AssetId, ShareClass } from '@centrifuge/sdk'
 import { AssetIconText, AssetSymbol, ColumnDefinition, DataTable } from '@centrifuge/ui'
@@ -12,6 +12,8 @@ type Item = {
   id: string
   approvedAt?: Date
   epoch?: number
+  isDisabled?: boolean
+  pricePerShare?: string
 }
 
 export type TableData = Item & {
@@ -27,6 +29,15 @@ export const OrdersTable = ({
   shareClass: ShareClass
   extraColumns?: ColumnDefinition<TableData>[]
 }) => {
+  const { watch } = useFormContext()
+  const watchedOrders = watch('orders')
+  const lowestEpoch = useMemo(
+    () => Math.min(...items.map((o) => o.epoch).filter((epoch): epoch is number => epoch !== undefined)),
+    [items]
+  )
+  const lowestEpochOrderId = useMemo(() => items.find((o) => o.epoch === lowestEpoch)?.id, [items, lowestEpoch])
+  const isLowestSelected = lowestEpochOrderId ? watchedOrders[lowestEpochOrderId]?.isSelected : false
+
   const { data: holdings } = useHoldings(shareClass)
 
   const data: TableData[] = useMemo(() => {
@@ -36,21 +47,17 @@ export const OrdersTable = ({
     }))
   }, [items, holdings])
 
-  //  @ts-ignore TODO: fix datatable
   const columns: ColumnDefinition<TableData>[] = useMemo(() => {
     return [
       {
         header: 'Approve',
+        accessor: 'id',
         render: ({ id, epoch }) => {
           if (!epoch) {
             return <Checkbox name={`orders.${id}.isSelected`} />
           }
 
-          const lowestEpoch = Math.min(
-            ...items.map((o) => o.epoch).filter((epoch): epoch is number => epoch !== undefined)
-          )
-          const disabled = epoch > lowestEpoch
-          return <Checkbox name={`orders.${id}.isSelected`} disabled={disabled} />
+          return <Checkbox name={`orders.${id}.isSelected`} disabled={epoch !== lowestEpoch && !isLowestSelected} />
         },
         width: '40px',
       },
@@ -68,8 +75,7 @@ export const OrdersTable = ({
       },
       ...(extraColumns ?? []),
     ]
-  }, [extraColumns])
+  }, [extraColumns, lowestEpoch, isLowestSelected])
 
-  // @ts-ignore
   return <DataTable data={data} columns={columns} />
 }

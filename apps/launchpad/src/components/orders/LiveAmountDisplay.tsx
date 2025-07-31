@@ -22,7 +22,7 @@ export const LiveAmountDisplay = ({
   const liveAmount = useWatch({ control, name }) as string
   const priceVal = useWatch({ control, name: pricePerShareName ?? '' }) as string
 
-  if (liveAmount == '' || !liveAmount) {
+  if (liveAmount === '') {
     return '0'
   }
 
@@ -34,7 +34,7 @@ export const LiveAmountDisplay = ({
     case 'issue':
       if (pricePerShareName) {
         if (priceVal === '0') {
-          return '0'
+          return priceVal
         }
         if (priceVal) {
           const priceDecimal = new Decimal(priceVal)
@@ -46,7 +46,7 @@ export const LiveAmountDisplay = ({
     case 'revoke':
       if (pricePerShareName) {
         if (priceVal === '0') {
-          return '0'
+          return priceVal
         }
         if (priceVal) {
           const priceDecimal = new Decimal(priceVal)

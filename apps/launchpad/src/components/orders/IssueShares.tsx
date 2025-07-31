@@ -2,12 +2,12 @@ import { formatDate, useCentrifugeTransaction, usePendingAmounts } from '@centri
 import { useSelectedPool } from '@contexts/SelectedPoolProvider'
 import { Grid, Text, VStack } from '@chakra-ui/react'
 import { useMemo } from 'react'
-import { convertBalance, useOrdersByChainId } from './utils'
+import { useOrdersByChainId } from './utils'
 import { ChainHeader } from './ChainHeader'
 import { Button, Card, ColumnDefinition } from '@centrifuge/ui'
 import { OrdersTable, TableData } from './OrdersTable'
 import { BalanceInput, Form, useForm } from '@centrifuge/forms'
-import { AssetId, Balance, Price } from '@centrifuge/sdk'
+import { AssetId, Price } from '@centrifuge/sdk'
 import { LiveAmountDisplay } from './LiveAmountDisplay'
 
 export const IssueShares = ({ onClose }: { onClose: () => void }) => {
@@ -77,7 +77,7 @@ export const IssueShares = ({ onClose }: { onClose: () => void }) => {
       const assets = arr.map((o) => {
         return {
           assetId: o.assetId,
-          issuePricePerShare: new Price(convertBalance(o.pricePerShare, poolCurrency?.decimals ?? 18).toString()),
+          issuePricePerShare: Price.fromFloat(o.pricePerShare),
         }
       })
 
@@ -88,9 +88,6 @@ export const IssueShares = ({ onClose }: { onClose: () => void }) => {
 
   const { setValue } = form
 
-  const lowestEpoch = Math.min(...orders.map((o) => o.epoch))
-
-  // @ts-ignore
   const extraColumns: ColumnDefinition<TableData>[] = useMemo(() => {
     return [
       {
@@ -104,8 +101,7 @@ export const IssueShares = ({ onClose }: { onClose: () => void }) => {
       {
         header: 'Issue with NAV per share',
         accessor: 'pricePerShare',
-        render: ({ id, epoch }: TableData & { epoch: number }) => {
-          const isDisabled = epoch > lowestEpoch
+        render: ({ id }: TableData) => {
           return (
             <BalanceInput
               name={`orders.${id}.pricePerShare`}
@@ -117,15 +113,13 @@ export const IssueShares = ({ onClose }: { onClose: () => void }) => {
                   setValue(`orders.${id}.pricePerShare`, raw)
                 }
               }}
-              disabled={isDisabled}
             />
           )
         },
       },
       {
         header: `Issue new shares (${shareClassDetails?.symbol})`,
-        accessor: 'approvedAmount',
-        render: ({ id }: { id: string }) => {
+        render: ({ id }: TableData) => {
           return (
             <LiveAmountDisplay
               name={`orders.${id}.amount`}
@@ -137,7 +131,7 @@ export const IssueShares = ({ onClose }: { onClose: () => void }) => {
         },
       },
     ]
-  }, [orders, setValue, lowestEpoch])
+  }, [orders, setValue])
 
   if (!pendingOrders || !shareClass || orders.length === 0) {
     return <VStack>No pending orders</VStack>

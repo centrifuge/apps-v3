@@ -76,13 +76,11 @@ export const ApproveRedemptions = ({ onClose }: { onClose: () => void }) => {
 
   const { setValue } = form
 
-  // @ts-ignore
   const extraColumns: ColumnDefinition<TableData>[] = useMemo(() => {
     return [
       {
         header: `Approve amount (${shareClassDetails?.symbol})`,
-        accessor: 'newAmount',
-        render: ({ id }: { id: string }) => {
+        render: ({ id }: TableData) => {
           return (
             <BalanceInput
               name={`orders.${id}.amount`}
@@ -100,8 +98,7 @@ export const ApproveRedemptions = ({ onClose }: { onClose: () => void }) => {
       },
       {
         header: 'Estimated payout',
-        accessor: 'approvedAmount',
-        render: ({ id }: { id: string }) => {
+        render: ({ id }: TableData) => {
           return (
             <LiveAmountDisplay
               name={`orders.${id}.amount`}

@@ -2,7 +2,7 @@ import { formatDate, useCentrifugeTransaction, usePendingAmounts } from '@centri
 import { useSelectedPool } from '@contexts/SelectedPoolProvider'
 import { Grid, Text, VStack } from '@chakra-ui/react'
 import { useMemo } from 'react'
-import { convertBalance, useOrdersByChainId } from './utils'
+import { useOrdersByChainId } from './utils'
 import { ChainHeader } from './ChainHeader'
 import { Button, Card, ColumnDefinition } from '@centrifuge/ui'
 import { OrdersTable, TableData } from './OrdersTable'
@@ -73,11 +73,9 @@ export const RevokeShares = ({ onClose }: { onClose: () => void }) => {
       const assets = arr.map((o) => {
         return {
           assetId: o.assetId,
-          // revokePricePerShare: new Price(convertBalance(o.pricePerShare, poolCurrency?.decimals ?? 18).toString()),
+          revokePricePerShare: Price.fromFloat(o.pricePerShare),
         }
       })
-
-      console.log(assets)
 
       await execute(shareClass.approveRedeemsAndRevokeShares(assets))
       onClose()
@@ -86,14 +84,10 @@ export const RevokeShares = ({ onClose }: { onClose: () => void }) => {
 
   const { setValue } = form
 
-  const lowestEpoch = Math.min(...orders.map((o) => o.epoch))
-
-  // @ts-ignore
   const extraColumns: ColumnDefinition<TableData>[] = useMemo(() => {
     return [
       {
         header: 'Approve at',
-        accessor: 'approvedAt',
         render: ({ approvedAt }) => {
           return <Text>{approvedAt ? formatDate(approvedAt, 'short', true) : '-'}</Text>
         },
@@ -102,18 +96,10 @@ export const RevokeShares = ({ onClose }: { onClose: () => void }) => {
       {
         header: 'Revoke with NAV per share',
         accessor: 'pricePerShare',
-        render: ({ id, epoch }: TableData & { epoch: number }) => {
-          // Disable the input if its epoch is greater than the first unapproved one.
-          // An already approved item should never be disabled.
-
-          const isDisabled = epoch > lowestEpoch
-
-          console.log(epoch, lowestEpoch)
-
+        render: ({ id }: TableData) => {
           return (
             <BalanceInput
               name={`orders.${id}.pricePerShare`}
-              disabled={isDisabled}
               buttonLabel="Latest"
               onButtonClick={() => {
                 const originalOrder = orders.find((o) => o.id === id)
@@ -128,8 +114,7 @@ export const RevokeShares = ({ onClose }: { onClose: () => void }) => {
       },
       {
         header: `Issue new shares (${shareClassDetails?.symbol})`,
-        accessor: 'approvedAmount',
-        render: ({ id }: { id: string }) => {
+        render: ({ id }: TableData) => {
           return (
             <LiveAmountDisplay
               name={`orders.${id}.amount`}
@@ -141,7 +126,7 @@ export const RevokeShares = ({ onClose }: { onClose: () => void }) => {
         },
       },
     ]
-  }, [orders, setValue, shareClassDetails, poolCurrency?.decimals, lowestEpoch])
+  }, [orders, setValue, shareClassDetails, poolCurrency?.decimals])
 
   if (!pendingOrders || !shareClass || orders.length === 0) {
     return <VStack>No pending orders</VStack>
