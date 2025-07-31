@@ -1,8 +1,8 @@
 import { Link } from 'react-router'
 import { Button, Flex, Heading, Image, Loader, Stack, Text } from '@chakra-ui/react'
 import { Balance, PoolId } from '@centrifuge/sdk'
-import { PoolDetails, useAddress, useAllPoolDetails, usePoolsByManager } from '@centrifuge/shared'
-import { ipfsToHttp } from '@centrifuge/shared/src/utils/formatting'
+import { formatUIBalance, PoolDetails, useAddress, useAllPoolDetails, usePoolsByManager } from '@centrifuge/shared'
+import { formatBalance, ipfsToHttp } from '@centrifuge/shared/src/utils/formatting'
 import { BalanceDisplay, DataTable, NetworkIcon, ColumnDefinition } from '@centrifuge/ui'
 import { mockMetadata } from './mockMetadata'
 
@@ -17,6 +17,7 @@ type Row = {
   tokenPrice: Balance
   shareClassId: string
   isManager: boolean
+  poolCurrency: string
 }
 
 const columns: ColumnDefinition<Row>[] = [
@@ -57,7 +58,9 @@ const columns: ColumnDefinition<Row>[] = [
   {
     header: 'Token price',
     accessor: 'tokenPrice',
-    render: ({ tokenPrice }: Row) => <BalanceDisplay balance={tokenPrice} />,
+    render: ({ tokenPrice, poolCurrency }: Row) => (
+      <Text>{formatUIBalance(tokenPrice, { precision: 6, currency: poolCurrency.symbol })}</Text>
+    ),
   },
   {
     header: '',
@@ -98,6 +101,7 @@ export const PoolOverviewTable = ({ poolIds }: { poolIds: PoolId[] }) => {
           shareClassId: sc.shareClass.id,
         })),
         isManager: !!poolsByManager?.find((p) => p.id.raw === pool.id.raw),
+        poolCurrency: pool.currency,
       }
     }) ?? []
 
@@ -113,6 +117,7 @@ export const PoolOverviewTable = ({ poolIds }: { poolIds: PoolId[] }) => {
       tokenPrice: sc.tokenPrice,
       shareClassId: sc.shareClassId,
       isManager: d.isManager,
+      poolCurrency: d.poolCurrency,
     }))
   )
 
