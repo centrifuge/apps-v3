@@ -108,7 +108,7 @@ export function InvestTxFeedback({ setActionType }: InvestTxFeedbackProps) {
               )}
             </Icon>
           </Flex>
-          <Box opacity={txState.isSuccessful ? 1 : 0.5}>
+          <Box opacity={txState.isSuccessful || txState.isFailed ? 1 : 0.5}>
             <InfoWrapper
               type={txState.isFailed ? 'error' : 'info'}
               text={txState.isFailed ? infoText().investFailed : infoText().investClaimable}
@@ -145,10 +145,9 @@ export function InvestTxFeedback({ setActionType }: InvestTxFeedbackProps) {
         <Button
           colorPalette="yellow"
           type="button"
-          mb={4}
+          my={4}
           onClick={handleClose}
           width="100%"
-          mt={4}
           disabled={isButtonDisabled}
         >
           Invest more
