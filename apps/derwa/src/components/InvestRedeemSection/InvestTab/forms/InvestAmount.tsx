@@ -67,7 +67,7 @@ export function InvestAmount({ isDisabled, maxInvestAmount, parsedInvestAmount }
     [pricePerShare]
   )
 
-  const debouncedCalculateReceiveAmount = useMemo(() => debounce(calculateReceiveAmount, 500), [calculateReceiveAmount])
+  const debouncedCalculateReceiveAmount = useMemo(() => debounce(calculateReceiveAmount, 250), [calculateReceiveAmount])
 
   const changeVault = useCallback(
     (value: string | number) => {

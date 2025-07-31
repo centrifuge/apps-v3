@@ -8,7 +8,7 @@ export type InvestSyncActionType = (typeof InvestAction)[keyof typeof InvestActi
 
 export const InvestSyncFormDefaultValues = {
   investAmount: '',
-  receiveAmount: '',
+  receiveAmount: '0',
   investorRequirements: [false, false, false],
 }
 
@@ -21,7 +21,7 @@ export type InvestActionType = (typeof InvestAction)[keyof typeof InvestAction]
 
 export const InvestFormDefaultValues = {
   investAmount: '',
-  receiveAmount: '',
+  receiveAmount: '0',
 }
 
 export const RedeemSyncAction = {
