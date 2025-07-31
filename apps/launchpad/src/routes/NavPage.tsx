@@ -1,20 +1,28 @@
 import { useMemo } from 'react'
-import { createBalanceSchema, Form, SubmitButton, useForm } from '@centrifuge/forms'
+import { Form, SubmitButton, useForm } from '@centrifuge/forms'
 import { Box, Card, Flex, Grid, GridItem, Heading, Text } from '@chakra-ui/react'
-import { formatUIBalance, useCentrifugeTransaction, useNavPerNetwork, useVaultsDetails } from '@centrifuge/shared'
+import {
+  formatUIBalance,
+  useAddress,
+  useCentrifugeTransaction,
+  useIsPoolManager,
+  useNavPerNetwork,
+  useVaultsDetails,
+} from '@centrifuge/shared'
 import { NavForm } from '@components/nav/NavForm'
 import { NavHoldings } from '@components/nav/NavHoldings'
 import { Price } from '@centrifuge/sdk'
 import { useSelectedPool } from '@contexts/SelectedPoolProvider'
 
 export default function NavPage() {
+  const { address } = useAddress()
   const { execute, isPending } = useCentrifugeTransaction()
-  const { poolDetails, shareClass, shareClassDetails, vaults } = useSelectedPool()
+  const { poolDetails, shareClass, shareClassDetails, vaults, poolId } = useSelectedPool()
   const { data: vaultsDetails } = useVaultsDetails(vaults, { enabled: !!vaults })
+  const isHubAdmin = useIsPoolManager(poolId, address ?? '')
 
   const shareClassId = shareClass?.id
   const poolCurrencySymbol = poolDetails?.currency.symbol ?? ''
-  const poolCurrencyDecimals = poolDetails?.currency.decimals ?? 18
 
   const vaultDetails = useMemo(
     () => vaultsDetails?.find((vault) => vault.shareClass.id.toString() === shareClassId?.toString()),
@@ -45,8 +53,8 @@ export default function NavPage() {
     <Form form={form}>
       <Flex alignItems="center" justifyContent="space-between" mb={4}>
         <Heading size="lg">Update NAV</Heading>
-        <SubmitButton colorPalette="yellow" size="sm" disabled={isPending || !newTokenPrice}>
-          Save Changes
+        <SubmitButton colorPalette="yellow" size="sm" disabled={isPending || !newTokenPrice || !isHubAdmin}>
+          Save changes
         </SubmitButton>
       </Flex>
       <Card.Root>
@@ -64,12 +72,12 @@ export default function NavPage() {
             <Text fontSize="xs" textAlign="center">
               {`This action will change the token price from ${formatUIBalance(shareClassDetails?.pricePerShare ?? 0, {
                 currency: poolCurrencySymbol,
-                precision: 2,
-                tokenDecimals: poolCurrencyDecimals,
+                precision: 6,
+                tokenDecimals: 18,
               })} to ${formatUIBalance(tokenPrice, {
                 currency: poolCurrencySymbol,
-                precision: 2,
-                tokenDecimals: poolCurrencyDecimals,
+                precision: 6,
+                tokenDecimals: 18,
               })}. Token prices will be propagated to all networks JTRSY is deployed to.`}
             </Text>
           </Box>
