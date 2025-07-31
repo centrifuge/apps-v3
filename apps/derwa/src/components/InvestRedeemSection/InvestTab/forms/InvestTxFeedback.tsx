@@ -109,7 +109,10 @@ export function InvestTxFeedback({ setActionType }: InvestTxFeedbackProps) {
             </Icon>
           </Flex>
           <Box opacity={txState.isSuccessful ? 1 : 0.5}>
-            <InfoWrapper type="info" text={infoText().investClaimable} />
+            <InfoWrapper
+              type={txState.isFailed ? 'error' : 'info'}
+              text={txState.isFailed ? infoText().investFailed : infoText().investClaimable}
+            />
             <Flex alignItems="center" gap={2} justifyContent="space-between" mt={6} width="100%">
               <Text fontWeight={500} fontSize="md">
                 You invest
