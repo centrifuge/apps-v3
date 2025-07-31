@@ -29,7 +29,7 @@ export function PoolDetailsSummary() {
     <Box bg="bg-primary" padding={6} borderRadius={10} border="1px solid" borderColor="border-primary" shadow="xs">
       <Grid templateColumns={{ base: 'repeat(3, 1fr)', lg: '7fr 6fr 4fr' }} gap={4}>
         {items.map((item, index) => (
-          <GridItem minW={0} overflow="hidden" position="relative">
+          <GridItem minW={0} overflow="hidden" position="relative" key={item.label}>
             <Box
               padding={{ base: '1rem 0 0 0', md: '0 1rem' }}
               borderLeft={index > 0 ? { base: 'none', md: '1px solid #E7E7E7' } : 'none'}

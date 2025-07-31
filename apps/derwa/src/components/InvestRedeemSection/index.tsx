@@ -102,10 +102,6 @@ function VaultGuard({ isInvestorWhiteListed, isLoading, tab: Tab }: VaultGuardPr
     )
   }
 
-  if (!isInvestorWhiteListed) {
-    return <InvestorOnboardingFeedback />
-  }
-
   if (hasClaims && vault) {
     return (
       <InvestRedeemClaimForm
@@ -127,6 +123,8 @@ function VaultGuard({ isInvestorWhiteListed, isLoading, tab: Tab }: VaultGuardPr
     >
       {!vault ? (
         <Text>No vaults found for this pool on this network.</Text>
+      ) : !isInvestorWhiteListed ? (
+        <InvestorOnboardingFeedback />
       ) : (
         <Stack height="100%">
           <Tab isLoading={isVaultGuardLoading} vault={vault} />
