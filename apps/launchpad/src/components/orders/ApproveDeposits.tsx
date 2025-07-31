@@ -97,12 +97,12 @@ export const ApproveDeposits = ({ onClose }: { onClose: () => void }) => {
           )
         },
       },
-      {
-        header: `Approve amount (${poolCurrency?.symbol})`,
-        render: ({ id }: TableData) => {
-          return <LiveAmountDisplay name={`orders.${id}.amount`} poolDecimals={poolCurrency?.decimals} />
-        },
-      },
+      // {
+      //  header: `Approve amount (${poolCurrency?.symbol})`,
+      //  render: ({ id }: TableData) => {
+      //    return <LiveAmountDisplay name={`orders.${id}.amount`} poolDecimals={poolCurrency?.decimals} />
+      //  },
+      // },
     ]
   }, [orders, setValue])
 
