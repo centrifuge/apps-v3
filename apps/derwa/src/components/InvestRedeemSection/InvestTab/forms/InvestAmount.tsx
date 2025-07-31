@@ -89,7 +89,7 @@ export function InvestAmount({ isDisabled, maxInvestAmount, parsedInvestAmount }
 
   return (
     <Box height="100%">
-      <Flex justify="space-between" flexDirection="column" height="100%" pb={6}>
+      <Flex justify="space-between" flexDirection="column" height="100%">
         <Box>
           <Text fontWeight={500}>You pay</Text>
           <BalanceInput
@@ -143,7 +143,10 @@ export function InvestAmount({ isDisabled, maxInvestAmount, parsedInvestAmount }
             Invest
           </SubmitButton>
           {!hasInvestmentCurrency ? (
-            <InfoWrapper text={infoText().portfolioMissingInvestmentCurrency} type="error" />
+            <InfoWrapper
+              text={infoText(portfolioInvestmentCurrency?.symbol).portfolioMissingInvestmentCurrency}
+              type="error"
+            />
           ) : null}
         </Box>
       </Flex>

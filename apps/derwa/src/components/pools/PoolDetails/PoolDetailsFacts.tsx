@@ -1,20 +1,35 @@
-import { Box, Flex, Grid, Heading, Text } from '@chakra-ui/react'
-import { ReactNode } from 'react'
+import { Box, Flex, Grid, Heading, Image, Text } from '@chakra-ui/react'
 import { LinkPill } from './LinkPill'
+import { usePoolsContext } from '@contexts/usePoolsContext'
+import { ipfsToHttp } from '@centrifuge/shared'
 
-export const PoolDetailsFacts = ({
-  heading,
-  topRow,
-  bottomRow,
-}: {
-  heading: string
-  topRow: { logo: ReactNode; links: { label: string }[] }
-  bottomRow: { leftPanel: { heading: string; text: string }; rightPanel: { items: { label: string; value: string }[] } }
-}) => {
+export function PoolDetailsFacts() {
+  const { poolDetails } = usePoolsContext()
+  const metadata = poolDetails?.metadata
+
+  // TODO: Replace with actual values from poolDetails when available
+  const items = [
+    { label: 'Historical default rate', value: '1.2%' },
+    { label: 'Fund admin', value: 'Galaxy' },
+    {
+      label: 'Trustee',
+      value: 'UMB Bank, N.A.',
+    },
+    {
+      label: 'Pricing oracle provider',
+      value: 'Anemoy',
+    },
+    { label: 'Auditor', value: 'Ernst & Young LLP' },
+    { label: 'Custodian', value: 'Galaxy' },
+    { label: 'Investment manager', value: 'UMB Bank, N.A.' },
+    { label: 'Sub-advisor', value: 'Anemoy' },
+    { label: 'Pool analysis', value: 'Universal Co.' },
+  ]
+
   return (
     <>
       <Heading size="lg" mt={8} mb={4}>
-        {heading}
+        Key facts
       </Heading>
 
       <Box
@@ -29,7 +44,12 @@ export const PoolDetailsFacts = ({
         <Grid templateColumns={{ base: '1fr', md: '1fr 5fr' }} gap={2}>
           <Flex justifyContent="flex-start" alignItems="center" gap={2} flexDirection={{ base: 'column', md: 'row' }}>
             <Box width={20} mb={{ base: 2, md: 0 }}>
-              {topRow.logo && topRow.logo}
+              <Image
+                src={ipfsToHttp(metadata?.pool.issuer.logo?.uri ?? '')}
+                alt={metadata?.pool.issuer.name}
+                height="2rem"
+                fit="contain"
+              />
             </Box>
           </Flex>
 
@@ -40,13 +60,13 @@ export const PoolDetailsFacts = ({
             flexDirection={{ base: 'column', md: 'row' }}
             wrap="wrap"
           >
-            {topRow.links.map((link) => (
+            {[{ label: 'Website' }, { label: 'Forum' }, { label: 'Email' }, { label: 'Summary' }].map((link) => (
               <LinkPill key={link.label} label={link.label} />
             ))}
           </Flex>
         </Grid>
 
-        <Grid templateColumns={{ base: '1fr', md: '1fr 1fr' }} gap={2} mt={8}>
+        <Grid templateColumns={{ base: '1fr', md: '1fr 1fr' }} gap={6} mt={8}>
           <Flex
             flexDirection="column"
             alignItems={{ base: 'center', md: 'flex-start' }}
@@ -65,22 +85,22 @@ export const PoolDetailsFacts = ({
                 left: 0,
                 width: '54px',
                 height: '2px',
-                bg: '#FFC012',
+                bg: 'yellow.500',
               }}
             >
-              {bottomRow.leftPanel.heading}
+              {metadata?.pool.issuer.name || 'Pool'}
             </Heading>
-            <Text fontSize="14px" color="#91969B" mt={8} fontWeight={400} lineHeight={'160%'}>
-              {bottomRow.leftPanel.text}
+            <Text fontSize="14px" color="gray.500" fontWeight={400} lineHeight={'160%'} mt={3}>
+              {metadata?.pool.issuer.description || 'No description available'}
             </Text>
           </Flex>
-          <Box bg="bg-primary" shadow="xs" boxShadow="none" mt={{ base: 6, md: 0 }}>
-            {bottomRow.rightPanel.items.map((item) => (
+          <Box bg="bg-primary" shadow="xs" boxShadow="none" pt={4}>
+            {items.map((item) => (
               <Flex justifyContent="space-between" alignItems="center" mt={4} key={item.label}>
-                <Text fontWeight={500} fontSize="14px" lineHeight="100%" color="#91969B">
+                <Text fontWeight={500} fontSize="14px" lineHeight="100%" color="gray.500">
                   {item.label}
                 </Text>
-                <Text fontWeight={600} fontSize="14px" lineHeight="100%" color="#252B34">
+                <Text fontWeight={600} fontSize="14px" lineHeight="100%" color="gray.800">
                   {item.value}
                 </Text>
               </Flex>

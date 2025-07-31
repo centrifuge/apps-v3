@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { z } from 'zod'
-import { Box, Button, Flex, Heading, Spinner, Text } from '@chakra-ui/react'
+import { Box, Spinner } from '@chakra-ui/react'
 import { Form, useForm, safeParse, createBalanceSchema } from '@centrifuge/forms'
 import { Balance } from '@centrifuge/sdk'
 import {
@@ -17,9 +17,8 @@ import {
 } from '@components/InvestRedeemSection/components/defaults'
 import { InvestTabForm } from '@components/InvestRedeemSection/InvestTab/forms/InvestTabForm'
 import { TabProps } from '@components/InvestRedeemSection'
-import { InfoWrapper } from '@components/InvestRedeemSection/components/InfoWrapper'
 
-export default function InvestTab({ isInvestorWhiteListed, isLoading: isTabLoading, vault }: TabProps) {
+export default function InvestTab({ isLoading: isTabLoading, vault }: TabProps) {
   const { data: vaultDetails, isLoading: isVaultDetailsLoading } = useVaultDetails(vault)
   const { data: investment, isLoading: isInvestmentLoading } = useInvestment(vault)
   const { data: portfolio, isLoading: isPortfolioLoading } = usePortfolio()
@@ -82,14 +81,10 @@ export default function InvestTab({ isInvestorWhiteListed, isLoading: isTabLoadi
 
   if (isLoading) {
     return (
-      <Box height="100%" display="flex" alignItems="center" justifyContent="center">
+      <Box height="100%" minH="210px" display="flex" alignItems="center" justifyContent="center">
         <Spinner size="lg" color="black.solid" />
       </Box>
     )
-  }
-
-  if (!isInvestorWhiteListed) {
-    return <InvestorOnboardingFeedback />
   }
 
   return (
@@ -104,37 +99,5 @@ export default function InvestTab({ isInvestorWhiteListed, isLoading: isTabLoadi
         />
       </Box>
     </Form>
-  )
-}
-
-function InvestorOnboardingFeedback() {
-  return (
-    <Box height="100%">
-      <Flex justify="space-between" flexDirection="column" height="100%" pb={6}>
-        <Box>
-          <Heading mt={4} mb={6}>
-            Onboarding required
-          </Heading>
-          <InfoWrapper
-            type="info"
-            text={
-              <>
-                <Text>Onboarding is required to invest and redeem.</Text>
-                <p>
-                  Email{' '}
-                  <a href="mailto:onbaord@anemoy.com?subject=Onboarding" style={{ color: '#FFC012' }}>
-                    onbaord@anemoy.com
-                  </a>{' '}
-                  to get started.
-                </p>
-              </>
-            }
-          />
-        </Box>
-        <Button disabled colorPalette="yellow">
-          Invest
-        </Button>
-      </Flex>
-    </Box>
   )
 }

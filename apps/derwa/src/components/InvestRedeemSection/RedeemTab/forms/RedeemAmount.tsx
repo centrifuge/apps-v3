@@ -108,7 +108,7 @@ export function RedeemAmount({ isDisabled, maxRedeemAmount, networks, parsedRede
 
   return (
     <Box height="100%">
-      <Flex justify="space-between" flexDirection="column" height="100%" pb={6}>
+      <Flex justify="space-between" flexDirection="column" height="100%">
         <Box>
           <Text fontWeight={500} mb={2}>
             Redeem

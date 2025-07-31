@@ -11,9 +11,9 @@ import type { PoolDetails } from '@utils/types'
 import { InvestRedeemClaimForm } from '@components/InvestRedeemSection/components/InvestRedeemClaimForm'
 import { useVaultsContext } from '@contexts/useVaultsContext'
 import { usePoolsContext } from '@contexts/usePoolsContext'
+import { InvestorOnboardingFeedback } from '@components/InvestRedeemSection/components/InvestorOnboardingFeedback'
 
 export interface TabProps {
-  isInvestorWhiteListed: boolean
   isLoading: boolean
   vault: Vault
 }
@@ -96,10 +96,14 @@ function VaultGuard({ isInvestorWhiteListed, isLoading, tab: Tab }: VaultGuardPr
 
   if (isVaultGuardLoading) {
     return (
-      <Box height="100%" display="flex" alignItems="center" justifyContent="center">
+      <Box height="100%" minH="210px" display="flex" alignItems="center" justifyContent="center">
         <Spinner size="lg" color="black.solid" />
       </Box>
     )
+  }
+
+  if (!isInvestorWhiteListed) {
+    return <InvestorOnboardingFeedback />
   }
 
   if (hasClaims && vault) {
@@ -125,7 +129,7 @@ function VaultGuard({ isInvestorWhiteListed, isLoading, tab: Tab }: VaultGuardPr
         <Text>No vaults found for this pool on this network.</Text>
       ) : (
         <Stack height="100%">
-          <Tab isInvestorWhiteListed={isInvestorWhiteListed} isLoading={isVaultGuardLoading} vault={vault} />
+          <Tab isLoading={isVaultGuardLoading} vault={vault} />
         </Stack>
       )}
     </ConnectionGuard>
