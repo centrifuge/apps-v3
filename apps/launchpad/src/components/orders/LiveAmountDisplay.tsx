@@ -22,7 +22,7 @@ export const LiveAmountDisplay = ({
   const liveAmount = useWatch({ control, name }) as string
   const priceVal = useWatch({ control, name: pricePerShareName ?? '' }) as string
 
-  if (liveAmount === '') {
+  if (liveAmount === '' || !liveAmount) {
     return '0'
   }
 

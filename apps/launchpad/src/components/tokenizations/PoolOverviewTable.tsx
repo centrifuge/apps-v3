@@ -1,8 +1,8 @@
 import { Link } from 'react-router'
-import { Button, Flex, Heading, Image, Loader, Stack, Text } from '@chakra-ui/react'
+import { Button, Flex, Heading, Image, Stack, Text } from '@chakra-ui/react'
 import { Balance, PoolId } from '@centrifuge/sdk'
 import { formatUIBalance, PoolDetails, useAddress, useAllPoolDetails, usePoolsByManager } from '@centrifuge/shared'
-import { formatBalance, ipfsToHttp } from '@centrifuge/shared/src/utils/formatting'
+import { ipfsToHttp } from '@centrifuge/shared/src/utils/formatting'
 import { BalanceDisplay, DataTable, NetworkIcon, ColumnDefinition } from '@centrifuge/ui'
 import { mockMetadata } from './mockMetadata'
 
@@ -17,7 +17,7 @@ type Row = {
   tokenPrice: Balance
   shareClassId: string
   isManager: boolean
-  poolCurrency: string
+  poolCurrency: PoolDetails['currency']
 }
 
 const columns: ColumnDefinition<Row>[] = [

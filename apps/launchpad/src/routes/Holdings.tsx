@@ -8,6 +8,8 @@ const Holdings = () => {
   const { shareClass, poolCurrency } = useSelectedPool()
   const { data: holdings, isLoading, isIdle } = useHoldings(shareClass)
 
+  console.log(holdings?.[0]?.assetId.raw.toString())
+
   if (!isLoading && !isIdle && !holdings?.length) return <VStack>No holdings found</VStack>
 
   if (isLoading || isIdle) return <Loader />
