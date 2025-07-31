@@ -2,7 +2,7 @@ import { formatDate, useCentrifugeTransaction, usePendingAmounts } from '@centri
 import { useSelectedPool } from '@contexts/SelectedPoolProvider'
 import { Grid, Text, VStack } from '@chakra-ui/react'
 import { useMemo } from 'react'
-import { convertBalance, useOrdersByChainId } from './utils'
+import { useOrdersByChainId } from './utils'
 import { ChainHeader } from './ChainHeader'
 import { Button, Card, ColumnDefinition } from '@centrifuge/ui'
 import { OrdersTable, TableData } from './OrdersTable'
@@ -17,35 +17,50 @@ export const IssueShares = ({ onClose }: { onClose: () => void }) => {
     enabled: !!shareClass,
   })
 
-  const orders = useMemo(
-    () =>
+  const orders = useMemo(() => {
+    if (!pendingOrders) {
+      return []
+    }
+
+    return (
       pendingOrders
         ?.flatMap((order) =>
-          order.pendingIssuances.map((r) => ({
+          order.pendingIssuances.map((r, index) => ({
             chainId: order.chainId,
-            amount: r.amount,
+            amount: r.amount.toFloat().toString(),
             assetId: order.assetId,
             approvedAt: r.approvedAt,
+            id: `${order.assetId.toString()}-${index}`,
+            isSelected: false,
+            epoch: r.epoch,
+            pricePerShare: shareClassDetails?.pricePerShare?.toFloat().toString() ?? '0',
           }))
         )
-        .filter((o) => !o.amount.isZero()) ?? [],
-    [pendingOrders]
-  )
+        .filter((o) => o.amount !== '0') ?? []
+    )
+  }, [pendingOrders])
 
   const ordersByChain = useOrdersByChainId(orders)
 
   const defaultOrders = orders.reduce(
     (acc, o) => {
-      acc[o.assetId.toString()] = {
-        assetId: o.assetId,
-        chainId: o.chainId,
-        amount: shareClassDetails?.pricePerShare ?? new Price(0),
-        isSelected: false,
-        approvedAt: o.approvedAt,
+      acc[o.id] = {
+        ...o,
       }
       return acc
     },
-    {} as Record<string, { assetId: AssetId; chainId: number; amount: Price; isSelected: boolean; approvedAt: Date }>
+    {} as Record<
+      string,
+      {
+        assetId: AssetId
+        chainId: number
+        amount: string
+        isSelected: boolean
+        approvedAt: Date
+        pricePerShare: string
+        epoch: number
+      }
+    >
   )
 
   const form = useForm({
@@ -60,10 +75,9 @@ export const IssueShares = ({ onClose }: { onClose: () => void }) => {
       }
 
       const assets = arr.map((o) => {
-        const balance = typeof o.amount !== 'string' ? o.amount.toString() : o.amount
         return {
           assetId: o.assetId,
-          issuePricePerShare: new Price(convertBalance(balance, poolCurrency?.decimals ?? 18).toString()),
+          issuePricePerShare: Price.fromFloat(o.pricePerShare),
         }
       })
 
@@ -74,7 +88,6 @@ export const IssueShares = ({ onClose }: { onClose: () => void }) => {
 
   const { setValue } = form
 
-  // @ts-ignore
   const extraColumns: ColumnDefinition<TableData>[] = useMemo(() => {
     return [
       {
@@ -87,19 +100,17 @@ export const IssueShares = ({ onClose }: { onClose: () => void }) => {
       },
       {
         header: 'Issue with NAV per share',
-        accessor: 'newAmount',
-        render: ({ id }: { id: string }) => {
+        accessor: 'pricePerShare',
+        render: ({ id }: TableData) => {
           return (
             <BalanceInput
-              name={`orders.${id}.amount`}
-              buttonLabel="MAX"
-              decimals={poolCurrency?.decimals}
+              name={`orders.${id}.pricePerShare`}
+              buttonLabel="Latest"
               onButtonClick={() => {
-                const originalOrder = orders.find((o) => o.assetId.toString() === id)
+                const originalOrder = orders.find((o) => o.id === id)
+                const raw = shareClassDetails?.pricePerShare?.toFloat().toString() ?? '0'
                 if (originalOrder) {
-                  setValue(`orders.${id}.amount`, originalOrder.amount, {
-                    shouldDirty: true,
-                  })
+                  setValue(`orders.${id}.pricePerShare`, raw)
                 }
               }}
             />
@@ -108,9 +119,15 @@ export const IssueShares = ({ onClose }: { onClose: () => void }) => {
       },
       {
         header: `Issue new shares (${shareClassDetails?.symbol})`,
-        accessor: 'approvedAmount',
-        render: ({ id }: { id: string }) => {
-          return <LiveAmountDisplay name={`orders.${id}.amount`} poolDecimals={poolCurrency?.decimals} />
+        render: ({ id }: TableData) => {
+          return (
+            <LiveAmountDisplay
+              name={`orders.${id}.amount`}
+              poolDecimals={poolCurrency?.decimals}
+              calculationType="issue"
+              pricePerShareName={`orders.${id}.pricePerShare`}
+            />
+          )
         },
       },
     ]
@@ -131,7 +148,7 @@ export const IssueShares = ({ onClose }: { onClose: () => void }) => {
           </Card>
         )
       })}
-      <Grid templateColumns={'1fr 1fr'} gap={2} mt={4}>
+      <Grid templateColumns={{ base: '1fr', md: '1fr 1fr' }} gap={2} mt={4}>
         <Button size="sm" variant="solid" colorPalette="gray" onClick={onClose} label="Cancel" />
         <Button
           size="sm"

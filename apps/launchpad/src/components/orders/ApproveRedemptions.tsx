@@ -1,4 +1,4 @@
-import { Holdings, useCentrifugeTransaction, usePendingAmounts } from '@centrifuge/shared'
+import { useCentrifugeTransaction, usePendingAmounts } from '@centrifuge/shared'
 import { useSelectedPool } from '@contexts/SelectedPoolProvider'
 import { Grid, VStack } from '@chakra-ui/react'
 import { useMemo } from 'react'
@@ -7,7 +7,7 @@ import { ChainHeader } from './ChainHeader'
 import { Button, Card, ColumnDefinition } from '@centrifuge/ui'
 import { OrdersTable, TableData } from './OrdersTable'
 import { BalanceInput, Form, useForm } from '@centrifuge/forms'
-import { AssetId, Balance } from '@centrifuge/sdk'
+import { AssetId } from '@centrifuge/sdk'
 import { LiveAmountDisplay } from './LiveAmountDisplay'
 
 export const ApproveRedemptions = ({ onClose }: { onClose: () => void }) => {
@@ -20,12 +20,13 @@ export const ApproveRedemptions = ({ onClose }: { onClose: () => void }) => {
   const orders = useMemo(() => {
     return (
       pendingOrders
-        ?.map((order) => ({
+        ?.map((order, index) => ({
           chainId: order.chainId,
-          amount: order.pendingRedeem,
+          amount: order.pendingRedeem.toFloat().toString(),
           assetId: order.assetId,
+          id: `${order.assetId.toString()}-${index}`,
         }))
-        .filter((order) => !order.amount.isZero()) ?? []
+        .filter((order) => order.amount !== '0') ?? []
     )
   }, [pendingOrders])
 
@@ -33,15 +34,20 @@ export const ApproveRedemptions = ({ onClose }: { onClose: () => void }) => {
 
   const defaultOrders = orders.reduce(
     (acc, o) => {
-      acc[o.assetId.toString()] = {
+      acc[o.id] = {
+        id: o.id,
         assetId: o.assetId,
         chainId: o.chainId,
         amount: o.amount,
         isSelected: false,
+        pricePerShare: shareClassDetails?.pricePerShare?.toFloat().toString() ?? '0',
       }
       return acc
     },
-    {} as Record<string, { assetId: AssetId; chainId: number; amount: Balance; isSelected: boolean }>
+    {} as Record<
+      string,
+      { id: string; assetId: AssetId; chainId: number; amount: string; isSelected: boolean; pricePerShare: string }
+    >
   )
 
   const form = useForm({
@@ -56,11 +62,10 @@ export const ApproveRedemptions = ({ onClose }: { onClose: () => void }) => {
       }
 
       const assets = arr.map((o) => {
-        const balance = typeof o.amount !== 'string' ? o.amount.toString() : o.amount
         return {
           assetId: o.assetId,
           // pool currency decimals
-          approveShareAmount: convertBalance(balance, poolCurrency?.decimals ?? 18),
+          approveShareAmount: convertBalance(o.amount, poolCurrency?.decimals ?? 18),
         }
       })
 
@@ -71,24 +76,20 @@ export const ApproveRedemptions = ({ onClose }: { onClose: () => void }) => {
 
   const { setValue } = form
 
-  // @ts-ignore
   const extraColumns: ColumnDefinition<TableData>[] = useMemo(() => {
     return [
       {
         header: `Approve amount (${shareClassDetails?.symbol})`,
-        accessor: 'newAmount',
-        render: ({ id }: { id: string }) => {
+        render: ({ id }: TableData) => {
           return (
             <BalanceInput
               name={`orders.${id}.amount`}
               buttonLabel="MAX"
               decimals={poolCurrency?.decimals}
               onButtonClick={() => {
-                const originalOrder = orders.find((o) => o.assetId.toString() === id)
+                const originalOrder = orders.find((o) => o.id === id)
                 if (originalOrder) {
-                  setValue(`orders.${id}.amount`, originalOrder.amount, {
-                    shouldDirty: true,
-                  })
+                  setValue(`orders.${id}.amount`, originalOrder.amount)
                 }
               }}
             />
@@ -97,13 +98,13 @@ export const ApproveRedemptions = ({ onClose }: { onClose: () => void }) => {
       },
       {
         header: 'Estimated payout',
-        accessor: 'approvedAmount',
-        render: ({ id }: { id: string }) => {
+        render: ({ id }: TableData) => {
           return (
             <LiveAmountDisplay
               name={`orders.${id}.amount`}
               poolDecimals={poolCurrency?.decimals}
-              shareClassDetails={shareClassDetails}
+              calculationType="revoke"
+              pricePerShareName={`orders.${id}.pricePerShare`}
             />
           )
         },

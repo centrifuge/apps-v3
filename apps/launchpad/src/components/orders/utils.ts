@@ -3,8 +3,9 @@ import { useMemo } from 'react'
 
 type Order = {
   chainId: number
-  amount: Balance
+  amount: string
   assetId: AssetId
+  id: string
 }
 
 export const useOrdersByChainId = (items: Order[]) => {
@@ -57,6 +58,6 @@ export const sumAmounts = (
       )
 }
 
-export const convertBalance = (balance: string, decimals: number) => {
+export const convertBalance = (balance: string | number, decimals: number) => {
   return Balance.fromFloat(balance, decimals)
 }

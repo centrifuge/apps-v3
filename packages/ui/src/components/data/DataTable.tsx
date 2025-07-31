@@ -4,7 +4,7 @@ import { FiChevronUp, FiChevronDown, FiCode } from 'react-icons/fi'
 
 export type ColumnDefinition<RowType> = {
   header: string
-  accessor: keyof RowType
+  accessor?: keyof RowType
   textAlign?: 'start' | 'center' | 'end'
   width?: string
   sortKey?: string
@@ -54,9 +54,9 @@ export const DataTable = <RowType extends { id?: string | number; actions?: (row
       <Table.Root size={size} overflow="hidden" border="none">
         <Table.Header>
           <Table.Row bg={TABLE_HEADER_COLOR}>
-            {columns.map((col) => (
+            {columns.map((col, index) => (
               <Table.ColumnHeader
-                key={String(col.accessor)}
+                key={`${col.header}-${index}`}
                 textAlign={col.textAlign}
                 width={col.width}
                 onClick={() => handleSort(col.sortKey)}
@@ -99,9 +99,9 @@ export const DataTable = <RowType extends { id?: string | number; actions?: (row
         <Table.Body>
           {sortedAndPaginatedData.map((row, rowIndex) => (
             <Table.Row key={row.id ?? rowIndex}>
-              {columns.map((col) => (
-                <Table.Cell key={String(col.accessor)} textAlign={col.textAlign} width={col.width}>
-                  {col.render ? col.render(row) : String(row[col.accessor] ?? '')}
+              {columns.map((col, index) => (
+                <Table.Cell key={`${col.header}-${index}`} textAlign={col.textAlign} width={col.width}>
+                  {col.render ? col.render(row) : col.accessor ? String(row[col.accessor] ?? '') : null}
                 </Table.Cell>
               ))}
               <Table.Cell key="actions-cell" textAlign="end">

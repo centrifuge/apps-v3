@@ -1,21 +1,23 @@
-import { Checkbox } from '@centrifuge/forms'
+import { Checkbox, useFormContext } from '@centrifuge/forms'
 import { formatUIBalance, Holdings, useHoldings } from '@centrifuge/shared'
-import { AssetId, Balance, ShareClass } from '@centrifuge/sdk'
+import { AssetId, ShareClass } from '@centrifuge/sdk'
 import { AssetIconText, AssetSymbol, ColumnDefinition, DataTable } from '@centrifuge/ui'
 import { useMemo } from 'react'
 import { Text } from '@chakra-ui/react'
 
 type Item = {
   chainId: number
-  amount: Balance
+  amount: string
   assetId: AssetId
+  id: string
+  approvedAt?: Date
+  epoch?: number
+  isDisabled?: boolean
+  pricePerShare?: string
 }
 
 export type TableData = Item & {
-  id: string
   holding?: Holdings[number]
-  checkboxId?: string
-  approvedAt?: Date
 }
 
 export const OrdersTable = ({
@@ -27,30 +29,42 @@ export const OrdersTable = ({
   shareClass: ShareClass
   extraColumns?: ColumnDefinition<TableData>[]
 }) => {
+  const { watch } = useFormContext()
+  const watchedOrders = watch('orders')
+  const lowestEpoch = useMemo(
+    () => Math.min(...items.map((o) => o.epoch).filter((epoch): epoch is number => epoch !== undefined)),
+    [items]
+  )
+  const lowestEpochOrderId = useMemo(() => items.find((o) => o.epoch === lowestEpoch)?.id, [items, lowestEpoch])
+  const isLowestSelected = lowestEpochOrderId ? watchedOrders[lowestEpochOrderId]?.isSelected : false
+
   const { data: holdings } = useHoldings(shareClass)
 
   const data: TableData[] = useMemo(() => {
     return items.map((item) => ({
       ...item,
-      id: item.assetId.toString(),
       holding: holdings?.find((h) => h.assetId.toString() === item.assetId.toString()),
     }))
   }, [items, holdings])
 
-  //  @ts-ignore TODO: fix datatable
   const columns: ColumnDefinition<TableData>[] = useMemo(() => {
     return [
       {
         header: 'Approve',
-        render: ({ id }) => {
-          return <Checkbox name={`orders.${id}.isSelected`} />
+        accessor: 'id',
+        render: ({ id, epoch }) => {
+          if (!epoch) {
+            return <Checkbox name={`orders.${id}.isSelected`} />
+          }
+
+          return <Checkbox name={`orders.${id}.isSelected`} disabled={epoch !== lowestEpoch && !isLowestSelected} />
         },
         width: '40px',
       },
       {
         header: 'Amount',
         accessor: 'amount',
-        render: ({ amount }) => <Text>{formatUIBalance(amount, { tokenDecimals: 18 })}</Text>,
+        render: ({ amount }) => <Text>{formatUIBalance(amount)}</Text>,
         width: '100px',
       },
       {
@@ -61,7 +75,7 @@ export const OrdersTable = ({
       },
       ...(extraColumns ?? []),
     ]
-  }, [extraColumns])
+  }, [extraColumns, lowestEpoch, isLowestSelected])
 
   return <DataTable data={data} columns={columns} />
 }

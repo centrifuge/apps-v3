@@ -1,51 +1,62 @@
-import { formatDate, Holdings, useCentrifugeTransaction, useHoldings, usePendingAmounts } from '@centrifuge/shared'
+import { formatDate, useCentrifugeTransaction, usePendingAmounts } from '@centrifuge/shared'
 import { useSelectedPool } from '@contexts/SelectedPoolProvider'
 import { Grid, Text, VStack } from '@chakra-ui/react'
 import { useMemo } from 'react'
-import { convertBalance, useOrdersByChainId } from './utils'
+import { useOrdersByChainId } from './utils'
 import { ChainHeader } from './ChainHeader'
 import { Button, Card, ColumnDefinition } from '@centrifuge/ui'
 import { OrdersTable, TableData } from './OrdersTable'
 import { BalanceInput, Form, useForm } from '@centrifuge/forms'
-import { AssetId, Balance, Price } from '@centrifuge/sdk'
+import { AssetId, Price } from '@centrifuge/sdk'
 import { LiveAmountDisplay } from './LiveAmountDisplay'
 
 export const RevokeShares = ({ onClose }: { onClose: () => void }) => {
   const { execute, isPending } = useCentrifugeTransaction()
-  const { shareClass, poolCurrency } = useSelectedPool()
+  const { shareClass, poolCurrency, shareClassDetails } = useSelectedPool()
   const { data: pendingOrders } = usePendingAmounts(shareClass, {
     enabled: !!shareClass,
   })
 
-  const orders = useMemo(
-    () =>
-      pendingOrders
-        ?.flatMap((order) =>
-          order.pendingRevocations.map((r) => ({
-            chainId: order.chainId,
-            amount: r.amount,
-            assetId: order.assetId,
-            approvedAt: r.approvedAt,
-          }))
-        )
-        .filter((o) => !o.amount.isZero()) ?? [],
-    [pendingOrders]
-  )
+  const orders = useMemo(() => {
+    if (!pendingOrders) {
+      return []
+    }
+
+    return pendingOrders.flatMap((order, index) => {
+      return order.pendingRevocations.map((revocation, revocationIndex) => ({
+        assetId: order.assetId,
+        chainId: order.chainId,
+        approvedAt: revocation.approvedAt,
+        pricePerShare: shareClassDetails?.pricePerShare?.toFloat().toString() ?? '0',
+        epoch: revocation.epoch,
+        amount: revocation.amount.toFloat().toString(),
+        id: `${order.assetId.toString()}-${index}-${revocationIndex}`,
+        isSelected: false,
+      }))
+    })
+  }, [pendingOrders, shareClassDetails])
 
   const ordersByChain = useOrdersByChainId(orders)
 
   const defaultOrders = orders.reduce(
     (acc, o) => {
-      acc[o.assetId.toString()] = {
-        assetId: o.assetId,
-        chainId: o.chainId,
-        amount: o.amount,
-        isSelected: false,
-        approvedAt: o.approvedAt,
+      acc[o.id] = {
+        ...o,
       }
       return acc
     },
-    {} as Record<string, { assetId: AssetId; chainId: number; amount: Balance; isSelected: boolean; approvedAt: Date }>
+    {} as Record<
+      string,
+      {
+        assetId: AssetId
+        chainId: number
+        amount: string
+        isSelected: boolean
+        approvedAt: Date
+        epoch: number
+        pricePerShare: string
+      }
+    >
   )
 
   const form = useForm({
@@ -60,10 +71,9 @@ export const RevokeShares = ({ onClose }: { onClose: () => void }) => {
       }
 
       const assets = arr.map((o) => {
-        const balance = typeof o.amount !== 'string' ? o.amount.toString() : o.amount
         return {
           assetId: o.assetId,
-          revokePricePerShare: new Price(convertBalance(balance, poolCurrency?.decimals ?? 18).toString()),
+          revokePricePerShare: Price.fromFloat(o.pricePerShare),
         }
       })
 
@@ -74,12 +84,10 @@ export const RevokeShares = ({ onClose }: { onClose: () => void }) => {
 
   const { setValue } = form
 
-  // @ts-ignore
   const extraColumns: ColumnDefinition<TableData>[] = useMemo(() => {
     return [
       {
         header: 'Approve at',
-        accessor: 'approvedAt',
         render: ({ approvedAt }) => {
           return <Text>{approvedAt ? formatDate(approvedAt, 'short', true) : '-'}</Text>
         },
@@ -87,19 +95,17 @@ export const RevokeShares = ({ onClose }: { onClose: () => void }) => {
       },
       {
         header: 'Revoke with NAV per share',
-        accessor: 'newAmount',
-        render: ({ id, holding }: { id: string; holding: Holdings[number] }) => {
+        accessor: 'pricePerShare',
+        render: ({ id }: TableData) => {
           return (
             <BalanceInput
-              name={`orders.${id}.amount`}
-              buttonLabel="MAX"
-              decimals={poolCurrency?.decimals}
+              name={`orders.${id}.pricePerShare`}
+              buttonLabel="Latest"
               onButtonClick={() => {
-                const originalOrder = orders.find((o) => o.assetId.toString() === id)
+                const originalOrder = orders.find((o) => o.id === id)
+                const raw = shareClassDetails?.pricePerShare?.toFloat().toString() ?? '0'
                 if (originalOrder) {
-                  setValue(`orders.${id}.amount`, originalOrder.amount, {
-                    shouldDirty: true,
-                  })
+                  setValue(`orders.${id}.pricePerShare`, raw)
                 }
               }}
             />
@@ -107,14 +113,20 @@ export const RevokeShares = ({ onClose }: { onClose: () => void }) => {
         },
       },
       {
-        header: `Approve amount (${poolCurrency?.symbol})`,
-        accessor: 'approvedAmount',
-        render: ({ id }: { id: string }) => {
-          return <LiveAmountDisplay name={`orders.${id}.amount`} poolDecimals={poolCurrency?.decimals} />
+        header: `Issue new shares (${shareClassDetails?.symbol})`,
+        render: ({ id }: TableData) => {
+          return (
+            <LiveAmountDisplay
+              name={`orders.${id}.amount`}
+              poolDecimals={poolCurrency?.decimals}
+              calculationType="issue"
+              pricePerShareName={`orders.${id}.pricePerShare`}
+            />
+          )
         },
       },
     ]
-  }, [orders, setValue])
+  }, [orders, setValue, shareClassDetails, poolCurrency?.decimals])
 
   if (!pendingOrders || !shareClass || orders.length === 0) {
     return <VStack>No pending orders</VStack>
@@ -131,14 +143,14 @@ export const RevokeShares = ({ onClose }: { onClose: () => void }) => {
           </Card>
         )
       })}
-      <Grid templateColumns={'1fr 1fr'} gap={2} mt={4}>
+      <Grid templateColumns={{ base: '1fr', md: '1fr 1fr' }} gap={2} mt={4}>
         <Button size="sm" variant="solid" colorPalette="gray" onClick={onClose} label="Cancel" />
         <Button
           size="sm"
           variant="solid"
           colorPalette="yellow"
           onClick={() => form.handleSubmit()}
-          label="Approve"
+          label="Revoke"
           loading={isPending}
         />
       </Grid>

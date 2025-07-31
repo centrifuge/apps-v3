@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useMemo } from 'react'
 import { useChainId } from 'wagmi'
-import { Pool, PoolId, PoolNetwork, ShareClass, ShareClassId, Vault } from '@centrifuge/sdk'
+import { Pool, PoolId, PoolNetwork, ShareClassId, Vault } from '@centrifuge/sdk'
 import {
   PoolDetails,
   ShareClassWithDetails,
