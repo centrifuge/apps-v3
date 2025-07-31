@@ -5,11 +5,14 @@ import { Flex, Heading, Separator, Stack } from '@chakra-ui/react'
 import { useMemo } from 'react'
 import { useSelectedPool } from '@contexts/SelectedPoolProvider'
 import { Balance } from '@centrifuge/sdk'
+import { sumAmounts } from '@components/orders/utils'
 
 export function Orders({ title, isInvestment }: { title: string; isInvestment?: boolean }) {
   const { poolId, shareClass, poolCurrency } = useSelectedPool()
   const { data: pendingAmounts } = usePendingAmounts(shareClass, { enabled: !!shareClass })
   const defaultRoute = `/pool/${poolId?.toString()}/${shareClass?.id.toString()}/orders/approve`
+
+  console.log(pendingAmounts)
 
   const poolCurrencySymbol = poolCurrency?.symbol ?? 'USD'
   const poolCurrencyDecimals = poolCurrency?.decimals ?? 18
@@ -29,19 +32,14 @@ export function Orders({ title, isInvestment }: { title: string; isInvestment?: 
     return route
   }
 
-  const pendingAmount = useMemo(() => {
-    const zero = new Balance(0, poolCurrencyDecimals)
-    return pendingAmounts
-      ?.map((p) => (isInvestment ? p.pendingDeposit : p.pendingRedeem))
-      .reduce((acc, curr) => acc.add(new Balance(curr.toBigInt(), poolCurrencyDecimals)), zero)
-  }, [pendingAmounts, isInvestment])
-
-  const approvedAmount = useMemo(() => {
-    const zero = new Balance(0, poolCurrencyDecimals)
-    return pendingAmounts
-      ?.map((p) => (isInvestment ? p.pendingIssuancesTotal : p.pendingRevocationsTotal))
-      .reduce((acc, curr) => acc.add(new Balance(curr.toBigInt(), poolCurrencyDecimals)), zero)
-  }, [pendingAmounts, isInvestment])
+  const { pendingInvestments, pendingRedemptions, pendingIssuances, pendingRevocations } = useMemo(() => {
+    return {
+      pendingInvestments: sumAmounts('pendingDeposit', pendingAmounts, poolCurrencyDecimals),
+      pendingRedemptions: sumAmounts('pendingRedeem', pendingAmounts, poolCurrencyDecimals),
+      pendingIssuances: sumAmounts('pendingIssuancesTotal', pendingAmounts, poolCurrencyDecimals),
+      pendingRevocations: sumAmounts('pendingRevocationsTotal', pendingAmounts, poolCurrencyDecimals),
+    }
+  }, [pendingAmounts])
 
   return (
     <Card>
@@ -51,7 +49,7 @@ export function Orders({ title, isInvestment }: { title: string; isInvestment?: 
         <Stack gap={0}>
           <Heading size="xs">{isInvestment ? 'Pending investments' : 'Pending redemptions'}</Heading>
           <Heading size="2xl">
-            {formatUIBalance(pendingAmount ?? 0, {
+            {formatUIBalance(isInvestment ? pendingInvestments : (pendingRedemptions ?? 0), {
               precision: 2,
               currency: poolCurrencySymbol,
             })}
@@ -66,7 +64,7 @@ export function Orders({ title, isInvestment }: { title: string; isInvestment?: 
         <Stack gap={0}>
           <Heading size="xs">{isInvestment ? 'Approved investments' : 'Approved redemptions'}</Heading>
           <Heading size="2xl">
-            {formatUIBalance(approvedAmount ?? 0, {
+            {formatUIBalance(isInvestment ? pendingIssuances : (pendingRevocations ?? 0), {
               precision: 2,
               currency: poolCurrencySymbol,
             })}
