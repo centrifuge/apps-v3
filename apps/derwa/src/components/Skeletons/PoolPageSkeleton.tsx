@@ -4,10 +4,9 @@ export const PoolPageSkeleton = () => {
   return (
     <Box bg="bg-secondary" p={6}>
       <Flex mb={6} ml={4} align="center" justify="space-between">
-        <Skeleton height="40px" width="150px" borderRadius="md" />
+        <Skeleton height="40px" width="200px" borderRadius="md" />
         <Flex>
-          <Skeleton height="40px" width="100px" borderRadius="md" mr={4} />
-          <Skeleton height="40px" width="100px" borderRadius="md" />
+          <Skeleton height="40px" width="200px" borderRadius="md" />
         </Flex>
       </Flex>
 
