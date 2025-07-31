@@ -37,38 +37,46 @@ export function InvestRedeemClaimForm({
               <IoMdCheckmarkCircleOutline />
             </Icon>
           </Flex>
-          <Box mt={6}>
-            <Text fontWeight={500}>Claimable shares</Text>
-            <Flex alignItems="center" justifyContent="flex-start">
-              <Heading fontSize="xl">
-                {formatBalance(claimableInvestShares ?? 0, shareCurrency?.symbol ?? '', 2)}
-              </Heading>
-            </Flex>
-          </Box>
-          <Box mt={3}>
-            <Text fontWeight={500}>Claimable invest currency equivalent</Text>
-            <Flex alignItems="center" justifyContent="flex-start">
-              <Heading fontSize="xl">
-                {formatBalance(claimableInvestCurrencyEquivalent ?? 0, investmentCurrency?.symbol ?? '', 2)}
-              </Heading>
-            </Flex>
-          </Box>
-          <Box mt={3}>
-            <Text fontWeight={500}>Claimable redeem amount</Text>
-            <Flex alignItems="center" justifyContent="flex-start">
-              <Heading fontSize="xl">
-                {formatBalance(claimableRedeemCurrency ?? 0, shareCurrency?.symbol ?? '', 2)}
-              </Heading>
-            </Flex>
-          </Box>
-          <Box mt={3}>
-            <Text fontWeight={500}>Claimable redeem currency equivalent</Text>
-            <Flex alignItems="center" justifyContent="flex-start">
-              <Heading fontSize="xl">
-                {formatBalance(claimableRedeemSharesEquivalent ?? 0, investmentCurrency?.symbol ?? '', 2)}
-              </Heading>
-            </Flex>
-          </Box>
+          {claimableInvestShares && !claimableInvestShares.isZero() && (
+            <Box mt={6}>
+              <Text fontWeight={500}>Claimable shares</Text>
+              <Flex alignItems="center" justifyContent="flex-start">
+                <Heading fontSize="xl">
+                  {formatBalance(claimableInvestShares ?? 0, shareCurrency?.symbol ?? '', 2)}
+                </Heading>
+              </Flex>
+            </Box>
+          )}
+          {claimableInvestCurrencyEquivalent && !claimableInvestCurrencyEquivalent.isZero() && (
+            <Box mt={3}>
+              <Text fontWeight={500}>Claimable invest currency equivalent</Text>
+              <Flex alignItems="center" justifyContent="flex-start">
+                <Heading fontSize="xl">
+                  {formatBalance(claimableInvestCurrencyEquivalent ?? 0, investmentCurrency?.symbol ?? '', 2)}
+                </Heading>
+              </Flex>
+            </Box>
+          )}
+          {claimableRedeemCurrency && !claimableRedeemCurrency.isZero() && (
+            <Box mt={3}>
+              <Text fontWeight={500}>Claimable redeem amount</Text>
+              <Flex alignItems="center" justifyContent="flex-start">
+                <Heading fontSize="xl">
+                  {formatBalance(claimableRedeemCurrency ?? 0, shareCurrency?.symbol ?? '', 2)}
+                </Heading>
+              </Flex>
+            </Box>
+          )}
+          {claimableRedeemSharesEquivalent && !claimableRedeemSharesEquivalent.isZero() && (
+            <Box mt={3}>
+              <Text fontWeight={500}>Claimable redeem currency equivalent</Text>
+              <Flex alignItems="center" justifyContent="flex-start">
+                <Heading fontSize="xl">
+                  {formatBalance(claimableRedeemSharesEquivalent ?? 0, investmentCurrency?.symbol ?? '', 2)}
+                </Heading>
+              </Flex>
+            </Box>
+          )}
         </Box>
         <Box pt={6}>
           <Button w="100%" onClick={claim} disabled={isPending}>
