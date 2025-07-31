@@ -12,11 +12,9 @@ import { LiveAmountDisplay } from './LiveAmountDisplay'
 
 export const ApproveDeposits = ({ onClose }: { onClose: () => void }) => {
   const { execute, isPending } = useCentrifugeTransaction()
-  const { shareClass, poolCurrency } = useSelectedPool()
+  const { shareClass, poolCurrency, shareClassDetails } = useSelectedPool()
+  const { data: holdings } = useHoldings(shareClass, { enabled: !!shareClass })
   const { data: pendingOrders } = usePendingAmounts(shareClass, {
-    enabled: !!shareClass,
-  })
-  const { data: holdings } = useHoldings(shareClass, {
     enabled: !!shareClass,
   })
 
@@ -37,7 +35,7 @@ export const ApproveDeposits = ({ onClose }: { onClose: () => void }) => {
 
   const defaultOrders = orders.reduce(
     (acc, o) => {
-      acc[o.assetId.toString()] = {
+      acc[o.id] = {
         id: o.id,
         assetId: o.assetId,
         chainId: o.chainId,
@@ -62,8 +60,10 @@ export const ApproveDeposits = ({ onClose }: { onClose: () => void }) => {
 
       const assets = arr.map((o) => {
         const holding = holdings?.find((o) => o.assetId.toString() === o.assetId.toString())
+
         return {
           assetId: o.assetId,
+          // pool currency decimals
           approveAssetAmount: convertBalance(o.amount, holding?.asset?.decimals ?? 18),
         }
       })
@@ -78,19 +78,17 @@ export const ApproveDeposits = ({ onClose }: { onClose: () => void }) => {
   const extraColumns: ColumnDefinition<TableData>[] = useMemo(() => {
     return [
       {
-        header: 'Approve amount',
-        render: ({ id, holding }: TableData) => {
+        header: `Approve amount`,
+        render: ({ id }: TableData) => {
           return (
             <BalanceInput
               name={`orders.${id}.amount`}
               buttonLabel="MAX"
-              decimals={holding?.asset?.decimals}
+              decimals={poolCurrency?.decimals}
               onButtonClick={() => {
                 const originalOrder = orders.find((o) => o.id === id)
                 if (originalOrder) {
-                  setValue(`orders.${id}.amount`, originalOrder.amount, {
-                    shouldDirty: true,
-                  })
+                  setValue(`orders.${id}.amount`, originalOrder.amount)
                 }
               }}
             />
@@ -98,11 +96,17 @@ export const ApproveDeposits = ({ onClose }: { onClose: () => void }) => {
         },
       },
       // {
-      //  header: `Approve amount (${poolCurrency?.symbol})`,
-      //  render: ({ id }: TableData) => {
-      //    return <LiveAmountDisplay name={`orders.${id}.amount`} poolDecimals={poolCurrency?.decimals} />
-      //  },
+      //  header: 'Estimated payout',
+      // render: ({ id }: TableData) => {
+      //  return (
+      //     <LiveAmountDisplay
+      //       name={`orders.${id}.amount`}
+      //       poolDecimals={poolCurrency?.decimals}
+      //       calculationType="revoke"
+      //     />
+      //   )
       // },
+      //},
     ]
   }, [orders, setValue])
 
@@ -121,7 +125,7 @@ export const ApproveDeposits = ({ onClose }: { onClose: () => void }) => {
           </Card>
         )
       })}
-      <Grid templateColumns={{ base: '1fr', md: '1fr 1fr' }} gap={2} mt={4}>
+      <Grid templateColumns={'1fr 1fr'} gap={2} mt={4}>
         <Button size="sm" variant="solid" colorPalette="gray" onClick={onClose} label="Cancel" />
         <Button
           size="sm"
