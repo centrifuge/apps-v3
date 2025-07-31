@@ -1,15 +1,7 @@
 import { Outlet, Link, useParams } from 'react-router-dom'
 import { useMemo, useState } from 'react'
-import { Box, Flex, IconButton, Text, Spacer, Heading, Separator } from '@chakra-ui/react'
-import {
-  ErrorBoundary,
-  IconArrowLeft,
-  IconArrowRight,
-  IconPlus,
-  LinkButton,
-  LogoCentrifuge,
-  LogoCentrifugeText,
-} from '@centrifuge/ui'
+import { Box, Flex, IconButton, Spacer, Heading, Separator } from '@chakra-ui/react'
+import { IconArrowLeft, IconArrowRight, IconPlus, LogoCentrifuge, LogoCentrifugeText } from '@centrifuge/ui'
 import { SidebarTabs } from './SidebarTabs'
 import { WalletButton } from '@centrifuge/wallet'
 import { usePoolDetails } from '@centrifuge/shared'
@@ -69,14 +61,13 @@ export const Sidebar = () => {
               <Link to="/pools/create">
                 <IconPlus />
               </Link>
-            ) : (
-              <LinkButton to="/pools/create" bg="gray.700" justifyContent="center" w="full">
-                <IconPlus color="white" />
-                <Text color="white" ml={2}>
-                  Create Pool
-                </Text>
-              </LinkButton>
-            )}
+            ) : // <LinkButton to="/pools/create" bg="gray.700" justifyContent="center" w="full">
+            //   <IconPlus color="white" />
+            //   <Text color="white" ml={2}>
+            //    Create Pool
+            //  </Text>
+            //</LinkButton>
+            null}
           </Box>
         </Flex>
       </Box>

@@ -139,7 +139,7 @@ export function HoldingsTable({
   }))
 
   return (
-    <Stack mt={8} gap={2}>
+    <Stack gap={2}>
       <Stack gap={0} mb={4}>
         <Heading size="sm">Holdings</Heading>
         <Flex justify="space-between">
