@@ -41,8 +41,16 @@ export const OrdersTable = ({
     return [
       {
         header: 'Approve',
-        render: ({ id }) => {
-          return <Checkbox name={`orders.${id}.isSelected`} />
+        render: ({ id, epoch }) => {
+          if (!epoch) {
+            return <Checkbox name={`orders.${id}.isSelected`} />
+          }
+
+          const lowestEpoch = Math.min(
+            ...items.map((o) => o.epoch).filter((epoch): epoch is number => epoch !== undefined)
+          )
+          const disabled = epoch > lowestEpoch
+          return <Checkbox name={`orders.${id}.isSelected`} disabled={disabled} />
         },
         width: '40px',
       },

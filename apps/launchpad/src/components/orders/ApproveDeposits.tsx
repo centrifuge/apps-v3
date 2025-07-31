@@ -88,7 +88,7 @@ export const ApproveDeposits = ({ onClose }: { onClose: () => void }) => {
               buttonLabel="MAX"
               decimals={holding?.asset?.decimals}
               onButtonClick={() => {
-                const originalOrder = orders.find((o) => o.assetId.toString() === id)
+                const originalOrder = orders.find((o) => o.id === id)
                 if (originalOrder) {
                   setValue(`orders.${id}.amount`, originalOrder.amount, {
                     shouldDirty: true,

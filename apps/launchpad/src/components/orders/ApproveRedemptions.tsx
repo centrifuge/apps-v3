@@ -89,7 +89,7 @@ export const ApproveRedemptions = ({ onClose }: { onClose: () => void }) => {
               buttonLabel="MAX"
               decimals={poolCurrency?.decimals}
               onButtonClick={() => {
-                const originalOrder = orders.find((o) => o.assetId.toString() === id)
+                const originalOrder = orders.find((o) => o.id === id)
                 if (originalOrder) {
                   setValue(`orders.${id}.amount`, originalOrder.amount)
                 }

@@ -17,32 +17,35 @@ export const IssueShares = ({ onClose }: { onClose: () => void }) => {
     enabled: !!shareClass,
   })
 
-  const orders = useMemo(
-    () =>
+  const orders = useMemo(() => {
+    if (!pendingOrders) {
+      return []
+    }
+
+    return (
       pendingOrders
         ?.flatMap((order) =>
-          order.pendingIssuances.map((r) => ({
+          order.pendingIssuances.map((r, index) => ({
             chainId: order.chainId,
-            amount: r.amount,
+            amount: r.amount.toFloat().toString(),
             assetId: order.assetId,
             approvedAt: r.approvedAt,
+            id: `${order.assetId.toString()}-${index}`,
+            isSelected: false,
+            epoch: r.epoch,
+            pricePerShare: shareClassDetails?.pricePerShare?.toFloat().toString() ?? '0',
           }))
         )
-        .filter((o) => !o.amount.isZero()) ?? [],
-    [pendingOrders]
-  )
+        .filter((o) => o.amount !== '0') ?? []
+    )
+  }, [pendingOrders])
 
   const ordersByChain = useOrdersByChainId(orders)
 
   const defaultOrders = orders.reduce(
     (acc, o) => {
-      acc[o.assetId.toString()] = {
-        assetId: o.assetId,
-        chainId: o.chainId,
-        amount: o.amount,
-        isSelected: false,
-        approvedAt: o.approvedAt,
-        pricePerShare: shareClassDetails?.pricePerShare?.toFloat() ?? 0,
+      acc[o.id] = {
+        ...o,
       }
       return acc
     },
@@ -51,10 +54,11 @@ export const IssueShares = ({ onClose }: { onClose: () => void }) => {
       {
         assetId: AssetId
         chainId: number
-        amount: Balance
+        amount: string
         isSelected: boolean
         approvedAt: Date
-        pricePerShare: number
+        pricePerShare: string
+        epoch: number
       }
     >
   )
@@ -84,6 +88,8 @@ export const IssueShares = ({ onClose }: { onClose: () => void }) => {
 
   const { setValue } = form
 
+  const lowestEpoch = Math.min(...orders.map((o) => o.epoch))
+
   // @ts-ignore
   const extraColumns: ColumnDefinition<TableData>[] = useMemo(() => {
     return [
@@ -98,18 +104,20 @@ export const IssueShares = ({ onClose }: { onClose: () => void }) => {
       {
         header: 'Issue with NAV per share',
         accessor: 'pricePerShare',
-        render: ({ id }: { id: string }) => {
+        render: ({ id, epoch }: TableData & { epoch: number }) => {
+          const isDisabled = epoch > lowestEpoch
           return (
             <BalanceInput
               name={`orders.${id}.pricePerShare`}
               buttonLabel="Latest"
               onButtonClick={() => {
-                const originalOrder = orders.find((o) => o.assetId.toString() === id)
-                const raw = shareClassDetails?.pricePerShare?.toFloat() ?? 0
+                const originalOrder = orders.find((o) => o.id === id)
+                const raw = shareClassDetails?.pricePerShare?.toFloat().toString() ?? '0'
                 if (originalOrder) {
                   setValue(`orders.${id}.pricePerShare`, raw)
                 }
               }}
+              disabled={isDisabled}
             />
           )
         },
@@ -129,7 +137,7 @@ export const IssueShares = ({ onClose }: { onClose: () => void }) => {
         },
       },
     ]
-  }, [orders, setValue])
+  }, [orders, setValue, lowestEpoch])
 
   if (!pendingOrders || !shareClass || orders.length === 0) {
     return <VStack>No pending orders</VStack>

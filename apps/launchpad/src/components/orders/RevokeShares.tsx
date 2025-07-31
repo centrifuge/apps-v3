@@ -7,7 +7,7 @@ import { ChainHeader } from './ChainHeader'
 import { Button, Card, ColumnDefinition } from '@centrifuge/ui'
 import { OrdersTable, TableData } from './OrdersTable'
 import { BalanceInput, Form, useForm } from '@centrifuge/forms'
-import { AssetId, Balance, Price } from '@centrifuge/sdk'
+import { AssetId, Price } from '@centrifuge/sdk'
 import { LiveAmountDisplay } from './LiveAmountDisplay'
 
 export const RevokeShares = ({ onClose }: { onClose: () => void }) => {
@@ -17,60 +17,31 @@ export const RevokeShares = ({ onClose }: { onClose: () => void }) => {
     enabled: !!shareClass,
   })
 
-  console.log(pendingOrders)
-
   const orders = useMemo(() => {
-    if (!pendingOrders) return []
+    if (!pendingOrders) {
+      return []
+    }
 
-    const flatOrders =
-      pendingOrders
-        ?.flatMap((order) =>
-          order.pendingRevocations.map((r) => ({
-            chainId: order.chainId,
-            amount: r.amount,
-            assetId: order.assetId,
-            approvedAt: r.approvedAt,
-            epoch: r.epoch,
-          }))
-        )
-        .filter((o) => !o.amount.isZero()) ?? []
-
-    const orderGroups = flatOrders.reduce(
-      (acc, order) => {
-        const key = order.assetId.toString()
-
-        if (!acc[key]) {
-          acc[key] = {
-            assetId: order.assetId,
-            chainId: order.chainId,
-            amount: order.amount,
-            subOrders: [order],
-            approvedAt: order.approvedAt,
-            epoch: order.epoch,
-          }
-        } else {
-          acc[key].amount = acc[key].amount.add(order.amount)
-          acc[key].subOrders.push(order)
-        }
-        return acc
-      },
-      {} as Record<string, any>
-    )
-
-    return Object.values(orderGroups)
-  }, [pendingOrders])
+    return pendingOrders.flatMap((order, index) => {
+      return order.pendingRevocations.map((revocation) => ({
+        assetId: order.assetId,
+        chainId: order.chainId,
+        approvedAt: revocation.approvedAt,
+        pricePerShare: shareClassDetails?.pricePerShare?.toFloat().toString() ?? '0',
+        epoch: revocation.epoch,
+        amount: revocation.amount.toFloat().toString(),
+        id: `${order.assetId.toString()}-${index}`,
+        isSelected: false,
+      }))
+    })
+  }, [pendingOrders, shareClassDetails])
 
   const ordersByChain = useOrdersByChainId(orders)
 
   const defaultOrders = orders.reduce(
     (acc, o) => {
-      acc[o.assetId.toString()] = {
-        assetId: o.assetId,
-        chainId: o.chainId,
-        amount: o.amount,
-        isSelected: false,
-        approvedAt: o.approvedAt,
-        pricePerShare: shareClassDetails?.pricePerShare?.toFloat() ?? 0,
+      acc[o.id] = {
+        ...o,
       }
       return acc
     },
@@ -79,10 +50,11 @@ export const RevokeShares = ({ onClose }: { onClose: () => void }) => {
       {
         assetId: AssetId
         chainId: number
-        amount: Balance
+        amount: string
         isSelected: boolean
         approvedAt: Date
-        pricePerShare: number
+        epoch: number
+        pricePerShare: string
       }
     >
   )
@@ -101,9 +73,11 @@ export const RevokeShares = ({ onClose }: { onClose: () => void }) => {
       const assets = arr.map((o) => {
         return {
           assetId: o.assetId,
-          revokePricePerShare: new Price(convertBalance(o.pricePerShare, poolCurrency?.decimals ?? 18).toString()),
+          // revokePricePerShare: new Price(convertBalance(o.pricePerShare, poolCurrency?.decimals ?? 18).toString()),
         }
       })
+
+      console.log(assets)
 
       await execute(shareClass.approveRedeemsAndRevokeShares(assets))
       onClose()
@@ -112,14 +86,10 @@ export const RevokeShares = ({ onClose }: { onClose: () => void }) => {
 
   const { setValue } = form
 
+  const lowestEpoch = Math.min(...orders.map((o) => o.epoch))
+
   // @ts-ignore
   const extraColumns: ColumnDefinition<TableData>[] = useMemo(() => {
-    // Find the epoch number of the first order that is not yet approved.
-    const firstUnapprovedEpoch = orders.reduce(
-      (earliest, order) => (order.epoch < earliest ? order.epoch : earliest),
-      Infinity
-    )
-
     return [
       {
         header: 'Approve at',
@@ -132,10 +102,13 @@ export const RevokeShares = ({ onClose }: { onClose: () => void }) => {
       {
         header: 'Revoke with NAV per share',
         accessor: 'pricePerShare',
-        render: ({ id, epoch, approvedAt }: TableData & { epoch: number }) => {
+        render: ({ id, epoch }: TableData & { epoch: number }) => {
           // Disable the input if its epoch is greater than the first unapproved one.
           // An already approved item should never be disabled.
-          const isDisabled = !approvedAt && epoch > firstUnapprovedEpoch
+
+          const isDisabled = epoch > lowestEpoch
+
+          console.log(epoch, lowestEpoch)
 
           return (
             <BalanceInput
@@ -143,8 +116,8 @@ export const RevokeShares = ({ onClose }: { onClose: () => void }) => {
               disabled={isDisabled}
               buttonLabel="Latest"
               onButtonClick={() => {
-                const originalOrder = orders.find((o) => o.assetId.toString() === id)
-                const raw = shareClassDetails?.pricePerShare?.toFloat() ?? 0
+                const originalOrder = orders.find((o) => o.id === id)
+                const raw = shareClassDetails?.pricePerShare?.toFloat().toString() ?? '0'
                 if (originalOrder) {
                   setValue(`orders.${id}.pricePerShare`, raw)
                 }
@@ -168,7 +141,7 @@ export const RevokeShares = ({ onClose }: { onClose: () => void }) => {
         },
       },
     ]
-  }, [orders, setValue, shareClassDetails, poolCurrency?.decimals])
+  }, [orders, setValue, shareClassDetails, poolCurrency?.decimals, lowestEpoch])
 
   if (!pendingOrders || !shareClass || orders.length === 0) {
     return <VStack>No pending orders</VStack>
