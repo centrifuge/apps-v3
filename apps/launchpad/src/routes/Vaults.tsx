@@ -11,7 +11,5 @@ export default function Vaults() {
     return <Loader />
   }
 
-  if (!vaults?.length) return <VStack>No vaults available</VStack>
-
   return <VaultList vaults={vaults} />
 }
