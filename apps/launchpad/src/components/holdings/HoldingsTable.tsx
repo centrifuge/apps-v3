@@ -3,7 +3,7 @@ import { Balance, ShareClass } from '@centrifuge/sdk'
 import { networkToName, formatUIBalance, Holdings, PoolDetails } from '@centrifuge/shared'
 import { Button, NetworkIcon } from '@centrifuge/ui'
 import { DataTable, ColumnDefinition, ActionsDropdown } from '@centrifuge/ui'
-import { Flex, Heading, Stack, Text } from '@chakra-ui/react'
+import { Flex, Heading, Stack, Text, VStack } from '@chakra-ui/react'
 import { AddHoldingForm } from './AddHoldingForm'
 import { DepositHolding } from './DepositHolding'
 import WithdrawHolding from './WithdrawHolding'
@@ -138,10 +138,8 @@ export function HoldingsTable({
     },
   }))
 
-  if (!holdings) return null
-
   return (
-    <Stack mt={8} gap={2}>
+    <Stack gap={2}>
       <Stack gap={0} mb={4}>
         <Heading size="sm">Holdings</Heading>
         <Flex justify="space-between">
@@ -158,7 +156,7 @@ export function HoldingsTable({
           </Flex>
         </Flex>
       </Stack>
-      <DataTable data={data} columns={columns} />
+      {holdings.length > 0 ? <DataTable data={data} columns={columns} /> : <VStack>No holdings found</VStack>}
       <AddHoldingForm openModal={openModal} setOpenModal={(modal) => setOpenModal({ ...openModal, ...modal })} />
       <DepositHolding
         openModal={openModal}

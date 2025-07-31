@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { Vault } from '@centrifuge/sdk'
 import { AssetIconText, AssetSymbol, Modal } from '@centrifuge/ui'
 import { vaultTypes } from './utils'
@@ -13,7 +14,6 @@ import { useSelectedPool } from '@contexts/SelectedPoolProvider'
 import { Form, Select, useForm } from '@centrifuge/forms'
 
 import { z } from 'zod'
-import { useMemo } from 'react'
 
 export const AddVaultModal = ({
   selectedVault,

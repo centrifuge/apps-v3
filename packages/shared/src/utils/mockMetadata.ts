@@ -1,14 +1,10 @@
 export const mockMetadata = {
   pool: {
-    name: 'Sepolia',
+    name: 'Tokenized AAA CLO',
     poolStatus: 'Active',
-    asset: {
-      class: 'Public credit',
-      subClass: 'US Treasuries',
-    },
+    asset: { class: 'Public credit', subClass: 'US Treasuries' },
     expenseRatio: '0.25',
     listed: true,
-
     poolStructure: 'Revolving',
     issuer: {
       description:
@@ -60,16 +56,12 @@ export const mockMetadata = {
     ],
   },
   shareClasses: {
-    '0x00010000000000010000000000000001': {
+    '0x00010000000000060000000000000001': {
       minInitialInvestment: '1000',
       apy: 'Target',
-      apyPercentage: 4.086,
+      apyPercentage: 5.983,
       weightedAverageMaturity: 49.42,
-      defaultAccounts: {
-        equity: 123,
-        gain: 123,
-        loss: 123,
-      },
+      defaultAccounts: { equity: 123, gain: 123, loss: 123 },
     },
   },
 }

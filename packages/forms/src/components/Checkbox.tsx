@@ -49,6 +49,7 @@ export function Checkbox<TFieldValues extends FieldValues = FieldValues>(props: 
             onChange?.(checked)
           }
         }}
+        checked={field.value}
       >
         {labelStart ? <ChakraCheckbox.Label>{label}</ChakraCheckbox.Label> : null}
 
