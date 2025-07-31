@@ -1,14 +1,17 @@
-import { Input, Select, useFormContext } from '@centrifuge/forms'
-import { Pool, PoolId, PoolNetwork } from '@centrifuge/sdk'
-import { networkToName, useCentrifugeTransaction, usePoolDetails, usePoolNetworks } from '@centrifuge/shared'
-import { AddressInput, NetworkIcon } from '@centrifuge/ui'
-import { Flex, Grid, Heading, Text } from '@chakra-ui/react'
+import { Form, Input, Select, useForm } from '@centrifuge/forms'
+import { PoolNetwork } from '@centrifuge/sdk'
+import { networkToName, useCentrifugeTransaction, usePoolNetworks } from '@centrifuge/shared'
+import { Button, Modal, NetworkIcon } from '@centrifuge/ui'
+import { Flex, Grid, Separator, Text } from '@chakra-ui/react'
 import { useSelectedPool } from '@contexts/SelectedPoolProvider'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
+import { isAddress } from 'viem'
 
-export const WhitelistInvestor = ({ poolId }: { poolId: PoolId }) => {
-  const { execute } = useCentrifugeTransaction()
-  const { pool, shareClass } = useSelectedPool()
+import { z } from 'zod'
+
+export const WhitelistInvestor = ({ isOpen, setIsOpen }: { isOpen: boolean; setIsOpen: (isOpen: boolean) => void }) => {
+  const { execute, isPending } = useCentrifugeTransaction()
+  const { shareClass, poolId } = useSelectedPool()
   const { data: networks } = usePoolNetworks(poolId, { enabled: !!poolId })
 
   const networkOptions = useMemo(() => {
@@ -25,11 +28,45 @@ export const WhitelistInvestor = ({ poolId }: { poolId: PoolId }) => {
     }))
   }, [networks])
 
+  const form = useForm({
+    schema: z.object({
+      address: z.string().refine((val) => isAddress(val), {
+        message: 'Invalid address',
+      }),
+      network: z.string().min(1),
+    }),
+    defaultValues: {
+      address: '',
+      network: '',
+    },
+    onSubmit: async (data) => {
+      const { address, network } = data
+      if (!shareClass) return
+      await execute(shareClass.updateMember(address, 4294967295, Number(network)))
+      setIsOpen(false)
+    },
+  })
+
   return (
-    <>
-      <Grid templateColumns="1fr 1fr" gap={4}>
-        <AddressInput onAdd={() => {}} label="Investor address" />
-      </Grid>
-    </>
+    <Modal isOpen={isOpen} onClose={() => setIsOpen(false)} title="Add investor">
+      <Form form={form}>
+        <Grid templateColumns="1fr" gap={4}>
+          <Input name="address" label="Investor address" size="sm" />
+          <Select name="network" items={networkOptions} label="Network" />
+        </Grid>
+        <Separator mt={4} />
+        <Grid templateColumns="1fr 1fr" gap={4} mt={4}>
+          <Button size="sm" variant="solid" colorPalette="gray" onClick={() => form.reset()} label="Cancel" />
+          <Button
+            size="sm"
+            variant="solid"
+            colorPalette="yellow"
+            onClick={() => form.handleSubmit()}
+            label="Add"
+            loading={isPending}
+          />
+        </Grid>
+      </Form>
+    </Modal>
   )
 }
