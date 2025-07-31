@@ -23,12 +23,13 @@ export const ApproveDeposits = ({ onClose }: { onClose: () => void }) => {
   const orders = useMemo(() => {
     return (
       pendingOrders
-        ?.map((order) => ({
+        ?.map((order, index) => ({
           chainId: order.chainId,
-          amount: order.pendingDeposit,
+          amount: order.pendingDeposit.toFloat().toString(),
           assetId: order.assetId,
+          id: `${order.assetId.toString()}-${index}`,
         }))
-        .filter((order) => !order.amount.isZero()) ?? []
+        .filter((order) => order.amount !== '0') ?? []
     )
   }, [pendingOrders])
 
@@ -37,6 +38,7 @@ export const ApproveDeposits = ({ onClose }: { onClose: () => void }) => {
   const defaultOrders = orders.reduce(
     (acc, o) => {
       acc[o.assetId.toString()] = {
+        id: o.id,
         assetId: o.assetId,
         chainId: o.chainId,
         amount: o.amount,
@@ -44,7 +46,7 @@ export const ApproveDeposits = ({ onClose }: { onClose: () => void }) => {
       }
       return acc
     },
-    {} as Record<string, { assetId: AssetId; chainId: number; amount: Balance; isSelected: boolean }>
+    {} as Record<string, { id: string; assetId: AssetId; chainId: number; amount: string; isSelected: boolean }>
   )
 
   const form = useForm({
@@ -59,16 +61,14 @@ export const ApproveDeposits = ({ onClose }: { onClose: () => void }) => {
       }
 
       const assets = arr.map((o) => {
-        const balance = typeof o.amount !== 'string' ? o.amount.toString() : o.amount
         const holding = holdings?.find((o) => o.assetId.toString() === o.assetId.toString())
+        console.log(o.amount)
         return {
           assetId: o.assetId,
-          // Asset to deposit decimals
-          approveAssetAmount: convertBalance(balance, holding?.asset?.decimals ?? poolCurrency?.decimals ?? 18),
         }
       })
 
-      await execute(shareClass.approveDepositsAndIssueShares(assets))
+      // await execute(shareClass.approveDepositsAndIssueShares(assets))
       onClose()
     },
   })

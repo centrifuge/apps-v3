@@ -1,21 +1,21 @@
 import { Checkbox } from '@centrifuge/forms'
 import { formatUIBalance, Holdings, useHoldings } from '@centrifuge/shared'
-import { AssetId, Balance, ShareClass } from '@centrifuge/sdk'
+import { AssetId, ShareClass } from '@centrifuge/sdk'
 import { AssetIconText, AssetSymbol, ColumnDefinition, DataTable } from '@centrifuge/ui'
 import { useMemo } from 'react'
 import { Text } from '@chakra-ui/react'
 
 type Item = {
   chainId: number
-  amount: Balance
+  amount: string
   assetId: AssetId
+  id: string
+  approvedAt?: Date
+  epoch?: number
 }
 
 export type TableData = Item & {
-  id: string
   holding?: Holdings[number]
-  checkboxId?: string
-  approvedAt?: Date
 }
 
 export const OrdersTable = ({
@@ -32,7 +32,6 @@ export const OrdersTable = ({
   const data: TableData[] = useMemo(() => {
     return items.map((item) => ({
       ...item,
-      id: item.assetId.toString(),
       holding: holdings?.find((h) => h.assetId.toString() === item.assetId.toString()),
     }))
   }, [items, holdings])
@@ -50,7 +49,7 @@ export const OrdersTable = ({
       {
         header: 'Amount',
         accessor: 'amount',
-        render: ({ amount }) => <Text>{formatUIBalance(amount, { tokenDecimals: 18 })}</Text>,
+        render: ({ amount }) => <Text>{formatUIBalance(amount)}</Text>,
         width: '100px',
       },
       {
@@ -63,5 +62,6 @@ export const OrdersTable = ({
     ]
   }, [extraColumns])
 
+  // @ts-ignore
   return <DataTable data={data} columns={columns} />
 }

@@ -7,7 +7,7 @@ import { ChainHeader } from './ChainHeader'
 import { Button, Card, ColumnDefinition } from '@centrifuge/ui'
 import { OrdersTable, TableData } from './OrdersTable'
 import { BalanceInput, Form, useForm } from '@centrifuge/forms'
-import { AssetId, Balance } from '@centrifuge/sdk'
+import { AssetId } from '@centrifuge/sdk'
 import { LiveAmountDisplay } from './LiveAmountDisplay'
 
 export const ApproveRedemptions = ({ onClose }: { onClose: () => void }) => {
@@ -20,12 +20,13 @@ export const ApproveRedemptions = ({ onClose }: { onClose: () => void }) => {
   const orders = useMemo(() => {
     return (
       pendingOrders
-        ?.map((order) => ({
+        ?.map((order, index) => ({
           chainId: order.chainId,
-          amount: order.pendingRedeem,
+          amount: order.pendingRedeem.toFloat().toString(),
           assetId: order.assetId,
+          id: `${order.assetId.toString()}-${index}`,
         }))
-        .filter((order) => !order.amount.isZero()) ?? []
+        .filter((order) => order.amount !== '0') ?? []
     )
   }, [pendingOrders])
 
@@ -33,18 +34,19 @@ export const ApproveRedemptions = ({ onClose }: { onClose: () => void }) => {
 
   const defaultOrders = orders.reduce(
     (acc, o) => {
-      acc[o.assetId.toString()] = {
+      acc[o.id] = {
+        id: o.id,
         assetId: o.assetId,
         chainId: o.chainId,
         amount: o.amount,
         isSelected: false,
-        pricePerShare: shareClassDetails?.pricePerShare?.toFloat() ?? 0,
+        pricePerShare: shareClassDetails?.pricePerShare?.toFloat().toString() ?? '0',
       }
       return acc
     },
     {} as Record<
       string,
-      { assetId: AssetId; chainId: number; amount: Balance; isSelected: boolean; pricePerShare: number }
+      { id: string; assetId: AssetId; chainId: number; amount: string; isSelected: boolean; pricePerShare: string }
     >
   )
 
@@ -60,11 +62,10 @@ export const ApproveRedemptions = ({ onClose }: { onClose: () => void }) => {
       }
 
       const assets = arr.map((o) => {
-        const balance = typeof o.amount !== 'string' ? o.amount.toString() : o.amount
         return {
           assetId: o.assetId,
           // pool currency decimals
-          approveShareAmount: convertBalance(balance, poolCurrency?.decimals ?? 18),
+          approveShareAmount: convertBalance(o.amount, poolCurrency?.decimals ?? 18),
         }
       })
 
@@ -90,9 +91,7 @@ export const ApproveRedemptions = ({ onClose }: { onClose: () => void }) => {
               onButtonClick={() => {
                 const originalOrder = orders.find((o) => o.assetId.toString() === id)
                 if (originalOrder) {
-                  setValue(`orders.${id}.amount`, originalOrder.amount, {
-                    shouldDirty: true,
-                  })
+                  setValue(`orders.${id}.amount`, originalOrder.amount)
                 }
               }}
             />

@@ -3,8 +3,9 @@ import { useMemo } from 'react'
 
 type Order = {
   chainId: number
-  amount: Balance
+  amount: string
   assetId: AssetId
+  id: string
 }
 
 export const useOrdersByChainId = (items: Order[]) => {

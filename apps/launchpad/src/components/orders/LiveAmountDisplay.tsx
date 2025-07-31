@@ -1,7 +1,8 @@
 import { useWatch, useFormContext } from 'react-hook-form'
 import { Box, Text } from '@chakra-ui/react'
-import { Balance, Price } from '@centrifuge/sdk'
+import { Balance } from '@centrifuge/sdk'
 import { formatUIBalance } from '@centrifuge/shared'
+import Decimal from 'decimal.js'
 
 type LiveAmountDisplayProps = {
   name: string
@@ -18,37 +19,39 @@ export const LiveAmountDisplay = ({
 }: LiveAmountDisplayProps) => {
   const { control } = useFormContext()
 
-  const liveAmount = useWatch({ control, name }) as Balance | string
-  const priceVal = useWatch({ control, name: pricePerShareName ?? '' }) as number | undefined
+  const liveAmount = useWatch({ control, name }) as string
+  const priceVal = useWatch({ control, name: pricePerShareName ?? '' }) as string
 
-  if (liveAmount == '') {
-    return 0
+  if (liveAmount == '' || !liveAmount) {
+    return '0'
   }
 
-  const amountFloat = typeof liveAmount === 'string' ? parseFloat(liveAmount) : liveAmount.toFloat()
+  const amountFloat = parseFloat(liveAmount)
   const amountToPoolDecimal = Balance.fromFloat(amountFloat, poolDecimals)
-  let finalAmount = amountToPoolDecimal ?? 0
+  let finalAmount = amountToPoolDecimal.toString()
 
   switch (calculationType) {
     case 'issue':
       if (pricePerShareName) {
-        if (priceVal === 0) {
-          return 0
+        if (priceVal === '0') {
+          return '0'
         }
         if (priceVal) {
-          const price = Balance.fromFloat(priceVal, poolDecimals)
-          finalAmount = amountToPoolDecimal.mul(price)
+          const priceDecimal = new Decimal(priceVal)
+          const amountDecimal = new Decimal(liveAmount)
+          finalAmount = amountDecimal.mul(priceDecimal).toString()
         }
       }
       break
     case 'revoke':
       if (pricePerShareName) {
-        if (priceVal === 0) {
-          return 0
+        if (priceVal === '0') {
+          return '0'
         }
         if (priceVal) {
-          const price = Balance.fromFloat(priceVal, poolDecimals)
-          finalAmount = amountToPoolDecimal.div(price)
+          const priceDecimal = new Decimal(priceVal)
+          const amountDecimal = new Decimal(liveAmount)
+          finalAmount = amountDecimal.div(priceDecimal).toString()
         }
       }
       break
@@ -56,11 +59,7 @@ export const LiveAmountDisplay = ({
 
   return (
     <Box display="flex" alignItems="center">
-      <Text>
-        {formatUIBalance(finalAmount, {
-          tokenDecimals: poolDecimals,
-        })}
-      </Text>
+      <Text>{formatUIBalance(finalAmount)}</Text>
     </Box>
   )
 }

@@ -17,8 +17,12 @@ export const RevokeShares = ({ onClose }: { onClose: () => void }) => {
     enabled: !!shareClass,
   })
 
-  const orders = useMemo(
-    () =>
+  console.log(pendingOrders)
+
+  const orders = useMemo(() => {
+    if (!pendingOrders) return []
+
+    const flatOrders =
       pendingOrders
         ?.flatMap((order) =>
           order.pendingRevocations.map((r) => ({
@@ -26,11 +30,35 @@ export const RevokeShares = ({ onClose }: { onClose: () => void }) => {
             amount: r.amount,
             assetId: order.assetId,
             approvedAt: r.approvedAt,
+            epoch: r.epoch,
           }))
         )
-        .filter((o) => !o.amount.isZero()) ?? [],
-    [pendingOrders]
-  )
+        .filter((o) => !o.amount.isZero()) ?? []
+
+    const orderGroups = flatOrders.reduce(
+      (acc, order) => {
+        const key = order.assetId.toString()
+
+        if (!acc[key]) {
+          acc[key] = {
+            assetId: order.assetId,
+            chainId: order.chainId,
+            amount: order.amount,
+            subOrders: [order],
+            approvedAt: order.approvedAt,
+            epoch: order.epoch,
+          }
+        } else {
+          acc[key].amount = acc[key].amount.add(order.amount)
+          acc[key].subOrders.push(order)
+        }
+        return acc
+      },
+      {} as Record<string, any>
+    )
+
+    return Object.values(orderGroups)
+  }, [pendingOrders])
 
   const ordersByChain = useOrdersByChainId(orders)
 
@@ -86,6 +114,12 @@ export const RevokeShares = ({ onClose }: { onClose: () => void }) => {
 
   // @ts-ignore
   const extraColumns: ColumnDefinition<TableData>[] = useMemo(() => {
+    // Find the epoch number of the first order that is not yet approved.
+    const firstUnapprovedEpoch = orders.reduce(
+      (earliest, order) => (order.epoch < earliest ? order.epoch : earliest),
+      Infinity
+    )
+
     return [
       {
         header: 'Approve at',
@@ -98,10 +132,15 @@ export const RevokeShares = ({ onClose }: { onClose: () => void }) => {
       {
         header: 'Revoke with NAV per share',
         accessor: 'pricePerShare',
-        render: ({ id }: { id: string }) => {
+        render: ({ id, epoch, approvedAt }: TableData & { epoch: number }) => {
+          // Disable the input if its epoch is greater than the first unapproved one.
+          // An already approved item should never be disabled.
+          const isDisabled = !approvedAt && epoch > firstUnapprovedEpoch
+
           return (
             <BalanceInput
               name={`orders.${id}.pricePerShare`}
+              disabled={isDisabled}
               buttonLabel="Latest"
               onButtonClick={() => {
                 const originalOrder = orders.find((o) => o.assetId.toString() === id)
@@ -129,7 +168,7 @@ export const RevokeShares = ({ onClose }: { onClose: () => void }) => {
         },
       },
     ]
-  }, [orders, setValue])
+  }, [orders, setValue, shareClassDetails, poolCurrency?.decimals])
 
   if (!pendingOrders || !shareClass || orders.length === 0) {
     return <VStack>No pending orders</VStack>

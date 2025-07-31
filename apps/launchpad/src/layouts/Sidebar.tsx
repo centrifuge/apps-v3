@@ -91,11 +91,9 @@ export const Sidebar = () => {
         <Separator />
 
         <Box flex="1" mt={8}>
-          <ErrorBoundary>
-            <SelectedPoolProvider>
-              <Outlet />
-            </SelectedPoolProvider>
-          </ErrorBoundary>
+          <SelectedPoolProvider>
+            <Outlet />
+          </SelectedPoolProvider>
         </Box>
       </Flex>
     </Flex>
