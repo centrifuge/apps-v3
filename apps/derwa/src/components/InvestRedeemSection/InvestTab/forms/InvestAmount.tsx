@@ -7,7 +7,7 @@ import { NetworkIcons } from '@centrifuge/ui'
 import { usePoolsContext } from '@contexts/usePoolsContext'
 import { infoText } from '@utils/infoText'
 import { InfoWrapper } from '@components/InvestRedeemSection/components/InfoWrapper'
-import { debounce, formatBalance, formatBalanceToString } from '@centrifuge/shared'
+import { debounce, formatBalanceToString } from '@centrifuge/shared'
 import { useGetPortfolioDetails } from '@hooks/useGetPortfolioDetails'
 import { useVaultsContext } from '@contexts/useVaultsContext'
 
@@ -118,7 +118,7 @@ export function InvestAmount({ isDisabled, maxInvestAmount, parsedInvestAmount }
                 MAX
               </Badge>
               <Text color="text-primary" opacity={0.5} alignSelf="flex-end" ml={2}>
-                {formatBalance(portfolioBalance ?? 0, portfolioInvestmentCurrency?.symbol)}
+                {maxInvestAmount}
               </Text>
             </Flex>
             <NetworkIcons networkIds={networkIds} />

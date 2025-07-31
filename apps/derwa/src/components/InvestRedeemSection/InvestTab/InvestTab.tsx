@@ -3,13 +3,7 @@ import { z } from 'zod'
 import { Box, Spinner } from '@chakra-ui/react'
 import { Form, useForm, safeParse, createBalanceSchema } from '@centrifuge/forms'
 import { Balance } from '@centrifuge/sdk'
-import {
-  formatBalanceToString,
-  useCentrifugeTransaction,
-  useInvestment,
-  usePortfolio,
-  useVaultDetails,
-} from '@centrifuge/shared'
+import { formatBalanceToString, useCentrifugeTransaction, useInvestment, useVaultDetails } from '@centrifuge/shared'
 import {
   type InvestActionType,
   InvestAction,
@@ -17,17 +11,14 @@ import {
 } from '@components/InvestRedeemSection/components/defaults'
 import { InvestTabForm } from '@components/InvestRedeemSection/InvestTab/forms/InvestTabForm'
 import { TabProps } from '@components/InvestRedeemSection'
+import { useGetPortfolioDetails } from '@hooks/useGetPortfolioDetails'
 
 export default function InvestTab({ isLoading: isTabLoading, vault }: TabProps) {
   const { data: vaultDetails, isLoading: isVaultDetailsLoading } = useVaultDetails(vault)
   const { data: investment, isLoading: isInvestmentLoading } = useInvestment(vault)
-  const { data: portfolio, isLoading: isPortfolioLoading } = usePortfolio()
+  const { portfolioBalance, isPortfolioLoading } = useGetPortfolioDetails(vaultDetails)
   const { execute, isPending } = useCentrifugeTransaction()
   const [actionType, setActionType] = useState<InvestActionType>(InvestAction.INVEST_AMOUNT)
-
-  const investmentCurrencyChainId = vaultDetails?.investmentCurrency?.chainId
-  const portfolioInvestmentAsset = portfolio?.find((asset) => asset.currency.chainId === investmentCurrencyChainId)
-  const portfolioBalance = portfolioInvestmentAsset?.balance
 
   const maxInvestAmount = useMemo(() => {
     if (!portfolioBalance) return '0'
