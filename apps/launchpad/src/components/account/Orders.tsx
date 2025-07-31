@@ -12,8 +12,6 @@ export function Orders({ title, isInvestment }: { title: string; isInvestment?: 
   const { data: pendingAmounts } = usePendingAmounts(shareClass, { enabled: !!shareClass })
   const defaultRoute = `/pool/${poolId?.toString()}/${shareClass?.id.toString()}/orders/approve`
 
-  console.log(pendingAmounts)
-
   const poolCurrencySymbol = poolCurrency?.symbol ?? 'USD'
   const poolCurrencyDecimals = poolCurrency?.decimals ?? 18
 

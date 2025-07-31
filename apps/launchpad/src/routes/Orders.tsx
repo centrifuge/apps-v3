@@ -1,7 +1,6 @@
 import { useMemo, useState } from 'react'
-import { Balance } from '@centrifuge/sdk'
 import { formatUIBalance, usePendingAmounts } from '@centrifuge/shared'
-import { Button, Card, Loader, Modal } from '@centrifuge/ui'
+import { Button, Card, Loader } from '@centrifuge/ui'
 import { Flex, Grid, GridItem, Heading, Stack, VStack } from '@chakra-ui/react'
 import { DisplayOrdersTable } from '@components/orders/DisplayOrdersTable'
 import { useSelectedPool } from '@contexts/SelectedPoolProvider'
