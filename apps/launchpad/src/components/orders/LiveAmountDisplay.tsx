@@ -1,65 +1,40 @@
 import { useWatch, useFormContext } from 'react-hook-form'
 import { Box, Text } from '@chakra-ui/react'
-import { Balance } from '@centrifuge/sdk'
 import { formatUIBalance } from '@centrifuge/shared'
 import Decimal from 'decimal.js'
 
 type LiveAmountDisplayProps = {
   name: string
-  pricePerShareName?: string
-  poolDecimals?: number
+  pricePerShare?: string | number
   calculationType?: 'issue' | 'revoke'
 }
 
-export const LiveAmountDisplay = ({
-  name,
-  pricePerShareName,
-  poolDecimals = 18,
-  calculationType = 'issue',
-}: LiveAmountDisplayProps) => {
+export const LiveAmountDisplay = ({ name, pricePerShare, calculationType = 'issue' }: LiveAmountDisplayProps) => {
   const { control } = useFormContext()
-
   const liveAmount = useWatch({ control, name }) as string
-  const priceVal = useWatch({ control, name: pricePerShareName ?? '' }) as string
 
-  if (liveAmount === '' || !liveAmount) {
-    return '0'
+  if (!liveAmount || liveAmount === '0') {
+    return <Text>0</Text>
   }
 
-  const amountFloat = parseFloat(liveAmount)
-  const amountToPoolDecimal = Balance.fromFloat(amountFloat, poolDecimals)
-  let finalAmount = amountToPoolDecimal.toString()
+  let finalAmount: Decimal | string = new Decimal(liveAmount)
 
-  switch (calculationType) {
-    case 'issue':
-      if (pricePerShareName) {
-        if (priceVal === '0') {
-          return priceVal
-        }
-        if (priceVal) {
-          const priceDecimal = new Decimal(priceVal)
-          const amountDecimal = new Decimal(liveAmount)
-          finalAmount = amountDecimal.mul(priceDecimal).toString()
-        }
-      }
-      break
-    case 'revoke':
-      if (pricePerShareName) {
-        if (priceVal === '0') {
-          return priceVal
-        }
-        if (priceVal) {
-          const priceDecimal = new Decimal(priceVal)
-          const amountDecimal = new Decimal(liveAmount)
-          finalAmount = amountDecimal.div(priceDecimal).toString()
-        }
-      }
-      break
+  if (pricePerShare) {
+    const priceDecimal = new Decimal(pricePerShare)
+    const amountDecimal = new Decimal(liveAmount)
+
+    if (priceDecimal.isZero()) {
+      finalAmount = '0'
+    } else if (calculationType === 'issue') {
+      finalAmount = amountDecimal.mul(priceDecimal)
+    } else if (calculationType === 'revoke') {
+      finalAmount = amountDecimal.div(priceDecimal)
+    }
   }
 
   return (
     <Box display="flex" alignItems="center">
-      <Text>{formatUIBalance(finalAmount)}</Text>
+      <Text>{formatUIBalance(finalAmount.toString())}</Text>
     </Box>
   )
 }

@@ -10,25 +10,10 @@ import { sumAmounts } from '@components/orders/utils'
 export function Orders({ title, isInvestment }: { title: string; isInvestment?: boolean }) {
   const { poolId, shareClass, poolCurrency } = useSelectedPool()
   const { data: pendingAmounts } = usePendingAmounts(shareClass, { enabled: !!shareClass })
-  const defaultRoute = `/pool/${poolId?.toString()}/${shareClass?.id.toString()}/orders/approve`
+  const defaultRoute = `/pool/${poolId?.toString()}/${shareClass?.id.toString()}/orders`
 
   const poolCurrencySymbol = poolCurrency?.symbol ?? 'USD'
   const poolCurrencyDecimals = poolCurrency?.decimals ?? 18
-
-  const findRoute = (isApprove: boolean) => {
-    let route = defaultRoute
-    if (isInvestment && isApprove) {
-      route = defaultRoute
-    } else if (!isInvestment && isApprove) {
-      route = `/pool/${poolId?.toString()}/${shareClass?.id.toString()}/orders/approveRedeem`
-    } else if (isInvestment && !isApprove) {
-      route = `/pool/${poolId?.toString()}/${shareClass?.id.toString()}/orders/issue`
-    } else if (!isInvestment && !isApprove) {
-      route = `/pool/${poolId?.toString()}/${shareClass?.id.toString()}/orders/revokeRedeem`
-    }
-
-    return route
-  }
 
   const { pendingInvestments, pendingRedemptions, pendingIssuances, pendingRevocations } = useMemo(() => {
     return {
@@ -53,9 +38,17 @@ export function Orders({ title, isInvestment }: { title: string; isInvestment?: 
             })}
           </Heading>
         </Stack>
-        <LinkButton to={findRoute(true)} colorPalette="black" size="sm" width="120px">
-          Approve
-        </LinkButton>
+        {isInvestment
+          ? !pendingInvestments?.isZero() && (
+              <LinkButton to={defaultRoute} colorPalette="black" size="sm" width="120px">
+                Approve
+              </LinkButton>
+            )
+          : !pendingRedemptions?.isZero() && (
+              <LinkButton to={defaultRoute} colorPalette="black" size="sm" width="120px">
+                Approve
+              </LinkButton>
+            )}
       </Flex>
       <Separator mt={4} mb={4} />
       <Flex mt={2} justify="space-between" alignItems="center">
@@ -68,14 +61,16 @@ export function Orders({ title, isInvestment }: { title: string; isInvestment?: 
             })}
           </Heading>
         </Stack>
-        {isInvestment ? (
-          <LinkButton to={findRoute(false)} colorPalette="black" size="sm" width="120px">
+        {isInvestment && !pendingIssuances?.isZero() ? (
+          <LinkButton to={defaultRoute} colorPalette="black" size="sm" width="120px">
             Issue
           </LinkButton>
         ) : (
-          <LinkButton to={findRoute(false)} colorPalette="black" size="sm" width="120px">
-            Revoke
-          </LinkButton>
+          !pendingRevocations?.isZero() && (
+            <LinkButton to={defaultRoute} colorPalette="black" size="sm" width="120px">
+              Revoke
+            </LinkButton>
+          )
         )}
       </Flex>
     </Card>
