@@ -1,14 +1,47 @@
 import { formatDate, useCentrifugeTransaction, usePendingAmounts } from '@centrifuge/shared'
 import { useSelectedPool } from '@contexts/SelectedPoolProvider'
 import { Grid, Text, VStack } from '@chakra-ui/react'
-import { useMemo } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { useOrdersByChainId } from './utils'
 import { ChainHeader } from './ChainHeader'
 import { Button, Card, ColumnDefinition } from '@centrifuge/ui'
 import { OrdersTable, TableData } from './OrdersTable'
 import { BalanceInput, Form, useForm } from '@centrifuge/forms'
-import { AssetId, Price } from '@centrifuge/sdk'
+import { Price } from '@centrifuge/sdk'
 import { LiveAmountDisplay } from './LiveAmountDisplay'
+import { z } from 'zod'
+
+function usePrevious<T>(value: T): T | undefined {
+  const ref = useRef<T>(value)
+  useEffect(() => {
+    ref.current = value
+  }, [value])
+  return ref.current
+}
+
+const createValidationSchema = () => {
+  return z.object({
+    orders: z.record(
+      z.string(),
+      z.object({
+        id: z.string(),
+        assetId: z.any(),
+        chainId: z.number(),
+        amount: z.string(),
+        isSelected: z.boolean(),
+        approvedAt: z.date(),
+        pricePerShare: z.string().refine(
+          (val) => {
+            if (!val.includes('.')) return true
+            return val.split('.')[1].length <= 18
+          },
+          { message: 'Max 18 decimal places' }
+        ),
+        epoch: z.number(),
+      })
+    ),
+  })
+}
 
 export const RevokeShares = ({ onClose }: { onClose: () => void }) => {
   const { execute, isPending } = useCentrifugeTransaction()
@@ -17,116 +50,172 @@ export const RevokeShares = ({ onClose }: { onClose: () => void }) => {
     enabled: !!shareClass,
   })
 
-  const orders = useMemo(() => {
-    if (!pendingOrders) {
-      return []
-    }
+  const validationSchema = createValidationSchema()
 
-    return pendingOrders.flatMap((order, index) => {
-      return order.pendingRevocations.map((revocation, revocationIndex) => ({
-        assetId: order.assetId,
-        chainId: order.chainId,
-        approvedAt: revocation.approvedAt,
-        pricePerShare: shareClassDetails?.pricePerShare?.toFloat().toString() ?? '0',
-        epoch: revocation.epoch,
-        amount: revocation.amount.toFloat().toString(),
-        id: `${order.assetId.toString()}-${index}-${revocationIndex}`,
-        isSelected: false,
-      }))
-    })
-  }, [pendingOrders, shareClassDetails])
+  // Sort orders by asset, then by epoch (oldest to newest)
+  const orders = useMemo(() => {
+    if (!pendingOrders) return []
+    return (
+      pendingOrders
+        .flatMap((order, orderIndex) =>
+          order.pendingRevocations.map((revocation, revocationIndex) => ({
+            chainId: order.chainId,
+            amount: revocation.amount.toFloat().toString(),
+            assetId: order.assetId,
+            approvedAt: revocation.approvedAt,
+            id: `${order.assetId.toString()}-${revocation.epoch}-${revocationIndex}`,
+            isSelected: false,
+            epoch: revocation.epoch,
+            pricePerShare: shareClassDetails?.pricePerShare?.toDecimal().toString() ?? '0',
+          }))
+        )
+        .filter((o) => o.amount !== '0')
+        .sort((a, b) => a.assetId.toString().localeCompare(b.assetId.toString()) || a.epoch - b.epoch) ?? []
+    )
+  }, [pendingOrders, shareClassDetails?.pricePerShare])
 
   const ordersByChain = useOrdersByChainId(orders)
 
-  const defaultOrders = orders.reduce(
-    (acc, o) => {
-      acc[o.id] = {
-        ...o,
-      }
-      return acc
-    },
-    {} as Record<
-      string,
-      {
-        assetId: AssetId
-        chainId: number
-        amount: string
-        isSelected: boolean
-        approvedAt: Date
-        epoch: number
-        pricePerShare: string
-      }
-    >
+  const defaultOrders = useMemo(
+    () =>
+      orders.reduce((acc, o) => {
+        acc[o.id] = { ...o }
+        return acc
+      }, {} as any),
+    [orders]
   )
 
   const form = useForm({
     defaultValues: { orders: defaultOrders },
     onSubmit: async (data) => {
       const { orders } = data
-      const arr = Object.values(orders).filter((o) => o.isSelected)
-
+      const arr = Object.values(orders).filter((o: any) => o.isSelected)
       if (!arr.length || !shareClass) {
         onClose()
         return
       }
-
-      const assets = arr.map((o) => {
-        return {
-          assetId: o.assetId,
-          revokePricePerShare: Price.fromFloat(o.pricePerShare),
-        }
-      })
-
+      const assets = arr.map((o: any) => ({
+        assetId: o.assetId,
+        revokePricePerShare: Price.fromFloat(o.pricePerShare),
+      }))
       await execute(shareClass.approveRedeemsAndRevokeShares(assets))
       onClose()
     },
   })
 
-  const { setValue } = form
+  const { setValue, watch, setError, clearErrors, formState } = form
+  const watchedOrders = watch('orders')
+  const prevWatchedOrders = usePrevious(watchedOrders)
+
+  useEffect(() => {
+    if (!prevWatchedOrders || !watchedOrders) return
+
+    let changed = false
+    const newOrders = { ...watchedOrders }
+
+    for (let i = 0; i < orders.length; i++) {
+      const order = orders[i]
+      const prevOrderState = prevWatchedOrders[order.id]
+      const currentOrderState = watchedOrders[order.id]
+
+      if (prevOrderState?.isSelected && !currentOrderState?.isSelected) {
+        // This order was just unchecked, so uncheck all subsequent orders of the same asset
+        for (let j = i + 1; j < orders.length; j++) {
+          const subsequentOrder = orders[j]
+          if (subsequentOrder.assetId.toString() === order.assetId.toString()) {
+            if (newOrders[subsequentOrder.id].isSelected) {
+              newOrders[subsequentOrder.id].isSelected = false
+              changed = true
+            }
+          }
+        }
+      }
+    }
+
+    if (changed) {
+      setValue('orders', newOrders)
+    }
+  }, [watchedOrders, prevWatchedOrders, orders, setValue])
+
+  useEffect(() => {
+    const result = validationSchema.safeParse({ orders: watchedOrders })
+    const activeErrors = new Map<string, string>()
+
+    if (!result.success) {
+      result.error.issues.forEach((issue) => {
+        const path = issue.path.join('.')
+        activeErrors.set(path, issue.message)
+      })
+    }
+
+    Object.keys(watchedOrders).forEach((id) => {
+      const fieldName = `orders.${id}.pricePerShare`
+      const orderErrors = formState.errors.orders as any
+      const currentError = orderErrors?.[id]?.pricePerShare?.message
+      const newError = activeErrors.get(fieldName)
+
+      if (newError && currentError !== newError) {
+        setError(fieldName as any, { type: 'manual', message: newError })
+      } else if (!newError && currentError) {
+        clearErrors(fieldName as any)
+      }
+    })
+  }, [watchedOrders, validationSchema, setError, clearErrors, formState.errors])
+
+  // FIFO
+  const disabledStates = useMemo(() => {
+    const disabledMap: Record<string, boolean> = {}
+    for (const order of orders) {
+      const assetStr = order.assetId.toString()
+      const prevOrder = orders
+        .slice()
+        .reverse()
+        .find((o) => o.assetId.toString() === assetStr && o.epoch < order.epoch)
+
+      if (prevOrder) {
+        if (!watchedOrders[prevOrder.id]?.isSelected) {
+          disabledMap[order.id] = true
+        }
+      }
+    }
+    return disabledMap
+  }, [orders, watchedOrders])
 
   const extraColumns: ColumnDefinition<TableData>[] = useMemo(() => {
     return [
       {
         header: 'Approve at',
-        render: ({ approvedAt }) => {
-          return <Text>{approvedAt ? formatDate(approvedAt, 'short', true) : '-'}</Text>
-        },
+        accessor: 'approvedAt',
+        render: ({ approvedAt }) => <Text>{approvedAt ? formatDate(approvedAt, 'short', true) : '-'}</Text>,
         width: '160px',
       },
       {
         header: 'Revoke with NAV per share',
         accessor: 'pricePerShare',
-        render: ({ id }: TableData) => {
-          return (
-            <BalanceInput
-              name={`orders.${id}.pricePerShare`}
-              buttonLabel="Latest"
-              onButtonClick={() => {
-                const originalOrder = orders.find((o) => o.id === id)
-                const raw = shareClassDetails?.pricePerShare?.toFloat().toString() ?? '0'
-                if (originalOrder) {
-                  setValue(`orders.${id}.pricePerShare`, raw)
-                }
-              }}
-            />
-          )
-        },
+        render: ({ id }: TableData) => (
+          <BalanceInput
+            name={`orders.${id}.pricePerShare`}
+            buttonLabel="Latest"
+            decimals={18}
+            onButtonClick={() => {
+              const latestPrice = shareClassDetails?.pricePerShare?.toDecimal().toString() ?? '0'
+              setValue(`orders.${id}.pricePerShare`, latestPrice, { shouldValidate: true })
+            }}
+          />
+        ),
       },
       {
-        header: `Issue new shares (${shareClassDetails?.symbol})`,
-        render: ({ id }: TableData) => {
-          return (
-            <LiveAmountDisplay
-              name={`orders.${id}.amount`}
-              poolDecimals={poolCurrency?.decimals}
-              calculationType="issue"
-              pricePerShareName={`orders.${id}.pricePerShare`}
-            />
-          )
-        },
+        header: `Est. Payout (${poolCurrency?.symbol})`,
+        render: ({ id }: TableData) => (
+          <LiveAmountDisplay
+            name={`orders.${id}.amount`}
+            calculationType="revoke"
+            pricePerShareName={`orders.${id}.pricePerShare`}
+          />
+        ),
       },
     ]
-  }, [orders, setValue, shareClassDetails, poolCurrency?.decimals])
+  }, [shareClassDetails, poolCurrency, setValue])
 
   if (!pendingOrders || !shareClass || orders.length === 0) {
     return <VStack>No pending orders</VStack>
@@ -139,7 +228,12 @@ export const RevokeShares = ({ onClose }: { onClose: () => void }) => {
         return (
           <Card key={chainId}>
             <ChainHeader chainId={chainId} />
-            <OrdersTable items={ordersByChain[chainIdNum]} shareClass={shareClass} extraColumns={extraColumns} />
+            <OrdersTable
+              items={ordersByChain[chainIdNum]}
+              shareClass={shareClass}
+              extraColumns={extraColumns}
+              disabledStates={disabledStates}
+            />
           </Card>
         )
       })}

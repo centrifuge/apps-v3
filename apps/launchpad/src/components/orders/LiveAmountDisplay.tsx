@@ -5,31 +5,31 @@ import Decimal from 'decimal.js'
 
 type LiveAmountDisplayProps = {
   name: string
-  pricePerShare?: string | number
+  pricePerShareName?: string
   calculationType?: 'issue' | 'revoke'
 }
 
-export const LiveAmountDisplay = ({ name, pricePerShare, calculationType = 'issue' }: LiveAmountDisplayProps) => {
+export const LiveAmountDisplay = ({ name, pricePerShareName, calculationType = 'issue' }: LiveAmountDisplayProps) => {
   const { control } = useFormContext()
-  const liveAmount = useWatch({ control, name }) as string
 
-  if (!liveAmount || liveAmount === '0') {
+  const liveAmount = useWatch({ control, name }) as string
+  const priceVal = useWatch({ control, name: pricePerShareName ?? '' }) as string
+
+  if (!liveAmount || liveAmount === '0' || !priceVal || priceVal === '0') {
     return <Text>0</Text>
   }
 
-  let finalAmount: Decimal | string = new Decimal(liveAmount)
+  const amountDecimal = new Decimal(liveAmount)
+  const priceDecimal = new Decimal(priceVal)
+  let finalAmount: Decimal = amountDecimal
 
-  if (pricePerShare) {
-    const priceDecimal = new Decimal(pricePerShare)
-    const amountDecimal = new Decimal(liveAmount)
-
-    if (priceDecimal.isZero()) {
-      finalAmount = '0'
-    } else if (calculationType === 'issue') {
-      finalAmount = amountDecimal.mul(priceDecimal)
-    } else if (calculationType === 'revoke') {
-      finalAmount = amountDecimal.div(priceDecimal)
-    }
+  switch (calculationType) {
+    case 'issue':
+      finalAmount = amountDecimal.div(priceDecimal) // amount of currency / price = amount of shares
+      break
+    case 'revoke':
+      finalAmount = amountDecimal.mul(priceDecimal) // amount of shares * price = amount of currency
+      break
   }
 
   return (

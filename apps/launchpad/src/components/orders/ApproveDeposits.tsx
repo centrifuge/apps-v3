@@ -137,10 +137,7 @@ export const ApproveDeposits = ({ onClose }: { onClose: () => void }) => {
           approveAssetAmount: convertBalance(o.amount, holding?.asset?.decimals ?? 18),
         }
       })
-
-      console.log(assets)
-
-      // await execute(shareClass.approveDepositsAndIssueShares(assets))
+      await execute(shareClass.approveDepositsAndIssueShares(assets))
       onClose()
     },
   })

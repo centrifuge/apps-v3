@@ -1,4 +1,4 @@
-import { Checkbox, useFormContext } from '@centrifuge/forms'
+import { Checkbox } from '@centrifuge/forms'
 import { formatUIBalance, Holdings, useHoldings } from '@centrifuge/shared'
 import { AssetId, ShareClass } from '@centrifuge/sdk'
 import { AssetIconText, AssetSymbol, ColumnDefinition, DataTable } from '@centrifuge/ui'
@@ -23,20 +23,13 @@ export const OrdersTable = ({
   items,
   shareClass,
   extraColumns,
+  disabledStates = {},
 }: {
   items: Item[]
   shareClass: ShareClass
   extraColumns?: ColumnDefinition<TableData>[]
+  disabledStates?: Record<string, boolean>
 }) => {
-  const { watch } = useFormContext()
-  const watchedOrders = watch('orders')
-  const lowestEpoch = useMemo(
-    () => Math.min(...items.map((o) => o.epoch).filter((epoch): epoch is number => epoch !== undefined)),
-    [items]
-  )
-  const lowestEpochOrderId = useMemo(() => items.find((o) => o.epoch === lowestEpoch)?.id, [items, lowestEpoch])
-  const isLowestSelected = lowestEpochOrderId ? watchedOrders[lowestEpochOrderId]?.isSelected : false
-
   const { data: holdings } = useHoldings(shareClass)
 
   const data: TableData[] = useMemo(() => {
@@ -51,12 +44,8 @@ export const OrdersTable = ({
       {
         header: 'Approve',
         accessor: 'id',
-        render: ({ id, epoch }) => {
-          if (!epoch) {
-            return <Checkbox name={`orders.${id}.isSelected`} />
-          }
-
-          return <Checkbox name={`orders.${id}.isSelected`} disabled={epoch !== lowestEpoch && !isLowestSelected} />
+        render: ({ id }) => {
+          return <Checkbox name={`orders.${id}.isSelected`} disabled={disabledStates[id] || false} />
         },
         width: '40px',
       },
@@ -74,7 +63,7 @@ export const OrdersTable = ({
       },
       ...(extraColumns ?? []),
     ]
-  }, [extraColumns, lowestEpoch, isLowestSelected])
+  }, [extraColumns, disabledStates])
 
   return <DataTable data={data} columns={columns} />
 }
