@@ -1,36 +1,47 @@
-import { useMemo } from 'react'
-import { ipfsToHttp, useAllPoolDetails, usePools, usePoolsByManager } from '@centrifuge/shared'
+import { useMemo, useState, useEffect, useRef } from 'react'
+import { ipfsToHttp, useAllPoolDetails, usePools } from '@centrifuge/shared'
 import { Flex, Heading, Image } from '@chakra-ui/react'
-import { Select } from '@centrifuge/ui'
+import { LogoCentrifuge, Select } from '@centrifuge/ui'
 import { useNavigate, useParams, useLocation } from 'react-router-dom'
 import { useAddress } from '@centrifuge/shared'
 import { WalletButton } from '@centrifuge/wallet'
+import { Select as ChakraSelect } from '@chakra-ui/react'
 
-// The selector should only show pools the user is admin of which is different from the overview which we show all the pools
-export const TokenSelector: React.FC = () => {
+type OpenChangeDetails = Parameters<Required<React.ComponentProps<typeof ChakraSelect.Root>>['onOpenChange']>[0]
+
+export const TokenSelector = () => {
   const { address } = useAddress()
   const navigate = useNavigate()
   const location = useLocation()
   const { poolId: poolParam, shareClassId: scParam } = useParams<{ poolId?: string; shareClassId?: string }>()
 
-  const { data: pools, isLoading: loadingPools } = usePoolsByManager(address)
+  const [isOpen, setIsOpen] = useState(false)
+  const searchInputRef = useRef<HTMLInputElement>(null)
+
+  const { data: pools, isLoading: loadingPools } = usePools()
   const poolIds = useMemo(() => pools?.map((p) => p.id) ?? [], [pools])
   const { data: details, isLoading: loadingDetails } = useAllPoolDetails(poolIds, {
     enabled: poolIds.length > 0,
   })
 
-  const items = useMemo(() => {
+  const allItems = useMemo(() => {
     if (!details) return []
     return details.flatMap((pool) =>
       pool.shareClasses.map((sc) => {
         const value = `${pool.id}-${sc.shareClass.id}`
-        const label = `${pool.metadata?.pool.name} — ${sc.details.symbol}`
+        const label = pool.metadata?.pool.name
+          ? `${pool.metadata?.pool.name} — ${sc.details.symbol}`
+          : sc.details.symbol
         return {
           value,
           label,
           children: (
             <Flex align="center" gap={2}>
-              <Image src={ipfsToHttp(pool.metadata?.pool.icon?.uri ?? '')} boxSize={6} alt={label} />
+              {pool.metadata?.pool.icon?.uri ? (
+                <Image src={ipfsToHttp(pool.metadata?.pool.icon?.uri)} boxSize={6} alt={label} />
+              ) : (
+                <LogoCentrifuge />
+              )}
               <Heading size="xs" lineHeight={1.2}>
                 {label}
               </Heading>
@@ -42,22 +53,46 @@ export const TokenSelector: React.FC = () => {
   }, [details])
 
   const selectedValue = useMemo(() => {
-    return poolParam && scParam ? `${poolParam}-${scParam}` : undefined
+    if (location.pathname === '/') return ''
+    return poolParam && scParam ? `${poolParam}-${scParam}` : ''
   }, [poolParam, scParam, location.pathname])
 
   const handleSelect = (value: string) => {
+    setIsOpen(false)
     const [newPool, newSC] = value.split('-')
+    const pathPrefix = `/pool/${newPool}/${newSC}`
 
     if (location.pathname === '/') {
-      navigate(`/pool/${newPool}/${newSC}/account`)
+      navigate(`${pathPrefix}/account`)
       return
     }
 
-    const segments = location.pathname.split('/')
-    const section = segments.slice(4).join('/')
-    const path = `/pool/${newPool}/${newSC}${section ? `/${section}` : ''}`
-    navigate(path)
+    const section = location.pathname.split('/').slice(4).join('/')
+    navigate(`${pathPrefix}${section ? `/${section}` : ''}`)
   }
+
+  const handleOpenChange = (details: OpenChangeDetails) => {
+    setIsOpen(details.open)
+  }
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'p' && (event.metaKey || event.ctrlKey)) {
+        event.preventDefault()
+        setIsOpen((prev) => !prev)
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (isOpen) {
+      setTimeout(() => searchInputRef.current?.focus(), 100)
+    }
+  }, [isOpen])
 
   if (!address) {
     return <WalletButton colorPalette={['yellow', 'yellow']} variant={['solid', 'solid']} />
@@ -65,13 +100,17 @@ export const TokenSelector: React.FC = () => {
 
   return (
     <Select
-      items={items}
+      items={allItems}
       onSelectionChange={handleSelect}
-      value={selectedValue ?? 'none'}
+      value={selectedValue}
       placeholder={loadingPools || loadingDetails ? 'Loading tokens…' : 'Select a token'}
       loading={loadingPools || loadingDetails}
       withIndicator
       color="white"
+      withSearch
+      open={isOpen}
+      onOpenChange={handleOpenChange}
+      inputRef={searchInputRef}
     />
   )
 }
