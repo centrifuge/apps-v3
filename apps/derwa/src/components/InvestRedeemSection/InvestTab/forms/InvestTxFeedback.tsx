@@ -1,19 +1,14 @@
-import { useCallback, useEffect, useState, type Dispatch, type SetStateAction } from 'react'
+import { useEffect, type Dispatch, type SetStateAction } from 'react'
 import { IoMdInformationCircleOutline, IoMdTimer } from 'react-icons/io'
-import { Box, Button, Flex, Heading, Icon, Text } from '@chakra-ui/react'
 import { useFormContext } from '@centrifuge/forms'
-import { useTransactions } from '@centrifuge/shared'
+import { Box, Button, Flex, Heading, Icon, Text } from '@chakra-ui/react'
 import { InvestAction, type InvestActionType } from '@components/InvestRedeemSection/components/defaults'
 import { IoClose } from 'react-icons/io5'
 import { InfoWrapper } from '@components/InvestRedeemSection/components/InfoWrapper'
 import { infoText } from '@utils/infoText'
 import { useVaultsContext } from '@contexts/useVaultsContext'
-
-interface TxState {
-  header: string
-  isSuccessful: boolean
-  isFailed: boolean
-}
+import { StepIndicator } from '@components/StepIndicator'
+import { useTxStateFeedback } from '@components/InvestRedeemSection/hooks/useTxStateFeedback'
 
 interface InvestTxFeedbackProps {
   setActionType: Dispatch<SetStateAction<InvestActionType>>
@@ -22,70 +17,17 @@ interface InvestTxFeedbackProps {
 export function InvestTxFeedback({ setActionType }: InvestTxFeedbackProps) {
   const { vaultDetails } = useVaultsContext()
   const { getValues, reset } = useFormContext()
-  const { transactions } = useTransactions()
-  const [txState, setTxState] = useState<TxState>({
-    header: 'Transaction pending',
-    isSuccessful: false,
-    isFailed: false,
-  })
+  const { txState, resetTxState, isTxInProgress } = useTxStateFeedback({ type: 'invest' })
 
-  const handleClose = useCallback(() => {
-    setActionType(InvestAction.INVEST_AMOUNT)
+  const handleClose = () => {
     reset()
-  }, [setActionType, reset])
+    resetTxState()
+    setActionType(InvestAction.INVEST_AMOUNT)
+  }
 
   useEffect(() => {
-    transactions.forEach((tx) => {
-      switch (tx.status) {
-        case 'unconfirmed': {
-          if (tx.dismissed) return
-          setTxState({
-            header: 'Signing transaction',
-            isSuccessful: false,
-            isFailed: false,
-          })
-          break
-        }
-        case 'failed': {
-          if (tx.dismissed) return
-          setTxState({
-            header: 'Transaction failed',
-            isSuccessful: false,
-            isFailed: true,
-          })
-          break
-        }
-        case 'succeeded': {
-          if (tx.dismissed) return
-          if (tx.title === 'Invest') {
-            const header = 'Investment in progress'
-            setTxState({
-              header,
-              isSuccessful: true,
-              isFailed: false,
-            })
-          }
-          break
-        }
-        default: {
-          setTxState((prev) => ({
-            ...prev,
-            header: 'Transaction pending',
-          }))
-        }
-      }
-    })
-
-    return () => {
-      setTxState({
-        header: 'Transaction pending',
-        isSuccessful: false,
-        isFailed: false,
-      })
-    }
-  }, [transactions])
-
-  const isButtonDisabled = !txState.isSuccessful && !txState.isFailed
+    resetTxState()
+  }, [])
 
   return (
     <Box height="100%">
@@ -142,16 +84,17 @@ export function InvestTxFeedback({ setActionType }: InvestTxFeedbackProps) {
             </Flex>
           </Box>
         </Box>
-        <Button
-          colorPalette="yellow"
-          type="button"
-          my={4}
-          onClick={handleClose}
-          width="100%"
-          disabled={isButtonDisabled}
-        >
+        <Button colorPalette="yellow" type="button" my={4} onClick={handleClose} width="100%" disabled={isTxInProgress}>
           Invest more
         </Button>
+        <Flex w="full" alignItems="center" justifyContent="center">
+          <StepIndicator
+            action="Invest"
+            isFailed={txState.isFailed}
+            isStep1Successful={txState.isApproved}
+            isStep2Successful={txState.isSuccessful}
+          />
+        </Flex>
       </Flex>
     </Box>
   )

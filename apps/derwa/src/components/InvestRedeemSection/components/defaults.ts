@@ -34,7 +34,7 @@ export type RedeemSyncActionType = (typeof RedeemAction)[keyof typeof RedeemActi
 
 export const RedeemSyncFormDefaultValues = {
   redeemAmount: '',
-  receiveAmount: '',
+  receiveAmount: '0',
 }
 
 export const RedeemAction = {
@@ -46,5 +46,5 @@ export type RedeemActionType = (typeof RedeemAction)[keyof typeof RedeemAction]
 
 export const RedeemFormDefaultValues = {
   redeemAmount: '',
-  receiveAmount: '',
+  receiveAmount: '0',
 }

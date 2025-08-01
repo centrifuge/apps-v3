@@ -1,20 +1,15 @@
-import { useCallback, useEffect, useState, type Dispatch, type SetStateAction } from 'react'
+import { useEffect, type Dispatch, type SetStateAction } from 'react'
 import { Box, Button, Flex, Heading, Icon, Text } from '@chakra-ui/react'
 import { Balance } from '@centrifuge/sdk'
 import { BalanceDisplay } from '@centrifuge/ui'
 import { RedeemAction, type RedeemActionType } from '@components/InvestRedeemSection/components/defaults'
 import { InfoWrapper } from '@components/InvestRedeemSection/components/InfoWrapper'
 import { infoText } from '@utils/infoText'
-import { useTransactions } from '@centrifuge/shared'
 import { useFormContext } from '@centrifuge/forms'
 import { IoClose } from 'react-icons/io5'
 import { IoMdTimer } from 'react-icons/io'
-
-interface TxState {
-  header: string
-  isSuccessful: boolean
-  isFailed: boolean
-}
+import { useTxStateFeedback } from '@components/InvestRedeemSection/hooks/useTxStateFeedback'
+import { StepIndicator } from '@components/StepIndicator'
 
 interface CancelRedeemProps {
   currencies: { redeemCurrency: string; receiveCurrency: string }
@@ -31,71 +26,18 @@ export function RedeemTxFeedback({
   parsedReceiveAmount,
   setActionType,
 }: CancelRedeemProps) {
-  const { transactions } = useTransactions()
+  const { txState, resetTxState, isTxInProgress } = useTxStateFeedback({ type: 'redeem' })
   const { reset } = useFormContext()
-  const [txState, setTxState] = useState<TxState>({
-    header: 'Transaction pending',
-    isSuccessful: false,
-    isFailed: false,
-  })
 
-  const handleClose = useCallback(() => {
+  const handleClose = () => {
     setActionType(RedeemAction.REDEEM_AMOUNT)
+    resetTxState()
     reset()
-  }, [setActionType, reset])
+  }
 
   useEffect(() => {
-    transactions.forEach((tx) => {
-      switch (tx.status) {
-        case 'unconfirmed': {
-          if (tx.dismissed) return
-          setTxState({
-            header: 'Signing transaction',
-            isSuccessful: false,
-            isFailed: false,
-          })
-          break
-        }
-        case 'failed': {
-          if (tx.dismissed) return
-          setTxState({
-            header: 'Transaction failed',
-            isSuccessful: false,
-            isFailed: true,
-          })
-          break
-        }
-        case 'succeeded': {
-          if (tx.dismissed) return
-          if (tx.title === 'Redeem') {
-            const header = 'Redemption in progress'
-            setTxState({
-              header,
-              isSuccessful: true,
-              isFailed: false,
-            })
-          }
-          break
-        }
-        default: {
-          setTxState((prev) => ({
-            ...prev,
-            header: 'Transaction pending',
-          }))
-        }
-      }
-    })
-
-    return () => {
-      setTxState({
-        header: 'Transaction pending',
-        isSuccessful: false,
-        isFailed: false,
-      })
-    }
-  }, [transactions])
-
-  const isButtonDisabled = (!txState.isSuccessful && !txState.isFailed) || isDisabled
+    resetTxState()
+  }, [])
 
   return (
     <Box>
@@ -131,9 +73,24 @@ export function RedeemTxFeedback({
           </Text>
         </Flex>
       </Box>
-      <Button colorPalette="yellow" type="button" width="100%" disabled={isButtonDisabled} my={4} onClick={handleClose}>
+      <Button
+        colorPalette="yellow"
+        type="button"
+        width="100%"
+        disabled={isTxInProgress || isDisabled}
+        my={4}
+        onClick={handleClose}
+      >
         Redeem more
       </Button>
+      <Flex w="full" alignItems="center" justifyContent="center">
+        <StepIndicator
+          action="Redeem"
+          isFailed={txState.isFailed}
+          isStep1Successful={txState.isApproved}
+          isStep2Successful={txState.isSuccessful}
+        />
+      </Flex>
     </Box>
   )
 }
