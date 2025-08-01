@@ -109,12 +109,12 @@ export function PendingTab({ isLoading: isTabLoading }: TabProps) {
         </Box>
       </Grid>
 
-      <Flex alignItems="center" justifyContent="space-between" gap="1rem" w="full" mt={8} mb={4}>
+      {/* <Flex alignItems="center" justifyContent="space-between" gap="1rem" w="full" mt={8} mb={4}>
         <Button w="calc(50% - 0.5rem)" colorPalette="black">
           Redeem more
         </Button>
         <Button w="calc(50% - 0.5rem)">Invest more</Button>
-      </Flex>
+      </Flex> */}
     </Box>
   )
 }
