@@ -150,9 +150,7 @@ export const ApproveRedemptions = ({ onClose }: { onClose: () => void }) => {
         }
       })
 
-      console.log(assets)
-
-      //await execute(shareClass.approveRedeemsAndRevokeShares(assets))
+      await execute(shareClass.approveRedeemsAndRevokeShares(assets))
       onClose()
     },
   })
