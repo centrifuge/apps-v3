@@ -51,7 +51,7 @@ export function RedeemAmount({ isDisabled, maxRedeemAmount, networks, parsedRede
     [pricePerShare]
   )
 
-  const debouncedCalculateReceiveAmount = useMemo(() => debounce(calculateReceiveAmount, 500), [calculateReceiveAmount])
+  const debouncedCalculateReceiveAmount = useMemo(() => debounce(calculateReceiveAmount, 250), [calculateReceiveAmount])
 
   const calculateRedeemAmountValue = useCallback(
     (receiveInputAmount?: Balance) => {
@@ -84,7 +84,7 @@ export function RedeemAmount({ isDisabled, maxRedeemAmount, networks, parsedRede
     [pricePerShare, setValue]
   )
 
-  const debouncedCalculateRedeemAmount = useMemo(() => debounce(calculateRedeemAmount, 500), [calculateRedeemAmount])
+  const debouncedCalculateRedeemAmount = useMemo(() => debounce(calculateRedeemAmount, 250), [calculateRedeemAmount])
 
   const changeVault = useCallback(
     (value: string | number) => {
@@ -138,7 +138,7 @@ export function RedeemAmount({ isDisabled, maxRedeemAmount, networks, parsedRede
                 MAX
               </Badge>
               <Text color="text-primary" opacity={0.5} alignSelf="flex-end" ml={2}>
-                {formatBalance(maxRedeemBalance, shareCurrencySymbol)}
+                {formatBalance(maxRedeemBalance, shareCurrencySymbol, 0)}
               </Text>
             </Flex>
             <NetworkIcons networkIds={networkIds} />

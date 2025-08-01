@@ -8,7 +8,7 @@ export type InvestSyncActionType = (typeof InvestAction)[keyof typeof InvestActi
 
 export const InvestSyncFormDefaultValues = {
   investAmount: '',
-  receiveAmount: '',
+  receiveAmount: '0',
   investorRequirements: [false, false, false],
 }
 
@@ -21,7 +21,7 @@ export type InvestActionType = (typeof InvestAction)[keyof typeof InvestAction]
 
 export const InvestFormDefaultValues = {
   investAmount: '',
-  receiveAmount: '',
+  receiveAmount: '0',
 }
 
 export const RedeemSyncAction = {
@@ -34,7 +34,7 @@ export type RedeemSyncActionType = (typeof RedeemAction)[keyof typeof RedeemActi
 
 export const RedeemSyncFormDefaultValues = {
   redeemAmount: '',
-  receiveAmount: '',
+  receiveAmount: '0',
 }
 
 export const RedeemAction = {
@@ -46,5 +46,5 @@ export type RedeemActionType = (typeof RedeemAction)[keyof typeof RedeemAction]
 
 export const RedeemFormDefaultValues = {
   redeemAmount: '',
-  receiveAmount: '',
+  receiveAmount: '0',
 }

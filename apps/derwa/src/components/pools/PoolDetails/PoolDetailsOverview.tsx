@@ -1,29 +1,31 @@
-import { formatBalance } from '@centrifuge/shared'
-import { NetworkIcon } from '@centrifuge/ui'
+// import { formatBalance } from '@centrifuge/shared'
+// import { NetworkIcon } from '@centrifuge/ui'
 import { Box, Flex, Heading, Text } from '@chakra-ui/react'
 import { getAgencyNormalisedName, RatingPill } from '@components/RatingPill'
 import { usePoolsContext } from '@contexts/usePoolsContext'
 
 export function PoolDetailsOverview() {
-  const { poolDetails, networks, shareClass } = usePoolsContext()
+  const { poolDetails, shareClass } = usePoolsContext()
   const metadata = poolDetails?.metadata
+  const assetType = `${metadata?.pool.asset.class && metadata.pool.asset.class}${metadata?.pool.asset.subClass && ` - ${metadata.pool.asset.subClass}`}`
 
   const items = [
-    { label: 'Asset type', value: metadata?.pool.asset.class },
+    { label: 'Fund', value: metadata?.pool.name },
+    { label: 'Asset type', value: assetType },
     { label: 'APY', value: `${shareClass?.details.apyPercentage ?? 0}%` },
-    {
-      label: 'Average asset maturity',
-      value: 24, // TODO: replace with actual value
-    },
-    { label: 'Min. investment', value: formatBalance(shareClass?.details.minInitialInvestment ?? 0, 'USD') },
+    // {
+    //   label: 'Average asset maturity',
+    //   value: 24, // TODO: replace with actual value
+    // },
+    // { label: 'Min. investment', value: formatBalance(shareClass?.details.minInitialInvestment ?? 0, 'USD') },
     { label: 'Investor type', value: metadata?.pool.investorType || 'Non-US Professional' },
+    // {
+    //   label: 'Available networks',
+    //   value: <Flex>{networks?.map((network, index) => <NetworkIcon key={index} networkId={network.chainId} />)}</Flex>,
+    // },
+    // { label: 'Pool structure', value: poolDetails?.metadata?.pool.poolStructure || 'Unknown' },
     {
-      label: 'Available networks',
-      value: <Flex>{networks?.map((network, index) => <NetworkIcon key={index} networkId={network.chainId} />)}</Flex>,
-    },
-    { label: 'Pool structure', value: poolDetails?.metadata?.pool.poolStructure || 'Unknown' },
-    {
-      label: 'Rating',
+      label: ' Fund rating',
       value: (
         <Flex>
           {metadata?.pool.poolRatings?.map((rating) => {
@@ -48,7 +50,7 @@ export function PoolDetailsOverview() {
   return (
     <>
       <Heading size="lg" mt={8} mb={4}>
-        Overview
+        Underlying assets
       </Heading>
 
       <Box
@@ -61,7 +63,7 @@ export function PoolDetailsOverview() {
         shadow="xs"
       >
         {items.map((item) => (
-          <Flex key={item.label} justifyContent="space-between" alignItems="center" mt={4}>
+          <Flex key={item.label} justifyContent="space-between" alignItems="center" mb={4} _last={{ mb: 0 }}>
             <Text fontWeight={500} fontSize="14px" lineHeight="100%" color="gray.500">
               {item.label}
             </Text>

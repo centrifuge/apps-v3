@@ -33,9 +33,9 @@ export default function PoolPage() {
 
   return (
     <>
-      <Flex justifyContent="space-between" alignItems="center" mb={8}>
+      <Flex justifyContent="space-between" alignItems="flex-end" my={8}>
         <BackLink heading={poolDetails.metadata?.pool.name ?? 'Back to pools'} />
-        <Box mt={4}>
+        <Box>
           <Text fontSize=".75rem" color="black" width="auto" textAlign="right">
             Your current holdings in {poolDetails?.metadata?.pool.name}
           </Text>

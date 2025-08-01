@@ -12,6 +12,7 @@ import { InvestRedeemClaimForm } from '@components/InvestRedeemSection/component
 import { useVaultsContext } from '@contexts/useVaultsContext'
 import { usePoolsContext } from '@contexts/usePoolsContext'
 import { InvestorOnboardingFeedback } from '@components/InvestRedeemSection/components/InvestorOnboardingFeedback'
+import { PendingTab } from '@components/InvestRedeemSection/PendingTab/PendingTab'
 
 export interface TabProps {
   isLoading: boolean
@@ -75,6 +76,15 @@ export function InvestRedeemSection({ pool: poolDetails }: { pool?: PoolDetails 
               <RestrictedCountry />
             ) : (
               <VaultGuard isInvestorWhiteListed={isInvestorWhiteListed} isLoading={isTabLoading} tab={RedeemTab} />
+            ),
+          },
+          {
+            label: 'Pending',
+            value: 'tab-pending',
+            body: isRestrictedCountry ? (
+              <RestrictedCountry />
+            ) : (
+              <VaultGuard isInvestorWhiteListed={isInvestorWhiteListed} isLoading={isTabLoading} tab={PendingTab} />
             ),
           },
         ]}
