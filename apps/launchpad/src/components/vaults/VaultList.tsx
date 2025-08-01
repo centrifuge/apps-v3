@@ -1,13 +1,13 @@
 import { Vault } from '@centrifuge/sdk'
 import { Holdings, networkToName, useHoldings } from '@centrifuge/shared'
-import { Flex, Grid, Heading, Stack, Text } from '@chakra-ui/react'
+import { Flex, Grid, Heading, Stack } from '@chakra-ui/react'
 import { useMemo, useState } from 'react'
 import { NetworkIcon, Button } from '@centrifuge/ui'
 import { AddVaultModal } from './AddVaultModal'
 import { useSelectedPool } from '@contexts/SelectedPoolProvider'
 import { HoldingDetailsCard } from './HoldingDetailsCard'
 
-export const VaultList = ({ vaults }: { vaults: Vault[] }) => {
+export const VaultList = ({ vaults }: { vaults?: Vault[] }) => {
   const { shareClass } = useSelectedPool()
   const { data: holdings } = useHoldings(shareClass)
   const [selectedVault, setSelectedVault] = useState<Vault | null>(null)
@@ -28,8 +28,6 @@ export const VaultList = ({ vaults }: { vaults: Vault[] }) => {
     }, {})
   }, [vaults])
 
-  if (!holdings) return
-
   return (
     <>
       {Object.entries(vaultsByChain).map(([chainId, vault]) => {
@@ -45,7 +43,7 @@ export const VaultList = ({ vaults }: { vaults: Vault[] }) => {
               <Button label="Add vault" colorPalette="yellow" size="sm" onClick={() => setSelectedVault(vault[0])} />
             </Flex>
             <Grid gridTemplateColumns={['1fr', '1fr 1fr 1fr']} gap={2}>
-              {holdingsPerVault.map((holding, index) => (
+              {holdingsPerVault?.map((holding, index) => (
                 <HoldingDetailsCard key={`${holding.asset.address}-${index}`} vault={vault[0]} holding={holding} />
               ))}
             </Grid>

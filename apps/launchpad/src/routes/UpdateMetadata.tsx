@@ -1,11 +1,11 @@
 import { PoolMetadata } from '@centrifuge/sdk'
 import { mockMetadata, useCentrifugeTransaction } from '@centrifuge/shared'
 import { Box, Button } from '@chakra-ui/react'
-import { usePoolProvider } from '@contexts/PoolProvider'
+import { useSelectedPool } from '@contexts/SelectedPoolProvider'
 
 export default function UpdateMetadata() {
   const { execute, isPending } = useCentrifugeTransaction()
-  const { pool } = usePoolProvider()
+  const { pool } = useSelectedPool()
 
   const handleUpdateMetadata = () => {
     if (!pool) return

@@ -38,7 +38,7 @@ export default function Orders() {
 
   if (isPendingOrdersLoading || isLoading) return <Loader />
 
-  if (!pendingOrders?.length) return <VStack>pending orders</VStack>
+  if (!pendingOrders?.length) return <VStack>No pending orders</VStack>
 
   return (
     <Stack gap={8}>
