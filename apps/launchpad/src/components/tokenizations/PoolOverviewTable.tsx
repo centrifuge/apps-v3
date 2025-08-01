@@ -1,10 +1,9 @@
 import { Link } from 'react-router'
 import { Button, Flex, Heading, Image, Stack, Text } from '@chakra-ui/react'
 import { Balance, PoolId } from '@centrifuge/sdk'
-import { useAllPoolDetails } from '@centrifuge/shared'
+import { formatUIBalance, PoolDetails, useAddress, useAllPoolDetails, usePoolsByManager } from '@centrifuge/shared'
 import { ipfsToHttp } from '@centrifuge/shared/src/utils/formatting'
-import { BalanceDisplay, Loader, NetworkIcon } from '@centrifuge/ui'
-import DataTable, { ColumnDefinition } from './DataTable'
+import { BalanceDisplay, DataTable, NetworkIcon, ColumnDefinition } from '@centrifuge/ui'
 import { mockMetadata } from './mockMetadata'
 
 type Row = {
@@ -17,12 +16,14 @@ type Row = {
   nav: Balance
   tokenPrice: Balance
   shareClassId: string
+  isManager: boolean
+  poolCurrency: PoolDetails['currency']
 }
 
 const columns: ColumnDefinition<Row>[] = [
   {
     header: 'Pool',
-    accessor: 'name',
+    accessor: 'poolName',
     render: ({ poolName, iconUri }: Row) => {
       return (
         <Flex alignItems="center">
@@ -40,34 +41,35 @@ const columns: ColumnDefinition<Row>[] = [
     header: 'Networks',
     accessor: 'networks',
     textAlign: 'center',
-    render: ({ networks }) => <NetworkIcon networkId={networks} width="100%" />,
+    render: ({ networks }: Row) => <NetworkIcon networkId={networks} width="100%" />,
   },
   {
     header: 'APY',
     accessor: 'apy',
     textAlign: 'center',
-    render: ({ apy }) => <Text>{apy.toString()}</Text>,
+    render: ({ apy }: Row) => <Text>{apy.toString()}</Text>,
   },
   {
-    header: 'Nav',
+    header: 'NAV',
     accessor: 'nav',
     textAlign: 'center',
-    render: ({ nav }) => <BalanceDisplay balance={nav} />,
+    render: ({ nav }: Row) => <BalanceDisplay balance={nav} />,
   },
   {
-    header: 'Token Price',
+    header: 'Token price',
     accessor: 'tokenPrice',
-    render: ({ tokenPrice }) => <BalanceDisplay balance={tokenPrice} />,
+    render: ({ tokenPrice, poolCurrency }: Row) => (
+      <Text>{formatUIBalance(tokenPrice, { precision: 6, currency: poolCurrency.symbol })}</Text>
+    ),
   },
   {
     header: '',
-    accessor: '',
-    render: ({ id, shareClassId }) => {
+    render: ({ id, shareClassId, isManager }: Row) => {
       const poolId = id.split('-')[0]
       return (
         <Link to={`/pool/${poolId}/${shareClassId}/account`}>
-          <Button colorPalette="black" size="xs">
-            Accounts
+          <Button colorPalette="gray" size="xs" width="100%" disabled={!isManager}>
+            Select
           </Button>
         </Link>
       )
@@ -76,10 +78,12 @@ const columns: ColumnDefinition<Row>[] = [
 ]
 
 export const PoolOverviewTable = ({ poolIds }: { poolIds: PoolId[] }) => {
+  const { address } = useAddress()
   const { data: pools, isLoading: isLoadingPools } = useAllPoolDetails(poolIds)
+  const { data: poolsByManager, isLoading: isLoadingPoolsByManager } = usePoolsByManager(address)
 
   const data =
-    pools?.map((pool: any) => {
+    pools?.map((pool: PoolDetails) => {
       const shareClassDetails = Object.values(pool.shareClasses)
       const metaShareClassKeys = pool.metadata?.shareClasses ? Object.keys(pool.metadata?.shareClasses) : []
       const apy = pool.metadata?.shareClasses[metaShareClassKeys[0]].apyPercentage ?? 0
@@ -88,14 +92,16 @@ export const PoolOverviewTable = ({ poolIds }: { poolIds: PoolId[] }) => {
         id: pool.id,
         name: pool.metadata?.pool.name ?? 'RWA Portfolio',
         icon: pool.metadata?.pool.icon ?? mockMetadata.pool.icon,
-        shareClasses: shareClassDetails.map((sc: any) => ({
+        shareClasses: shareClassDetails.map((sc) => ({
           token: sc.details.symbol,
           apy,
-          tokenPrice: sc.details.pricePerShare,
+          tokenPrice: sc.details.pricePerShare.toFloat().toString(),
           totalIssuance: sc.details.totalIssuance,
           networks: sc.shareClass.pool.chainId,
           shareClassId: sc.shareClass.id,
         })),
+        isManager: !!poolsByManager?.find((p) => p.id.raw === pool.id.raw),
+        poolCurrency: pool.currency,
       }
     }) ?? []
 
@@ -110,10 +116,12 @@ export const PoolOverviewTable = ({ poolIds }: { poolIds: PoolId[] }) => {
       nav: sc.totalIssuance,
       tokenPrice: sc.tokenPrice,
       shareClassId: sc.shareClassId,
+      isManager: d.isManager,
+      poolCurrency: d.poolCurrency,
     }))
   )
 
-  if (isLoadingPools) return null
+  if (isLoadingPools || isLoadingPoolsByManager) return null
 
   return (
     <Stack gap={4}>

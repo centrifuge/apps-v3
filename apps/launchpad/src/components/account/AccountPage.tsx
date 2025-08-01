@@ -8,7 +8,7 @@ import { Orders } from './Orders'
 import { useSelectedPool } from '@contexts/SelectedPoolProvider'
 
 export function AccountPage() {
-  const { shareClass, poolDetails } = useSelectedPool()
+  const { shareClass, poolDetails, shareClassDetails } = useSelectedPool()
   const { data: navPerNetwork } = useNavPerNetwork(shareClass, { enabled: !!shareClass })
 
   const decimals = poolDetails?.currency.decimals ?? 18
@@ -32,7 +32,6 @@ export function AccountPage() {
       ) || initialTotals
 
     const amounts = {
-      totalNav: totals.totalNav.mul(totals.totalIssuance),
       totalIssuance: totals.totalIssuance,
       totalNavPerShare: totals.totalNavPerShare,
     }
@@ -49,7 +48,7 @@ export function AccountPage() {
               <Stack gap={0}>
                 <Heading fontSize="xs">NAV</Heading>
                 <Heading size="2xl">
-                  {formatUIBalance(amounts.totalNav, {
+                  {formatUIBalance(shareClassDetails?.nav, {
                     precision: 2,
                     tokenDecimals: decimals,
                     currency: poolCurrencySymbol,

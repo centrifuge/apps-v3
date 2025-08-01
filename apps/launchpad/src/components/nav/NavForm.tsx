@@ -32,7 +32,7 @@ export function NavForm({ shareClassDetails }: NavFormProps) {
             balance={shareClassDetails?.nav ?? 0}
             currency={poolDetails?.currency.symbol ?? ''}
             decimals={decimals}
-            label="Current Nav"
+            label="Current NAV"
           />
         </Box>
         <Box mb={gapValue}>
@@ -40,7 +40,8 @@ export function NavForm({ shareClassDetails }: NavFormProps) {
             balance={shareClassDetails?.pricePerShare ?? 0}
             currency={poolDetails?.currency.symbol ?? ''}
             decimals={decimals}
-            label="Current Token Price"
+            label="Current Token price"
+            precision={6}
           />
         </Box>
       </GridItem>
@@ -50,7 +51,7 @@ export function NavForm({ shareClassDetails }: NavFormProps) {
             balance={newNav}
             currency={poolDetails?.currency.symbol ?? ''}
             decimals={decimals}
-            label="New Nav"
+            label="New NAV"
           />
         </Box>
         <Box mb={gapValue}>
@@ -61,7 +62,7 @@ export function NavForm({ shareClassDetails }: NavFormProps) {
             inputGroupProps={{
               endAddon: 'USD per share',
             }}
-            label="New Token Price"
+            label="New token price"
           />
         </Box>
       </GridItem>

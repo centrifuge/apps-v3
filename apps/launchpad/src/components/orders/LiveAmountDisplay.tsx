@@ -1,65 +1,40 @@
 import { useWatch, useFormContext } from 'react-hook-form'
 import { Box, Text } from '@chakra-ui/react'
-import { Balance } from '@centrifuge/sdk'
 import { formatUIBalance } from '@centrifuge/shared'
 import Decimal from 'decimal.js'
 
 type LiveAmountDisplayProps = {
   name: string
   pricePerShareName?: string
-  poolDecimals?: number
   calculationType?: 'issue' | 'revoke'
 }
 
-export const LiveAmountDisplay = ({
-  name,
-  pricePerShareName,
-  poolDecimals = 18,
-  calculationType = 'issue',
-}: LiveAmountDisplayProps) => {
+export const LiveAmountDisplay = ({ name, pricePerShareName, calculationType = 'issue' }: LiveAmountDisplayProps) => {
   const { control } = useFormContext()
 
   const liveAmount = useWatch({ control, name }) as string
   const priceVal = useWatch({ control, name: pricePerShareName ?? '' }) as string
 
-  if (liveAmount === '') {
-    return '0'
+  if (!liveAmount || liveAmount === '0' || !priceVal || priceVal === '0') {
+    return <Text>0</Text>
   }
 
-  const amountFloat = parseFloat(liveAmount)
-  const amountToPoolDecimal = Balance.fromFloat(amountFloat, poolDecimals)
-  let finalAmount = amountToPoolDecimal.toString()
+  const amountDecimal = new Decimal(liveAmount)
+  const priceDecimal = new Decimal(priceVal)
+  let finalAmount: Decimal = amountDecimal
 
   switch (calculationType) {
     case 'issue':
-      if (pricePerShareName) {
-        if (priceVal === '0') {
-          return priceVal
-        }
-        if (priceVal) {
-          const priceDecimal = new Decimal(priceVal)
-          const amountDecimal = new Decimal(liveAmount)
-          finalAmount = amountDecimal.mul(priceDecimal).toString()
-        }
-      }
+      finalAmount = amountDecimal.div(priceDecimal) // amount of currency / price = amount of shares
       break
     case 'revoke':
-      if (pricePerShareName) {
-        if (priceVal === '0') {
-          return priceVal
-        }
-        if (priceVal) {
-          const priceDecimal = new Decimal(priceVal)
-          const amountDecimal = new Decimal(liveAmount)
-          finalAmount = amountDecimal.div(priceDecimal).toString()
-        }
-      }
+      finalAmount = amountDecimal.mul(priceDecimal) // amount of shares * price = amount of currency
       break
   }
 
   return (
     <Box display="flex" alignItems="center">
-      <Text>{formatUIBalance(finalAmount)}</Text>
+      <Text>{formatUIBalance(finalAmount.toString())}</Text>
     </Box>
   )
 }

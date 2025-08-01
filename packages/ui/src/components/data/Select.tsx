@@ -1,6 +1,6 @@
-import { Portal, Select as ChakraSelect, createListCollection, Grid } from '@chakra-ui/react'
-
-// non-form select, controlled by the parent
+import { Box, Input, Select as ChakraSelect, createListCollection, Grid, InputGroup } from '@chakra-ui/react'
+import { IconSearch } from '../icons'
+import React, { useState, useMemo, useEffect } from 'react'
 
 type SelectProps = Omit<ChakraSelect.RootProps, 'collection' | 'defaultValue' | 'value'> & {
   items: { value: string; label: string; children?: React.ReactNode }[]
@@ -12,6 +12,9 @@ type SelectProps = Omit<ChakraSelect.RootProps, 'collection' | 'defaultValue' | 
   color?: string
   defaultValue?: string
   value?: string
+  withSearch?: boolean
+  inputRef?: React.Ref<HTMLInputElement>
+  open?: boolean
 }
 
 export const Select = ({
@@ -23,10 +26,14 @@ export const Select = ({
   onSelectionChange,
   color,
   defaultValue,
-  onReset,
   value,
+  withSearch,
+  inputRef,
+  open,
   ...rest
 }: SelectProps) => {
+  const [internalSearch, setInternalSearch] = useState('')
+
   const handleSelectionChange = (details: { value: string[] }) => {
     onSelectionChange?.(details.value[0])
   }
@@ -35,15 +42,26 @@ export const Select = ({
     items,
   })
 
+  const filteredItemsForRender = useMemo(() => {
+    if (!internalSearch) return items
+    return items.filter((item) => item.label.toLowerCase().includes(internalSearch.toLowerCase()))
+  }, [items, internalSearch])
+
+  useEffect(() => {
+    if (!open) {
+      setInternalSearch('')
+    }
+  }, [open])
+
   return (
     <ChakraSelect.Root
       collection={collection}
       size="sm"
       disabled={loading}
       onValueChange={handleSelectionChange}
-      value={value ? [value] : undefined}
-      defaultValue={defaultValue ? [defaultValue] : undefined}
-      positioning={{ strategy: 'absolute', sameWidth: true, placement: 'top' }}
+      value={value ? [value] : []}
+      defaultValue={defaultValue ? [defaultValue] : []}
+      open={open}
       {...rest}
     >
       <ChakraSelect.HiddenSelect />
@@ -58,30 +76,44 @@ export const Select = ({
       </ChakraSelect.Control>
       <ChakraSelect.Positioner>
         <ChakraSelect.Content>
-          {items.map((item) => (
-            <Grid
-              templateColumns={withIndicator ? '1fr 20px' : '1fr'}
-              border={withIndicator ? '1px solid' : 'none'}
-              borderColor={withIndicator ? 'gray.200' : 'transparent'}
-              borderRadius={withIndicator ? 'md' : 'none'}
-              _hover={{ bg: withIndicator ? 'gray.100' : 'transparent' }}
-              mb={withIndicator ? 1 : 0}
-              mt={withIndicator ? 1 : 0}
+          {withSearch && (
+            <Box p={2} borderBottomWidth="1px">
+              <InputGroup startElement={<IconSearch size={16} />}>
+                <Input
+                  ref={inputRef}
+                  placeholder="Search"
+                  value={internalSearch}
+                  onChange={(e) => setInternalSearch(e.target.value)}
+                  onPointerDown={(e) => e.stopPropagation()}
+                  pl={8}
+                  borderRadius="md"
+                  size="xs"
+                  color="black"
+                />
+              </InputGroup>
+            </Box>
+          )}
+          {filteredItemsForRender.map((item) => (
+            <ChakraSelect.Item
+              item={item}
               key={item.value}
+              color="black"
+              display="flex"
+              justifyContent="space-between"
+              alignItems="center"
+              p={2}
+              border="1px solid"
+              borderColor="gray.200"
+              borderRadius="md"
+              _hover={{ bg: 'gray.100' }}
+              _selected={{ bg: 'gray.100' }}
+              _focus={{ bg: 'gray.100' }}
+              _active={{ bg: 'gray.100' }}
+              mt={2}
             >
-              <ChakraSelect.Item
-                item={item}
-                key={item.value}
-                _hover={{ bg: withIndicator ? 'transparent' : 'gray.100' }}
-                _selected={{ bg: withIndicator ? 'transparent' : 'gray.100' }}
-                _focus={{ bg: withIndicator ? 'transparent' : 'gray.100' }}
-                _active={{ bg: withIndicator ? 'transparent' : 'gray.100' }}
-                color="black"
-              >
-                {item.children ?? item.label}
-                {withIndicator && <ChakraSelect.ItemIndicator />}
-              </ChakraSelect.Item>
-            </Grid>
+              {item.children ?? item.label}
+              {withIndicator && <ChakraSelect.ItemIndicator />}
+            </ChakraSelect.Item>
           ))}
         </ChakraSelect.Content>
       </ChakraSelect.Positioner>

@@ -24,7 +24,12 @@ export const Modal = ({
   size = 'md',
 }: ModalProps) => {
   return (
-    <Dialog.Root open={isOpen} onOpenChange={(open) => !open && onClose()} size={size}>
+    <Dialog.Root
+      open={isOpen}
+      onOpenChange={(details) => !details.open && onClose()}
+      size={size}
+      closeOnInteractOutside={true}
+    >
       <Portal>
         <Dialog.Backdrop />
         <Dialog.Positioner>

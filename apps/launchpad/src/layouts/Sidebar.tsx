@@ -25,7 +25,7 @@ export const Sidebar = () => {
   }, [poolDetails, shareClassId])
 
   const displayTitle = useMemo(() => {
-    if (!poolName) return undefined
+    if (!poolName) return 'Overview'
     if (shareClassName) return `${poolName} - ${shareClassName}`
     return poolName
   }, [poolName, shareClassName])

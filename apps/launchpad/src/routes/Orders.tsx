@@ -1,7 +1,6 @@
 import { useMemo, useState } from 'react'
-import { Balance } from '@centrifuge/sdk'
 import { formatUIBalance, usePendingAmounts } from '@centrifuge/shared'
-import { Button, Card, Loader, Modal } from '@centrifuge/ui'
+import { Button, Card, Loader } from '@centrifuge/ui'
 import { Flex, Grid, GridItem, Heading, Stack, VStack } from '@chakra-ui/react'
 import { DisplayOrdersTable } from '@components/orders/DisplayOrdersTable'
 import { useSelectedPool } from '@contexts/SelectedPoolProvider'
@@ -65,6 +64,7 @@ export default function Orders() {
                   label="Approve"
                   w="120px"
                   onClick={() => setModal({ approve: true, redeem: false, issue: false, revoke: false })}
+                  disabled={pendingInvestments?.isZero()}
                 />
               </Flex>
               <DisplayOrdersTable dataKey="pendingDeposit" orders={pendingOrders ?? []} />
@@ -87,6 +87,7 @@ export default function Orders() {
                   label="Redeem"
                   w="120px"
                   onClick={() => setModal({ approve: false, redeem: true, issue: false, revoke: false })}
+                  disabled={pendingRedemptions?.isZero()}
                 />
               </Flex>
               <DisplayOrdersTable dataKey="pendingRedeem" orders={pendingOrders ?? []} />
@@ -116,6 +117,7 @@ export default function Orders() {
                   label="Issue"
                   w="120px"
                   onClick={() => setModal({ approve: false, redeem: false, issue: true, revoke: false })}
+                  disabled={pendingIssuances?.isZero()}
                 />
               </Flex>
               <DisplayOrdersTable dataKey="pendingIssuances" orders={pendingOrders ?? []} />
@@ -138,6 +140,7 @@ export default function Orders() {
                   label="Revoke"
                   w="120px"
                   onClick={() => setModal({ approve: false, redeem: false, issue: false, revoke: true })}
+                  disabled={pendingRevocations?.isZero()}
                 />
               </Flex>
               <DisplayOrdersTable dataKey="pendingRevocations" orders={pendingOrders ?? []} />
